@@ -1,5 +1,6 @@
 ﻿namespace AimPicker.Service;
 
+using AimPicker.Domain;
 using AimPicker.UI.Tools.Snippets;
 using System;
 using System.Diagnostics;
@@ -7,24 +8,22 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-internal class SnippetManager
+internal class PickerService
 {
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
     [DllImport("user32.dll")]
     static extern IntPtr GetForegroundWindow();
 
-    public void RunSnippetTool()
+    public static void Run(PickerMode mode)
     {
+        // HotKey押下時のウィンドウのハンドルを取得
         IntPtr hWnd = GetForegroundWindow();
 
-        // 自身のプロセスを取得
-        var currentProcess = Process.GetCurrentProcess();
-
         // 自身のウィンドウハンドルをアクティブにする
-        SetForegroundWindow(currentProcess.MainWindowHandle);
+        SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
 
-        var window = new PickerWindow();
+        var window = new PickerWindow(mode);
         window.ShowDialog();
         var text = window.SnippetText;
         if (string.IsNullOrEmpty(text))
@@ -38,7 +37,7 @@ internal class SnippetManager
 
         // 元のプロセスをアクティブにする
         SetForegroundWindow(hWnd);
-        Thread.Sleep(100);
+        Thread.Sleep(100); // アクテイブになるまで少し待つ
 
         // SendKeysを使用してキーを送信するためにSystem.Windows.Formsを追加する必要がある
         SendKeys.SendWait("^v");

@@ -16,12 +16,31 @@ namespace AimPicker.UI.Tools.Snippets
         DispatcherTimer? typingTimer;
         private string beforeText = string.Empty;
 
+        public PickerWindow(PickerMode mode) : this()
+        {
+            switch (mode)
+            {
+                case PickerMode.Snippet:
+                    break;
+                case PickerMode.Command:
+                    this.FilterTextBox.Text = ">";
+                    break;
+                case PickerMode.Calculate:
+                    this.FilterTextBox.Text = "=";
+                    break;
+            }
+
+            Mode = mode;
+
+            this.FilterTextBox.Focus();
+            this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
+            this.ComboListBox.SelectedIndex = 0;
+        }
+
         public PickerWindow()
         {
             this.InitializeComponent();
             this.DataContext = this;
-            this.FilterTextBox.Focus();
-            this.ComboListBox.SelectedIndex = 0;
         }
 
         public ObservableCollection<Combo> ComboLists { get; } = new ObservableCollection<Combo>()
@@ -35,6 +54,7 @@ namespace AimPicker.UI.Tools.Snippets
                                                                       };
 
         public string SnippetText { get; set; } = string.Empty;
+        public PickerMode Mode { get; }
 
         private void CloseWindow()
         {

@@ -11,6 +11,7 @@
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
+        WindowStartupLocation="CenterScreen"
         >
         <!--Style="{StaticResource MaterialDesignWindow}"-->
     <Grid>
