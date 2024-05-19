@@ -1,5 +1,8 @@
 ﻿using AimPicker.Domain;
 using AimPicker.Service.Plugins;
+using AimPicker.UI.Combos;
+using AimPicker.UI.Combos.Commands;
+using AimPicker.UI.Combos.Snippets;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -38,31 +41,31 @@ namespace AimPicker.UI.Tools.Snippets
             var  aaa  = aa.GetCombos();
             foreach (var item in aaa)
             {
-                if(item is PickerCommand command)
+                if(item is PickerCommandViewModel command)
                 {
                     ComboDictionary[PickerMode.Command].Add(command);
                 }
             }
         }
 
-        public Dictionary<PickerMode, ObservableCollection<ICombo>> ComboDictionary { get; private set; } = new Dictionary<PickerMode, ObservableCollection<ICombo>>()
+        public Dictionary<PickerMode, ObservableCollection<IComboViewModel>> ComboDictionary { get; private set; } = new Dictionary<PickerMode, ObservableCollection<IComboViewModel>>()
         {
-            {PickerMode.Snippet, new ObservableCollection<ICombo>()
+            {PickerMode.Snippet, new ObservableCollection<IComboViewModel>()
             {
-            new PickerSnippet("aim","AimNext"),
-            new PickerSnippet("Today",DateTime.Now.ToString("d")),
-            new PickerSnippet("Now",DateTime.Now.ToString("t")),
-            new PickerSnippet("AppData",Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
-            new PickerSnippet("Downloads",Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads")),
-            new PickerSnippet("環境変数","control.exe sysdm.cpl,,3"),
+            new SnippetViewModel("aim","AimNext"),
+            new SnippetViewModel("Today",DateTime.Now.ToString("d")),
+            new SnippetViewModel("Now",DateTime.Now.ToString("t")),
+            new SnippetViewModel("AppData",Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
+            new SnippetViewModel("Downloads",Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads")),
+            new SnippetViewModel("環境変数","control.exe sysdm.cpl,,3"),
             } },
-            { PickerMode.Command ,new ObservableCollection<ICombo>()
+            { PickerMode.Command ,new ObservableCollection<IComboViewModel>()
             {
             } },
-            {PickerMode.Calculate, new ObservableCollection<ICombo>() }
+            {PickerMode.Calculate, new ObservableCollection<IComboViewModel>() }
 
         };
-        public ObservableCollection<ICombo> ComboLists => this.ComboDictionary[this.Mode];
+        public ObservableCollection<IComboViewModel> ComboLists => this.ComboDictionary[this.Mode];
         public PickerMode Mode { get; set; }
         public string SnippetText { get; set; } = string.Empty;
 
@@ -83,7 +86,7 @@ namespace AimPicker.UI.Tools.Snippets
                 return true;
             }
 
-            var combo = obj as PickerSnippet;
+            var combo = obj as SnippetViewModel;
             if (combo != null)
             {
                 if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
@@ -169,7 +172,7 @@ namespace AimPicker.UI.Tools.Snippets
         {
             if (e.Key == Key.Enter)
             {
-                if (this.ComboListBox.SelectedItem is PickerSnippet combo)
+                if (this.ComboListBox.SelectedItem is SnippetViewModel combo)
                 {
                     this.SnippetText = combo.Snippet;
                 }
@@ -249,7 +252,7 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
-            if(this.ComboListBox.SelectedItem is ICombo combo)
+            if(this.ComboListBox.SelectedItem is IComboViewModel combo)
             {
                 this.previewWindow.Contents?.Children.Clear();
 

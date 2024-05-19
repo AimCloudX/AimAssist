@@ -1,4 +1,4 @@
-﻿using AimPicker.Domain;
+﻿using AimPicker.UI.Combos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,6 @@ namespace AimPicker.Service.Plugins
 {
     public interface IComboPlugin
     {
-        IEnumerable<ICombo> GetCombo();
+        IEnumerable<IComboViewModel> GetCombo();
     }
 }

@@ -1,11 +1,11 @@
-﻿using AimPicker.Domain;
+﻿using AimPicker.UI.Combos;
 using System.Windows;
 
 namespace ClipboardAnalyzer.UI
 {
     public class ClipboardAnalyzerPreviewFactory : IPreviewFactory
     {
-        public UIElement Create(ICombo combo)
+        public UIElement Create(IComboViewModel combo)
         {
             return new ClipboardList();
         }
