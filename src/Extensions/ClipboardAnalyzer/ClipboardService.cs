@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-namespace AimPicker.Service.Clipboard;
+namespace ClipboardAnalyzer;
 
 public class ClipboardService
 {

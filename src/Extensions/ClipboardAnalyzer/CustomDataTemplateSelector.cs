@@ -1,10 +1,9 @@
-﻿using AimPicker.Service.Clipboard;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace AimPicker.UI.ClipboardAnalyzer
+namespace ClipboardAnalyzer
 {
-    internal class CustomDataTemplateSelector : DataTemplateSelector
+    public class CustomDataTemplateSelector : DataTemplateSelector
     {
         public DataTemplate StringTemplate { get; set; }
         public DataTemplate ImageTemplate { get; set; }

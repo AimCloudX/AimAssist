@@ -1,6 +1,5 @@
 ﻿using AimPicker.Domain;
-using AimPicker.UI.ClipboardAnalyzer;
-using System;
+using AimPicker.Service.Plugins;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -12,16 +11,8 @@ using System.Windows.Threading;
 
 namespace AimPicker.UI.Tools.Snippets
 {
-    public partial class PickerWindow : Window, INotifyPropertyChanged
+    public partial class PickerWindow : INotifyPropertyChanged
     {
-        private bool isClosing;
-
-        DispatcherTimer? typingTimer;
-        private string beforeText = string.Empty;
-        private PreviewWindow previewWindow;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         public PickerWindow(PickerMode mode) : this()
         {
             switch (mode)
@@ -41,12 +32,17 @@ namespace AimPicker.UI.Tools.Snippets
             this.FilterTextBox.Focus();
             this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
             this.ComboListBox.SelectedIndex = 0;
-        }
 
-        public PickerWindow()
-        {
-            this.InitializeComponent();
-            this.DataContext = this;
+            var aa = new PluginsService();
+            aa.LoadCommandPlugins();
+            var  aaa  = aa.GetCombos();
+            foreach (var item in aaa)
+            {
+                if(item is PickerCommand command)
+                {
+                    ComboDictionary[PickerMode.Command].Add(command);
+                }
+            }
         }
 
         public Dictionary<PickerMode, ObservableCollection<ICombo>> ComboDictionary { get; private set; } = new Dictionary<PickerMode, ObservableCollection<ICombo>>()
@@ -62,17 +58,59 @@ namespace AimPicker.UI.Tools.Snippets
             } },
             { PickerMode.Command ,new ObservableCollection<ICombo>()
             {
-                new PickerCommand("ClipboardAnalyzer",System.Windows.Clipboard.GetText(), ()=>new ClipboardList())
             } },
             {PickerMode.Calculate, new ObservableCollection<ICombo>() }
 
         };
-
-
         public ObservableCollection<ICombo> ComboLists => this.ComboDictionary[this.Mode];
-
-        public string SnippetText { get; set; } = string.Empty;
         public PickerMode Mode { get; set; }
+        public string SnippetText { get; set; } = string.Empty;
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        private bool Filter(object obj)
+        {
+            var filterText = this.FilterTextBox.Text;
+            if(this.Mode != PickerMode.Snippet)
+            {
+                filterText = filterText.Substring(1);
+            }
+
+            if (string.IsNullOrEmpty(filterText))
+            {
+                return true;
+            }
+
+            var combo = obj as PickerSnippet;
+            if (combo != null)
+            {
+                if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    public partial class PickerWindow : Window
+    {
+        private bool isClosing;
+
+        DispatcherTimer? typingTimer;
+        private string beforeText = string.Empty;
+        private PreviewWindow previewWindow;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public PickerWindow()
+        {
+            this.InitializeComponent();
+            this.DataContext = this;
+        }
 
         private void CloseWindow()
         {
@@ -126,34 +164,6 @@ namespace AimPicker.UI.Tools.Snippets
             this.ComboListBox.SelectedIndex = 0;
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        private bool Filter(object obj)
-        {
-            var filterText = this.FilterTextBox.Text;
-            if(this.Mode != PickerMode.Snippet)
-            {
-                filterText = filterText.Substring(1);
-            }
-
-            if (string.IsNullOrEmpty(filterText))
-            {
-                return true;
-            }
-
-            var combo = obj as PickerSnippet;
-            if (combo != null)
-            {
-                if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
 
         private void SnippetToolWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -243,7 +253,7 @@ namespace AimPicker.UI.Tools.Snippets
             {
                 this.previewWindow.Contents?.Children.Clear();
 
-                var uiElement = combo.Factory.Invoke();
+                var uiElement = combo.Create();
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
         }

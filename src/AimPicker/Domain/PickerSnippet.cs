@@ -19,14 +19,31 @@ namespace AimPicker.Domain
 
         public string GetSnippetText => this.Snippet;
 
-        public Func<UIElement> Factory =>() =>  new System.Windows.Controls.TextBox() { Text = this.Snippet }; 
+        public IPreviewFactory Factory => new SnippetPreviewFactory(); 
+        public UIElement Create()
+        {
+            return this.Factory.Create(this);
+        }
+    }
+
+    public interface IPreviewFactory
+    {
+        UIElement Create(ICombo combo);
+    }
+
+    public class SnippetPreviewFactory : IPreviewFactory
+    {
+        public UIElement Create(ICombo combo)
+        {
+            return new System.Windows.Controls.TextBox() { Text = combo.Description };
+        }
     }
 
     public class PickerCommand : ICombo
     {
         public string Name { get; }
 
-        public PickerCommand(string name, string description, Func<UIElement> factory)
+        public PickerCommand(string name, string description, IPreviewFactory factory)
         {
             Name = name;
             Description = description;
@@ -34,7 +51,12 @@ namespace AimPicker.Domain
         }
 
         public string Description { get; }
-        public Func<UIElement> Factory { get; }
+        public IPreviewFactory Factory { get; }
+
+        public UIElement Create()
+        {
+            return this.Factory.Create(this);
+        }
     }
 
     public interface ISnippet : ICombo
@@ -48,7 +70,7 @@ namespace AimPicker.Domain
 
         string Description { get; }
 
-        Func<UIElement> Factory { get; }
-
+        UIElement Create();
     }
+
 }

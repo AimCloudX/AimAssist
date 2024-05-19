@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AimPicker", "AimPicker\AimPicker.csproj", "{CA7E4D7C-5D72-4F1E-894D-0AA188979686}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AimPicker", "AimPicker\AimPicker.csproj", "{CA7E4D7C-5D72-4F1E-894D-0AA188979686}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{9ED6EB73-B505-45CF-A059-C6C67C5CF08D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipboardAnalyzer", "Extensions\ClipboardAnalyzer\ClipboardAnalyzer.csproj", "{953CBB5A-35B1-4076-AF39-45EE601B6346}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +19,16 @@ Global
 		{CA7E4D7C-5D72-4F1E-894D-0AA188979686}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA7E4D7C-5D72-4F1E-894D-0AA188979686}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA7E4D7C-5D72-4F1E-894D-0AA188979686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{953CBB5A-35B1-4076-AF39-45EE601B6346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{953CBB5A-35B1-4076-AF39-45EE601B6346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{953CBB5A-35B1-4076-AF39-45EE601B6346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{953CBB5A-35B1-4076-AF39-45EE601B6346}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{953CBB5A-35B1-4076-AF39-45EE601B6346} = {9ED6EB73-B505-45CF-A059-C6C67C5CF08D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90FDF691-BAB3-4955-9A7C-4C323F4344C3}
