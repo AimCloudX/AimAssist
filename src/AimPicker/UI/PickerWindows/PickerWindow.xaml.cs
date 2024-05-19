@@ -36,16 +36,23 @@ namespace AimPicker.UI.Tools.Snippets
             this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
             this.ComboListBox.SelectedIndex = 0;
 
-            var aa = new PluginsService();
-            aa.LoadCommandPlugins();
-            var  aaa  = aa.GetCombos();
-            foreach (var item in aaa)
+            var pluginService = new PluginsService();
+            pluginService.LoadCommandPlugins();
+            var combos = pluginService.GetCombos();
+            foreach (var item in combos)
             {
-                if(item is PickerCommandViewModel command)
+                if (item is SnippetViewModel snippet)
+                {
+                    ComboDictionary[PickerMode.Snippet].Add(snippet);
+                }
+
+                if (item is PickerCommandViewModel command)
                 {
                     ComboDictionary[PickerMode.Command].Add(command);
                 }
             }
+
+            ComboDictionary[PickerMode.Command].Add(new PickerCommandViewModel("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory()));
         }
 
         public Dictionary<PickerMode, ObservableCollection<IComboViewModel>> ComboDictionary { get; private set; } = new Dictionary<PickerMode, ObservableCollection<IComboViewModel>>()
@@ -76,7 +83,7 @@ namespace AimPicker.UI.Tools.Snippets
         private bool Filter(object obj)
         {
             var filterText = this.FilterTextBox.Text;
-            if(this.Mode != PickerMode.Snippet)
+            if (this.Mode != PickerMode.Snippet)
             {
                 filterText = filterText.Substring(1);
             }
@@ -150,7 +157,8 @@ namespace AimPicker.UI.Tools.Snippets
             if (this.FilterTextBox.Text.StartsWith('>'))
             {
                 this.Mode = PickerMode.Command;
-            }else if (this.FilterTextBox.Text.StartsWith('='))
+            }
+            else if (this.FilterTextBox.Text.StartsWith('='))
             {
                 this.Mode = PickerMode.Calculate;
             }
@@ -247,12 +255,12 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(this.previewWindow == null)
+            if (this.previewWindow == null)
             {
                 return;
             }
 
-            if(this.ComboListBox.SelectedItem is IComboViewModel combo)
+            if (this.ComboListBox.SelectedItem is IComboViewModel combo)
             {
                 this.previewWindow.Contents?.Children.Clear();
 
