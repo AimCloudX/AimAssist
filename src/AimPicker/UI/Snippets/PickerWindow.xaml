@@ -12,6 +12,9 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
         >
         <!--Style="{StaticResource MaterialDesignWindow}"-->
     <Grid>
@@ -21,7 +24,7 @@
     </Grid.RowDefinitions>
         <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
                  InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
-        <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding ComboLists}">
+        <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding ComboLists}" SelectionChanged="ComboListBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -34,7 +37,7 @@
                             </TextBlock>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
-                            <TextBlock FontSize="12" Text="{Binding Snippet}" HorizontalAlignment="Right"></TextBlock>
+                            <TextBlock FontSize="12" Text="{Binding Description}" HorizontalAlignment="Right" MaxWidth="200" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
