@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="ClipboardList.xaml.cs">
+    <Compile Update="UI\ClipboardList.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

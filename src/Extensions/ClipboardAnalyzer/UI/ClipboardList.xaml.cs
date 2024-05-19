@@ -13,15 +13,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ClipboardAnalyzer.DomainModels;
+using ClipboardAnalyzer.Services;
 
 namespace ClipboardAnalyzer
 {
     /// <summary>
     /// ClipboardList.xaml の相互作用ロジック
     /// </summary>
-    public partial class ClipboardList : System.Windows.Controls.UserControl
+    public partial class ClipboardList : UserControl
     {
-        public ObservableCollection<ClipboardService.IClipboardData> Items { get; set; } = new ObservableCollection<ClipboardService.IClipboardData>();
+        public ObservableCollection<IClipboardData> Items { get; set; } = new ObservableCollection<IClipboardData>();
         public ClipboardList()
         {
             InitializeComponent();

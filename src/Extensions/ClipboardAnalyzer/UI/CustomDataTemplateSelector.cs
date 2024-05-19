@@ -1,7 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using ClipboardAnalyzer.DomainModels;
 
-namespace ClipboardAnalyzer
+namespace ClipboardAnalyzer.UI
 {
     public class CustomDataTemplateSelector : DataTemplateSelector
     {
@@ -10,12 +11,12 @@ namespace ClipboardAnalyzer
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if(item is ClipboardService.ClipboardData data)
+            if (item is ClipboardData data)
             {
                 return StringTemplate;
             }
 
-            if(item is ClipboardService.ClipboardImage image)
+            if (item is ClipboardImage image)
             {
                 return ImageTemplate;
             }

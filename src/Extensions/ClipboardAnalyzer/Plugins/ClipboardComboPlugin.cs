@@ -7,9 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Composition;
 using System.ComponentModel.Composition;
+using ClipboardAnalyzer.UI;
 
 
-namespace ClipboardAnalyzer
+namespace ClipboardAnalyzer.Plugins
 {
     [Export(typeof(IComboPlugin))]
     public class ClipboardComboPlugin : IComboPlugin
