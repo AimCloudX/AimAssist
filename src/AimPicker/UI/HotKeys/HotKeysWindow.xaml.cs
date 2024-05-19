@@ -21,7 +21,7 @@ namespace AimPicker.UI.Tools.HotKeys
                                   Key.P,
                                   (_, __) =>
                                       {
-                                          new SnippetManager().RunSnippetTool();
+                                          PickerService.Run(Domain.PickerMode.Snippet);
                                       });
         }
 

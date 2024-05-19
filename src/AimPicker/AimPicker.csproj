@@ -12,7 +12,13 @@
 
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2478.35" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="8.0.0" />
   </ItemGroup>
 
+  <Target Name="CopyExtensions" AfterTargets="AfterBuild">
+    <!-- DLLのコピー先を指定 -->
+    <Copy SourceFiles="..\Extensions\ClipboardAnalyzer\bin\Debug\net8.0-windows\ClipboardAnalyzer.dll" DestinationFolder="$(OutputPath)\Plugins" />
+  </Target>
 </Project>

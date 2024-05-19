@@ -13,9 +13,28 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" /> 
             </ResourceDictionary.MergedDictionaries>-->
             <ResourceDictionary.MergedDictionaries>
-                <ui:ThemeResources />
+                <ui:ThemeResources RequestedTheme="Dark" />
                 <ui:XamlControlsResources />
+                <ResourceDictionary>
+                    <Style TargetType="Window" x:Key="CustomWindowStyle1">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Window">
+                                    <Border Background="White" BorderBrush="Black" BorderThickness="1">
+                                        <AdornerDecorator>
+                                            <ContentPresenter/>
+                                        </AdornerDecorator>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                </ResourceDictionary>
+                
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+
     </Application.Resources>
 </Application>
