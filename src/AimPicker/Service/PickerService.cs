@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows;
 using System.Windows.Forms;
 
 internal class PickerService
@@ -20,6 +21,11 @@ internal class PickerService
 
     public static void Run(PickerMode mode)
     {
+        if (window?.Visibility == Visibility.Visible)
+        {
+            return;
+        }
+
         // HotKey押下時のウィンドウのハンドルを取得
         IntPtr hWnd = GetForegroundWindow();
 
@@ -29,6 +35,7 @@ internal class PickerService
         //var window = new PickerWindow(mode);
         if(window != null  && window.IsClosing == false)
         {
+
             window.WindowActivate();
             window.ShowDialog();
         }
