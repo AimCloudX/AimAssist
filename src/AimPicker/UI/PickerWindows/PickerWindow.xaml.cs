@@ -5,6 +5,7 @@ using AimPicker.UI.Combos.Commands;
 using AimPicker.UI.Combos.Snippets;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -104,11 +105,22 @@ namespace AimPicker.UI.Tools.Snippets
 
             return true;
         }
+
+        public void WindowActivate()
+        {
+            this.PreviewWindow.Visibility = Visibility.Visible;
+            this.PreviewWindow.Topmost = true;;
+            this.PreviewWindow.Show();
+            this.Visibility = Visibility.Visible;
+            this.Topmost = true;
+            this.Activate();
+            this.Focus();
+        }
     }
 
     public partial class PickerWindow : Window
     {
-        private bool isClosing;
+        public bool IsClosing { get; set; }
 
         DispatcherTimer? typingTimer;
         private string beforeText = string.Empty;
@@ -120,26 +132,26 @@ namespace AimPicker.UI.Tools.Snippets
         {
             this.InitializeComponent();
             this.DataContext = this;
+
+            App.Current.Deactivated += AppDeacivated;
         }
 
-        private void CloseWindow()
+        private void AppDeacivated(object? sender, EventArgs e)
         {
-            if (this.isClosing)
+            this.HideWindow();
+        }
+
+        private void HideWindow()
+        {
+            if (this.IsClosing)
             {
                 return;
             }
 
-            this.Close();
+            this.PreviewWindow.Visibility = Visibility.Hidden;
+            this.Visibility = Visibility.Hidden;
         }
 
-        private void CommandPaletteWindow_OnDeactivated(object sender, EventArgs e)
-        {
-#if DEBUG
-            return;
-#endif
-
-            this.CloseWindow();
-        }
 
         private void HandleTypingTimerTimeout(object sender, EventArgs e)
         {
@@ -185,11 +197,11 @@ namespace AimPicker.UI.Tools.Snippets
                     this.SnippetText = combo.Snippet;
                 }
 
-                this.CloseWindow();
+                this.HideWindow();
             }
             else if (e.Key == Key.Escape)
             {
-                this.CloseWindow();
+                this.HideWindow();
             }
         }
 
@@ -232,25 +244,36 @@ namespace AimPicker.UI.Tools.Snippets
             this.typingTimer.Start();
         }
 
+        public PreviewWindow PreviewWindow 
+        { 
+            get
+            {
+                if(previewWindow == null)
+                {
+                    this.previewWindow = new PreviewWindow();
+
+                    // MainWindowの位置とサイズを取得
+                    double mainWindowLeft = this.Left;
+                    double mainWindowTop = this.Top;
+                    double mainWindowWidth = this.Width;
+                    double mainWindowHeight = this.Height;
+
+                    // SecondaryWindowの位置を設定
+                    previewWindow.Left = mainWindowLeft + mainWindowWidth;
+                    previewWindow.Top = mainWindowTop + mainWindowHeight + 130;
+                    //secondaryWindow.Top = mainWindowTop;
+                }
+
+                return previewWindow;
+            } }
+
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // 新しいウィンドウを作成
-            this.previewWindow = new PreviewWindow();
-
-            // MainWindowの位置とサイズを取得
-            double mainWindowLeft = this.Left;
-            double mainWindowTop = this.Top;
-            double mainWindowWidth = this.Width;
-            double mainWindowHeight = this.Height;
-
-            // SecondaryWindowの位置を設定
-            previewWindow.Left = mainWindowLeft + mainWindowWidth;
-            previewWindow.Top = mainWindowTop + mainWindowHeight + 130;
-            //secondaryWindow.Top = mainWindowTop;
-
-            // SecondaryWindowを表示
-            previewWindow.Show();
-
+            if(this.previewWindow == null)
+            {
+                this.PreviewWindow.Show();
+            }
         }
 
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -271,8 +294,11 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            this.previewWindow?.Close();
-            this.isClosing = true;
+            this.IsClosing = true;
+            if(this.previewWindow != null)
+            {
+                this.previewWindow.Close();
+            }
         }
     }
 }
