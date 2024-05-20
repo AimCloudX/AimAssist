@@ -11,15 +11,18 @@ namespace AimPicker.UI.Combos.Commands
             Name = name;
             Description = description;
             Factory = factory;
+            uiElement = Factory.Create(this);
+
         }
 
         public string Description { get; }
         public IPreviewFactory Factory { get; }
 
+        private UIElement uiElement { get; set; }
+
         public UIElement Create()
         {
-            return Factory.Create(this);
+            return uiElement;
         }
     }
-
 }
