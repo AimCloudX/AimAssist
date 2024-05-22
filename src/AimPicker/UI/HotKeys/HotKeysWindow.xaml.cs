@@ -8,6 +8,7 @@ namespace AimPicker.UI.Tools.HotKeys
 {
     public partial class HowKeysWindow : Window
     {
+        private bool isPickerServiceActivated;
         private HotKeyController hotkeyController;
         public HowKeysWindow()
         {
@@ -21,7 +22,16 @@ namespace AimPicker.UI.Tools.HotKeys
                                   Key.P,
                                   (_, __) =>
                                       {
+                                          if (isPickerServiceActivated)
+                                          {
+                                              return;
+                                          }
+
+                                          isPickerServiceActivated = true;
+
                                           PickerService.Run(Domain.PickerMode.Snippet);
+
+                                          isPickerServiceActivated = false;
                                       });
         }
 

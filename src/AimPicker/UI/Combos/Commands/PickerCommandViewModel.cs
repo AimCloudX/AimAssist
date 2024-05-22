@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using AimPicker.UI.Repositories;
+using System.Windows;
 
 namespace AimPicker.UI.Combos.Commands
 {
@@ -11,18 +12,22 @@ namespace AimPicker.UI.Combos.Commands
             Name = name;
             Description = description;
             Factory = factory;
-            uiElement = Factory.Create(this);
-
+            uiElement = UIElementRepository.GetUIElement(this);
         }
 
         public string Description { get; }
         public IPreviewFactory Factory { get; }
 
-        private UIElement uiElement { get; set; }
+        private UIElement uiElement;
 
         public UIElement Create()
         {
-            return uiElement;
+            if(uiElement == null)
+            {
+                uiElement = Factory.Create(this);
+            }
+
+           return  uiElement;
         }
     }
 }

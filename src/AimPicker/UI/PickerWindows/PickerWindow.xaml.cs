@@ -3,6 +3,7 @@ using AimPicker.Service.Plugins;
 using AimPicker.UI.Combos;
 using AimPicker.UI.Combos.Commands;
 using AimPicker.UI.Combos.Snippets;
+using AimPicker.UI.Repositories;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -105,17 +106,6 @@ namespace AimPicker.UI.Tools.Snippets
 
             return true;
         }
-
-        public void WindowActivate()
-        {
-            this.PreviewWindow.Visibility = Visibility.Visible;
-            this.PreviewWindow.Topmost = true;;
-            this.PreviewWindow.Show();
-            this.Visibility = Visibility.Visible;
-            this.Topmost = true;
-            this.Activate();
-            this.Focus();
-        }
     }
 
     public partial class PickerWindow : Window
@@ -134,22 +124,6 @@ namespace AimPicker.UI.Tools.Snippets
             this.DataContext = this;
 
             App.Current.Deactivated += AppDeacivated;
-        }
-
-        private void AppDeacivated(object? sender, EventArgs e)
-        {
-            this.HideWindow();
-        }
-
-        private void HideWindow()
-        {
-            if (this.IsClosing)
-            {
-                return;
-            }
-
-            this.PreviewWindow.Visibility = Visibility.Hidden;
-            this.Visibility = Visibility.Hidden;
         }
 
 
@@ -187,7 +161,6 @@ namespace AimPicker.UI.Tools.Snippets
             this.ComboListBox.SelectedIndex = 0;
         }
 
-
         private void SnippetToolWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -197,11 +170,11 @@ namespace AimPicker.UI.Tools.Snippets
                     this.SnippetText = combo.Snippet;
                 }
 
-                this.HideWindow();
+                this.CloseWindow();
             }
             else if (e.Key == Key.Escape)
             {
-                this.HideWindow();
+                this.CloseWindow();
             }
         }
 
@@ -244,38 +217,6 @@ namespace AimPicker.UI.Tools.Snippets
             this.typingTimer.Start();
         }
 
-        public PreviewWindow PreviewWindow 
-        { 
-            get
-            {
-                if(previewWindow == null)
-                {
-                    this.previewWindow = new PreviewWindow();
-
-                    // MainWindowの位置とサイズを取得
-                    double mainWindowLeft = this.Left;
-                    double mainWindowTop = this.Top;
-                    double mainWindowWidth = this.Width;
-                    double mainWindowHeight = this.Height;
-
-                    // SecondaryWindowの位置を設定
-                    previewWindow.Left = mainWindowLeft + mainWindowWidth;
-                    previewWindow.Top = mainWindowTop + mainWindowHeight + 130;
-                    //secondaryWindow.Top = mainWindowTop;
-                }
-
-                return previewWindow;
-            } }
-
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            if(this.previewWindow == null)
-            {
-                this.PreviewWindow.Show();
-            }
-        }
-
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (this.previewWindow == null)
@@ -291,14 +232,79 @@ namespace AimPicker.UI.Tools.Snippets
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
         }
+        public PreviewWindow PreviewWindow 
+        { 
+            get
+            {
+                if(this.previewWindow == null)
+                {
+                    var previewWindow = UIElementRepository.PreviewWindow;
+                    if(previewWindow != null) 
+                    {
+                        this.previewWindow = previewWindow;
+                    }
+                    else
+                    {
+                        previewWindow = new PreviewWindow();
+                        previewWindow.Topmost = true;
+
+                        // MainWindowの位置とサイズを取得
+                        double mainWindowLeft = this.Left;
+                        double mainWindowTop = this.Top;
+                        double mainWindowWidth = this.Width;
+                        double mainWindowHeight = this.Height;
+
+                        // SecondaryWindowの位置を設定
+                        previewWindow.Left = mainWindowLeft + mainWindowWidth;
+                        previewWindow.Top = mainWindowTop + mainWindowHeight + 130;
+                        //secondaryWindow.Top = mainWindowTop;
+
+                        UIElementRepository.PreviewWindow = previewWindow;
+                        this.previewWindow = previewWindow;
+                    }
+                }
+
+                return this.previewWindow;
+            } }
+
+        private void AppDeacivated(object? sender, EventArgs e)
+        {
+            this.CloseWindow();
+        }
+
+        private void CloseWindow()
+        {
+            if (this.IsClosing)
+            {
+                return;
+            }
+
+            this.IsClosing = true; ;
+            this.previewWindow.Visibility = Visibility.Hidden;
+            this.Close();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            if(this.previewWindow == null)
+            {
+                this.PreviewWindow.Show();
+            }
+            else
+            {
+                this.previewWindow.Visibility = Visibility.Visible;
+                this.previewWindow.Show();
+            }
+
+            this.Topmost = true;
+            this.Activate();
+            this.Focus();
+        }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             this.IsClosing = true;
-            if(this.previewWindow != null)
-            {
-                this.previewWindow.Close();
-            }
         }
     }
 }
