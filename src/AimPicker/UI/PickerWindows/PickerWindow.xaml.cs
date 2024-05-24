@@ -23,53 +23,9 @@ namespace AimPicker.UI.Tools.Snippets
 {
     public partial class PickerWindow : INotifyPropertyChanged
     {
-        public PickerWindow(PickerMode mode) : this()
+        public Dictionary<IPickerMode, ObservableCollection<IComboViewModel>> ComboDictionary { get; private set; } = new Dictionary<IPickerMode, ObservableCollection<IComboViewModel>>()
         {
-            switch (mode)
-            {
-                case PickerMode.Snippet:
-                    break;
-                case PickerMode.Command:
-                    this.FilterTextBox.Text = ">";
-                    break;
-                case PickerMode.Calculate:
-                    this.FilterTextBox.Text = "=";
-                    break;
-            }
-
-            Mode = mode;
-
-            this.FilterTextBox.Focus();
-            this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
-            this.ComboListBox.SelectedIndex = 0;
-
-            var pluginService = new PluginsService();
-            pluginService.LoadCommandPlugins();
-            var combos = pluginService.GetCombos();
-            foreach (var item in combos)
-            {
-                if (item is SnippetViewModel snippet)
-                {
-                    ComboDictionary[PickerMode.Snippet].Add(snippet);
-                }
-
-                if (item is PickerCommandViewModel command)
-                {
-                    ComboDictionary[PickerMode.Command].Add(command);
-                }
-            }
-
-            if (System.Windows.Clipboard.ContainsText())
-            {
-                ComboDictionary[PickerMode.Snippet].Insert(0, new SnippetViewModel("クリップボード", System.Windows.Clipboard.GetText()));
-            }
-
-            ComboDictionary[PickerMode.Command].Add(new PickerCommandViewModel("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory()));
-        }
-
-        public Dictionary<PickerMode, ObservableCollection<IComboViewModel>> ComboDictionary { get; private set; } = new Dictionary<PickerMode, ObservableCollection<IComboViewModel>>()
-        {
-            {PickerMode.Snippet, new ObservableCollection<IComboViewModel>()
+            {SnippetMode.Instance, new ObservableCollection<IComboViewModel>()
             {
             new SnippetViewModel("aim","AimNext"),
             new SnippetViewModel("Today",DateTime.Now.ToString("d")),
@@ -78,13 +34,13 @@ namespace AimPicker.UI.Tools.Snippets
             new SnippetViewModel("Downloads",Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads")),
             new SnippetViewModel("環境変数","control.exe sysdm.cpl,,3"),
             } },
-            { PickerMode.Command ,new ObservableCollection<IComboViewModel>()
+            { WorkFlowMode.Instance ,new ObservableCollection<IComboViewModel>()
             {
             } },
-            {PickerMode.Calculate, new ObservableCollection<IComboViewModel>() },
-            {PickerMode.URL, new ObservableCollection<IComboViewModel>(){
+            {CalculationMode.Instance, new ObservableCollection<IComboViewModel>() },
+            {UrlMode.Instance, new ObservableCollection<IComboViewModel>(){
             } },
-            {PickerMode.BookSearch, new ObservableCollection<IComboViewModel>(){
+            {BookSearchMode.Instance, new ObservableCollection<IComboViewModel>(){
             } },
         };
         public ObservableCollection<IComboViewModel> ComboLists => this.ComboDictionary[this.Mode];
@@ -98,7 +54,7 @@ namespace AimPicker.UI.Tools.Snippets
         private bool Filter(object obj)
         {
             var filterText = this.FilterTextBox.Text;
-            if (this.Mode != PickerMode.Snippet)
+            if (this.Mode != SnippetMode.Instance)
             {
                 filterText = filterText.Substring(1);
             }
@@ -136,6 +92,33 @@ namespace AimPicker.UI.Tools.Snippets
         {
             this.InitializeComponent();
             this.DataContext = this;
+            this.FilterTextBox.Focus();
+            this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
+            this.ComboListBox.SelectedIndex = 0;
+
+            var pluginService = new PluginsService();
+            pluginService.LoadCommandPlugins();
+            var combos = pluginService.GetCombos();
+            foreach (var item in combos)
+            {
+                if (item is SnippetViewModel snippet)
+                {
+                    ComboDictionary[SnippetMode.Instance].Add(snippet);
+                }
+
+                if (item is PickerCommandViewModel command)
+                {
+                    ComboDictionary[WorkFlowMode.Instance].Add(command);
+                }
+            }
+
+            if (System.Windows.Clipboard.ContainsText())
+            {
+                ComboDictionary[SnippetMode.Instance].Insert(0, new SnippetViewModel("クリップボード", System.Windows.Clipboard.GetText()));
+            }
+
+            ComboDictionary[WorkFlowMode.Instance].Add(new PickerCommandViewModel("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory()));
+
 
             App.Current.Deactivated += AppDeacivated;
         }
@@ -156,16 +139,16 @@ namespace AimPicker.UI.Tools.Snippets
 
             if (this.FilterTextBox.Text.StartsWith('>'))
             {
-                this.Mode = PickerMode.Command;
+                this.Mode = WorkFlowMode.Instance;
             }
             else if (this.FilterTextBox.Text.StartsWith('='))
             {
-                this.Mode = PickerMode.Calculate;
+                this.Mode = CalculationMode.Instance;
             }
             else if (this.FilterTextBox.Text.StartsWith('!'))
             {
-                this.Mode = PickerMode.BookSearch;
-                this.ComboDictionary[PickerMode.BookSearch].Clear();
+                this.Mode = BookSearchMode.Instance;
+                this.ComboDictionary[BookSearchMode.Instance].Clear();
 
                 var searchTitleText = this.FilterTextBox.Text.Substring(1);
                 InitializeAsync(searchTitleText);
@@ -175,22 +158,22 @@ namespace AimPicker.UI.Tools.Snippets
             }
             else if (this.FilterTextBox.Text.StartsWith("https://"))
             {
-                this.Mode = PickerMode.URL;
+                this.Mode = UrlMode.Instance;
                 var text = this.FilterTextBox.Text;
-                this.ComboDictionary[PickerMode.URL].Clear();
+                this.ComboDictionary[UrlMode.Instance].Clear();
                 if (this.FilterTextBox.Text.StartsWith("https://www.amazon"))
                 {
 
-                    this.ComboDictionary[PickerMode.URL].Add(new UrlCommandViewModel("Amazon Preview", text, new AmazonWebViewPreviewFactory()));
+                    this.ComboDictionary[UrlMode.Instance].Add(new UrlCommandViewModel("Amazon Preview", text, new AmazonWebViewPreviewFactory()));
                 }
                 else
                 {
-                    this.ComboDictionary[PickerMode.URL].Add(new UrlCommandViewModel("URL Preview", text, new WebViewPreviewFactory()));
+                    this.ComboDictionary[UrlMode.Instance].Add(new UrlCommandViewModel("URL Preview", text, new WebViewPreviewFactory()));
                 }
             }
             else
             {
-                this.Mode = PickerMode.Snippet;
+                this.Mode = SnippetMode.Instance;
             }
 
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboLists);
@@ -269,7 +252,7 @@ namespace AimPicker.UI.Tools.Snippets
                     if(bb.type == "ISBN_10")
                     {
                         var url = $"https://www.amazon.co.jp/dp/{bb.identifier}";
-                        this.ComboDictionary[PickerMode.BookSearch].Add(new UrlCommandViewModel(titlte , url, new AmazonWebViewPreviewFactory()));
+                        this.ComboDictionary[BookSearchMode.Instance].Add(new UrlCommandViewModel(titlte , url, new AmazonWebViewPreviewFactory()));
                     }
                 }
             }
