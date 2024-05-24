@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         xmlns:ui="http://schemas.modernwpf.com/2019" 
         x:Name="Winodw"
-        ResizeMode="NoResize"
         ui:WindowHelper.UseModernWindowStyle="True"
         SizeToContent="WidthAndHeight"
         Focusable="False"
+        Closing="Winodw_Closing"
         ShowInTaskbar="False"
         Title="Preview" >
     <Grid>
@@ -19,6 +19,6 @@
             
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" x:Name="Contents" />
+        <Grid Grid.Row="0" x:Name="Contents" />
     </Grid>
 </Window>

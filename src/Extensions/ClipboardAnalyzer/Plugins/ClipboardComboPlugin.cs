@@ -18,7 +18,9 @@ namespace ClipboardAnalyzer.Plugins
     {
         public IEnumerable<IComboViewModel> GetCombo()
         {
-            yield return new PickerCommandViewModel("ClipboardAnalyzer", System.Windows.Clipboard.GetText(), new ClipboardAnalyzerPreviewFactory());
+            var text = System.Windows.Clipboard.ContainsText() ? System.Windows.Clipboard.GetText() : string.Empty;
+
+            yield return new PickerCommandViewModel("ClipboardAnalyzer", text, new ClipboardAnalyzerPreviewFactory());
         }
     }
 }

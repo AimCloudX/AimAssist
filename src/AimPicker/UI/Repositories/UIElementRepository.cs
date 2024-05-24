@@ -11,10 +11,23 @@ namespace AimPicker.UI.Repositories
     public static class UIElementRepository
     {
         private static Dictionary<string, UIElement> _elements = new Dictionary<string, UIElement>();
+        private static Dictionary<string, UIElement> urls = new Dictionary<string, UIElement>();
 
         public static PreviewWindow PreviewWindow { get; set; }
 
         public static UIElement GetUIElement(PickerCommandViewModel pickerCommandViewModel)
+        {
+            if(_elements.ContainsKey(pickerCommandViewModel.Name))
+            {
+                return _elements[pickerCommandViewModel.Name];
+            }
+
+            var uiElement = pickerCommandViewModel.Create();
+            _elements.Add(pickerCommandViewModel.Name, uiElement);
+
+            return uiElement;
+        }
+        public static UIElement GetUIElement(UrlCommandViewModel pickerCommandViewModel)
         {
             if(_elements.ContainsKey(pickerCommandViewModel.Name))
             {

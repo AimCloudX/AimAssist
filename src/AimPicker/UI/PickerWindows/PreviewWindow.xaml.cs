@@ -1,4 +1,5 @@
-﻿using ModernWpf.Controls.Primitives;
+﻿using AimPicker.UI.Repositories;
+using ModernWpf.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,6 +25,12 @@ namespace AimPicker.UI
         public PreviewWindow()
         {
             InitializeComponent();
+        }
+
+        private void Winodw_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.Contents.Children.Clear();
+            UIElementRepository.PreviewWindow = null;
         }
     }
 }

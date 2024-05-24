@@ -4,8 +4,12 @@ using AimPicker.UI.Combos;
 using AimPicker.UI.Combos.Commands;
 using AimPicker.UI.Combos.Snippets;
 using AimPicker.UI.Repositories;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -13,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AimPicker.UI.Tools.Snippets
 {
@@ -54,6 +59,11 @@ namespace AimPicker.UI.Tools.Snippets
                 }
             }
 
+            if (System.Windows.Clipboard.ContainsText())
+            {
+                ComboDictionary[PickerMode.Snippet].Insert(0, new SnippetViewModel("クリップボード", System.Windows.Clipboard.GetText()));
+            }
+
             ComboDictionary[PickerMode.Command].Add(new PickerCommandViewModel("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory()));
         }
 
@@ -71,8 +81,11 @@ namespace AimPicker.UI.Tools.Snippets
             { PickerMode.Command ,new ObservableCollection<IComboViewModel>()
             {
             } },
-            {PickerMode.Calculate, new ObservableCollection<IComboViewModel>() }
-
+            {PickerMode.Calculate, new ObservableCollection<IComboViewModel>() },
+            {PickerMode.URL, new ObservableCollection<IComboViewModel>(){
+            } },
+            {PickerMode.BookSearch, new ObservableCollection<IComboViewModel>(){
+            } },
         };
         public ObservableCollection<IComboViewModel> ComboLists => this.ComboDictionary[this.Mode];
         public PickerMode Mode { get; set; }
@@ -106,6 +119,7 @@ namespace AimPicker.UI.Tools.Snippets
 
             return true;
         }
+
     }
 
     public partial class PickerWindow : Window
@@ -148,6 +162,32 @@ namespace AimPicker.UI.Tools.Snippets
             {
                 this.Mode = PickerMode.Calculate;
             }
+            else if (this.FilterTextBox.Text.StartsWith('!'))
+            {
+                this.Mode = PickerMode.BookSearch;
+                this.ComboDictionary[PickerMode.BookSearch].Clear();
+
+                var searchTitleText = this.FilterTextBox.Text.Substring(1);
+                InitializeAsync(searchTitleText);
+
+
+
+            }
+            else if (this.FilterTextBox.Text.StartsWith("https://"))
+            {
+                this.Mode = PickerMode.URL;
+                var text = this.FilterTextBox.Text;
+                this.ComboDictionary[PickerMode.URL].Clear();
+                if (this.FilterTextBox.Text.StartsWith("https://www.amazon"))
+                {
+
+                    this.ComboDictionary[PickerMode.URL].Add(new UrlCommandViewModel("Amazon Preview", text, new AmazonWebViewPreviewFactory()));
+                }
+                else
+                {
+                    this.ComboDictionary[PickerMode.URL].Add(new UrlCommandViewModel("URL Preview", text, new WebViewPreviewFactory()));
+                }
+            }
             else
             {
                 this.Mode = PickerMode.Snippet;
@@ -159,6 +199,89 @@ namespace AimPicker.UI.Tools.Snippets
             this.beforeText = this.FilterTextBox.Text;
             this.OnPropertyChanged(nameof(this.ComboLists));
             this.ComboListBox.SelectedIndex = 0;
+        }
+
+        private WebView2 webView;
+        private bool iswebloading;
+        private Stopwatch timer = new Stopwatch();
+        private async void InitializeAsync(string searchText)
+        {
+            if (iswebloading)
+            {
+                return;
+            }
+            timer.Start();
+            iswebloading = true;
+
+            webView = new WebView2();
+            webView.Height = 0;
+            webView.Width = 0;
+            this.FilterContents.Children.Clear();
+            this.FilterContents.Children.Add(webView);
+
+            await webView.EnsureCoreWebView2Async(null);
+            if(webView.CoreWebView2 == null)
+            {
+                iswebloading = false;
+                return;
+            }
+
+            webView.CoreWebView2.NavigationCompleted += CoreWebView2_NavigationCompleted;
+
+            string apiUrl = $"https://www.googleapis.com/books/v1/volumes?q={searchText}";
+            webView.CoreWebView2.Navigate("about:blank"); // Navigate to a blank page to execute JavaScript
+            string script = $@"
+                fetch('{apiUrl}')
+                    .then(response => response.json())
+                    .then(data => {{
+                        window.chrome.webview.postMessage(data);
+                    }})
+                    .catch(error => {{
+                        console.error('Error:', error);
+                    }});
+            ";
+            await webView.CoreWebView2.ExecuteScriptAsync(script);
+            iswebloading = false;
+        }
+
+        private void CoreWebView2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        {
+            webView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+        }
+
+        private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            string jsonResponse = e.WebMessageAsJson;
+
+            Root bookInfo = JsonConvert.DeserializeObject<Root>(jsonResponse);
+            if(bookInfo.items != null)
+            {
+            foreach(var aa in bookInfo.items)
+            {
+                var titlte = aa.volumeInfo.title;
+                var author = aa.volumeInfo.authors?.FirstOrDefault();
+                    if (aa.volumeInfo.industryIdentifiers == null)
+                    {
+                        continue;
+                    }
+                    foreach (var bb in aa.volumeInfo.industryIdentifiers)
+                {
+                    if(bb.type == "ISBN_10")
+                    {
+                        var url = $"https://www.amazon.co.jp/dp/{bb.identifier}";
+                        this.ComboDictionary[PickerMode.BookSearch].Add(new UrlCommandViewModel(titlte , url, new AmazonWebViewPreviewFactory()));
+                    }
+                }
+            }
+            }
+
+
+
+
+            timer.Stop();
+            File.AppendAllText("C:\\Temp\\test.txt", $"Elapsed Time: {timer.Elapsed.TotalSeconds.ToString()} seconds"+"\r\n");
+            timer.Reset();
+            iswebloading = false;
         }
 
         private void SnippetToolWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
@@ -208,7 +331,7 @@ namespace AimPicker.UI.Tools.Snippets
                     Tag = null
                 };
 
-                this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
+                this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
 
                 this.typingTimer.Tick += this.HandleTypingTimerTimeout;
             }
@@ -269,7 +392,7 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void AppDeacivated(object? sender, EventArgs e)
         {
-            this.CloseWindow();
+            //this.CloseWindow();
         }
 
         private void CloseWindow()
@@ -297,6 +420,8 @@ namespace AimPicker.UI.Tools.Snippets
                 this.previewWindow.Show();
             }
 
+            AjustWindowCommand = new RelayCommand((o) => { CenterWindowsOnScreen(this, this.previewWindow); });
+
             this.Topmost = true;
             this.Activate();
             this.Focus();
@@ -305,6 +430,73 @@ namespace AimPicker.UI.Tools.Snippets
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             this.IsClosing = true;
+        }
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            InitializeCenterWindowsOnScreen(this, this.previewWindow);
+        }
+
+        public ICommand AjustWindowCommand { get; set; }
+
+        private void CenterWindowsOnScreen(Window mainWindow, Window secondaryWindow)
+        {
+            // Get the screen width and height
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+
+            // Get the width and height of both windows
+            double mainWindowWidth = mainWindow.ActualWidth;
+            double mainWindowHeight = mainWindow.ActualHeight;
+            double secondaryWindowWidth = secondaryWindow.ActualWidth;
+            double secondaryWindowHeight = secondaryWindow.ActualHeight;
+
+            // Calculate the total width of both windows
+            double totalWidth = mainWindowWidth + secondaryWindowWidth;
+
+            // Calculate the left position for each window
+            double mainWindowLeft = (screenWidth - totalWidth) / 2;
+            double secondaryWindowLeft = mainWindowLeft + mainWindowWidth;
+
+            // Calculate the top position for both windows
+            double topPosition = (screenHeight - Math.Max(mainWindowHeight, secondaryWindowHeight)) / 2;
+
+            // Set the position of the main window
+            mainWindow.Left = mainWindowLeft;
+            mainWindow.Top = topPosition;
+
+            // Set the position of the secondary window
+            secondaryWindow.Left = secondaryWindowLeft;
+            secondaryWindow.Top = topPosition;
+        }
+        private void InitializeCenterWindowsOnScreen(Window mainWindow, Window secondaryWindow)
+        {
+            // Get the screen width and height
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+
+            // Get the width and height of both windows
+            double mainWindowWidth = mainWindow.ActualWidth;
+            double mainWindowHeight = mainWindow.ActualHeight;
+            double secondaryWindowWidth = 400;
+            double secondaryWindowHeight = 500;
+
+            // Calculate the total width of both windows
+            double totalWidth = mainWindowWidth + secondaryWindowWidth;
+
+            // Calculate the left position for each window
+            double mainWindowLeft = (screenWidth - totalWidth) / 2;
+            double secondaryWindowLeft = mainWindowLeft + mainWindowWidth;
+
+            // Calculate the top position for both windows
+            double topPosition = (screenHeight - Math.Max(mainWindowHeight, secondaryWindowHeight)) / 2;
+
+            // Set the position of the main window
+            mainWindow.Left = mainWindowLeft;
+            mainWindow.Top = topPosition;
+
+            // Set the position of the secondary window
+            secondaryWindow.Left = secondaryWindowLeft;
+            secondaryWindow.Top = topPosition;
         }
     }
 }

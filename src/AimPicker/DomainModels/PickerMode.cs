@@ -11,5 +11,7 @@ namespace AimPicker.Domain
         Snippet,
         Command,
         Calculate,
+        URL,
+        BookSearch,
     }
 }

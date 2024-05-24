@@ -10,19 +10,29 @@
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
-        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Closing="Window_Closing"
         Loaded="Window_Loaded"
+        ContentRendered="Window_ContentRendered"
         >
         <!--Style="{StaticResource MaterialDesignWindow}"-->
-    <Grid>
+    <Grid x:Name="Root">
+        <Grid.InputBindings>
+            <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding AjustWindowCommand}"/>
+        </Grid.InputBindings>
     <Grid.RowDefinitions>
         <RowDefinition Height="Auto"></RowDefinition>
         <RowDefinition Height="*"></RowDefinition>
     </Grid.RowDefinitions>
-        <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
                  InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
+            <StackPanel x:Name="FilterContents"/>
+        </Grid>
         <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding ComboLists}" SelectionChanged="ComboListBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
