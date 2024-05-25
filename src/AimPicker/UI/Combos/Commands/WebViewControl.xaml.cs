@@ -1,4 +1,5 @@
 ﻿using Microsoft.Web.WebView2.Core;
+using System.Diagnostics;
 using System.Windows;
 
 namespace AimPicker.UI.Combos.Commands
@@ -88,6 +89,18 @@ namespace AimPicker.UI.Combos.Commands
             else
             {
             }
+        }
+
+        private void Button_Click2(object sender, RoutedEventArgs e)
+        {
+            // デフォルトのブラウザでURLを開く
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = this.url,
+                UseShellExecute = true
+            });
+
+
         }
     }
 }
