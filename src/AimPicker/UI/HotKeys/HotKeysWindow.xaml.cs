@@ -29,7 +29,7 @@ namespace AimPicker.UI.Tools.HotKeys
 
                                           isPickerServiceActivated = true;
 
-                                          PickerService.Run(Domain.PickerMode.Snippet);
+                                          PickerService.Run();
 
                                           isPickerServiceActivated = false;
                                       });

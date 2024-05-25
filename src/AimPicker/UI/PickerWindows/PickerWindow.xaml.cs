@@ -1,12 +1,12 @@
 ﻿using AimPicker.Domain;
-using AimPicker.Service.Plugins;
 using AimPicker.UI.Combos;
 using AimPicker.UI.Combos.Commands;
 using AimPicker.UI.Combos.Snippets;
 using AimPicker.UI.Repositories;
+using Microsoft.Web.WebView2.Wpf;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,64 +18,24 @@ namespace AimPicker.UI.Tools.Snippets
 {
     public partial class PickerWindow : INotifyPropertyChanged
     {
-        public PickerWindow(PickerMode mode) : this()
+        public ObservableCollection<IComboViewModel> ComboLists { get; } = new ObservableCollection<IComboViewModel>();
+        private PickerMode mode;
+        public PickerMode Mode
         {
-            switch (mode)
+            get { return this.mode; }
+            set
             {
-                case PickerMode.Snippet:
-                    break;
-                case PickerMode.Command:
-                    this.FilterTextBox.Text = ">";
-                    break;
-                case PickerMode.Calculate:
-                    this.FilterTextBox.Text = "=";
-                    break;
-            }
-
-            Mode = mode;
-
-            this.FilterTextBox.Focus();
-            this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
-            this.ComboListBox.SelectedIndex = 0;
-
-            var pluginService = new PluginsService();
-            pluginService.LoadCommandPlugins();
-            var combos = pluginService.GetCombos();
-            foreach (var item in combos)
-            {
-                if (item is SnippetViewModel snippet)
+                if (value == this.mode)
                 {
-                    ComboDictionary[PickerMode.Snippet].Add(snippet);
+                    return;
                 }
 
-                if (item is PickerCommandViewModel command)
-                {
-                    ComboDictionary[PickerMode.Command].Add(command);
-                }
+                this.mode = value;
+                UpdateCandidate();
+                OnPropertyChanged();
             }
-
-            ComboDictionary[PickerMode.Command].Add(new PickerCommandViewModel("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory()));
         }
 
-        public Dictionary<PickerMode, ObservableCollection<IComboViewModel>> ComboDictionary { get; private set; } = new Dictionary<PickerMode, ObservableCollection<IComboViewModel>>()
-        {
-            {PickerMode.Snippet, new ObservableCollection<IComboViewModel>()
-            {
-            new SnippetViewModel("aim","AimNext"),
-            new SnippetViewModel("Today",DateTime.Now.ToString("d")),
-            new SnippetViewModel("Now",DateTime.Now.ToString("t")),
-            new SnippetViewModel("AppData",Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
-            new SnippetViewModel("Downloads",Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads")),
-            new SnippetViewModel("環境変数","control.exe sysdm.cpl,,3"),
-            } },
-            { PickerMode.Command ,new ObservableCollection<IComboViewModel>()
-            {
-            } },
-            {PickerMode.Calculate, new ObservableCollection<IComboViewModel>() }
-
-        };
-        public ObservableCollection<IComboViewModel> ComboLists => this.ComboDictionary[this.Mode];
-        public PickerMode Mode { get; set; }
         public string SnippetText { get; set; } = string.Empty;
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
@@ -85,19 +45,27 @@ namespace AimPicker.UI.Tools.Snippets
         private bool Filter(object obj)
         {
             var filterText = this.FilterTextBox.Text;
-            if (this.Mode != PickerMode.Snippet)
-            {
-                filterText = filterText.Substring(1);
-            }
+            filterText = filterText.Substring(this.mode.Prefix.Length);
 
             if (string.IsNullOrEmpty(filterText))
             {
                 return true;
             }
 
-            var combo = obj as SnippetViewModel;
+            var combo = obj as IComboViewModel;
             if (combo != null)
             {
+                if(combo is UrlCommandViewModel)
+                {
+                    return true;
+                }
+
+                if(combo is BookSearchViewModel)
+                {
+                    return true;
+                }
+
+
                 if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
@@ -106,6 +74,7 @@ namespace AimPicker.UI.Tools.Snippets
 
             return true;
         }
+
     }
 
     public partial class PickerWindow : Window
@@ -115,6 +84,7 @@ namespace AimPicker.UI.Tools.Snippets
         DispatcherTimer? typingTimer;
         private string beforeText = string.Empty;
         private PreviewWindow previewWindow;
+        private ComboViewModelsFacotry comboViewModelFactory;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -122,8 +92,40 @@ namespace AimPicker.UI.Tools.Snippets
         {
             this.InitializeComponent();
             this.DataContext = this;
+            this.comboViewModelFactory = new ComboViewModelsFacotry();
+            
+            this.Mode = SnippetMode.Instance;
+            this.FilterTextBox.Text = UIElementRepository.RescentText;
+            this.FilterTextBox.Focus();
+            if(!string.IsNullOrEmpty(this.FilterTextBox.Text))
+            {
+                this.FilterTextBox.SelectAll();
+            }
+
+            //this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
+            this.ComboListBox.SelectedIndex = 0;
 
             App.Current.Deactivated += AppDeacivated;
+        }
+
+        private async void UpdateCandidate()
+        {
+            string inputText;
+            if(this.mode == BookSearchMode.Instance)
+            {
+                inputText = this.FilterTextBox.Text.Substring(BookSearchMode.Instance.Prefix.Length);
+            }
+            else
+            {
+                inputText = this.FilterTextBox.Text;    
+            }
+
+            ComboLists.Clear();
+            var combos = this.comboViewModelFactory.Create(this.Mode, inputText);
+            await foreach ( var item in combos )
+            {
+                ComboLists.Add(item);
+            }
         }
 
 
@@ -140,17 +142,34 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
-            if (this.FilterTextBox.Text.StartsWith('>'))
+            if (this.FilterTextBox.Text.StartsWith(WorkFlowMode.Instance.Prefix))
             {
-                this.Mode = PickerMode.Command;
+                this.Mode = WorkFlowMode.Instance;
             }
-            else if (this.FilterTextBox.Text.StartsWith('='))
+            else if (this.FilterTextBox.Text.StartsWith(CalculationMode.Instance.Prefix))
             {
-                this.Mode = PickerMode.Calculate;
+                this.Mode = CalculationMode.Instance;
+            }
+            else if (this.FilterTextBox.Text.StartsWith(BookSearchMode.Instance.Prefix))
+            {
+                var resentMode = this.mode;
+                if(resentMode ==  BookSearchMode.Instance)
+                {
+                    UpdateCandidate();
+                }
+                else
+                {
+                    this.Mode = BookSearchMode.Instance;
+                }
+
+            }
+            else if (this.FilterTextBox.Text.StartsWith(UrlMode.Instance.Prefix))
+            {
+                this.Mode = UrlMode.Instance;
             }
             else
             {
-                this.Mode = PickerMode.Snippet;
+                this.Mode = SnippetMode.Instance;
             }
 
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboLists);
@@ -161,10 +180,23 @@ namespace AimPicker.UI.Tools.Snippets
             this.ComboListBox.SelectedIndex = 0;
         }
 
+        private WebView2 webView;
+        private bool iswebloading;
+        private Stopwatch timer = new Stopwatch();
+
+
         private void SnippetToolWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
+                if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
+                {
+                    var currentText = this.FilterTextBox.Text;
+                    this.FilterTextBox.Text = mode.Text + currentText;
+                    FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
+                    return;
+                }
+
                 if (this.ComboListBox.SelectedItem is SnippetViewModel combo)
                 {
                     this.SnippetText = combo.Snippet;
@@ -172,6 +204,18 @@ namespace AimPicker.UI.Tools.Snippets
 
                 this.CloseWindow();
             }
+            else if(e.Key == Key.Tab)
+            {
+                if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
+                {
+                    var currentText = this.FilterTextBox.Text;
+                    this.FilterTextBox.Text = mode.Text + currentText;
+                    FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
+                    e.Handled = true;
+                    return;
+                }
+            }
+
             else if (e.Key == Key.Escape)
             {
                 this.CloseWindow();
@@ -208,7 +252,7 @@ namespace AimPicker.UI.Tools.Snippets
                     Tag = null
                 };
 
-                this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
+                this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
 
                 this.typingTimer.Tick += this.HandleTypingTimerTimeout;
             }
@@ -219,19 +263,20 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.previewWindow == null)
+            if(this.previewWindow == null)
             {
                 return;
             }
 
             if (this.ComboListBox.SelectedItem is IComboViewModel combo)
             {
-                this.previewWindow.Contents?.Children.Clear();
+                this.PreviewWindow.Contents.Children.Clear();
 
                 var uiElement = combo.Create();
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
         }
+
         public PreviewWindow PreviewWindow 
         { 
             get
@@ -269,7 +314,7 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void AppDeacivated(object? sender, EventArgs e)
         {
-            this.CloseWindow();
+            //this.CloseWindow();
         }
 
         private void CloseWindow()
@@ -279,23 +324,26 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
+            UIElementRepository.RescentText = this.FilterTextBox.Text;
             this.IsClosing = true; ;
             this.previewWindow.Visibility = Visibility.Hidden;
+            this.comboViewModelFactory.Dispose();
             this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            this.PreviewWindow.Show();
+            if (this.ComboListBox.SelectedItem is IComboViewModel combo)
+            {
+                this.PreviewWindow.Contents.Children.Clear();
 
-            if(this.previewWindow == null)
-            {
-                this.PreviewWindow.Show();
+                var uiElement = combo.Create();
+                this.previewWindow?.Contents?.Children.Add(uiElement);
             }
-            else
-            {
-                this.previewWindow.Visibility = Visibility.Visible;
-                this.previewWindow.Show();
-            }
+
+            AjustWindowCommand = new RelayCommand((o) => { CenterWindowsOnScreen(this, this.previewWindow); });
+            OnPropertyChanged(nameof(AjustWindowCommand));
 
             this.Topmost = true;
             this.Activate();
@@ -305,6 +353,73 @@ namespace AimPicker.UI.Tools.Snippets
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             this.IsClosing = true;
+        }
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            InitializeCenterWindowsOnScreen(this, this.previewWindow);
+        }
+
+        public ICommand AjustWindowCommand { get; set; }
+
+        private void CenterWindowsOnScreen(Window mainWindow, Window secondaryWindow)
+        {
+            // Get the screen width and height
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+
+            // Get the width and height of both windows
+            double mainWindowWidth = mainWindow.ActualWidth;
+            double mainWindowHeight = mainWindow.ActualHeight;
+            double secondaryWindowWidth = secondaryWindow.ActualWidth;
+            double secondaryWindowHeight = secondaryWindow.ActualHeight;
+
+            // Calculate the total width of both windows
+            double totalWidth = mainWindowWidth + secondaryWindowWidth;
+
+            // Calculate the left position for each window
+            double mainWindowLeft = (screenWidth - totalWidth) / 2;
+            double secondaryWindowLeft = mainWindowLeft + mainWindowWidth;
+
+            // Calculate the top position for both windows
+            double topPosition = (screenHeight - Math.Max(mainWindowHeight, secondaryWindowHeight)) / 2;
+
+            // Set the position of the main window
+            mainWindow.Left = mainWindowLeft;
+            mainWindow.Top = topPosition;
+
+            // Set the position of the secondary window
+            secondaryWindow.Left = secondaryWindowLeft;
+            secondaryWindow.Top = topPosition;
+        }
+        private void InitializeCenterWindowsOnScreen(Window mainWindow, Window secondaryWindow)
+        {
+            // Get the screen width and height
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+
+            // Get the width and height of both windows
+            double mainWindowWidth = mainWindow.ActualWidth;
+            double mainWindowHeight = mainWindow.ActualHeight;
+            double secondaryWindowWidth = 400;
+            double secondaryWindowHeight = 500;
+
+            // Calculate the total width of both windows
+            double totalWidth = mainWindowWidth + secondaryWindowWidth;
+
+            // Calculate the left position for each window
+            double mainWindowLeft = (screenWidth - totalWidth) / 2;
+            double secondaryWindowLeft = mainWindowLeft + mainWindowWidth;
+
+            // Calculate the top position for both windows
+            double topPosition = (screenHeight - Math.Max(mainWindowHeight, secondaryWindowHeight)) / 2;
+
+            // Set the position of the main window
+            mainWindow.Left = mainWindowLeft;
+            mainWindow.Top = topPosition;
+
+            // Set the position of the secondary window
+            secondaryWindow.Left = secondaryWindowLeft;
+            secondaryWindow.Top = topPosition;
         }
     }
 }

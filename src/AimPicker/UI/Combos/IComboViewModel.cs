@@ -6,7 +6,7 @@ namespace AimPicker.UI.Combos
     {
         string Name { get; }
 
-        string Description { get; }
+        string Text { get; }
 
         UIElement Create();
     }

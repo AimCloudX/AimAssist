@@ -1,4 +1,5 @@
-﻿using AimPicker.UI.Combos.Commands;
+﻿using AimPicker.UI.Combos;
+using AimPicker.UI.Combos.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,11 @@ namespace AimPicker.UI.Repositories
     {
         private static Dictionary<string, UIElement> _elements = new Dictionary<string, UIElement>();
 
+        public static string RescentText { get; set; }
+
         public static PreviewWindow PreviewWindow { get; set; }
 
-        public static UIElement GetUIElement(PickerCommandViewModel pickerCommandViewModel)
+        public static UIElement GetUIElement(IComboViewModel pickerCommandViewModel)
         {
             if(_elements.ContainsKey(pickerCommandViewModel.Name))
             {

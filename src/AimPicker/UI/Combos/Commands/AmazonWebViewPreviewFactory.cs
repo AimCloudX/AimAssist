@@ -1,20 +1,19 @@
-﻿using Microsoft.Web.WebView2.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace AimPicker.UI.Combos.Commands
 {
-    public class WebViewPreviewFactory : IPreviewFactory
+    public class AmazonWebViewPreviewFactory : IPreviewFactory
     {
         public bool IsKeepUiElement => true;
 
         public UIElement Create(IComboViewModel combo)
         {
-            return new WebViewControl(combo.Text);
+            return new AmazonWebViewControl(combo.Text);
         }
     }
 }

@@ -12,7 +12,7 @@ internal class PickerService
     [DllImport("user32.dll")]
     static extern IntPtr GetForegroundWindow();
 
-    public static void Run(PickerMode mode)
+    public static void Run()
     {
         // HotKey押下時のウィンドウのハンドルを取得
         IntPtr hWnd = GetForegroundWindow();
@@ -20,18 +20,26 @@ internal class PickerService
         // 自身のウィンドウハンドルをアクティブにする
         SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
 
-        var window = new PickerWindow(mode);
-        window.ShowDialog();
-
-        var text = window.SnippetText;
-        if (string.IsNullOrEmpty(text))
+        try
         {
-            // 元のプロセスをアクティブにする
-            SetForegroundWindow(hWnd);
-            return;
-        }
+            var window = new PickerWindow();
+            window.ShowDialog();
 
-        System.Windows.Clipboard.SetText(text);
+            var text = window.SnippetText;
+            if (string.IsNullOrEmpty(text))
+            {
+                // 元のプロセスをアクティブにする
+                SetForegroundWindow(hWnd);
+                return;
+            }
+
+            System.Windows.Clipboard.SetText(text);
+
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(ex.Message);
+        }
 
         // 元のプロセスをアクティブにする
         SetForegroundWindow(hWnd);
