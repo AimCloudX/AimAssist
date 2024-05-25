@@ -92,4 +92,15 @@
         public override string Prefix => "bs ";
         public override string Description => "入力されたテキストを元に Google Books APIを使用して本を探して、ISBN10からamazonのリンクを作成して表示";
     }
+    public class BookmarkMode : PickerMode
+    {
+        private BookmarkMode(): base(ModeName) {}
+
+        public const string ModeName = "Bookmark";
+
+        public static BookmarkMode Instance { get; } = new BookmarkMode();
+
+        public override string Prefix => "bm ";
+        public override string Description => "ブックマークのPreview";
+    }
 }

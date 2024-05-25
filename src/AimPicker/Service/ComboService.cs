@@ -25,6 +25,7 @@ namespace AimPicker.Service
             {new ModeCombo(WorkFlowMode.Instance) },
             {new ModeCombo(BookSearchMode.Instance) },
             {new ModeCombo(CalculationMode.Instance) },
+            {new ModeCombo(BookmarkMode.Instance) },
         };
     }
 }

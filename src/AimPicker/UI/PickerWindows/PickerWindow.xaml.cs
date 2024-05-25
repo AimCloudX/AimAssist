@@ -51,20 +51,14 @@ namespace AimPicker.UI.Tools.Snippets
             {
                 return true;
             }
+            if(this.mode== UrlMode.Instance || this.mode == BookSearchMode.Instance)
+            {
+                return true;
+            }
 
             var combo = obj as IComboViewModel;
             if (combo != null)
             {
-                if(combo is UrlCommandViewModel)
-                {
-                    return true;
-                }
-
-                if(combo is BookSearchViewModel)
-                {
-                    return true;
-                }
-
 
                 if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
                 {
@@ -166,6 +160,10 @@ namespace AimPicker.UI.Tools.Snippets
             else if (this.FilterTextBox.Text.StartsWith(UrlMode.Instance.Prefix))
             {
                 this.Mode = UrlMode.Instance;
+            }
+            else if (this.FilterTextBox.Text.StartsWith(BookmarkMode.Instance.Prefix))
+            {
+                this.Mode = BookmarkMode.Instance;
             }
             else
             {
