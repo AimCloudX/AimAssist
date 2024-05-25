@@ -1,5 +1,6 @@
 ﻿using AimPicker.Domain;
 using AimPicker.UI.Combos;
+using AimPicker.UI.Combos.Commands;
 using AimPicker.UI.Combos.Snippets;
 using AimPicker.UI.Repositories;
 using Microsoft.Web.WebView2.Wpf;
@@ -44,19 +45,27 @@ namespace AimPicker.UI.Tools.Snippets
         private bool Filter(object obj)
         {
             var filterText = this.FilterTextBox.Text;
-            if (this.Mode != SnippetMode.Instance)
-            {
-                filterText = filterText.Substring(1);
-            }
+            filterText = filterText.Substring(this.mode.Prefix.Length);
 
             if (string.IsNullOrEmpty(filterText))
             {
                 return true;
             }
 
-            var combo = obj as SnippetViewModel;
+            var combo = obj as IComboViewModel;
             if (combo != null)
             {
+                if(combo is UrlCommandViewModel)
+                {
+                    return true;
+                }
+
+                if(combo is BookSearchViewModel)
+                {
+                    return true;
+                }
+
+
                 if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
@@ -86,8 +95,14 @@ namespace AimPicker.UI.Tools.Snippets
             this.comboViewModelFactory = new ComboViewModelsFacotry();
             
             this.Mode = SnippetMode.Instance;
+            this.FilterTextBox.Text = UIElementRepository.RescentText;
             this.FilterTextBox.Focus();
-            this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
+            if(!string.IsNullOrEmpty(this.FilterTextBox.Text))
+            {
+                this.FilterTextBox.SelectAll();
+            }
+
+            //this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
             this.ComboListBox.SelectedIndex = 0;
 
             App.Current.Deactivated += AppDeacivated;
@@ -174,6 +189,14 @@ namespace AimPicker.UI.Tools.Snippets
         {
             if (e.Key == Key.Enter)
             {
+                if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
+                {
+                    var currentText = this.FilterTextBox.Text;
+                    this.FilterTextBox.Text = mode.Text + currentText;
+                    FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
+                    return;
+                }
+
                 if (this.ComboListBox.SelectedItem is SnippetViewModel combo)
                 {
                     this.SnippetText = combo.Snippet;
@@ -181,6 +204,17 @@ namespace AimPicker.UI.Tools.Snippets
 
                 this.CloseWindow();
             }
+            else if(e.Key == Key.Tab)
+            {
+                if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
+                {
+                    var currentText = this.FilterTextBox.Text;
+                    this.FilterTextBox.Text = mode.Text + currentText;
+                    FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
+                    return;
+                }
+            }
+
             else if (e.Key == Key.Escape)
             {
                 this.CloseWindow();
@@ -289,6 +323,7 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
+            UIElementRepository.RescentText = this.FilterTextBox.Text;
             this.IsClosing = true; ;
             this.previewWindow.Visibility = Visibility.Hidden;
             this.comboViewModelFactory.Dispose();

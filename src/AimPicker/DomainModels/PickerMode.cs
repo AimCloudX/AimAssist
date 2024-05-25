@@ -4,6 +4,8 @@
     {
         string Name { get; }
         string Prefix { get; }
+
+        string Description { get; }
     }
 
     public abstract class PickerMode : IPickerMode
@@ -16,6 +18,8 @@
         public string Name { get; }
 
         public abstract string Prefix { get; }
+
+        public virtual string Description { get; set; }
 
         public override bool Equals(object? obj)
         {
@@ -42,6 +46,8 @@
         public static SnippetMode Instance { get; } = new SnippetMode();
 
         public override string Prefix => "";
+
+        public override string Description => "デフォルト";
     }
     public class WorkFlowMode : PickerMode
     {
@@ -52,6 +58,7 @@
         public static WorkFlowMode Instance { get; } = new WorkFlowMode();
 
         public override string Prefix => ">";
+        public override string Description => "登録されたWorkFlowを表示";
     }
 
     public class CalculationMode : PickerMode
@@ -83,5 +90,6 @@
         public static BookSearchMode Instance { get; } = new BookSearchMode();
 
         public override string Prefix => "bs ";
+        public override string Description => "入力されたテキストを元に Google Books APIを使用して本を探して、ISBN10からamazonのリンクを作成して表示";
     }
 }

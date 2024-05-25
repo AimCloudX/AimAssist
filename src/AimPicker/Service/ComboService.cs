@@ -1,8 +1,6 @@
 ﻿using AimPicker.Domain;
 using AimPicker.DomainModels;
-using AimPicker.UI.Combos;
 using AimPicker.UI.Combos.Commands;
-using AimPicker.UI.Combos.Snippets;
 
 namespace AimPicker.Service
 {
@@ -22,22 +20,12 @@ namespace AimPicker.Service
         new WorkFlowCombo("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory()),
     } }
         };
-        public static Dictionary<IPickerMode, List<IComboViewModel>> ComboDictionary = new Dictionary<IPickerMode, List<IComboViewModel>>() {
-            { SnippetMode.Instance, new List<IComboViewModel>()
-            {
-            new SnippetViewModel("aim","AimNext"),
-            new SnippetViewModel("Today",DateTime.Now.ToString("d")),
-            new SnippetViewModel("Now",DateTime.Now.ToString("t")),
-            new SnippetViewModel("AppData",Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
-            new SnippetViewModel("Downloads",Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads")),
-            new SnippetViewModel("環境変数","control.exe sysdm.cpl,,3"),
-            }
-    },{WorkFlowMode.Instance, new List<IComboViewModel>{
-        new PickerCommandViewModel("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory())
 
-    } }
+        public static List<ModeCombo> ModeComboLists = new List<ModeCombo>() {
+            {new ModeCombo(SnippetMode.Instance) },
+            {new ModeCombo(WorkFlowMode.Instance) },
+            {new ModeCombo(BookSearchMode.Instance) },
+            {new ModeCombo(CalculationMode.Instance) },
         };
-
-
     }
 }

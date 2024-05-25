@@ -36,6 +36,16 @@ namespace AimPicker.UI.Combos
 
         public async IAsyncEnumerable<IComboViewModel> Create(IPickerMode mode, string inputText)
         {
+            if(mode == SnippetMode.Instance)
+            {
+                foreach(var modeCombo in ComboService.ModeComboLists)
+                {
+                    yield return new ModeComboViewModel(modeCombo);
+
+                }
+            }
+
+
             switch (mode)
             {
                 case SnippetMode:
@@ -91,7 +101,7 @@ namespace AimPicker.UI.Combos
             {
                 if (combo is SnippetCombo snippet)
                 {
-                    yield return new SnippetViewModel(snippet.Name, snippet.Code);
+                    yield return new SnippetViewModel(snippet.Name, snippet.Text);
                 }
             }
         }
@@ -103,7 +113,7 @@ namespace AimPicker.UI.Combos
             {
                 if (combo is WorkFlowCombo workFlow)
                 {
-                    yield return new PickerCommandViewModel(workFlow.Name, workFlow.Code, workFlow.PreviewFactory);
+                    yield return new PickerCommandViewModel(workFlow.Name, workFlow.Text, workFlow.PreviewFactory);
                 }
             }
         }

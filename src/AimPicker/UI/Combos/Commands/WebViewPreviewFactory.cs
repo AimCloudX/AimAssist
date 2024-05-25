@@ -10,9 +10,11 @@ namespace AimPicker.UI.Combos.Commands
 {
     public class WebViewPreviewFactory : IPreviewFactory
     {
+        public bool IsKeepUiElement => true;
+
         public UIElement Create(IComboViewModel combo)
         {
-            return new WebViewControl(combo.Description);
+            return new WebViewControl(combo.Text);
         }
     }
 }

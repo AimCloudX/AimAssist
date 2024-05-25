@@ -15,16 +15,16 @@ namespace AimPicker.UI.Combos.Commands
 
         public string Name { get; }
 
-        public UrlCommandViewModel(string name, string description, IPreviewFactory previewFactory)
+        public UrlCommandViewModel(string name, string text, IPreviewFactory previewFactory)
         {
             Name = name;
-            this.Description = description;
+            this.Text = text;
             this.previewFactory = previewFactory;
             uiElement = UIElementRepository.GetUIElement(this);
 
         }
 
-        public string Description { get; }
+        public string Text { get; }
         private UIElement uiElement;
 
         public UIElement Create()

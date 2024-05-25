@@ -14,7 +14,7 @@ namespace AimPicker.UI.Combos.Snippets
 
         public string Snippet { get; }
 
-        public string Description => GetSnippetText;
+        public string Text => GetSnippetText;
 
         public string GetSnippetText => Snippet;
 

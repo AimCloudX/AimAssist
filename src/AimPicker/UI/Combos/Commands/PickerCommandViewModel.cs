@@ -7,15 +7,23 @@ namespace AimPicker.UI.Combos.Commands
     {
         public string Name { get; }
 
-        public PickerCommandViewModel(string name, string description, IPreviewFactory factory)
+        public PickerCommandViewModel(string name, string text, IPreviewFactory factory)
         {
             Name = name;
-            Description = description;
+            Text = text;
             Factory = factory;
-            uiElement = UIElementRepository.GetUIElement(this);
+            // TODO:Keepするかの判断を移動させる
+            if (factory.IsKeepUiElement)
+            {
+                uiElement = UIElementRepository.GetUIElement(this);
+            }
+            else
+            {
+                uiElement = factory.Create(this);
+            }
         }
 
-        public string Description { get; }
+        public string Text { get; }
         public IPreviewFactory Factory { get; }
 
         private UIElement uiElement;

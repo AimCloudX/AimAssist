@@ -8,15 +8,15 @@ namespace AimPicker.DomainModels
 {
     public class SnippetCombo : ICombo
     {
-        public SnippetCombo(string name, string Description)
+        public SnippetCombo(string name, string text)
         {
             this.Name  = name;
-            this.Code = Description;
+            this.Text = text;
 
         }
 
         public string Name { get; }
 
-        public string Code { get; }
+        public string Text { get; }
     }
 }

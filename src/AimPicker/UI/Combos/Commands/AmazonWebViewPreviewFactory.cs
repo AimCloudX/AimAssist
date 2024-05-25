@@ -7,11 +7,13 @@ using System.Windows;
 
 namespace AimPicker.UI.Combos.Commands
 {
-    public class AmazonWebViewPreviewFactory: IPreviewFactory
+    public class AmazonWebViewPreviewFactory : IPreviewFactory
     {
+        public bool IsKeepUiElement => true;
+
         public UIElement Create(IComboViewModel combo)
         {
-            return new AmazonWebViewControl(combo.Description);
+            return new AmazonWebViewControl(combo.Text);
         }
     }
 }

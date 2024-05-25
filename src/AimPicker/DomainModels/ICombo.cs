@@ -9,6 +9,6 @@ namespace AimPicker.DomainModels
     public interface ICombo
     {
         string Name { get; }
-        string Code { get; }
+        string Text { get; }
     }
 }

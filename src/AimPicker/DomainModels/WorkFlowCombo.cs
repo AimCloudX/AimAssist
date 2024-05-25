@@ -11,14 +11,14 @@ namespace AimPicker.DomainModels
     {
         public string Name { get; }
 
-        public WorkFlowCombo(string name, string description, IPreviewFactory previewFactory)
+        public WorkFlowCombo(string name, string text, IPreviewFactory previewFactory)
         {
             Name = name;
-            this.Code = description;
+            this.Text = text;
             PreviewFactory = previewFactory;
         }
 
-        public string Code { get; }
+        public string Text { get; }
         public IPreviewFactory PreviewFactory { get; }
     }
 }

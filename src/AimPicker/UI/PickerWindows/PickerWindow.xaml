@@ -47,7 +47,7 @@
                             </TextBlock>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
-                            <TextBlock FontSize="12" Text="{Binding Description}" HorizontalAlignment="Right" MaxWidth="200" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
+                            <TextBlock FontSize="12" Text="{Binding Text}" HorizontalAlignment="Right" MaxWidth="200" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
