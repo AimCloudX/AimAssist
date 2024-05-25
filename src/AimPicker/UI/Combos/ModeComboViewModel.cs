@@ -1,5 +1,6 @@
 ﻿using AimPicker.DomainModels;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AimPicker.UI.Combos
 {
@@ -10,11 +11,14 @@ namespace AimPicker.UI.Combos
         public ModeComboViewModel(ModeCombo combo)
         {
             this.combo = combo;
+            Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/Ap.ico"));
         }
 
         public string Name => combo.Name;
 
         public string Text => combo.Text;
+
+        public BitmapImage Icon { get; set; }
 
         public UIElement Create()
         {

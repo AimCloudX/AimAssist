@@ -39,16 +39,31 @@
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="4"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="{Binding Name}"  FontSize="18">
-                            </TextBlock>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1">
-                            <TextBlock FontSize="12" Text="{Binding Text}" HorizontalAlignment="Right" MaxWidth="200" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
-                        </StackPanel>
+                        <Grid Grid.Column="0">
+                            <Image Source="{Binding Icon}" Width="30" Height="30"></Image>
+                        </Grid>
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="2"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="2"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0">
+                                <TextBlock Text="{Binding Name}"  FontSize="18">
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2">
+                                <TextBlock FontSize="14" Text="{Binding Text}" 
+                                Foreground="Gray"
+                                           HorizontalAlignment="Left" MaxWidth="200" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
+                            </StackPanel>
+
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

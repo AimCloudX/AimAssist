@@ -211,6 +211,7 @@ namespace AimPicker.UI.Tools.Snippets
                     var currentText = this.FilterTextBox.Text;
                     this.FilterTextBox.Text = mode.Text + currentText;
                     FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
+                    e.Handled = true;
                     return;
                 }
             }
