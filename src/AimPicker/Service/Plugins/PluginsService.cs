@@ -1,4 +1,5 @@
-﻿using AimPicker.UI.Combos;
+﻿using AimPicker.DomainModels;
+using AimPicker.UI.Combos;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -41,9 +42,9 @@ namespace AimPicker.Service.Plugins
             container.ComposeParts(this);
         }
 
-        public IEnumerable<IComboViewModel> GetCombos()
+        public IEnumerable<ICombo> GetCombos()
         {
-            var combos = new List<IComboViewModel>();
+            var combos = new List<ICombo>();
             foreach (var plugin in _plugins)
             {
                 combos.AddRange(plugin.GetCombo());

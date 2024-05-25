@@ -8,17 +8,19 @@
         xmlns:ui="http://schemas.modernwpf.com/2019" 
         x:Name="Winodw"
         ui:WindowHelper.UseModernWindowStyle="True"
-        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
         Focusable="False"
+        SizeToContent="WidthAndHeight"
         Closing="Winodw_Closing"
-        ShowInTaskbar="False"
+        ContentRendered="Winodw_ContentRendered"
         Title="Preview" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
-            
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" x:Name="Contents" />
+        <Grid Grid.Row="0" x:Name="Contents"  HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          Margin="0"/>
     </Grid>
 </Window>

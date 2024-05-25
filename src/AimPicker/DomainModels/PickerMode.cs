@@ -3,6 +3,7 @@
     public interface IPickerMode
     {
         string Name { get; }
+        string Prefix { get; }
     }
 
     public abstract class PickerMode : IPickerMode
@@ -13,6 +14,8 @@
         }
 
         public string Name { get; }
+
+        public abstract string Prefix { get; }
 
         public override bool Equals(object? obj)
         {
@@ -37,6 +40,8 @@
         public const string ModeName = "Snippet";
 
         public static SnippetMode Instance { get; } = new SnippetMode();
+
+        public override string Prefix => "";
     }
     public class WorkFlowMode : PickerMode
     {
@@ -45,6 +50,8 @@
         public const string ModeName = "WorkFlow";
 
         public static WorkFlowMode Instance { get; } = new WorkFlowMode();
+
+        public override string Prefix => ">";
     }
 
     public class CalculationMode : PickerMode
@@ -54,6 +61,8 @@
         public const string ModeName = "Calculation";
 
         public static CalculationMode Instance { get; } = new CalculationMode();
+
+        public override string Prefix => "=";
     }
     public class UrlMode : PickerMode
     {
@@ -62,6 +71,8 @@
         public const string ModeName = "URL";
 
         public static UrlMode Instance { get; } = new UrlMode();
+
+        public override string Prefix => "https://";
     }
     public class BookSearchMode : PickerMode
     {
@@ -70,5 +81,7 @@
         public const string ModeName = "BookSearch";
 
         public static BookSearchMode Instance { get; } = new BookSearchMode();
+
+        public override string Prefix => "bs ";
     }
 }

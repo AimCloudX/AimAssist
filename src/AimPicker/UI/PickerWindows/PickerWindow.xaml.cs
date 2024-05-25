@@ -98,7 +98,7 @@ namespace AimPicker.UI.Tools.Snippets
             string inputText;
             if(this.mode == BookSearchMode.Instance)
             {
-                inputText = this.FilterTextBox.Text.Substring(1);
+                inputText = this.FilterTextBox.Text.Substring(BookSearchMode.Instance.Prefix.Length);
             }
             else
             {
@@ -127,20 +127,28 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
-            if (this.FilterTextBox.Text.StartsWith('>'))
+            if (this.FilterTextBox.Text.StartsWith(WorkFlowMode.Instance.Prefix))
             {
                 this.Mode = WorkFlowMode.Instance;
             }
-            else if (this.FilterTextBox.Text.StartsWith('='))
+            else if (this.FilterTextBox.Text.StartsWith(CalculationMode.Instance.Prefix))
             {
                 this.Mode = CalculationMode.Instance;
             }
-            else if (this.FilterTextBox.Text.StartsWith('!'))
+            else if (this.FilterTextBox.Text.StartsWith(BookSearchMode.Instance.Prefix))
             {
-                this.mode = BookSearchMode.Instance;
-                UpdateCandidate();
+                var resentMode = this.mode;
+                if(resentMode ==  BookSearchMode.Instance)
+                {
+                    UpdateCandidate();
+                }
+                else
+                {
+                    this.Mode = BookSearchMode.Instance;
+                }
+
             }
-            else if (this.FilterTextBox.Text.StartsWith("https://"))
+            else if (this.FilterTextBox.Text.StartsWith(UrlMode.Instance.Prefix))
             {
                 this.Mode = UrlMode.Instance;
             }
@@ -220,19 +228,20 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.previewWindow == null)
+            if(this.previewWindow == null)
             {
                 return;
             }
 
             if (this.ComboListBox.SelectedItem is IComboViewModel combo)
             {
-                this.previewWindow.Contents?.Children.Clear();
+                this.PreviewWindow.Contents.Children.Clear();
 
                 var uiElement = combo.Create();
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
         }
+
         public PreviewWindow PreviewWindow 
         { 
             get
@@ -288,18 +297,17 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            this.PreviewWindow.Show();
+            if (this.ComboListBox.SelectedItem is IComboViewModel combo)
+            {
+                this.PreviewWindow.Contents.Children.Clear();
 
-            if(this.previewWindow == null)
-            {
-                this.PreviewWindow.Show();
-            }
-            else
-            {
-                this.previewWindow.Visibility = Visibility.Visible;
-                this.previewWindow.Show();
+                var uiElement = combo.Create();
+                this.previewWindow?.Contents?.Children.Add(uiElement);
             }
 
             AjustWindowCommand = new RelayCommand((o) => { CenterWindowsOnScreen(this, this.previewWindow); });
+            OnPropertyChanged(nameof(AjustWindowCommand));
 
             this.Topmost = true;
             this.Activate();

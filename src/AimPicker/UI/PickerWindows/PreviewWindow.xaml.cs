@@ -32,5 +32,9 @@ namespace AimPicker.UI
             this.Contents.Children.Clear();
             UIElementRepository.PreviewWindow = null;
         }
+
+        private void Winodw_ContentRendered(object sender, EventArgs e)
+        {
+        }
     }
 }

@@ -98,11 +98,6 @@ namespace AimPicker.UI.Combos
 
         private async IAsyncEnumerable<IComboViewModel> CreateWorkFlowCombo()
         {
-            if (System.Windows.Clipboard.ContainsText())
-            {
-                yield return new SnippetViewModel("クリップボード", System.Windows.Clipboard.GetText());
-            }
-
             var combos = ComboService.ComboDictionary2[WorkFlowMode.Instance];
             foreach (var combo in combos)
             {

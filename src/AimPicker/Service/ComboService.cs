@@ -3,11 +3,6 @@ using AimPicker.DomainModels;
 using AimPicker.UI.Combos;
 using AimPicker.UI.Combos.Commands;
 using AimPicker.UI.Combos.Snippets;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace AimPicker.Service
 {
@@ -24,7 +19,7 @@ namespace AimPicker.Service
             new SnippetCombo("環境変数","control.exe sysdm.cpl,,3"),
             }
     },{WorkFlowMode.Instance, new List<ICombo>{
-        new WorkFlowCombo("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory())
+        new WorkFlowCombo("ChatGPT", "https://chatgpt.com/", new WebViewPreviewFactory()),
     } }
         };
         public static Dictionary<IPickerMode, List<IComboViewModel>> ComboDictionary = new Dictionary<IPickerMode, List<IComboViewModel>>() {
