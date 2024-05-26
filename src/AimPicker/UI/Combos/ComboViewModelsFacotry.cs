@@ -37,18 +37,17 @@ namespace AimPicker.UI.Combos
 
         public async IAsyncEnumerable<IComboViewModel> Create(IPickerMode mode, string inputText)
         {
-            if(mode == SnippetMode.Instance)
-            {
-                foreach(var modeCombo in ComboService.ModeComboLists)
-                {
-                    yield return new ModeComboViewModel(modeCombo);
-
-                }
-            }
-
-
             switch (mode)
             {
+                case NormalMode:
+                    foreach (var modeCombo in ComboService.ModeComboLists)
+                    {
+                        yield return new ModeComboViewModel(modeCombo);
+
+                    }
+                    // 必要があれば各モードのcomboを追加する
+
+                    break;
                 case SnippetMode:
                     await foreach (var combo in CreateSnippetCombo())
                     {

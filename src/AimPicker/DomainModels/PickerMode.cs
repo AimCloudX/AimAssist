@@ -37,6 +37,19 @@
         }
     }
 
+    public class NormalMode : PickerMode
+    {
+        private NormalMode(): base(ModeName) {}
+
+        public const string ModeName = "AimPicker";
+
+        public static NormalMode Instance { get; } = new NormalMode();
+
+        public override string Prefix => "";
+
+        public override string Description => "モード選択";
+    }
+
     public class SnippetMode : PickerMode
     {
         private SnippetMode(): base(ModeName) {}
@@ -45,9 +58,9 @@
 
         public static SnippetMode Instance { get; } = new SnippetMode();
 
-        public override string Prefix => "";
+        public override string Prefix => "sn ";
 
-        public override string Description => "デフォルト";
+        public override string Description => "スニペットモード";
     }
     public class WorkFlowMode : PickerMode
     {

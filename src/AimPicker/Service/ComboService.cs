@@ -21,7 +21,18 @@ namespace AimPicker.Service
     } }
         };
 
+        public static List<IPickerMode> ModeLists = new List<IPickerMode>() {
+            {NormalMode.Instance },
+            {SnippetMode.Instance },
+            {WorkFlowMode.Instance },
+            {BookSearchMode.Instance },
+            {CalculationMode.Instance },
+            {BookmarkMode.Instance },
+            {UrlMode.Instance },
+        };
+
         public static List<ModeCombo> ModeComboLists = new List<ModeCombo>() {
+            {new ModeCombo(SnippetMode.Instance) },
             {new ModeCombo(WorkFlowMode.Instance) },
             {new ModeCombo(BookSearchMode.Instance) },
             {new ModeCombo(CalculationMode.Instance) },

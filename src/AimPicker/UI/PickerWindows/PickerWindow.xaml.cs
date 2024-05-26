@@ -1,4 +1,5 @@
 ﻿using AimPicker.Domain;
+using AimPicker.Service;
 using AimPicker.UI.Combos;
 using AimPicker.UI.Combos.Commands;
 using AimPicker.UI.Combos.Snippets;
@@ -19,8 +20,8 @@ namespace AimPicker.UI.Tools.Snippets
     public partial class PickerWindow : INotifyPropertyChanged
     {
         public ObservableCollection<IComboViewModel> ComboLists { get; } = new ObservableCollection<IComboViewModel>();
-        private PickerMode mode;
-        public PickerMode Mode
+        private IPickerMode mode;
+        public IPickerMode Mode
         {
             get { return this.mode; }
             set
@@ -88,7 +89,7 @@ namespace AimPicker.UI.Tools.Snippets
             this.DataContext = this;
             this.comboViewModelFactory = new ComboViewModelsFacotry();
             
-            this.Mode = SnippetMode.Instance;
+            this.Mode = NormalMode.Instance;
             this.FilterTextBox.Text = UIElementRepository.RescentText;
             this.FilterTextBox.Focus();
             if(!string.IsNullOrEmpty(this.FilterTextBox.Text))
@@ -105,9 +106,9 @@ namespace AimPicker.UI.Tools.Snippets
         private async void UpdateCandidate()
         {
             string inputText;
-            if(this.mode == BookSearchMode.Instance)
+            if(this.mode != UrlMode.Instance)
             {
-                inputText = this.FilterTextBox.Text.Substring(BookSearchMode.Instance.Prefix.Length);
+                inputText = this.FilterTextBox.Text.Substring(this.mode.Prefix.Length);
             }
             else
             {
@@ -136,38 +137,18 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
-            if (this.FilterTextBox.Text.StartsWith(WorkFlowMode.Instance.Prefix))
+            var resentMode = this.mode;
+            var mode = GetModeFromText(this.FilterTextBox.Text);
+            if(mode == resentMode)
             {
-                this.Mode = WorkFlowMode.Instance;
-            }
-            else if (this.FilterTextBox.Text.StartsWith(CalculationMode.Instance.Prefix))
-            {
-                this.Mode = CalculationMode.Instance;
-            }
-            else if (this.FilterTextBox.Text.StartsWith(BookSearchMode.Instance.Prefix))
-            {
-                var resentMode = this.mode;
-                if(resentMode ==  BookSearchMode.Instance)
+                if (mode == BookSearchMode.Instance)
                 {
                     UpdateCandidate();
                 }
-                else
-                {
-                    this.Mode = BookSearchMode.Instance;
-                }
-
-            }
-            else if (this.FilterTextBox.Text.StartsWith(UrlMode.Instance.Prefix))
-            {
-                this.Mode = UrlMode.Instance;
-            }
-            else if (this.FilterTextBox.Text.StartsWith(BookmarkMode.Instance.Prefix))
-            {
-                this.Mode = BookmarkMode.Instance;
             }
             else
             {
-                this.Mode = SnippetMode.Instance;
+                this.Mode = mode;
             }
 
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboLists);
@@ -178,10 +159,18 @@ namespace AimPicker.UI.Tools.Snippets
             this.ComboListBox.SelectedIndex = 0;
         }
 
-        private WebView2 webView;
-        private bool iswebloading;
-        private Stopwatch timer = new Stopwatch();
+        private IPickerMode GetModeFromText(string text)
+        {
+            foreach(var mode in ComboService.ModeLists.Where(x=>x != NormalMode.Instance))
+            {
+                if (text.StartsWith(mode.Prefix))
+                {
+                    return mode;
+                }
+            }
 
+            return NormalMode.Instance;
+        }
 
         private void SnippetToolWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
