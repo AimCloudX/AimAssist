@@ -21,7 +21,15 @@ public partial class ClipboardService
             }
 
             var isVisible = isVisibleList.Contains(format);
-            var data = System.Windows.Clipboard.GetData(format);
+            object data;
+            try
+            {
+                data = System.Windows.Clipboard.GetData(format);
+            }
+            catch
+            {
+                continue;
+            }
 
             yield return new ClipboardData(format, data, isVisible);
         }
