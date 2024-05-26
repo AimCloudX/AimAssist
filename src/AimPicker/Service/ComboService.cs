@@ -1,6 +1,7 @@
 ﻿using AimPicker.Domain;
 using AimPicker.DomainModels;
 using AimPicker.UI.Combos.Commands;
+using Microsoft.Web.WebView2.Core;
 
 namespace AimPicker.Service
 {
@@ -29,6 +30,7 @@ namespace AimPicker.Service
             {CalculationMode.Instance },
             {BookmarkMode.Instance },
             {UrlMode.Instance },
+            {WikiMode.Instance },
         };
 
         public static List<ModeCombo> ModeComboLists = new List<ModeCombo>() {
@@ -37,6 +39,7 @@ namespace AimPicker.Service
             {new ModeCombo(BookSearchMode.Instance) },
             {new ModeCombo(CalculationMode.Instance) },
             {new ModeCombo(BookmarkMode.Instance) },
+            {new ModeCombo(WikiMode.Instance) },
         };
     }
 }

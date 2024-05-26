@@ -179,7 +179,7 @@ namespace AimPicker.UI.Tools.Snippets
                 if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
                 {
                     var currentText = this.FilterTextBox.Text;
-                    this.FilterTextBox.Text = mode.Text + currentText;
+                    this.FilterTextBox.Text = mode.Text;
                     FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
                     return;
                 }
@@ -195,8 +195,9 @@ namespace AimPicker.UI.Tools.Snippets
             {
                 if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
                 {
+                    // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
                     var currentText = this.FilterTextBox.Text;
-                    this.FilterTextBox.Text = mode.Text + currentText;
+                    this.FilterTextBox.Text = mode.Text;
                     FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
                     e.Handled = true;
                     return;
@@ -239,7 +240,7 @@ namespace AimPicker.UI.Tools.Snippets
                     Tag = null
                 };
 
-                this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
+                this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
 
                 this.typingTimer.Tick += this.HandleTypingTimerTimeout;
             }

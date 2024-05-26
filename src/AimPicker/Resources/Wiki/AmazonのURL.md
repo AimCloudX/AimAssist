@@ -1,0 +1,1 @@
+﻿[AmazonのURLを知ろう！｜Internets-21st](https://note.com/internets21st/n/ne3dda3c40065)

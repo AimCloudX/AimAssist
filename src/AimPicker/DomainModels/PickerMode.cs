@@ -116,4 +116,15 @@
         public override string Prefix => "bm ";
         public override string Description => "ブックマークのPreview";
     }
+    public class WikiMode : PickerMode
+    {
+        private WikiMode(): base(ModeName) {}
+
+        public const string ModeName = "Wiki";
+
+        public static WikiMode Instance { get; } = new WikiMode();
+
+        public override string Prefix => "wiki ";
+        public override string Description => "AimPicker開発のwiki";
+    }
 }

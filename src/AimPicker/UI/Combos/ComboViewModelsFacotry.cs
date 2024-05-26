@@ -7,6 +7,7 @@ using Microsoft.Web.WebView2.Wpf;
 using Newtonsoft.Json;
 using System.IO;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AimPicker.UI.Combos
 {
@@ -77,6 +78,16 @@ namespace AimPicker.UI.Combos
                     {
                         yield return combo;
                     }
+                    break;
+                case WikiMode:
+                    var aa = new DirectoryInfo("Resources/Wiki/");
+                    foreach(var file in aa.GetFiles())
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(file.Name);
+                        yield return new WikiViewModel(fileName, file.FullName);
+                    }
+                    //yield return new WikiViewModel(file.Name, "C:\\Projects\\AimPicker\\README.md");
+
                     break;
                 default:
                     throw new NotImplementedException();
