@@ -240,7 +240,14 @@ namespace AimPicker.UI.Tools.Snippets
                     Tag = null
                 };
 
-                this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
+                if(this.mode == BookSearchMode.Instance)
+                {
+                    this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
+                }
+                else
+                {
+                    this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
+                }
 
                 this.typingTimer.Tick += this.HandleTypingTimerTimeout;
             }
