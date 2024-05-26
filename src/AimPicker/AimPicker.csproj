@@ -12,6 +12,11 @@
 
   <ItemGroup>
     <None Remove="Resources\Icons\Ap.ico" />
+    <None Remove="Resources\Icons\Snippet.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Icons\Snippet.ico" />
   </ItemGroup>
 
   <ItemGroup>

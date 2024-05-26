@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AimPicker.UI.Combos.Snippets
 {
@@ -8,6 +9,7 @@ namespace AimPicker.UI.Combos.Snippets
         {
             Name = name;
             Snippet = text;
+            Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/Snippet.ico"));
         }
 
         public string Name { get; }
@@ -17,6 +19,7 @@ namespace AimPicker.UI.Combos.Snippets
         public string Text => GetSnippetText;
 
         public string GetSnippetText => Snippet;
+        public BitmapImage Icon { get; set; }
 
         public IPreviewFactory Factory => new SnippetPreviewFactory();
         public UIElement Create()
