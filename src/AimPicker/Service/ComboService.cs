@@ -1,6 +1,7 @@
 ﻿using AimPicker.Domain;
 using AimPicker.DomainModels;
 using AimPicker.UI.Combos.Commands;
+using Microsoft.Web.WebView2.Core;
 
 namespace AimPicker.Service
 {
@@ -21,10 +22,24 @@ namespace AimPicker.Service
     } }
         };
 
+        public static List<IPickerMode> ModeLists = new List<IPickerMode>() {
+            {NormalMode.Instance },
+            {SnippetMode.Instance },
+            {WorkFlowMode.Instance },
+            {BookSearchMode.Instance },
+            {CalculationMode.Instance },
+            {BookmarkMode.Instance },
+            {UrlMode.Instance },
+            {WikiMode.Instance },
+        };
+
         public static List<ModeCombo> ModeComboLists = new List<ModeCombo>() {
+            {new ModeCombo(SnippetMode.Instance) },
             {new ModeCombo(WorkFlowMode.Instance) },
             {new ModeCombo(BookSearchMode.Instance) },
             {new ModeCombo(CalculationMode.Instance) },
+            {new ModeCombo(BookmarkMode.Instance) },
+            {new ModeCombo(WikiMode.Instance) },
         };
     }
 }

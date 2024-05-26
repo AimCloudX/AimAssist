@@ -17,7 +17,8 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button Content="リンク作成" Click="Button_Click2" Margin="0,0,10,0" IsEnabled="{Binding CanExectuteCommand,Mode=OneWay}" />
-            <Button Content="Amazon書誌情報取得" Click="Button_Click1"  IsEnabled="{Binding CanExectuteCommand,Mode=OneWay}"/>
+            <Button Content="書誌情報取得" Click="Button_Click1" Margin="0,0,10,0" IsEnabled="{Binding CanExectuteCommand,Mode=OneWay}"/>
+            <Button Content="ブラウザで開く" Click="Button_Click3" Margin="0,0,10,0"/>
         </StackPanel>
         <wpf:WebView2 Grid.Row="1" x:Name="webView" 
         NavigationStarting="webView_NavigationStarting"

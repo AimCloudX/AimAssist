@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -273,6 +274,15 @@ ASIN;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        private void Button_Click3(object sender, RoutedEventArgs e)
+        {
+            // デフォルトのブラウザでURLを開く
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = this.url,
+                UseShellExecute = true
+            });
         }
     }
 }
