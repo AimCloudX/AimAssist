@@ -11,12 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.37.0" />
     <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2478.35" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.ComponentModel.Composition" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,9 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Wiki\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\AimPikcer.Plugins\AimPikcer.Plugins.csproj" />
   </ItemGroup>
   <Target Name="CopyReadMe" AfterTargets="AfterBuild">
     <!-- DLLのコピー先を指定 -->

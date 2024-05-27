@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AimPicker\AimPicker.csproj" />
+    <ProjectReference Include="..\..\AimPikcer.Plugins\AimPikcer.Plugins.csproj" />
   </ItemGroup>
 
   <ItemGroup>

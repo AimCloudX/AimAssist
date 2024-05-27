@@ -1,4 +1,4 @@
-﻿using AimPicker.UI.Combos;
+﻿using AimPicker.Combos;
 using System.Windows;
 
 namespace ClipboardAnalyzer.UI
@@ -7,7 +7,7 @@ namespace ClipboardAnalyzer.UI
     {
         public bool IsKeepUiElement => false;
 
-        public UIElement Create(IComboViewModel combo)
+        public UIElement Create(IUnitViewModel combo)
         {
             return new ClipboardList();
         }
