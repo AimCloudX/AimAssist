@@ -3,9 +3,10 @@ using AimPicker.Combos.Mode;
 using AimPicker.Combos.Mode.Snippet;
 using AimPicker.UI.Combos;
 using AimPicker.UI.Combos.Commands;
+using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
-using AimPicker.Unit.Implementation.BookSearch;
-using AimPicker.Unit.Implementation.Urls;
+using AimPicker.Unit.Implementation.Web.BookSearch;
+using AimPicker.Unit.Implementation.Web.Urls;
 using AimPicker.WebViewCash;
 using Microsoft.Web.WebView2.Wpf;
 using System.Collections.ObjectModel;
@@ -22,7 +23,7 @@ namespace AimPicker.UI.Tools.Snippets
 {
     public partial class PickerWindow : INotifyPropertyChanged
     {
-        public ObservableCollection<IUnitViewModel> ComboLists { get; } = new ObservableCollection<IUnitViewModel>();
+        public ObservableCollection<IUnit> ComboLists { get; } = new ObservableCollection<IUnit>();
         private IPickerMode mode;
         public IPickerMode Mode
         {
@@ -60,7 +61,7 @@ namespace AimPicker.UI.Tools.Snippets
                 return true;
             }
 
-            var combo = obj as IUnitViewModel;
+            var combo = obj as IUnit;
             if (combo != null)
             {
 
@@ -82,7 +83,7 @@ namespace AimPicker.UI.Tools.Snippets
         DispatcherTimer? typingTimer;
         private string beforeText = string.Empty;
         private PreviewWindow previewWindow;
-        private ComboViewModelsFacotry comboViewModelFactory;
+        private ComboUnitsFacotry comboUnitsFactory;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -90,7 +91,7 @@ namespace AimPicker.UI.Tools.Snippets
         {
             this.InitializeComponent();
             this.DataContext = this;
-            this.comboViewModelFactory = new ComboViewModelsFacotry();
+            this.comboUnitsFactory = new ComboUnitsFacotry();
             
             this.Mode = NormalMode.Instance;
             this.FilterTextBox.Text = UIElementRepository.RescentText;
@@ -119,7 +120,7 @@ namespace AimPicker.UI.Tools.Snippets
             }
 
             ComboLists.Clear();
-            var combos = this.comboViewModelFactory.Create(this.Mode, inputText);
+            var combos = this.comboUnitsFactory.Create(this.Mode, inputText);
             await foreach ( var item in combos )
             {
                 ComboLists.Add(item);
@@ -141,8 +142,8 @@ namespace AimPicker.UI.Tools.Snippets
             }
 
             var resentMode = this.mode;
-            var mode = GetModeFromText(this.FilterTextBox.Text);
-            if(mode == resentMode)
+            var mode = ComboService.GetModeFromText(this.FilterTextBox.Text);
+            if (mode == resentMode)
             {
                 if (mode == BookSearchMode.Instance)
                 {
@@ -162,24 +163,11 @@ namespace AimPicker.UI.Tools.Snippets
             this.ComboListBox.SelectedIndex = 0;
         }
 
-        private IPickerMode GetModeFromText(string text)
-        {
-            foreach(var mode in ComboService.ModeLists.Where(x=>x != NormalMode.Instance))
-            {
-                if (text.StartsWith(mode.Prefix))
-                {
-                    return mode;
-                }
-            }
-
-            return NormalMode.Instance;
-        }
-
         private void SnippetToolWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
+                if(this.ComboListBox.SelectedItem is ModeChangeUnit mode)
                 {
                     var currentText = this.FilterTextBox.Text;
                     this.FilterTextBox.Text = mode.Text;
@@ -187,16 +175,16 @@ namespace AimPicker.UI.Tools.Snippets
                     return;
                 }
 
-                if (this.ComboListBox.SelectedItem is SnippetViewModel combo)
+                if (this.ComboListBox.SelectedItem is SnippetUnit combo)
                 {
-                    this.SnippetText = combo.Snippet;
+                    this.SnippetText = combo.Text;
                 }
 
                 this.CloseWindow();
             }
             else if(e.Key == Key.Tab)
             {
-                if(this.ComboListBox.SelectedItem is ModeComboViewModel mode)
+                if(this.ComboListBox.SelectedItem is ModeChangeUnit mode)
                 {
                     // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
                     var currentText = this.FilterTextBox.Text;
@@ -266,11 +254,11 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
-            if (this.ComboListBox.SelectedItem is IUnitViewModel combo)
+            if (this.ComboListBox.SelectedItem is IUnit combo)
             {
                 this.PreviewWindow.Contents.Children.Clear();
 
-                var uiElement = combo.Create();
+                var uiElement = combo.PreviewFactory.Create(combo);
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
         }
@@ -325,18 +313,18 @@ namespace AimPicker.UI.Tools.Snippets
             UIElementRepository.RescentText = this.FilterTextBox.Text;
             this.IsClosing = true; ;
             this.previewWindow.Visibility = Visibility.Hidden;
-            this.comboViewModelFactory.Dispose();
+            this.comboUnitsFactory.Dispose();
             this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.PreviewWindow.Show();
-            if (this.ComboListBox.SelectedItem is IUnitViewModel combo)
+            if (this.ComboListBox.SelectedItem is IUnit combo)
             {
                 this.PreviewWindow.Contents.Children.Clear();
 
-                var uiElement = combo.Create();
+                var uiElement = combo.PreviewFactory.Create(combo);
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
 

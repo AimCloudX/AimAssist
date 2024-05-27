@@ -1,6 +1,7 @@
 ﻿using AimPicker.Combos;
 using AimPicker.UI;
 using AimPicker.UI.Combos.Commands;
+using AimPicker.Unit.Implementation.Web.Urls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +19,15 @@ namespace AimPicker.WebViewCash
 
         public static PreviewWindow PreviewWindow { get; set; }
 
-        public static UIElement GetUIElement(IUnitViewModel pickerCommandViewModel)
+        public static UIElement GetUIElement(UrlUnit urlUnit)
         {
-            if (_elements.ContainsKey(pickerCommandViewModel.Name))
+            if (_elements.ContainsKey(urlUnit.Name))
             {
-                return _elements[pickerCommandViewModel.Name];
+                return _elements[urlUnit.Name];
             }
 
-            var uiElement = pickerCommandViewModel.Create();
-            _elements.Add(pickerCommandViewModel.Name, uiElement);
+            var uiElement = urlUnit.Create();
+            _elements.Add(urlUnit.Name, uiElement);
 
             return uiElement;
         }

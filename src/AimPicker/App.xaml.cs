@@ -21,7 +21,7 @@ namespace AimPicker
             var combos = pluginService.GetCombos();
             foreach (var item in combos)
             {
-                if (item is SnippetCombo snippet)
+                if (item is SnippetUnit snippet)
                 {
                     ComboService.ComboDictionary2[SnippetMode.Instance].Add(snippet);
                 }

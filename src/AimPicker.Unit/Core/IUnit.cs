@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using AimPicker.Combos;
+using System.Windows;
 
 namespace AimPicker.Unit.Core
 {
@@ -6,6 +7,6 @@ namespace AimPicker.Unit.Core
     {
         string Name { get; }
         string Text { get; }
-        UIElement PreviewUI { get; }
+        IPreviewFactory PreviewFactory { get; }
     }
 }

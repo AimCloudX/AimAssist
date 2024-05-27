@@ -11,5 +11,6 @@
         public override string Prefix => "";
 
         public override string Description => "モード選択";
+        public override bool IsAddUnitLists => false; 
     }
 }

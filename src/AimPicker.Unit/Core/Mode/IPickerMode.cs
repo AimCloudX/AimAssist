@@ -6,5 +6,7 @@
         string Prefix { get; }
 
         string Description { get; }
+
+        bool IsAddUnitLists { get; }
     }
 }

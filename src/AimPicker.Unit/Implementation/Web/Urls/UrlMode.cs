@@ -1,6 +1,6 @@
 ﻿using AimPicker.Unit.Core.Mode;
 
-namespace AimPicker.Unit.Implementation.Urls
+namespace AimPicker.Unit.Implementation.Web.Urls
 {
     public class UrlMode : PikcerModeBase
     {
@@ -11,5 +11,6 @@ namespace AimPicker.Unit.Implementation.Urls
         public static UrlMode Instance { get; } = new UrlMode();
 
         public override string Prefix => "https://";
+        public override bool IsAddUnitLists => false;
     }
 }

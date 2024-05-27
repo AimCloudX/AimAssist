@@ -1,6 +1,6 @@
 ﻿using AimPicker.Unit.Core.Mode;
 
-namespace AimPicker.Unit.Implementation.Bookmarks
+namespace AimPicker.Unit.Implementation.Web.Bookmarks
 {
     public class BookmarkMode : PikcerModeBase
     {

@@ -1,6 +1,6 @@
 ﻿using AimPicker.Unit.Core.Mode;
 
-namespace AimPicker.Unit.Implementation.BookSearch
+namespace AimPicker.Unit.Implementation.Web.BookSearch
 {
     public class BookSearchMode : PikcerModeBase
     {

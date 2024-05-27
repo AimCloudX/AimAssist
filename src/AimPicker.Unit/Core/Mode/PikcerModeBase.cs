@@ -10,9 +10,10 @@
 
         public string Name { get; }
 
-        public abstract string Prefix { get; }
+        public virtual string Prefix => string.Empty;
+        public virtual bool IsAddUnitLists => true;
 
-        public virtual string Description { get; set; }
+        public virtual string Description => string.Empty;
 
         public override bool Equals(object? obj)
         {

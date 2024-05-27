@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using AimPicker.Unit.Core;
+using System.Windows;
 
 namespace AimPicker.Combos.Mode.Snippet
 {
@@ -6,11 +7,11 @@ namespace AimPicker.Combos.Mode.Snippet
     {
         public bool IsKeepUiElement => false;
 
-        public UIElement Create(IUnitViewModel combo)
+        public UIElement Create(IUnit unit)
         {
             return new System.Windows.Controls.TextBox()
             {
-                Text = combo.Text,
+                Text = unit.Text,
                 HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Margin = new Thickness(0)

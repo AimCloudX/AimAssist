@@ -1,17 +1,17 @@
-﻿using AimPicker.Combos.Mode;
-using AimPicker.Combos.Mode.BookSearch.GoogleApis;
-using AimPicker.Combos.Mode.Snippet;
+﻿using AimPicker.Combos.Mode.Snippet;
 using AimPicker.Combos.Mode.Wiki;
 using AimPicker.Combos.Mode.WorkFlows;
+using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
-using AimPicker.Unit.Implementation.Bookmarks;
-using AimPicker.Unit.Implementation.BookSearch;
 using AimPicker.Unit.Implementation.Snippets;
-using AimPicker.Unit.Implementation.Urls;
+using AimPicker.Unit.Implementation.Web;
+using AimPicker.Unit.Implementation.Web.Bookmarks;
+using AimPicker.Unit.Implementation.Web.Bookmarks.GoogleApis;
+using AimPicker.Unit.Implementation.Web.BookSearch;
+using AimPicker.Unit.Implementation.Web.Urls;
 using AimPicker.Unit.Implementation.Wiki;
 using AimPicker.Unit.Implementation.WorkFlows;
 using Common.UI;
-using Common.UI.Amazon;
 using Microsoft.Web.WebView2.Wpf;
 using Newtonsoft.Json;
 using System.IO;
@@ -19,11 +19,11 @@ using System.Windows;
 
 namespace AimPicker.Combos
 {
-    public class ComboViewModelsFacotry : IDisposable
+    public class ComboUnitsFacotry : IDisposable
     {
         private readonly Window window;
         private readonly WebView2 webView;
-        public ComboViewModelsFacotry()
+        public ComboUnitsFacotry()
         {
             window = new Window();
             window.Height = 0;
@@ -45,14 +45,14 @@ namespace AimPicker.Combos
         }
 
 
-        public async IAsyncEnumerable<IUnitViewModel> Create(IPickerMode mode, string inputText)
+        public async IAsyncEnumerable<IUnit> Create(IPickerMode mode, string inputText)
         {
             switch (mode)
             {
                 case NormalMode:
-                    foreach (var modeCombo in ComboService.ModeComboLists)
+                    foreach (var modeCombo in ComboService.ModeLists.Where(x => x.IsAddUnitLists))
                     {
-                        yield return new ModeComboViewModel(modeCombo);
+                        yield return new ModeChangeUnit(modeCombo);
 
                     }
                     // 必要があれば各モードのcomboを追加する
@@ -93,9 +93,8 @@ namespace AimPicker.Combos
                     foreach (var file in aa.GetFiles())
                     {
                         var fileName = Path.GetFileNameWithoutExtension(file.Name);
-                        yield return new KnowledgeViewModel(fileName, file.FullName);
+                        yield return new KnowledgeUnit(fileName, file.FullName);
                     }
-                    //yield return new WikiViewModel(file.Name, "C:\\Projects\\AimPicker\\README.md");
 
                     break;
                 default:
@@ -103,7 +102,7 @@ namespace AimPicker.Combos
             }
         }
 
-        private async IAsyncEnumerable<IUnitViewModel> CreateBookMarcCombo()
+        private async IAsyncEnumerable<IUnit> CreateBookMarcCombo()
         {
             var allBookmarks = new List<BookmarkItem>();
             var chromeBookmarksPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -139,53 +138,43 @@ namespace AimPicker.Combos
                 {
                     continue;
                 }
-                yield return new UrlCommandViewModel(bookmark.FullPath, bookmark.URL, new WebViewPreviewFactory());
+                yield return new UrlUnit(bookmark.FullPath, bookmark.URL, new WebViewPreviewFactory());
             }
 
         }
 
-        private async static IAsyncEnumerable<IUnitViewModel> CreateUrlCobo(string inputText)
+        private async static IAsyncEnumerable<IUnit> CreateUrlCobo(string inputText)
         {
-            if (inputText.StartsWith("https://www.amazon"))
-            {
-                yield return new UrlCommandViewModel("Amazon Preview", inputText, new AmazonWebViewPreviewFactory());
-            }
-            else
-            {
-                yield return new UrlCommandViewModel("URL Preview", inputText, new WebViewPreviewFactory());
-            }
+            yield return new UrlUnit("URL Preview", inputText, new WebViewPreviewFactory());
         }
 
-        private static async IAsyncEnumerable<IUnitViewModel> CreateSnippetCombo()
+        private static async IAsyncEnumerable<IUnit> CreateSnippetCombo()
         {
             if (System.Windows.Clipboard.ContainsText())
             {
-                yield return new SnippetViewModel("クリップボード", System.Windows.Clipboard.GetText());
+                yield return new SnippetUnit("クリップボード", System.Windows.Clipboard.GetText());
             }
 
             var combos = ComboService.ComboDictionary2[SnippetMode.Instance];
             foreach (var combo in combos)
             {
-                if (combo is SnippetCombo snippet)
+                if (combo is SnippetUnit snippet)
                 {
-                    yield return new SnippetViewModel(snippet.Name, snippet.Text);
+                    yield return new SnippetUnit(snippet.Name, snippet.Text);
                 }
             }
         }
 
-        private async IAsyncEnumerable<IUnitViewModel> CreateWorkFlowCombo()
+        private async IAsyncEnumerable<IUnit> CreateWorkFlowCombo()
         {
             var combos = ComboService.ComboDictionary2[WorkFlowMode.Instance];
             foreach (var combo in combos)
             {
-                if (combo is WorkFlowCombo workFlow)
-                {
-                    yield return new PickerCommandViewModel(workFlow.Name, workFlow.Text, workFlow.PreviewFactory);
-                }
+                yield return combo;
             }
         }
 
-        private async IAsyncEnumerable<IUnitViewModel> CreateBookSearchBombo(string inputText)
+        private async IAsyncEnumerable<IUnit> CreateBookSearchBombo(string inputText)
         {
             if (iswebloading)
             {
@@ -237,7 +226,7 @@ namespace AimPicker.Combos
                         if (bb.type == "ISBN_10")
                         {
                             var url = $"https://www.amazon.co.jp/dp/{bb.identifier}";
-                            yield return new UrlCommandViewModel(titlte, url, new AmazonWebViewPreviewFactory());
+                            yield return new UrlUnit(titlte, url, new WebViewPreviewFactory());
                         }
                     }
                 }
