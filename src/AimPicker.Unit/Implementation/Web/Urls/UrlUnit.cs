@@ -1,5 +1,6 @@
 ﻿using AimPicker.Combos;
 using AimPicker.Unit.Core;
+using AimPicker.Unit.Core.Mode;
 using System.Windows;
 
 namespace AimPicker.Unit.Implementation.Web.Urls
@@ -13,23 +14,19 @@ namespace AimPicker.Unit.Implementation.Web.Urls
             Name = name;
             Text = text;
             this.PreviewFactory = previewFactory;
-
         }
 
         public string Text { get; }
 
         public IPreviewFactory PreviewFactory { get; }
 
-        private UIElement uiElement;
+        public IPickerMode Mode => UrlMode.Instance;
 
-        public UIElement Create()
+        public string Category => string.Empty;
+
+        public UIElement GetUiElement()
         {
-            if (uiElement == null)
-            {
-                uiElement = PreviewFactory.Create(this);
-            }
-
-            return uiElement;
+            return PreviewFactory.Create(this);
         }
     }
 }

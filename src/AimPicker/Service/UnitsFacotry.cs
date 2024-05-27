@@ -1,6 +1,6 @@
 ﻿using AimPicker.Combos.Mode.Snippet;
 using AimPicker.Combos.Mode.Wiki;
-using AimPicker.Combos.Mode.WorkFlows;
+using AimPicker.Service;
 using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 using AimPicker.Unit.Implementation.Snippets;
@@ -19,11 +19,11 @@ using System.Windows;
 
 namespace AimPicker.Combos
 {
-    public class ComboUnitsFacotry : IDisposable
+    public class UnitsFacotry : IDisposable
     {
         private readonly Window window;
         private readonly WebView2 webView;
-        public ComboUnitsFacotry()
+        public UnitsFacotry()
         {
             window = new Window();
             window.Height = 0;
@@ -50,12 +50,28 @@ namespace AimPicker.Combos
             switch (mode)
             {
                 case NormalMode:
-                    foreach (var modeCombo in ComboService.ModeLists.Where(x => x.IsAddUnitLists))
+                    foreach (var modeCombo in UnitService.ModeLists.Where(x => x.IsAddUnitLists))
                     {
                         yield return new ModeChangeUnit(modeCombo);
 
                     }
                     // 必要があれば各モードのcomboを追加する
+                    await foreach (var combo in CreateSnippetCombo())
+                    {
+                        yield return combo;
+                    }
+
+                    await foreach (var combo in CreateWorkFlow())
+                    {
+                        yield return combo;
+                    }
+
+                    var info = new DirectoryInfo("Resources/Wiki/");
+                    foreach (var file in info.GetFiles())
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(file.Name);
+                        yield return new KnowledgeUnit(fileName, file.FullName);
+                    }
 
                     break;
                 case SnippetMode:
@@ -65,7 +81,7 @@ namespace AimPicker.Combos
                     }
                     break;
                 case WorkFlowMode:
-                    await foreach (var combo in CreateWorkFlowCombo())
+                    await foreach (var combo in CreateWorkFlow())
                     {
                         yield return combo;
                     }
@@ -77,7 +93,7 @@ namespace AimPicker.Combos
                     }
                     break;
                 case BookSearchMode:
-                    await foreach (var combo in CreateBookSearchBombo(inputText))
+                    await foreach (var combo in CreateBookSearch(inputText))
                     {
                         yield return combo;
                     }
@@ -89,8 +105,8 @@ namespace AimPicker.Combos
                     }
                     break;
                 case KnowledgeMode:
-                    var aa = new DirectoryInfo("Resources/Wiki/");
-                    foreach (var file in aa.GetFiles())
+                    var dictInfo = new DirectoryInfo("Resources/Wiki/");
+                    foreach (var file in dictInfo.GetFiles())
                     {
                         var fileName = Path.GetFileNameWithoutExtension(file.Name);
                         yield return new KnowledgeUnit(fileName, file.FullName);
@@ -155,7 +171,7 @@ namespace AimPicker.Combos
                 yield return new SnippetUnit("クリップボード", System.Windows.Clipboard.GetText());
             }
 
-            var combos = ComboService.ComboDictionary2[SnippetMode.Instance];
+            var combos = UnitService.UnitDictionary[SnippetMode.Instance];
             foreach (var combo in combos)
             {
                 if (combo is SnippetUnit snippet)
@@ -165,16 +181,16 @@ namespace AimPicker.Combos
             }
         }
 
-        private async IAsyncEnumerable<IUnit> CreateWorkFlowCombo()
+        private async IAsyncEnumerable<IUnit> CreateWorkFlow()
         {
-            var combos = ComboService.ComboDictionary2[WorkFlowMode.Instance];
+            var combos = UnitService.UnitDictionary[WorkFlowMode.Instance];
             foreach (var combo in combos)
             {
                 yield return combo;
             }
         }
 
-        private async IAsyncEnumerable<IUnit> CreateBookSearchBombo(string inputText)
+        private async IAsyncEnumerable<IUnit> CreateBookSearch(string inputText)
         {
             if (iswebloading)
             {

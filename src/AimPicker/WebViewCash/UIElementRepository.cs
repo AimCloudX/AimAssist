@@ -19,17 +19,19 @@ namespace AimPicker.WebViewCash
 
         public static PreviewWindow PreviewWindow { get; set; }
 
-        public static UIElement GetUIElement(UrlUnit urlUnit)
+        public static UIElement GetUIElement(string urlPath)
         {
-            if (_elements.ContainsKey(urlUnit.Name))
+            if (_elements.ContainsKey(urlPath))
             {
-                return _elements[urlUnit.Name];
+                return _elements[urlPath];
             }
 
-            var uiElement = urlUnit.Create();
-            _elements.Add(urlUnit.Name, uiElement);
+            return null;
+        }
 
-            return uiElement;
+        internal static void RegisterUIElement(string path, UIElement uiElement)
+        {
+            _elements[path] = uiElement;
         }
     }
 }

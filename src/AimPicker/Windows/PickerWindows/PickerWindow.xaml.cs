@@ -1,17 +1,14 @@
 ﻿using AimPicker.Combos;
-using AimPicker.Combos.Mode;
 using AimPicker.Combos.Mode.Snippet;
-using AimPicker.UI.Combos;
-using AimPicker.UI.Combos.Commands;
+using AimPicker.Service;
 using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 using AimPicker.Unit.Implementation.Web.BookSearch;
 using AimPicker.Unit.Implementation.Web.Urls;
 using AimPicker.WebViewCash;
-using Microsoft.Web.WebView2.Wpf;
+using AimPicker.Windows.PickerWindows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,7 +20,7 @@ namespace AimPicker.UI.Tools.Snippets
 {
     public partial class PickerWindow : INotifyPropertyChanged
     {
-        public ObservableCollection<IUnit> ComboLists { get; } = new ObservableCollection<IUnit>();
+        public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
         private IPickerMode mode;
         public IPickerMode Mode
         {
@@ -37,6 +34,21 @@ namespace AimPicker.UI.Tools.Snippets
 
                 this.mode = value;
                 UpdateCandidate();
+                // CollectionViewSourceの取得
+                CollectionViewSource groupedItems = (CollectionViewSource)this.Resources["GroupedItems"];
+
+                if (groupedItems != null)
+                {
+                    groupedItems.GroupDescriptions.Clear();
+                    if(this.mode == NormalMode.Instance)
+                    {
+                        groupedItems.GroupDescriptions.Add(new CustomGroupDescription());
+                    }
+                    else
+                    {
+                        groupedItems.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
+                    }
+                }
                 OnPropertyChanged();
             }
         }
@@ -83,7 +95,7 @@ namespace AimPicker.UI.Tools.Snippets
         DispatcherTimer? typingTimer;
         private string beforeText = string.Empty;
         private PreviewWindow previewWindow;
-        private ComboUnitsFacotry comboUnitsFactory;
+        private UnitsFacotry comboUnitsFactory;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -91,7 +103,7 @@ namespace AimPicker.UI.Tools.Snippets
         {
             this.InitializeComponent();
             this.DataContext = this;
-            this.comboUnitsFactory = new ComboUnitsFacotry();
+            this.comboUnitsFactory = new UnitsFacotry();
             
             this.Mode = NormalMode.Instance;
             this.FilterTextBox.Text = UIElementRepository.RescentText;
@@ -119,11 +131,11 @@ namespace AimPicker.UI.Tools.Snippets
                 inputText = this.FilterTextBox.Text;    
             }
 
-            ComboLists.Clear();
+            UnitLists.Clear();
             var combos = this.comboUnitsFactory.Create(this.Mode, inputText);
             await foreach ( var item in combos )
             {
-                ComboLists.Add(item);
+                UnitLists.Add(item);
             }
         }
 
@@ -142,7 +154,7 @@ namespace AimPicker.UI.Tools.Snippets
             }
 
             var resentMode = this.mode;
-            var mode = ComboService.GetModeFromText(this.FilterTextBox.Text);
+            var mode = UnitService.GetModeFromText(this.FilterTextBox.Text);
             if (mode == resentMode)
             {
                 if (mode == BookSearchMode.Instance)
@@ -159,7 +171,7 @@ namespace AimPicker.UI.Tools.Snippets
             view.Filter = this.Filter;
             this.typingTimer = null;
             this.beforeText = this.FilterTextBox.Text;
-            this.OnPropertyChanged(nameof(this.ComboLists));
+            this.OnPropertyChanged(nameof(this.UnitLists));
             this.ComboListBox.SelectedIndex = 0;
         }
 
@@ -258,7 +270,7 @@ namespace AimPicker.UI.Tools.Snippets
             {
                 this.PreviewWindow.Contents.Children.Clear();
 
-                var uiElement = combo.PreviewFactory.Create(combo);
+                var uiElement = combo.GetOrCreateUiElemnt();
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
         }
@@ -324,7 +336,7 @@ namespace AimPicker.UI.Tools.Snippets
             {
                 this.PreviewWindow.Contents.Children.Clear();
 
-                var uiElement = combo.PreviewFactory.Create(combo);
+                var uiElement = combo.GetOrCreateUiElemnt();
                 this.previewWindow?.Contents?.Children.Add(uiElement);
             }
 

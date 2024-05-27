@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{Binding Mode.Name, Mode=OneWay}"
-        SizeToContent="Height"
         Width="400"
+        Height="600"
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
@@ -17,7 +17,7 @@
         ContentRendered="Window_ContentRendered"
         >
         <Window.Resources>
-    <CollectionViewSource x:Key="GroupedItems" Source="{Binding ComboLists}">
+    <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">
         <CollectionViewSource.GroupDescriptions>
             <PropertyGroupDescription PropertyName="Category"/>
         </CollectionViewSource.GroupDescriptions>
@@ -89,8 +89,11 @@
                                 </TextBlock>
                             </StackPanel>
                             <StackPanel Grid.Row="2">
-                                <TextBlock FontSize="14" Text="{Binding Text}" 
+                                <TextBlock FontSize="14" Text="{Binding Text}" Height="17"
                                 Foreground="Gray"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"
+                                           
                                            HorizontalAlignment="Left" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
                             </StackPanel>
 

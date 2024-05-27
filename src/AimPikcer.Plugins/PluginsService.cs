@@ -16,7 +16,7 @@ namespace AimPicker.Plugins
 {
     public class PluginsService
     {
-        [ImportMany(typeof(IComboPlugin))] private IEnumerable<IComboPlugin> _plugins;
+        [ImportMany(typeof(IUnitplugin))] private IEnumerable<IUnitplugin> _plugins;
 
 
         public void LoadCommandPlugins()
@@ -49,7 +49,7 @@ namespace AimPicker.Plugins
             var combos = new List<IUnit>();
             foreach (var plugin in _plugins)
             {
-                combos.AddRange(plugin.GetCombo());
+                combos.AddRange(plugin.GetUnits());
             }
 
             return combos;

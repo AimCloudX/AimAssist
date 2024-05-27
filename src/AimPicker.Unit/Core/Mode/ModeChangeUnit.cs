@@ -6,35 +6,32 @@ namespace AimPicker.Unit.Core.Mode
 {
     public class ModeChangeUnit : IUnit
     {
-        private readonly IPickerMode combo;
+        private readonly IPickerMode pickerMode;
 
         public ModeChangeUnit(IPickerMode combo)
         {
-            this.combo = combo;
+            this.pickerMode = combo;
             Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/Ap.ico"));
         }
 
-        public string Name => combo.Name;
+        public string Name => pickerMode.Name;
 
-        public string Text => combo.Description;
+        public string Text => pickerMode.Description;
         public string Category => "Mode";
 
         public BitmapImage Icon { get; set; }
 
-        public IPreviewFactory PreviewFactory => new ModePreviewFactory();
+        public IPickerMode Mode => this.Mode;
 
-        public class ModePreviewFactory : IPreviewFactory
+        public UIElement GetUiElement()
         {
-            public UIElement Create(IUnit combo)
+            return new System.Windows.Controls.TextBox()
             {
-                return new System.Windows.Controls.TextBox()
-                {
-                    Text = combo.Text,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    Margin = new Thickness(0)
-                };
-            }
+                Text = this.Text,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Margin = new Thickness(0)
+            };
         }
     }
 }

@@ -2,8 +2,8 @@
 
 namespace AimPicker.Plugins
 {
-    public interface IComboPlugin
+    public interface IUnitplugin
     {
-        IEnumerable<IUnit> GetCombo();
+        IEnumerable<IUnit> GetUnits();
     }
 }

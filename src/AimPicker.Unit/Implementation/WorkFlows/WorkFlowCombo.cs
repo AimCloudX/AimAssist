@@ -1,9 +1,6 @@
 ﻿using AimPicker.Unit.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AimPicker.Unit.Core.Mode;
+using AimPicker.Unit.Implementation.WorkFlows;
 using System.Windows;
 
 namespace AimPicker.Combos.Mode.WorkFlows
@@ -16,12 +13,19 @@ namespace AimPicker.Combos.Mode.WorkFlows
         {
             Name = name;
             Text = text;
-            PreviewFactory = previewFactory;
+            this.previewFactory = previewFactory;
         }
 
         public string Text { get; }
-        public IPreviewFactory PreviewFactory { get; }
+        private IPreviewFactory previewFactory { get; }
 
-        public UIElement PreviewUI => throw new NotImplementedException();
+        public IPickerMode Mode => WorkFlowMode.Instance;
+
+        public string Category => string.Empty;
+
+        public UIElement GetUiElement()
+        {
+            return this.previewFactory.Create(this);
+        }
     }
 }

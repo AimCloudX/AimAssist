@@ -10,13 +10,12 @@ using AimPicker.Unit.Implementation.Web.BookSearch;
 using AimPicker.Unit.Implementation.Web.Urls;
 using AimPicker.Unit.Implementation.Wiki;
 using AimPicker.Unit.Implementation.WorkFlows;
-using Common.UI;
 
-namespace AimPicker.Combos
+namespace AimPicker.Service
 {
-    public static class ComboService
+    public static class UnitService
     {
-        public static Dictionary<IPickerMode, List<IUnit>> ComboDictionary2 = new Dictionary<IPickerMode, List<IUnit>>() {
+        public static Dictionary<IPickerMode, List<IUnit>> UnitDictionary = new Dictionary<IPickerMode, List<IUnit>>() {
             { SnippetMode.Instance, new List<IUnit>()
             {
             new SnippetUnit("aim","AimNext"),

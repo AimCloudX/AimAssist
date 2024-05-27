@@ -7,10 +7,10 @@ using AimPicker.Unit.Core;
 
 namespace ClipboardAnalyzer.Plugins
 {
-    [Export(typeof(IComboPlugin))]
-    public class ClipboardComboPlugin : IComboPlugin
+    [Export(typeof(IUnitplugin))]
+    public class ClipboardPlugin : IUnitplugin
     {
-        public IEnumerable<IUnit> GetCombo()
+        public IEnumerable<IUnit> GetUnits()
         {
             var text = System.Windows.Clipboard.ContainsText() ? System.Windows.Clipboard.GetText() : string.Empty;
 
