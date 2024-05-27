@@ -1,0 +1,128 @@
+﻿<Window x:Class="AimPicker.UI.Tools.Snippets.PickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="{Binding Mode.Name, Mode=OneWay}"
+        Width="400"
+        Height="600"
+        KeyDown="SnippetToolWindow_OnKeyUp"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Closing="Window_Closing"
+        Loaded="Window_Loaded"
+        ContentRendered="Window_ContentRendered"
+        >
+        <Window.Resources>
+    <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">
+        <CollectionViewSource.GroupDescriptions>
+            <PropertyGroupDescription PropertyName="Category"/>
+        </CollectionViewSource.GroupDescriptions>
+    </CollectionViewSource>
+        <Style TargetType="GroupItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupItem">
+                        <Expander IsExpanded="True" BorderThickness="0">
+                            <Expander.Header>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="LightSlateGray" Height="15" IsHitTestVisible="False"/>
+                            </Expander.Header>
+                            <ItemsPresenter />
+                        </Expander>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+        <!--Style="{StaticResource MaterialDesignWindow}"-->
+    <Grid x:Name="Root">
+        <Grid.InputBindings>
+            <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding AjustWindowCommand}"/>
+        </Grid.InputBindings>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"></RowDefinition>
+        <RowDefinition Height="*"></RowDefinition>
+    </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
+                 InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
+            <StackPanel x:Name="FilterContents"/>
+        </Grid>
+        <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding Source={StaticResource GroupedItems}}" SelectionChanged="ComboListBox_SelectionChanged">
+            <ListBox.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"  Foreground="Gray" IsHitTestVisible="False"/>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListBox.GroupStyle>
+            
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="4"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Image Source="{Binding Icon}" Width="30" Height="30"></Image>
+                        </Grid>
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="2"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="2"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0">
+                                <TextBlock Text="{Binding Name}"  FontSize="18">
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2">
+                                <TextBlock FontSize="14" Text="{Binding Text}" Height="17"
+                                Foreground="Gray"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"
+                                           
+                                           HorizontalAlignment="Left" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
+                            </StackPanel>
+
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                Background="{TemplateBinding Background}"
+                                                Padding="{TemplateBinding Padding}" CornerRadius="10"
+                                                ClipToBounds="True">
+                                    <ContentPresenter />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Foreground" Value="Orange"></Setter>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+    </Grid>
+</Window>

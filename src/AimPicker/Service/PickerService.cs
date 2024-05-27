@@ -1,5 +1,4 @@
 ﻿
-using AimPicker.Domain;
 using AimPicker.UI.Tools.Snippets;
 using System.Diagnostics;
 using System.Runtime.InteropServices;

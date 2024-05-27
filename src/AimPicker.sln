@@ -5,9 +5,19 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AimPicker", "AimPicker\AimPicker.csproj", "{CA7E4D7C-5D72-4F1E-894D-0AA188979686}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{9ED6EB73-B505-45CF-A059-C6C67C5CF08D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{9ED6EB73-B505-45CF-A059-C6C67C5CF08D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipboardAnalyzer", "Extensions\ClipboardAnalyzer\ClipboardAnalyzer.csproj", "{953CBB5A-35B1-4076-AF39-45EE601B6346}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipboardAnalyzer", "Extensions\ClipboardAnalyzer\ClipboardAnalyzer.csproj", "{953CBB5A-35B1-4076-AF39-45EE601B6346}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AimPicker.Unit", "AimPicker.Unit\AimPicker.Unit.csproj", "{6F62591F-D8D9-49A7-8F85-F270A6A176F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snippet", "Snippet\Snippet.csproj", "{6EEB2E23-D32D-494A-8DD5-D9ADE8600C85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{30969614-ADAC-44F6-A5E2-428A4C55DA28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.UI", "Common.UI\Common.UI.csproj", "{456961B4-ADF2-4B81-872D-0C1967179452}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AimPikcer.Plugins", "AimPikcer.Plugins\AimPikcer.Plugins.csproj", "{07374F94-D49D-4094-AB63-64F35BF1E7E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +33,26 @@ Global
 		{953CBB5A-35B1-4076-AF39-45EE601B6346}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{953CBB5A-35B1-4076-AF39-45EE601B6346}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{953CBB5A-35B1-4076-AF39-45EE601B6346}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F62591F-D8D9-49A7-8F85-F270A6A176F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F62591F-D8D9-49A7-8F85-F270A6A176F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F62591F-D8D9-49A7-8F85-F270A6A176F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F62591F-D8D9-49A7-8F85-F270A6A176F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EEB2E23-D32D-494A-8DD5-D9ADE8600C85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EEB2E23-D32D-494A-8DD5-D9ADE8600C85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EEB2E23-D32D-494A-8DD5-D9ADE8600C85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EEB2E23-D32D-494A-8DD5-D9ADE8600C85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30969614-ADAC-44F6-A5E2-428A4C55DA28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30969614-ADAC-44F6-A5E2-428A4C55DA28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30969614-ADAC-44F6-A5E2-428A4C55DA28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30969614-ADAC-44F6-A5E2-428A4C55DA28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{456961B4-ADF2-4B81-872D-0C1967179452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{456961B4-ADF2-4B81-872D-0C1967179452}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{456961B4-ADF2-4B81-872D-0C1967179452}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{456961B4-ADF2-4B81-872D-0C1967179452}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07374F94-D49D-4094-AB63-64F35BF1E7E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07374F94-D49D-4094-AB63-64F35BF1E7E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07374F94-D49D-4094-AB63-64F35BF1E7E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07374F94-D49D-4094-AB63-64F35BF1E7E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,11 @@
-﻿using AimPicker.Domain;
-using AimPicker.DomainModels;
+﻿using AimPicker.Combos.Mode;
+using AimPicker.Combos.Mode.Snippet;
+using AimPicker.Combos.Mode.WorkFlows;
+using AimPicker.Plugins;
 using AimPicker.Service;
-using AimPicker.Service.Plugins;
 using AimPicker.UI.Tools.HotKeys;
-using System.Runtime.CompilerServices;
+using AimPicker.Unit.Implementation.Snippets;
+using AimPicker.Unit.Implementation.WorkFlows;
 
 namespace AimPicker
 {
@@ -19,14 +21,14 @@ namespace AimPicker
             var combos = pluginService.GetCombos();
             foreach (var item in combos)
             {
-                if (item is SnippetCombo snippet)
+                if (item is SnippetUnit snippet)
                 {
-                    ComboService.ComboDictionary2[SnippetMode.Instance].Add(snippet);
+                    UnitService.UnitDictionary[SnippetMode.Instance].Add(snippet);
                 }
 
                 if (item is WorkFlowCombo command)
                 {
-                    ComboService.ComboDictionary2[WorkFlowMode.Instance].Add(command);
+                    UnitService.UnitDictionary[WorkFlowMode.Instance].Add(command);
                 }
             }
 
