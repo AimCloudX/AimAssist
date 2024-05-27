@@ -28,5 +28,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <Target Name="CopyReadMe" AfterTargets="AfterBuild">
+    <!-- DLLのコピー先を指定 -->
+    <Copy SourceFiles="..\..\README.md" DestinationFolder="$(OutputPath)\Resources\Wiki\" />
+  </Target>
 
 </Project>
