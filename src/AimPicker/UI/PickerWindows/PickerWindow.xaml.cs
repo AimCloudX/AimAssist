@@ -151,7 +151,7 @@ namespace AimPicker.UI.Tools.Snippets
                 this.Mode = mode;
             }
 
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboLists);
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
             view.Filter = this.Filter;
             this.typingTimer = null;
             this.beforeText = this.FilterTextBox.Text;

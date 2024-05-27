@@ -17,6 +17,7 @@ namespace AimPicker.UI.Combos
         public string Name => combo.Name;
 
         public string Text => combo.Text;
+        public string Category => "Mode";
 
         public BitmapImage Icon { get; set; }
 

@@ -16,6 +16,27 @@
         Loaded="Window_Loaded"
         ContentRendered="Window_ContentRendered"
         >
+        <Window.Resources>
+    <CollectionViewSource x:Key="GroupedItems" Source="{Binding ComboLists}">
+        <CollectionViewSource.GroupDescriptions>
+            <PropertyGroupDescription PropertyName="Category"/>
+        </CollectionViewSource.GroupDescriptions>
+    </CollectionViewSource>
+        <Style TargetType="GroupItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupItem">
+                        <Expander IsExpanded="True" BorderThickness="0">
+                            <Expander.Header>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="LightSlateGray" Height="15" IsHitTestVisible="False"/>
+                            </Expander.Header>
+                            <ItemsPresenter />
+                        </Expander>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
         <!--Style="{StaticResource MaterialDesignWindow}"-->
     <Grid x:Name="Root">
         <Grid.InputBindings>
@@ -34,7 +55,17 @@
                  InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
             <StackPanel x:Name="FilterContents"/>
         </Grid>
-        <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding ComboLists}" SelectionChanged="ComboListBox_SelectionChanged">
+        <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding Source={StaticResource GroupedItems}}" SelectionChanged="ComboListBox_SelectionChanged">
+            <ListBox.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"  Foreground="Gray" IsHitTestVisible="False"/>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListBox.GroupStyle>
+            
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
