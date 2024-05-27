@@ -16,7 +16,7 @@ namespace AimPicker.Unit.Core.Mode
 
         public string Name => pickerMode.Name;
 
-        public string Text => pickerMode.Description;
+        public string Text => pickerMode.Prefix;
         public string Category => "Mode";
 
         public BitmapImage Icon { get; set; }
@@ -27,7 +27,7 @@ namespace AimPicker.Unit.Core.Mode
         {
             return new System.Windows.Controls.TextBox()
             {
-                Text = this.Text,
+                Text = this.pickerMode.Description,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Margin = new Thickness(0)
