@@ -21,14 +21,13 @@ namespace AimPicker
             var combos = pluginService.GetCombos();
             foreach (var item in combos)
             {
-                if (item is SnippetUnit snippet)
+                if (UnitService.UnitDictionary.ContainsKey(item.Mode))
                 {
-                    UnitService.UnitDictionary[SnippetMode.Instance].Add(snippet);
+                    UnitService.UnitDictionary[item.Mode].Add(item);
                 }
-
-                if (item is WorkFlowCombo command)
+                else
                 {
-                    UnitService.UnitDictionary[WorkFlowMode.Instance].Add(command);
+                    UnitService.UnitDictionary[item.Mode] = new List<Unit.Core.IUnit> { item };
                 }
             }
 

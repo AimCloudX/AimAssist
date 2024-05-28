@@ -18,12 +18,9 @@ namespace AimPicker.Unit.Implementation.Snippets
                 yield return new SnippetUnit("クリップボード", System.Windows.Clipboard.GetText());
             }
 
-            foreach (var combo in UnitService.UnitDictionary[SnippetMode.Instance])
+            foreach (var unit in UnitService.UnitDictionary[SnippetMode.Instance])
             {
-                if (combo is SnippetUnit snippet)
-                {
-                    yield return new SnippetUnit(snippet.Name, snippet.Text);
-                }
+                yield return unit;
             }
         }
     }

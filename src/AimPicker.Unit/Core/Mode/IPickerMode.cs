@@ -7,6 +7,6 @@
 
         string Description { get; }
 
-        bool IsAddUnitLists { get; }
+        bool IsApplyFiter { get; }
     }
 }

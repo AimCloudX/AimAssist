@@ -11,9 +11,9 @@
         public string Name { get; }
 
         public virtual string Prefix => string.Empty;
-        public virtual bool IsAddUnitLists => true;
-
         public virtual string Description => string.Empty;
+
+        public virtual bool IsApplyFiter => true;
 
         public override bool Equals(object? obj)
         {

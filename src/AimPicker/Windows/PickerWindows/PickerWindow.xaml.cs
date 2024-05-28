@@ -73,7 +73,7 @@ namespace AimPicker.UI.Tools.Snippets
             {
                 return true;
             }
-            if(this.mode== UrlMode.Instance || this.mode == BookSearchMode.Instance)
+            if(this.mode.IsApplyFiter == false)
             {
                 return true;
             }
