@@ -4,6 +4,6 @@ namespace AimPicker.Plugins
 {
     public interface IUnitplugin
     {
-        IEnumerable<IUnit> GetUnits();
+        IEnumerable<IUnitsFacotry> GetUnitsFactory();
     }
 }

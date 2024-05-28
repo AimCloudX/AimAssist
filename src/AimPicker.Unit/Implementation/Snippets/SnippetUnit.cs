@@ -17,13 +17,15 @@ namespace AimPicker.Combos.Mode.Snippet
 
         public string Text { get; }
 
+        public string Code => this.Text;
+
         public IPickerMode Mode => SnippetMode.Instance;
 
         public string Category => string.Empty;
 
         public UIElement GetUiElement()
         {
-            return new SnippetPreviewFactory().Create(this);
+            return new SnippetPreviewFactory().Create(this.Code);
         }
     }
 }

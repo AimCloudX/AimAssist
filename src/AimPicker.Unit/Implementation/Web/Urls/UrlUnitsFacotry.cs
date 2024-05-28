@@ -9,9 +9,9 @@ namespace AimPicker.Unit.Implementation.Web.Urls
 
         public bool IsShowInStnadard => false;
 
-        public IEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
+        public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
-            yield return new UrlUnit("URL Preview", pamater.InputText, new WebViewPreviewFactory());
+            yield return new UrlUnit("URL Preview", pamater.InputText);
         }
     }
 }

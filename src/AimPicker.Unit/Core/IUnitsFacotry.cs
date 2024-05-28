@@ -5,7 +5,7 @@ namespace AimPicker.Unit.Core
     public interface IUnitsFacotry
     {
         IPickerMode TargetMode { get; }
-        IEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater);
+        IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater);
         bool IsShowInStnadard { get; }
     }
 

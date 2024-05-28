@@ -15,6 +15,8 @@
 
         public virtual bool IsApplyFiter => true;
 
+        public IUnit ModeChangeUnits=> new ModeChangeUnit(this);
+
         public override bool Equals(object? obj)
         {
             if (obj is IPickerMode pickerMode)

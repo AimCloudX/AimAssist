@@ -1,18 +1,15 @@
-﻿using AimPicker.Unit.Core;
-using System.Windows;
+﻿using System.Windows;
 
 namespace AimPicker.Combos.Mode.Snippet
 {
-    public class SnippetPreviewFactory : IPreviewFactory
+    public class SnippetPreviewFactory
     {
-        public bool IsKeepUiElement => false;
-
-        public UIElement Create(IUnit unit)
+        public UIElement Create(string code)
         {
             return new System.Windows.Controls.TextBox()
             {
-                Text = unit.Text,
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
+                Text = code,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Margin = new Thickness(0)
             };

@@ -14,13 +14,13 @@ namespace AimPicker.Unit.Implementation.Standard
 
         public bool IsShowInStnadard => true;
 
-        public IEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
+        public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
-            yield return new ModeChangeUnit(SnippetMode.Instance);
-            yield return new ModeChangeUnit(KnowledgeMode.Instance);
-            yield return new ModeChangeUnit(WorkFlowMode.Instance);
-            yield return new ModeChangeUnit(BookSearchMode.Instance);
-            yield return new ModeChangeUnit(BookmarkMode.Instance);
+            yield return SnippetMode.Instance.ModeChangeUnits;
+            yield return KnowledgeMode.Instance.ModeChangeUnits;
+            yield return WorkFlowMode.Instance.ModeChangeUnits;
+            yield return BookSearchMode.Instance.ModeChangeUnits;
+            yield return BookmarkMode.Instance.ModeChangeUnits;
         }
     }
 }

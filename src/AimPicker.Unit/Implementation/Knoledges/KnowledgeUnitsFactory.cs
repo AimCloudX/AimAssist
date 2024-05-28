@@ -12,7 +12,7 @@ namespace AimPicker.Unit.Implementation.Knoledges
 
         public IPickerMode TargetMode => KnowledgeMode.Instance;
 
-        public IEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
+        public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
             var dictInfo = new DirectoryInfo("Resources/Knowledge/");
             foreach (var file in dictInfo.GetFiles())

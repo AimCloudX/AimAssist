@@ -1,5 +1,4 @@
 ﻿using AimPicker.Combos.Mode.Snippet;
-using AimPicker.Service;
 using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 
@@ -11,17 +10,20 @@ namespace AimPicker.Unit.Implementation.Snippets
 
         public bool IsShowInStnadard => true;
 
-        public IEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
+        public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
             if (System.Windows.Clipboard.ContainsText())
             {
                 yield return new SnippetUnit("クリップボード", System.Windows.Clipboard.GetText());
             }
 
-            foreach (var unit in UnitService.UnitDictionary[SnippetMode.Instance])
-            {
-                yield return unit;
-            }
+            // TODO:設定ファイルからのLoad
+            yield return new SnippetUnit("aim", "AimNext");
+            yield return new SnippetUnit("Today", DateTime.Now.ToString("d"));
+            yield return new SnippetUnit("Now", DateTime.Now.ToString("t"));
+            yield return new SnippetUnit("AppData", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            yield return new SnippetUnit("Downloads",Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads"));
+            yield return new SnippetUnit("環境変数", "control.exe sysdm.cpl,,3");
         }
     }
 }

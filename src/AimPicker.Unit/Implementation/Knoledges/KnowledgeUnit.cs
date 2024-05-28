@@ -9,15 +9,17 @@ namespace AimPicker.Combos.Mode.Wiki
     {
         public string Name { get; }
 
-        public KnowledgeUnit(string name, string text)
+        public KnowledgeUnit(string name, string path)
         {
             Name = name;
-            Text = text;
+            Path = path;
         }
 
-        public string Text { get; }
+        public string Text => this.Path;
 
-        public IPreviewFactory PreviewFactory => new MarkdownPreviewFactory();
+        public string Path { get; }
+
+        public MarkdownPreviewFactory PreviewFactory => new MarkdownPreviewFactory();
 
         public IPickerMode Mode => KnowledgeMode.Instance;
 
@@ -25,7 +27,7 @@ namespace AimPicker.Combos.Mode.Wiki
 
         public UIElement GetUiElement()
         {
-            return new MarkdownPreviewFactory().Create(this);
+            return new MarkdownPreviewFactory().Create(this.Path);
         }
     }
 }

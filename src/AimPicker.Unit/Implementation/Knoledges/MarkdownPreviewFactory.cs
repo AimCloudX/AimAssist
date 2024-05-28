@@ -1,14 +1,13 @@
 ﻿using AimPicker.UI.Combos;
-using AimPicker.Unit.Core;
 using System.Windows;
 
 namespace AimPicker.Combos.Mode.Wiki
 {
-    public class MarkdownPreviewFactory : IPreviewFactory
+    public class MarkdownPreviewFactory
     {
-        public UIElement Create(IUnit combo)
+        public UIElement Create(string path)
         {
-            return new MarkdownView(combo.Text);
+            return new MarkdownView(path);
         }
     }
 }

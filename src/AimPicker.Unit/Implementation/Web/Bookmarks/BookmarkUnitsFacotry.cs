@@ -12,7 +12,7 @@ namespace AimPicker.Unit.Implementation.Web.Bookmarks
 
         public bool IsShowInStnadard => false;
 
-        public IEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
+        public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
             var allBookmarks = new List<BookmarkItem>();
             var chromeBookmarksPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -48,7 +48,7 @@ namespace AimPicker.Unit.Implementation.Web.Bookmarks
                 {
                     continue;
                 }
-                yield return new UrlUnit(bookmark.FullPath, bookmark.URL, new WebViewPreviewFactory());
+                yield return new UrlUnit(bookmark.FullPath, bookmark.URL);
             }
         }
         static void PrintBookmarks(List<ChromeBookmarkNode> bookmarks)
