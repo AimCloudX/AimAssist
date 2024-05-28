@@ -27,7 +27,7 @@ namespace AimPicker.UI.Combos.Commands
 
         private string producttitle;
         private string ISBN;
-        private string Price;
+        private int Price;
         private string Publisher;
         private string Author;
         private string ASIN;
@@ -153,10 +153,12 @@ price;
                 webView.CoreWebView2.ExecuteScriptAsync(priceScript).ContinueWith(task =>
                 {
                     // JavaScriptの結果を取得
-                    Price = task.Result;
+                    var  priceString = task.Result;
 
                     // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    Price = Price.Trim('"');
+                    priceString = priceString.Trim('"');
+
+                    Price = ConvertStringToInt(priceString);
 
                 });
 
@@ -223,7 +225,7 @@ ASIN;
 
         private void Button_Click1(object sender, RoutedEventArgs e)
         {
-            var text = producttitle + "\t"+ Publisher + "\t"+Author+ "\t"+Price +"\t"+ISBN;
+            var text = producttitle + "\t"+ Publisher + "\t"+Author+ "\t"+Price +"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+ISBN;
 
             System.Windows.Clipboard.SetText(text);
         }
@@ -283,6 +285,22 @@ ASIN;
                 FileName = this.url,
                 UseShellExecute = true
             });
+        }
+
+        private static int ConvertStringToInt(string input)
+        {
+            // 円記号とカンマを削除
+            string cleanedString = input.Replace("\\", "").Replace(",", "");
+
+            // 整数に変換
+            if (int.TryParse(cleanedString, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }
