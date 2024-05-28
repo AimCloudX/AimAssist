@@ -4,6 +4,7 @@ using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 using AimPicker.Unit.Implementation;
 using AimPicker.Unit.Implementation.Snippets;
+using AimPicker.Unit.Implementation.Standard;
 using AimPicker.Unit.Implementation.Web;
 using AimPicker.Unit.Implementation.Web.Bookmarks;
 using AimPicker.Unit.Implementation.Web.BookSearch;
@@ -31,7 +32,7 @@ namespace AimPicker.Service
         };
 
         public static List<IPickerMode> ModeLists = new List<IPickerMode>() {
-            {NormalMode.Instance },
+            {StandardMode.Instance },
             {SnippetMode.Instance },
             {WorkFlowMode.Instance },
             {BookSearchMode.Instance },
@@ -51,7 +52,7 @@ namespace AimPicker.Service
                 }
             }
 
-            return NormalMode.Instance;
+            return StandardMode.Instance;
         }
 
     }

@@ -3,8 +3,13 @@ using AimPicker.Combos.Mode.Snippet;
 using AimPicker.Service;
 using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
+using AimPicker.Unit.Implementation.Knoledges;
+using AimPicker.Unit.Implementation.Snippets;
+using AimPicker.Unit.Implementation.Standard;
+using AimPicker.Unit.Implementation.Web.Bookmarks;
 using AimPicker.Unit.Implementation.Web.BookSearch;
 using AimPicker.Unit.Implementation.Web.Urls;
+using AimPicker.Unit.Implementation.WorkFlows;
 using AimPicker.WebViewCash;
 using AimPicker.Windows.PickerWindows;
 using System.Collections.ObjectModel;
@@ -40,7 +45,7 @@ namespace AimPicker.UI.Tools.Snippets
                 if (groupedItems != null)
                 {
                     groupedItems.GroupDescriptions.Clear();
-                    if(this.mode == NormalMode.Instance)
+                    if(this.mode == StandardMode.Instance)
                     {
                         groupedItems.GroupDescriptions.Add(new CustomGroupDescription());
                     }
@@ -104,8 +109,15 @@ namespace AimPicker.UI.Tools.Snippets
             this.InitializeComponent();
             this.DataContext = this;
             this.comboUnitsFactory = new UnitsFacotry();
+            this.comboUnitsFactory.RegisterFactory(new ModeChangeUnitsFacotry());
+            this.comboUnitsFactory.RegisterFactory(new SnippetUnitsFactory());
+            this.comboUnitsFactory.RegisterFactory(new WorkFlowUnitsFactory());
+            this.comboUnitsFactory.RegisterFactory(new BookSearchUnitsFactory());
+            this.comboUnitsFactory.RegisterFactory(new KnowledgeUnitsFactory());
+            this.comboUnitsFactory.RegisterFactory(new BookmarkUnitsFacotry());
+            this.comboUnitsFactory.RegisterFactory(new UrlUnitsFacotry());
             
-            this.Mode = NormalMode.Instance;
+            this.Mode = StandardMode.Instance;
             this.FilterTextBox.Text = UIElementRepository.RescentText;
             this.FilterTextBox.Focus();
             if(!string.IsNullOrEmpty(this.FilterTextBox.Text))

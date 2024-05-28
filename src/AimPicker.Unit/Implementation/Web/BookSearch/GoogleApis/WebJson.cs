@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace AimPicker.Unit.Implementation.Web.Bookmarks.GoogleApis
+namespace AimPicker.Unit.Implementation.Web.BookSearch.GoogleApis
 {
     using System;
     using System.Collections.Generic;
