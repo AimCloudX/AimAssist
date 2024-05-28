@@ -66,7 +66,7 @@ namespace AimPicker.Combos
                         yield return combo;
                     }
 
-                    var info = new DirectoryInfo("Resources/Wiki/");
+                    var info = new DirectoryInfo("Resources/Knowledge/");
                     foreach (var file in info.GetFiles())
                     {
                         var fileName = Path.GetFileNameWithoutExtension(file.Name);
@@ -105,7 +105,7 @@ namespace AimPicker.Combos
                     }
                     break;
                 case KnowledgeMode:
-                    var dictInfo = new DirectoryInfo("Resources/Wiki/");
+                    var dictInfo = new DirectoryInfo("Resources/Knowledge/");
                     foreach (var file in dictInfo.GetFiles())
                     {
                         var fileName = Path.GetFileNameWithoutExtension(file.Name);
