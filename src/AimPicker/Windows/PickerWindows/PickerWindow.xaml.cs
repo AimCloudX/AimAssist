@@ -309,7 +309,10 @@ namespace AimPicker.UI.Tools.Snippets
 
         private void AppDeacivated(object? sender, EventArgs e)
         {
-            //this.CloseWindow();
+#if DEBUG
+            return;
+#endif
+            this.CloseWindow();
         }
 
         private void CloseWindow()
