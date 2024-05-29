@@ -12,5 +12,7 @@ namespace AimPicker.Unit.Implementation.Web.BookSearch
 
         public override string Prefix => "bs ";
         public override string Description => "入力されたテキストを元に Google Books APIを使用して本を探して、ISBN10からamazonのリンクを作成して表示";
+
+        public override bool IsApplyFiter => false; 
     }
 }

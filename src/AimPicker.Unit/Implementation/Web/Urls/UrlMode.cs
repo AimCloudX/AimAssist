@@ -11,6 +11,6 @@ namespace AimPicker.Unit.Implementation.Web.Urls
         public static UrlMode Instance { get; } = new UrlMode();
 
         public override string Prefix => "https://";
-        public override bool IsAddUnitLists => false;
+        public override bool IsApplyFiter => false;
     }
 }

@@ -1,5 +1,4 @@
-﻿using AimPicker.Combos;
-using AimPicker.Unit.Core;
+﻿using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 using System.Windows;
 
@@ -9,16 +8,16 @@ namespace AimPicker.Unit.Implementation.Web.Urls
     {
         public string Name { get; }
 
-        public UrlUnit(string name, string text, IPreviewFactory previewFactory)
+        public UrlUnit(string name, string path)
         {
             Name = name;
-            Text = text;
-            this.PreviewFactory = previewFactory;
+            Path = path;
         }
 
-        public string Text { get; }
+        public string Text => this.Path;
+        public string Path { get; }
 
-        public IPreviewFactory PreviewFactory { get; }
+        public WebViewPreviewFactory PreviewFactory { get; } = new WebViewPreviewFactory();
 
         public IPickerMode Mode => UrlMode.Instance;
 
@@ -26,7 +25,7 @@ namespace AimPicker.Unit.Implementation.Web.Urls
 
         public UIElement GetUiElement()
         {
-            return PreviewFactory.Create(this);
+            return PreviewFactory.Create(this.Path);
         }
     }
 }

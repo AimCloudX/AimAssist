@@ -1,15 +1,7 @@
-﻿using AimPicker.Combos;
-using AimPicker.UI.Combos;
-using AimPicker.Unit.Core;
-using System;
-using System.Collections.Generic;
+﻿using AimPicker.Unit.Core;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Composition;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace AimPicker.Plugins
@@ -44,12 +36,12 @@ namespace AimPicker.Plugins
             container.ComposeParts(this);
         }
 
-        public IEnumerable<IUnit> GetCombos()
+        public IEnumerable<IUnitsFacotry> GetFactories()
         {
-            var combos = new List<IUnit>();
+            var combos = new List<IUnitsFacotry>();
             foreach (var plugin in _plugins)
             {
-                combos.AddRange(plugin.GetUnits());
+                combos.AddRange(plugin.GetUnitsFactory());
             }
 
             return combos;

@@ -1,23 +1,21 @@
-﻿using AimPicker.Combos;
-using AimPicker.UI.Combos.Commands;
-using AimPicker.Unit.Core;
+﻿using AimPicker.UI.Combos.Commands;
 using Common.UI;
 using System.Windows;
 
 namespace AimPicker.Unit.Implementation.Web
 {
-    public class WebViewPreviewFactory : IPreviewFactory
+    public class WebViewPreviewFactory
     {
         public bool IsKeepUiElement => true;
 
-        public UIElement Create(IUnit combo)
+        public UIElement Create(string url)
         {
-            if (combo.Text.StartsWith("https://www.amazon"))
+            if (url.StartsWith("https://www.amazon"))
             {
-                return new AmazonWebViewControl(combo.Text);
+                return new AmazonWebViewControl(url);
             }
 
-            return new WebViewControl(combo.Text);
+            return new WebViewControl(url);
         }
     }
 }

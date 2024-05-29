@@ -1,8 +1,8 @@
-﻿using AimPicker.Combos;
-using AimPicker.Combos.Mode.Snippet;
+﻿using AimPicker.Combos.Mode.Snippet;
 using AimPicker.Service;
 using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
+using AimPicker.Unit.Implementation.Standard;
 using AimPicker.Unit.Implementation.Web.BookSearch;
 using AimPicker.Unit.Implementation.Web.Urls;
 using AimPicker.WebViewCash;
@@ -40,7 +40,7 @@ namespace AimPicker.UI.Tools.Snippets
                 if (groupedItems != null)
                 {
                     groupedItems.GroupDescriptions.Clear();
-                    if(this.mode == NormalMode.Instance)
+                    if(this.mode == StandardMode.Instance)
                     {
                         groupedItems.GroupDescriptions.Add(new CustomGroupDescription());
                     }
@@ -95,7 +95,6 @@ namespace AimPicker.UI.Tools.Snippets
         DispatcherTimer? typingTimer;
         private string beforeText = string.Empty;
         private PreviewWindow previewWindow;
-        private UnitsFacotry comboUnitsFactory;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -103,9 +102,8 @@ namespace AimPicker.UI.Tools.Snippets
         {
             this.InitializeComponent();
             this.DataContext = this;
-            this.comboUnitsFactory = new UnitsFacotry();
             
-            this.Mode = NormalMode.Instance;
+            this.Mode = StandardMode.Instance;
             this.FilterTextBox.Text = UIElementRepository.RescentText;
             this.FilterTextBox.Focus();
             if(!string.IsNullOrEmpty(this.FilterTextBox.Text))
@@ -132,13 +130,12 @@ namespace AimPicker.UI.Tools.Snippets
             }
 
             UnitLists.Clear();
-            var combos = this.comboUnitsFactory.Create(this.Mode, inputText);
-            await foreach ( var item in combos )
+            var units = UnitsService.Instnace.CreateUnits(this.Mode, inputText);
+            await foreach ( var unit in units )
             {
-                UnitLists.Add(item);
+                UnitLists.Add(unit);
             }
         }
-
 
         private void HandleTypingTimerTimeout(object sender, EventArgs e)
         {
@@ -154,7 +151,7 @@ namespace AimPicker.UI.Tools.Snippets
             }
 
             var resentMode = this.mode;
-            var mode = UnitService.GetModeFromText(this.FilterTextBox.Text);
+            var mode = UnitsService.Instnace.GetModeFromText(this.FilterTextBox.Text);
             if (mode == resentMode)
             {
                 if (mode == BookSearchMode.Instance)
@@ -325,7 +322,6 @@ namespace AimPicker.UI.Tools.Snippets
             UIElementRepository.RescentText = this.FilterTextBox.Text;
             this.IsClosing = true; ;
             this.previewWindow.Visibility = Visibility.Hidden;
-            this.comboUnitsFactory.Dispose();
             this.Close();
         }
 

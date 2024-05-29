@@ -5,27 +5,27 @@ using System.Windows;
 
 namespace AimPicker.Combos.Mode.WorkFlows
 {
-    public class WorkFlowCombo : IUnit
+    public class WorkFlowUnit : IUnit
     {
+        private readonly Func<WorkFlowUnit, UIElement> createUI;
+
         public string Name { get; }
 
-        public WorkFlowCombo(string name, string text, IPreviewFactory previewFactory)
+        public WorkFlowUnit(string name, string text, Func<WorkFlowUnit, UIElement> createUI)
         {
             Name = name;
             Text = text;
-            this.previewFactory = previewFactory;
+            this.createUI = createUI;
         }
 
         public string Text { get; }
-        private IPreviewFactory previewFactory { get; }
-
         public IPickerMode Mode => WorkFlowMode.Instance;
 
         public string Category => string.Empty;
 
         public UIElement GetUiElement()
         {
-            return this.previewFactory.Create(this);
+            return this.createUI.Invoke(this);
         }
     }
 }
