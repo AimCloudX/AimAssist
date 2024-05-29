@@ -1,4 +1,5 @@
-﻿using AimPicker.Plugins;
+﻿using AimPicker.Commands;
+using AimPicker.Plugins;
 using AimPicker.Service;
 using AimPicker.UI.Tools.HotKeys;
 using AimPicker.Unit.Implementation.Knoledges;
@@ -18,6 +19,32 @@ namespace AimPicker
     {
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
         {
+            RegisterUnitsFactory();
+
+            GenelateNotifyIcon();
+
+            var window = new HowKeysWindow();
+            window.Show();
+        }
+
+        private void GenelateNotifyIcon()
+        {
+            var menu = new ContextMenuStrip();
+            menu.Items.Add("Show PickerWindow", null, Show_Click);
+            menu.Items.Add("Quit AimPicker", null, Exit_Click);
+            var icon = GetResourceStream(new Uri("Resources/Icons/Ap.ico", UriKind.Relative)).Stream;
+            var notifyIcon = new NotifyIcon
+            {
+                Visible = true,
+                Icon = new Icon(icon),
+                Text = "AimPicker",
+                ContextMenuStrip = menu,
+            };
+            notifyIcon.MouseClick += new MouseEventHandler(NotifyIcon_Click);
+        }
+
+        private static void RegisterUnitsFactory()
+        {
             // TODO 場所の移動
             var factory = UnitsService.Instnace;
             factory.RegisterFactory(new ModeChangeUnitsFacotry());
@@ -35,9 +62,24 @@ namespace AimPicker
             {
                 factory.RegisterFactory(item);
             }
+        }
 
-            var window = new HowKeysWindow();
-            window.Show();
+        private void Show_Click(object? sender, EventArgs e)
+        {
+            PickerCommands.ShowWindowCommand.Execute(e);
+        }
+
+        private void NotifyIcon_Click(object? sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                PickerCommands.ShowWindowCommand.Execute(e);
+            }
+        }
+
+        private void Exit_Click(object? sender, EventArgs e)
+        {
+            Shutdown();
         }
     }
 

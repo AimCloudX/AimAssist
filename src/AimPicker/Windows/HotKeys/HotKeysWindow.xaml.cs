@@ -1,4 +1,5 @@
 ﻿
+using AimPicker.Commands;
 using AimPicker.HotKeys;
 using AimPicker.Service;
 using System.Windows;
@@ -22,16 +23,7 @@ namespace AimPicker.UI.Tools.HotKeys
                                   Key.P,
                                   (_, __) =>
                                       {
-                                          if (isPickerServiceActivated)
-                                          {
-                                              return;
-                                          }
-
-                                          isPickerServiceActivated = true;
-
-                                          PickerService.Run();
-
-                                          isPickerServiceActivated = false;
+                                          PickerCommands.ShowWindowCommand.Execute(this);
                                       });
         }
 
