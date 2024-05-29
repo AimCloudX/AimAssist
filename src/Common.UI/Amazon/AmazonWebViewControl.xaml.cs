@@ -1,36 +1,21 @@
 ﻿using Microsoft.Web.WebView2.Core;
-using System;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AimPicker.UI.Combos.Commands
 {
     public partial class AmazonWebViewControl : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {
         private string url;
-        private string readedURl;
         private string title;
 
         private string producttitle;
-        private string ISBN;
-        private int Price;
-        private string Publisher;
-        private string Author;
         private string ASIN;
+        private BookInfo book;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -82,23 +67,20 @@ namespace AimPicker.UI.Combos.Commands
             var titleUrl = $"[{title}]({url})";
 
             // クリップボードに書き込む
-            var dataObject = new System.Windows.DataObject();
-            dataObject.SetData(System.Windows.DataFormats.Html, htmlLink);
-            dataObject.SetData(System.Windows.DataFormats.Text, titleUrl);
-            System.Windows.Clipboard.SetDataObject(dataObject);
+            var dataObject = new DataObject();
+            dataObject.SetData(DataFormats.Html, htmlLink);
+            dataObject.SetData(DataFormats.Text, titleUrl);
+            Clipboard.SetDataObject(dataObject);
 
             string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
             webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
         }
 
-        private void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        private async void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             // ナビゲーションが成功したか確認
             if (e.IsSuccess)
             {
-                // 現在のURLを取得
-                readedURl = webView.Source.ToString();
-
                 // 現在のページのタイトルを取得するためにJavaScriptを実行
                 webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
                 {
@@ -127,74 +109,6 @@ namespace AimPicker.UI.Combos.Commands
 
                 });
 
-var script = @"
-var ISBNElement = document.querySelector('.a-section#rpi-attribute-book_details-isbn13 .a-section.rpi-attribute-value span');
-var ISBN = ISBNElement ? ISBNElement.innerText.trim() : '';
-ISBN;
-            ";
-
-                webView.CoreWebView2.ExecuteScriptAsync(script).ContinueWith(task =>
-                {
-                    // JavaScriptの結果を取得
-                    ISBN = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    ISBN = ISBN.Trim('"');
-
-                });
-
-                // price
-var priceScript = @"
-var priceElement = document.querySelector('.a-price .a-offscreen');
-var price = priceElement ? priceElement.innerText.trim() : '';
-price;
-            ";
-
-                webView.CoreWebView2.ExecuteScriptAsync(priceScript).ContinueWith(task =>
-                {
-                    // JavaScriptの結果を取得
-                    var  priceString = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    priceString = priceString.Trim('"');
-
-                    Price = ConvertStringToInt(priceString);
-
-                });
-
-                // publisher
-string publicherScript = @"
-var publisherElement = document.querySelector('.a-section#rpi-attribute-book_details-publisher .a-section.rpi-attribute-value span');
-var publisher = publisherElement ? publisherElement.innerText.trim() : '';
-publisher;
-";
-
-                webView.CoreWebView2.ExecuteScriptAsync(publicherScript).ContinueWith(task =>
-                {
-                    // JavaScriptの結果を取得
-                    Publisher = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    Publisher = Publisher.Trim('"');
-
-                });
-
-                // Author
-string AuthorScript = @"
-var authorElement = document.querySelector('.author.notFaded a');
-var author = authorElement ? authorElement.innerText.trim() : '';
-author;
-";
-
-                webView.CoreWebView2.ExecuteScriptAsync(AuthorScript).ContinueWith(task =>
-                {
-                    // JavaScriptの結果を取得
-                    Author = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    Author = Author.Trim('"');
-
-                });
 
                 // ASIN
 string asinScript = @"
@@ -213,21 +127,60 @@ ASIN;
 
                 });
 
+                book = await FetchBookInfoAsync();
 
                 this.CanExectuteCommand = true;
                 OnPropertyChanged(nameof(CanExectuteCommand));
 
             }
-            else
-            {
-            }
         }
 
         private void Button_Click1(object sender, RoutedEventArgs e)
         {
-            var text = producttitle + "\t"+ Publisher + "\t"+Author+ "\t"+Price +"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+ISBN;
+            if(book == null)
+            {
+                string bookmarklet = "javascript:(function(){alert('書籍情報の取得に失敗しました');})();";
+                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+                return;
+            }
 
-            System.Windows.Clipboard.SetText(text);
+            var price = ConvertStringToInt(book.price);
+
+            var errorList = new List<string>();
+            if(price== 0)
+            {
+                errorList.Add("価格");
+            }
+
+            if (string.IsNullOrEmpty(book.productTitle))
+            {
+                errorList.Add("本のタイトル");
+            }
+
+            if (string.IsNullOrEmpty(book.publisher))
+            {
+                errorList.Add("出版社");
+            }
+
+            if (string.IsNullOrEmpty(book.author))
+            {
+                errorList.Add("著者");
+            }
+            if (string.IsNullOrEmpty(book.isbn13))
+            {
+                errorList.Add("ISBN");
+            }
+
+            var text = book.productTitle + "\t"+ book.publisher + "\t"+book.author+ "\t"+ price +"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+book.isbn13;
+            Clipboard.SetText(text);
+            if (errorList.Any())
+            {
+                var sb = new StringBuilder();
+                sb.Append("次ののデータの取得に失敗しました ");
+                sb.Append(string.Join(" ", errorList));
+                string bookmarklet = $"javascript:(function(){{alert('{sb.ToString()}');}})();";
+                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+            }
         }
 
         private void Button_Click2(object sender, RoutedEventArgs e)
@@ -242,10 +195,10 @@ ASIN;
                 var htmlLink = $"<a href=\"{url}\">{title}</a>";
                 var titleUrl = $"[{title}]({url})";
                 // クリップボードに書き込む
-                var dataObject = new System.Windows.DataObject();
-                dataObject.SetData(System.Windows.DataFormats.Html, htmlLink);
-                dataObject.SetData(System.Windows.DataFormats.Text, titleUrl);
-                System.Windows.Clipboard.SetDataObject(dataObject);
+                DataObject dataObject = new DataObject();
+                dataObject.SetData(DataFormats.Html, htmlLink);
+                dataObject.SetData(DataFormats.Text, titleUrl);
+                Clipboard.SetDataObject(dataObject);
                 string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
 
@@ -258,10 +211,10 @@ ASIN;
                 var titleUrl = $"[{producttitle}]({shortURL})";
 
                 // クリップボードに書き込む
-                var dataObject = new System.Windows.DataObject();
-                dataObject.SetData(System.Windows.DataFormats.Html, htmlLink);
-                dataObject.SetData(System.Windows.DataFormats.Text, titleUrl);
-                System.Windows.Clipboard.SetDataObject(dataObject);
+                var dataObject = new DataObject();
+                dataObject.SetData(DataFormats.Html, htmlLink);
+                dataObject.SetData(DataFormats.Text, titleUrl);
+                Clipboard.SetDataObject(dataObject);
                 string bookmarklet = "javascript:(function(){alert('短縮形のリンクをコピーしました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
             }
@@ -273,6 +226,7 @@ ASIN;
             this.CanExectuteCommand = false;
             OnPropertyChanged(nameof(CanExectuteCommand));
         }
+
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -290,7 +244,7 @@ ASIN;
         private static int ConvertStringToInt(string input)
         {
             // 円記号とカンマを削除
-            string cleanedString = input.Replace("\\", "").Replace(",", "");
+            var cleanedString = input.Replace("￥", "").Replace("\\", "").Replace(",", "").Trim();
 
             // 整数に変換
             if (int.TryParse(cleanedString, out int result))
@@ -301,6 +255,64 @@ ASIN;
             {
                 return 0;
             }
+        }
+
+        private async Task<BookInfo> FetchBookInfoAsync()
+        {
+string script = @"
+var productTitleElement = document.getElementById('productTitle');
+if(!productTitleElement)var productTitleElement = document.getElementById('ebooksProductTitle');
+var productTitle = productTitleElement ? productTitleElement.innerText.trim() : '';
+
+var authorElement = document.querySelector('.author.notFaded a');
+var author = authorElement ? authorElement.innerText.trim() : '';
+
+var ASINElement = document.querySelector('#ASIN');
+var ASIN = ASINElement ? ASINElement.value : '';
+
+var ISBNElement = document.querySelector('.a-section#rpi-attribute-book_details-isbn13 .a-section.rpi-attribute-value span');
+var ISBN = ISBNElement ? ISBNElement.innerText.trim() : '';
+
+var priceWholeElement = document.querySelector('.a-price-whole');
+var price = priceWholeElement ? priceWholeElement.innerText.trim() : '';
+
+var publisherElement = document.querySelector('#rpi-attribute-book_details-publisher .rpi-attribute-value span');
+var publisher = publisherElement ? publisherElement.innerText.trim() : '';
+
+JSON.stringify({ productTitle:productTitle, isbn13: ISBN, price: price, publisher: publisher, author:author, asin:ASIN });
+";
+
+            try
+            {
+                string resultString = await webView.CoreWebView2.ExecuteScriptAsync(script);
+                resultString = resultString.Trim('"').Replace("\\\"", "\"");
+                var result = JsonConvert.DeserializeObject<BookInfo>(resultString);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error fetching book info: " + ex.Message);
+                return null;
+            }
+        }
+
+        public class BookInfo
+        {
+            [JsonProperty("productTitle")]
+            public string productTitle { get; set; }
+            [JsonProperty("isbn13")]
+            public string isbn13 { get; set; }
+
+            [JsonProperty("asin")]
+            public string ASIN { get; set; }
+            [JsonProperty("author")]
+            public string author { get; set; }
+
+            [JsonProperty("price")]
+            public string price { get; set; }
+            [JsonProperty("publisher")]
+            public string publisher { get; set; }
         }
     }
 }
