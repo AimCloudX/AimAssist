@@ -2,6 +2,7 @@
 using AimPicker.Unit.Core.Mode;
 using AimPicker.Unit.Implementation.WorkFlows;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AimPicker.Combos.Mode.WorkFlows
 {
@@ -11,6 +12,7 @@ namespace AimPicker.Combos.Mode.WorkFlows
 
         public string Name { get; }
 
+        public BitmapImage Icon => new BitmapImage();
         public WorkFlowUnit(string name, string text, Func<WorkFlowUnit, UIElement> createUI)
         {
             Name = name;

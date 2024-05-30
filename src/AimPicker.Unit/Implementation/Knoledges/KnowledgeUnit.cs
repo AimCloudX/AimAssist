@@ -2,6 +2,7 @@
 using AimPicker.Unit.Core.Mode;
 using AimPicker.Unit.Implementation.Wiki;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AimPicker.Combos.Mode.Wiki
 {
@@ -24,6 +25,8 @@ namespace AimPicker.Combos.Mode.Wiki
         public IPickerMode Mode => KnowledgeMode.Instance;
 
         public string Category => string.Empty;
+
+        public BitmapImage Icon => new BitmapImage();
 
         public UIElement GetUiElement()
         {

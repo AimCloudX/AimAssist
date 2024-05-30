@@ -16,12 +16,12 @@
         Loaded="Window_Loaded"
         ContentRendered="Window_ContentRendered"
         >
-        <Window.Resources>
-    <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">
-        <CollectionViewSource.GroupDescriptions>
-            <PropertyGroupDescription PropertyName="Category"/>
-        </CollectionViewSource.GroupDescriptions>
-    </CollectionViewSource>
+    <Window.Resources>
+        <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Category"/>
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
         <Style TargetType="GroupItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -37,25 +37,30 @@
             </Setter>
         </Style>
     </Window.Resources>
-        <!--Style="{StaticResource MaterialDesignWindow}"-->
     <Grid x:Name="Root">
         <Grid.InputBindings>
             <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding AjustWindowCommand}"/>
         </Grid.InputBindings>
-    <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"></RowDefinition>
-        <RowDefinition Height="*"></RowDefinition>
-    </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
-                 InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
+                     InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
             <StackPanel x:Name="FilterContents"/>
         </Grid>
-        <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding Source={StaticResource GroupedItems}}" SelectionChanged="ComboListBox_SelectionChanged">
+        <ListBox Grid.Row="1"  x:Name="ComboListBox" ItemsSource="{Binding Source={StaticResource GroupedItems}}" SelectionChanged="ComboListBox_SelectionChanged"
+                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Standard">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
             <ListBox.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
@@ -65,7 +70,6 @@
                     </GroupStyle.HeaderTemplate>
                 </GroupStyle>
             </ListBox.GroupStyle>
-            
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -85,18 +89,15 @@
                                 <RowDefinition Height="2"></RowDefinition>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0">
-                                <TextBlock Text="{Binding Name}"  FontSize="18">
-                                </TextBlock>
+                                <TextBlock Text="{Binding Name}"  FontSize="18"/>
                             </StackPanel>
                             <StackPanel Grid.Row="2">
                                 <TextBlock FontSize="14" Text="{Binding Text}" Height="17"
-                                Foreground="Gray"
-                                TextTrimming="CharacterEllipsis"
-                                TextWrapping="NoWrap"
-                                           
-                                           HorizontalAlignment="Left" InputMethod.PreferredImeConversionMode="FullShape"></TextBlock>
+                                           Foreground="Gray"
+                                           TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap"
+                                           HorizontalAlignment="Left" InputMethod.PreferredImeConversionMode="FullShape"/>
                             </StackPanel>
-
                         </Grid>
                     </Grid>
                 </DataTemplate>
@@ -107,10 +108,10 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
                                 <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                Background="{TemplateBinding Background}"
-                                                Padding="{TemplateBinding Padding}" CornerRadius="10"
-                                                ClipToBounds="True">
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        Background="{TemplateBinding Background}"
+                                        Padding="{TemplateBinding Padding}" CornerRadius="10"
+                                        ClipToBounds="True">
                                     <ContentPresenter />
                                 </Border>
                                 <ControlTemplate.Triggers>
