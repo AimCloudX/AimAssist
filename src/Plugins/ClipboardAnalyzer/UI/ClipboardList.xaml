@@ -43,9 +43,9 @@
         </ListView>
         </ScrollViewer>
             <StackPanel Grid.Row="1">
-                <ComboBox x:Name="ComboBox"></ComboBox>
-            <TextBox x:Name="PreviewText"></TextBox>
-            <Button Click="Button_Click"></Button>
+                <ComboBox x:Name="ComboBox" SelectionChanged="ComboBox_SelectionChanged"></ComboBox>
+            <TextBox x:Name="PreviewText" Width="400"></TextBox>
+            <Button Content="Copy" Click="Button_Click"></Button>
             </StackPanel>
     </Grid>
 </UserControl>
