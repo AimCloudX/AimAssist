@@ -38,6 +38,12 @@ namespace ClipboardAnalyzer
                 Items.Add(clipboardData);
             }
             this.DataContext = this;
+            this.ComboBox.ItemsSource = clipboardDatas.Select(x => x.Format).ToList();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Clipboard.SetText(this.PreviewText.Text);
         }
     }
 }

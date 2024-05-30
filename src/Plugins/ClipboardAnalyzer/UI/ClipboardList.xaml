@@ -19,6 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*">
             </RowDefinition>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="0" CanContentScroll="False">
                 <ListView  x:Name="ListView" ItemsSource="{Binding Items}"  MaxHeight="600" SelectionMode="Multiple"
@@ -40,7 +41,11 @@
                 </GridView>
             </ListView.View>
         </ListView>
-            
         </ScrollViewer>
+            <StackPanel Grid.Row="1">
+                <ComboBox x:Name="ComboBox"></ComboBox>
+            <TextBox x:Name="PreviewText"></TextBox>
+            <Button Click="Button_Click"></Button>
+            </StackPanel>
     </Grid>
 </UserControl>
