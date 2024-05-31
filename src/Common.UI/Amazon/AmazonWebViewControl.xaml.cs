@@ -21,6 +21,12 @@ namespace AimPicker.UI.Combos.Commands
 
         public bool CanExectuteCommand { get; set; }
 
+        public string Url { get => this.url;
+                set { 
+                this.url = value;
+                webView.CoreWebView2.Navigate(url);
+            } }
+
         public AmazonWebViewControl(string url)
         {
             InitializeComponent();

@@ -15,7 +15,7 @@
             <RowDefinition Height="*"></RowDefinition>
             
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" x:Name="WebMenu">
             <Button Content="リンク作成" Margin="0,0,10,0" Click="Button_Click" />
             <Button Content="ブラウザで開く" Margin="0,0,10,0" Click="Button_Click2" />
         </StackPanel>

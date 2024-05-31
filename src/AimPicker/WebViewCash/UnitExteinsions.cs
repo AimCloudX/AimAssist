@@ -1,10 +1,5 @@
-﻿using AimPicker.Unit.Core;
-using AimPicker.Unit.Implementation.Web.Urls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AimPicker.Combos.Mode.WorkFlows;
+using AimPicker.Unit.Core;
 using System.Windows;
 
 namespace AimPicker.WebViewCash
@@ -13,16 +8,21 @@ namespace AimPicker.WebViewCash
     {
         public static UIElement GetOrCreateUiElemnt(this IUnit unit)
         {
-            if (unit.Text.StartsWith("https:"))
+            if(unit is WorkFlowUnit work)
             {
                 var uiElement = UIElementRepository.GetUIElement(unit.Text);
-                if (uiElement == null)
+                if(uiElement == null)
                 {
-                    uiElement = unit.GetUiElement();
-                    UIElementRepository.RegisterUIElement(unit.Text, uiElement);
-                    return uiElement;
+                    uiElement = work.GetUiElement();
+                    UIElementRepository.RegisterUIElement(work.Name, uiElement);
                 }
 
+                return uiElement;
+            }
+
+            if (unit.Text.StartsWith("https:"))
+            {
+                var uiElement = UIElementRepository.GetWebViewControl(unit.Text);
                 return uiElement;
             }
 
