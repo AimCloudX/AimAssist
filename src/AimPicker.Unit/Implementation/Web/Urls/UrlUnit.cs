@@ -1,6 +1,7 @@
 ﻿using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AimPicker.Unit.Implementation.Web.Urls
 {
@@ -14,6 +15,7 @@ namespace AimPicker.Unit.Implementation.Web.Urls
             Path = path;
         }
 
+        public BitmapImage Icon => new BitmapImage();
         public string Text => this.Path;
         public string Path { get; }
 

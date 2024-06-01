@@ -286,7 +286,6 @@ namespace AimPicker.UI.Tools.Snippets
                     else
                     {
                         previewWindow = new PreviewWindow();
-                        previewWindow.Topmost = true;
 
                         // MainWindowの位置とサイズを取得
                         double mainWindowLeft = this.Left;
@@ -342,7 +341,6 @@ namespace AimPicker.UI.Tools.Snippets
             AjustWindowCommand = new RelayCommand((o) => { CenterWindowsOnScreen(this, this.previewWindow); });
             OnPropertyChanged(nameof(AjustWindowCommand));
 
-            this.Topmost = true;
             this.Activate();
             this.Focus();
         }

@@ -64,9 +64,10 @@ namespace AimPicker.Service
                 default:
                     foreach (var factory in this.factories.Where(x=>x.TargetMode == mode))
                     {
-                        await foreach (var units in factory.GetUnits(paramter))
+                        var units = factory.GetUnits(paramter);
+                        await foreach (var unit in units)
                         {
-                            yield return units;
+                            yield return unit;
                         }
                     }
                     break;

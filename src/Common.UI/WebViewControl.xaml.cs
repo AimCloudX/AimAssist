@@ -38,6 +38,12 @@ namespace Common.UI
             }
         }
 
+        public string Url { get => this.url; set
+            {
+                this.url = value;
+                webView.CoreWebView2.Navigate(url);
+            } }
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             InitializeWebView();

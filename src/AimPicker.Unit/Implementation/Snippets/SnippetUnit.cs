@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media.Imaging;
 using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 using AimPicker.Unit.Implementation.Snippets;
@@ -13,6 +14,7 @@ namespace AimPicker.Combos.Mode.Snippet
             Text = text;
         }
 
+        public BitmapImage Icon => new BitmapImage();
         public string Name { get; }
 
         public string Text { get; }
