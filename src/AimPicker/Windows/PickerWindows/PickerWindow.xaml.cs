@@ -21,7 +21,9 @@ namespace AimPicker.UI.Tools.Snippets
     public partial class PickerWindow : INotifyPropertyChanged
     {
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
-        private IPickerMode mode;
+        private IPickerMode mode = StandardMode.Instance;
+
+        public List<IUnitPackage> UsingPackages { get; } = new List<IUnitPackage>();
         public IPickerMode Mode
         {
             get { return this.mode; }
@@ -33,7 +35,6 @@ namespace AimPicker.UI.Tools.Snippets
                 }
 
                 this.mode = value;
-                UpdateCandidate();
                 // CollectionViewSourceの取得
                 CollectionViewSource groupedItems = (CollectionViewSource)this.Resources["GroupedItems"];
 
@@ -62,7 +63,10 @@ namespace AimPicker.UI.Tools.Snippets
         private bool Filter(object obj)
         {
             var filterText = this.FilterTextBox.Text;
-            filterText = filterText.Substring(this.mode.Prefix.Length);
+            if (filterText.StartsWith(this.mode.Prefix))
+            {
+                filterText = filterText.Substring(this.mode.Prefix.Length);
+            }
 
             if (string.IsNullOrEmpty(filterText))
             {
@@ -85,7 +89,6 @@ namespace AimPicker.UI.Tools.Snippets
 
             return true;
         }
-
     }
 
     public partial class PickerWindow : Window
@@ -104,6 +107,7 @@ namespace AimPicker.UI.Tools.Snippets
             this.DataContext = this;
             
             this.Mode = StandardMode.Instance;
+            this.UpdateCandidate();
             this.FilterTextBox.Text = UIElementRepository.RescentText;
             this.FilterTextBox.Focus();
             if(!string.IsNullOrEmpty(this.FilterTextBox.Text))
@@ -119,6 +123,19 @@ namespace AimPicker.UI.Tools.Snippets
 
         private async void UpdateCandidate()
         {
+            // packageがあったらPacageから取得する
+            var lastPackage = this.UsingPackages.LastOrDefault();
+            if(lastPackage != null)
+            {
+                UnitLists.Clear();
+                foreach (var unit in lastPackage.GetChildren())
+                {
+                    UnitLists.Add(unit);
+                }
+                return;
+            }
+
+            //なければ モードから取得する
             string inputText;
             if(this.mode != UrlMode.Instance)
             {
@@ -150,18 +167,22 @@ namespace AimPicker.UI.Tools.Snippets
                 return;
             }
 
-            var resentMode = this.mode;
-            var mode = UnitsService.Instnace.GetModeFromText(this.FilterTextBox.Text);
-            if (mode == resentMode)
+            if (!UsingPackages.Any())
             {
-                if (mode == BookSearchMode.Instance)
+                var resentMode = this.mode;
+                var mode = UnitsService.Instnace.GetModeFromText(this.FilterTextBox.Text);
+                if (mode == resentMode)
                 {
-                    UpdateCandidate();
+                    if (mode == BookSearchMode.Instance)
+                    {
+                        UpdateCandidate();
+                    }
                 }
-            }
-            else
-            {
-                this.Mode = mode;
+                else
+                {
+                    this.Mode = mode;
+                    this.UpdateCandidate();
+                }
             }
 
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
@@ -176,37 +197,53 @@ namespace AimPicker.UI.Tools.Snippets
         {
             if (e.Key == Key.Enter)
             {
-                if(this.ComboListBox.SelectedItem is ModeChangeUnit mode)
-                {
-                    var currentText = this.FilterTextBox.Text;
-                    this.FilterTextBox.Text = mode.Text;
-                    FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
-                    return;
-                }
-
                 if (this.ComboListBox.SelectedItem is SnippetUnit combo)
                 {
                     this.SnippetText = combo.Text;
+                    this.CloseWindow();
                 }
 
-                this.CloseWindow();
+                ExecuteUnit(e);
             }
             else if(e.Key == Key.Tab)
             {
-                if(this.ComboListBox.SelectedItem is ModeChangeUnit mode)
-                {
-                    // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
-                    var currentText = this.FilterTextBox.Text;
-                    this.FilterTextBox.Text = mode.Text;
-                    FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
-                    e.Handled = true;
-                    return;
-                }
+                ExecuteUnit(e);
             }
 
             else if (e.Key == Key.Escape)
             {
                 this.CloseWindow();
+            }
+        }
+
+        private void ExecuteUnit(System.Windows.Input.KeyEventArgs e)
+        {
+            if (this.ComboListBox.SelectedItem is ModeChangeUnit mode)
+            {
+                // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
+                var currentText = this.FilterTextBox.Text;
+                this.FilterTextBox.Text = mode.Text;
+                FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
+                e.Handled = true;
+                return;
+            }
+
+            if (this.ComboListBox.SelectedItem is IUnitPackage package)
+            {
+                // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
+                var currentText = this.FilterTextBox.Text;
+                this.FilterTextBox.Text = string.Empty;
+
+                UsingPackages.Add(package);
+                this.Mode = package.Mode;
+                this.PackageText.Text = package.Name;
+                this.PackageText.Visibility = Visibility.Visible;
+                this.PackgeTextBorder.Visibility = Visibility.Visible;
+                UpdateCandidate();
+
+                e.Handled = true;
+
+                return;
             }
         }
 
@@ -224,6 +261,26 @@ namespace AimPicker.UI.Tools.Snippets
                 var index = this.ComboListBox.SelectedIndex;
                 if (index >= this.ComboListBox.Items.Count) return;
                 this.ComboListBox.SelectedIndex = index + 1;
+            }
+            else if (e.Key == Key.Back)
+            {
+                if (string.IsNullOrEmpty(this.FilterTextBox.Text))
+                {
+                    if (this.UsingPackages.Any())
+                    {
+                        this.UsingPackages.Remove(this.UsingPackages.Last());
+                        var  lastPackage = this.UsingPackages.LastOrDefault();
+                        if (lastPackage == null)
+                        {
+                            this.Mode = StandardMode.Instance;
+                            PackgeTextBorder.Visibility = Visibility.Collapsed;
+                            this.PackageText.Visibility = Visibility.Collapsed;
+                            this.PackageText.Text = string.Empty;
+                        }
+
+                        UpdateCandidate();
+                    }
+                }
             }
 
             this.ComboListBox.ScrollIntoView(this.ComboListBox.SelectedItem);

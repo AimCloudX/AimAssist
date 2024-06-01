@@ -2,6 +2,7 @@
 using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
@@ -23,6 +24,26 @@ namespace AimPicker.UI.Combos
             WebView.NavigationCompleted += OnNavigationCompleted;
             // WebView2を初期化
             InitializeAsync();
+        }
+        public MarkdownView(IEnumerable<string> filePaths)
+        {
+            InitializeComponent();
+            var sb = new StringBuilder();
+            foreach (string filePath in filePaths)
+            {
+                sb.AppendLine(File.ReadAllText(filePath));
+            }
+
+            markdownText = sb.ToString() ;
+
+            // WebView2の初期化完了イベントを設定
+            WebView.NavigationCompleted += OnNavigationCompleted;
+            // WebView2を初期化
+            InitializeAsync();
+        }
+
+        public MarkdownView()
+        {
         }
 
         private async void InitializeAsync()

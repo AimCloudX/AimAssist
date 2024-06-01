@@ -1,6 +1,7 @@
 ﻿using AimPicker.Unit.Core;
 using AimPicker.Unit.Core.Mode;
 using AimPicker.Unit.Implementation.Wiki;
+using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -8,17 +9,19 @@ namespace AimPicker.Combos.Mode.Wiki
 {
     public class KnowledgeUnit : IUnit
     {
-        public string Name { get; }
+        private readonly FileInfo fileInfo;
 
-        public KnowledgeUnit(string name, string path)
+        public string Name =>
+                 System.IO.Path.GetFileNameWithoutExtension(fileInfo.Name);
+
+        public KnowledgeUnit(FileInfo fileInfo)
         {
-            Name = name;
-            Path = path;
+            this.fileInfo = fileInfo;
         }
 
         public string Text => this.Path;
 
-        public string Path { get; }
+        public string Path => fileInfo.FullName;
 
         public MarkdownPreviewFactory PreviewFactory => new MarkdownPreviewFactory();
 

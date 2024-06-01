@@ -15,10 +15,14 @@ namespace AimPicker.Unit.Implementation.Knoledges
         public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
             var dictInfo = new DirectoryInfo("Resources/Knowledge/");
+            foreach (var directory in dictInfo.GetDirectories())
+            {
+                yield return new KnowledgedDirecotry(directory);
+            }
+
             foreach (var file in dictInfo.GetFiles())
             {
-                var fileName = Path.GetFileNameWithoutExtension(file.Name);
-                yield return new KnowledgeUnit(fileName, file.FullName);
+                yield return new KnowledgeUnit(file);
             }
         }
     }
