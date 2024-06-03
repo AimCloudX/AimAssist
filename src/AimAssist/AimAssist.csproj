@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
-    <ApplicationIcon>Resources\Icons\Ap.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Icons\AimAssist.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

@@ -32,7 +32,7 @@ namespace AimAssist
             var menu = new ContextMenuStrip();
             menu.Items.Add("Show PickerWindow", null, Show_Click);
             menu.Items.Add("Quit AimAssist", null, Exit_Click);
-            var icon = GetResourceStream(new Uri("Resources/Icons/Ap.ico", UriKind.Relative)).Stream;
+            var icon = GetResourceStream(new Uri("Resources/Icons/AimAssist.ico", UriKind.Relative)).Stream;
             var notifyIcon = new NotifyIcon
             {
                 Visible = true,

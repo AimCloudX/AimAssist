@@ -11,7 +11,7 @@ namespace AimAssist.Unit.Core.Mode
         public ModeChangeUnit(IPickerMode combo)
         {
             this.pickerMode = combo;
-            Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/Ap.ico"));
+            Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/AimAssist.ico"));
         }
 
         public string Name => pickerMode.Name;
