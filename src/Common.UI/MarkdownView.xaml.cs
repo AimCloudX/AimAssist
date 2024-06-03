@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
-namespace AimPicker.UI.Combos
+namespace AimAssist.UI.Combos
 {
     /// <summary>
     /// MarkdownView.xaml の相互作用ロジック

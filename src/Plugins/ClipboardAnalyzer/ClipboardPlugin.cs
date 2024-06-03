@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.Composition;
-using AimPicker.Plugins;
-using AimPicker.Unit.Core;
+using AimAssist.Plugins;
+using AimAssist.Unit.Core;
 
 
 namespace ClipboardAnalyzer

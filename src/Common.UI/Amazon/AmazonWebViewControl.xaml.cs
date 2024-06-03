@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 
-namespace AimPicker.UI.Combos.Commands
+namespace AimAssist.UI.Combos.Commands
 {
     public partial class AmazonWebViewControl : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {

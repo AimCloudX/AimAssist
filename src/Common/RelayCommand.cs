@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace AimPicker.UI
+namespace AimAssist.UI
 {
 
     public class RelayCommand : ICommand

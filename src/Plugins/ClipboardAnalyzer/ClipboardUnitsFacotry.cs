@@ -1,7 +1,7 @@
-﻿using AimPicker.Combos.Mode.WorkFlows;
-using AimPicker.Unit.Core;
-using AimPicker.Unit.Core.Mode;
-using AimPicker.Unit.Implementation.WorkFlows;
+﻿using AimAssist.Combos.Mode.WorkFlows;
+using AimAssist.Unit.Core;
+using AimAssist.Unit.Core.Mode;
+using AimAssist.Unit.Implementation.WorkFlows;
 
 namespace ClipboardAnalyzer
 {

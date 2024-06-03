@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AimPikcer.Plugins\AimPikcer.Plugins.csproj" />
+    <ProjectReference Include="..\..\AimAssist.Plugins\AimAssist.Plugins.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +22,6 @@
   </ItemGroup>
   <Target Name="CopyExtensions" AfterTargets="AfterBuild">
     <!-- DLLのコピー先を指定 -->
-    <Copy SourceFiles="$(OutputPath)\ClipboardAnalyzer.dll" DestinationFolder="..\..\AimPicker\bin\Debug\net8.0-windows\Plugins" />
+    <Copy SourceFiles="$(OutputPath)\ClipboardAnalyzer.dll" DestinationFolder="..\..\AimAssist\bin\Debug\net8.0-windows\Plugins" />
   </Target>
 </Project>
