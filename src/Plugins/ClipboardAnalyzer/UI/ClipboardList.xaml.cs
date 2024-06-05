@@ -28,7 +28,13 @@ namespace ClipboardAnalyzer
         public ClipboardList()
         {
             InitializeComponent();
-            var  clipboardDatas  = ClipboardService.Load();
+            UpdateClipboard();
+        }
+
+        private void UpdateClipboard()
+        {
+            var clipboardDatas = ClipboardService.Load();
+            Items.Clear();
             foreach (var clipboardData in clipboardDatas)
             {
                 if (clipboardData.IsDisabled)
@@ -40,55 +46,87 @@ namespace ClipboardAnalyzer
             }
             this.DataContext = this;
 
-            var formats = Items.Select(x => x.Format).ToList();
-            formats.Add("JSON");
+            var formats = Items.Where(x => x.Format != "PNG").Select(x => x.Format).ToList();
 
             this.ComboBox.ItemsSource = formats;
+            this.ComboBox.SelectedItem = "Text";
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Clipboard.SetText(this.PreviewText.Text);
+            var selectedFormat = this.ComboBox.SelectedItem as string;
+            Clipboard.SetData(selectedFormat, this.PreviewText.Text);
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedText = this.ComboBox.SelectedItem as string;
+            SetPreviewText();
+        }
 
-            foreach(var item in Items)
+        private void SetPreviewText()
+        {
+            var selectedFormat = this.ComboBox.SelectedItem as string;
+
+            if (string.IsNullOrEmpty(selectedFormat))
             {
-                if(item.Format == selectedText)
-                {
-                    this.PreviewText.Text = item.Data.ToString();
-                }
+                this.PreviewText.Text = string.Empty;
+                return;
             }
 
-            if(selectedText == "JSON")
+            var foramtData = Items.FirstOrDefault(x => x.Format == selectedFormat);
+            if (foramtData != null)
             {
-                string text = "";
-                foreach (var item in Items)
-                {
-                    if (item.Format == "Text")
-                    {
-                        text = item.Data.ToString();
-                    }
-                }
+                this.PreviewText.Text = foramtData.Data.ToString();
+            }
+        }
 
+        private void JsonConvert_Click(object sender, RoutedEventArgs e)
+        {
+                var text = this.PreviewText.Text;
                 if(string.IsNullOrEmpty(text))
                 {
                     return;
                 }
 
-                string[] result = text.Split('\t');
-                if (result.Length == 2)
+                var separators = new string[] { "\r\n", "\n" };
+                var lines = text.Split(separators, StringSplitOptions.None);
+
+                var sb  = new StringBuilder();
+                foreach( var line in lines )
                 {
-                    var key = result[0];
-                    var value = result[1].Replace("\r\n", "");
-                    this.PreviewText.Text = $"{{\"{key}\" : \"{value}\"}}";
+                    var splitedText = line.Split(new char[] { ' ', '\t' });
+                    var key  = splitedText[0];
+                var value = string.Join(" ", splitedText, 1, splitedText.Length - 1);
+
+                    sb.AppendLine($"{{\"{key}\" : \"{value}\"}}");
                 }
 
-                
+                this.PreviewText.Text = sb.ToString().TrimEnd('\r', '\n');
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            SetPreviewText();
+        }
+
+        private void Update_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateClipboard();
+            SetPreviewText();
+        }
+
+        private void Convert_Click(object sender, RoutedEventArgs e)
+        {
+            var text = this.PreviewText.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
             }
+
+            var replacedText = text.Replace(this.beforeText.Text, this.afterText.Text);
+            this.PreviewText.Text = replacedText;
+
+
         }
     }
 }
