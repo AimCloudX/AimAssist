@@ -19,6 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*">
             </RowDefinition>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="0" CanContentScroll="False">
                 <ListView  x:Name="ListView" ItemsSource="{Binding Items}"  MaxHeight="600" SelectionMode="Multiple"
@@ -40,7 +41,28 @@
                 </GridView>
             </ListView.View>
         </ListView>
-            
         </ScrollViewer>
+        <StackPanel Grid.Row="1">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="JsonConvert" Content="Json形式に変換" HorizontalAlignment="Right" Click="JsonConvert_Click" Margin="0,0,5,0"></Button>
+                    <Button x:Name="Clear" Content="変換Clear" Click="Clear_Click" Margin="0,0,5,0" HorizontalAlignment="Right"></Button>
+                </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="置換元"></TextBlock>
+                <TextBox x:Name="beforeText"></TextBox>
+                <TextBlock Text="置換先"></TextBlock>
+                <TextBox x:Name="afterText"></TextBox>
+                <Button x:Name="Convert" Content="置換" Click="Convert_Click" Margin="0,0,5,0"></Button>
+                    </StackPanel>
+            </StackPanel>
+            <TextBox Margin="10" HorizontalAlignment="Left" x:Name="PreviewText" MinWidth="400"></TextBox>
+            <StackPanel Orientation="Horizontal">
+            <ComboBox x:Name="ComboBox" SelectionChanged="ComboBox_SelectionChanged" Margin="0,0,5,0"></ComboBox>
+            <Button Content="Copy" Click="Button_Click" Margin="0,0,5,0"></Button>
+            <Button x:Name="Update" Content="Clipboard更新" Click="Update_Click"></Button>
+                
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>
