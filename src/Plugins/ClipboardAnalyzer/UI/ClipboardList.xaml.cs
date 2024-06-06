@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ClipboardAnalyzer.DomainModels;
 using ClipboardAnalyzer.Services;
 
@@ -82,26 +70,32 @@ namespace ClipboardAnalyzer
 
         private void JsonConvert_Click(object sender, RoutedEventArgs e)
         {
-                var text = this.PreviewText.Text;
-                if(string.IsNullOrEmpty(text))
+            var text = this.PreviewText.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            var separators = new string[] { "\r\n", "\n" };
+            var lines = text.Split(separators, StringSplitOptions.None);
+
+            var sb = new StringBuilder();
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrEmpty(line))
                 {
-                    return;
+                    sb.AppendLine();
+                    continue;
                 }
 
-                var separators = new string[] { "\r\n", "\n" };
-                var lines = text.Split(separators, StringSplitOptions.None);
-
-                var sb  = new StringBuilder();
-                foreach( var line in lines )
-                {
-                    var splitedText = line.Split(new char[] { ' ', '\t' });
-                    var key  = splitedText[0];
+                var splitedText = line.Split(new char[] { ' ', '\t' });
+                var key = splitedText[0];
                 var value = string.Join(" ", splitedText, 1, splitedText.Length - 1);
 
-                    sb.AppendLine($"{{\"{key}\" : \"{value}\"}}");
-                }
+                sb.AppendLine($"{{\"{key}\" : \"{value}\"}}");
+            }
 
-                this.PreviewText.Text = sb.ToString().TrimEnd('\r', '\n');
+            this.PreviewText.Text = sb.ToString().TrimEnd('\r', '\n');
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)
@@ -125,8 +119,6 @@ namespace ClipboardAnalyzer
 
             var replacedText = text.Replace(this.beforeText.Text, this.afterText.Text);
             this.PreviewText.Text = replacedText;
-
-
         }
     }
 }
