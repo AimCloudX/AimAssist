@@ -40,7 +40,7 @@ namespace AimAssist.WebViewCash
 
         internal static UIElement GetWebViewControl(string url)
         {
-            if (url.StartsWith("https://amazon"))
+            if (url.StartsWith("https://www.amazon"))
             {
                 if (amazonwebView == null)
                 {
