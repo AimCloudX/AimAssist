@@ -2,14 +2,24 @@
 import * as monacoVim from 'monaco-vim';
 import 'monaco-editor/min/vs/editor/editor.main.css';
 
-// Create the editor instance
 const editor = monaco.editor.create(document.getElementById('container'), {
   value: '',
   language: 'javascript',
   theme: 'vs-dark',
 });
 
-// Enable Vim mode
-const statusNode = document.createElement('div');
-document.body.appendChild(statusNode);
-monacoVim.initVimMode(editor, statusNode);
+let vimMode = null;
+
+function toggleVimMode(enable) {
+  if (enable) {
+    vimMode = monacoVim.initVimMode(editor, document.createElement('div'));
+  } else {
+    if (vimMode) {
+      vimMode.dispose();
+      vimMode = null;
+    }
+  }
+}
+
+// グローバルスコープに関数を追加して、C#から呼び出せるようにする
+window.toggleVimMode = toggleVimMode;

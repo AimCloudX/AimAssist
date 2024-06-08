@@ -38,5 +38,16 @@ namespace Common.UI.Editor
         private void WebView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             // オプション: ナビゲーション完了イベントを処理
-        }    }
+        }    
+    private void VimModeCheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        webView.CoreWebView2.ExecuteScriptAsync("toggleVimMode(true);");
+    }
+
+    private void VimModeCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        webView.CoreWebView2.ExecuteScriptAsync("toggleVimMode(false);");
+    }
+    }
+
 }
