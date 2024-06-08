@@ -35,4 +35,13 @@ public class MonacoModel
         RequestSave?.Invoke(this);
     }
 }
+
+}
+[ComVisible(true)]
+public class keyChange(string key, string command, string mode)
+{
+    public string key { get; set; } = key;
+
+    public string command { get; set; }
+    public string mode { get; set; } = mode;
 }

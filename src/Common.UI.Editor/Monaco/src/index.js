@@ -2,7 +2,6 @@
 import * as monacoVim from 'monaco-vim';
 import 'monaco-editor/min/vs/editor/editor.main.css';
 //import './editor.main.nord.css';
-import { VimMode } from 'monaco-vim';
 
 // カスタムNordテーマの定義
 monaco.editor.defineTheme('nord', {
@@ -52,7 +51,7 @@ self.MonacoEnvironment = {
 };
 
 const editor = monaco.editor.create(document.getElementById('container'), {
-  value: '',
+  value: 'aa',
   language: 'javascript',
   theme: 'nord',
 });
@@ -61,21 +60,8 @@ let vimMode = null;
 
 function toggleVimMode(enable) {
   if (enable) {
-    vimMode = monacoVim.initVimMode(editor, document.createElement('div'));
-      VimMode.Vim.mapCommand(';', 'ex', 'normal')
-      VimMode.Vim.mapCommand(':', 'motion', 'repeatLastCharacterSearch', { forward: true })
-      VimMode.Vim.mapCommand('H', 'motion', 'moveToFirstNonWhiteSpaceCharacter')
-      VimMode.Vim.mapCommand('L', 'motion', 'moveToEol')
-      VimMode.Vim.mapCommand('gj', 'motion', 'moveByLines', { forward: true, linewise: true })
-      VimMode.Vim.mapCommand('gk', 'motion', 'moveByLines', { forward: false, linewise: true })
-      VimMode.Vim.mapCommand('j', 'motion', 'moveByDisplayLines', { forward: true })
-      VimMode.Vim.mapCommand('k', 'motion', 'moveByDisplayLines', { forward: false })
-      VimMode.Vim.map('J', '10j', 'normal')
-      VimMode.Vim.map('K', '10k', 'normal')
-      VimMode.Vim.map('jj', '<Esc>', 'insert')
-      VimMode.Vim.map('<Space>,', '<<', 'visual')
-      VimMode.Vim.map('<Space>.', '>>', 'visual')
-
+      vimMode = monacoVim.initVimMode(editor, document.createElement('div'));
+      
   } else {
     if (vimMode) {
       vimMode.dispose();
@@ -97,18 +83,20 @@ function getEditorContent() {
   return editor.getValue();
 }
 
+function updateVimMap(before, after, mode) {
+    monacoVim.VimMode.Vim.map(before, after, mode)
+}
+function updateVimMapCommand(key, command, option) {
+      monacoVim.VimMode.Vim.mapCommand(key, command, option)
+}
+function updateVimMapCommand2(key, command, option1, option2) {
+      monacoVim.VimMode.Vim.mapCommand(key, command, option1, option2)
+}
+
 // グローバルスコープに関数を追加して、C#から呼び出せるようにする
 window.toggleVimMode = toggleVimMode;
 window.setEditorContent = setEditorContent;
 window.getEditorContent = getEditorContent;
-
-window.updateVimKeyBindings = function (keyBindings) {
-
-
-    //keyBindings.forEach(binding => {
-    //    window.vimMode.vim.editor.addKeybinding({
-    //        key: binding.key,
-    //        command: binding.command
-    //    });
-    //});
-};
+window.updateVimMap = updateVimMap;
+window.updateVimMapCommand = updateVimMapCommand;
+window.updateVimMapCommand2 = updateVimMapCommand2;

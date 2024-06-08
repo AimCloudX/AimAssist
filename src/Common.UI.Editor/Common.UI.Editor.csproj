@@ -27,6 +27,9 @@
     <None Update="Monaco\src\editor.main.nord.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Monaco\src\keybindings.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Monaco\src\vimrc.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

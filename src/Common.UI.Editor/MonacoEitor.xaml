@@ -10,6 +10,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
+            <Button Content="Load vimrc" Click="LoadVimrc_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"/>
             <CheckBox Name="VimModeCheckBox" Content="Enable Vim Mode" Checked="VimModeCheckBox_Checked" Unchecked="VimModeCheckBox_Unchecked"/>
             <Button Content="Load File" Click="LoadFileButton_Click"/>
             <Button Content="Save File" Click="SaveFileButton_Click"/>
