@@ -1,0 +1,5 @@
+﻿# Monaco/distフォルダ内の全てのファイルを除外
+Monaco/dist/*
+
+# ただし、bundle.jsは含める
+!Monaco/dist/bundle.js

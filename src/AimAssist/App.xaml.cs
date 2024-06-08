@@ -9,6 +9,8 @@ using AimAssist.Unit.Implementation.Web.Bookmarks;
 using AimAssist.Unit.Implementation.Web.BookSearch;
 using AimAssist.Unit.Implementation.Web.Urls;
 using AimAssist.Unit.Implementation.WorkFlows;
+using Common.UI.Editor;
+using System.Windows;
 
 namespace AimAssist
 {
@@ -25,6 +27,12 @@ namespace AimAssist
 
             var window = new HowKeysWindow();
             window.Show();
+
+            var aa = new Window();
+            aa.Content = new MonacoEditor();
+            aa.Width = 400;
+            aa.Height = 400;
+            aa.Show();
         }
 
         private void GenelateNotifyIcon()
