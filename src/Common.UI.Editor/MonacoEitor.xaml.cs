@@ -76,6 +76,30 @@ namespace Common.UI.Editor
                 await File.WriteAllTextAsync(filePath, decodedContent);
             }
         }
+
+        private async void UpdateKeyBindings_Click(object sender, RoutedEventArgs e)
+        {
+            if (webView.CoreWebView2 != null)
+            {
+                string keyBindings = "[ { 'before': ['j'], 'after': ['k'] }, { 'before': ['k'], 'after': ['j'] } ]"; // 例：Vimのキーバインディング
+                await webView.CoreWebView2.ExecuteScriptAsync($"updateVimKeyBindings({keyBindings});");
+            }
+        }
+
+        private async void LoadVimrc_Click(object sender, RoutedEventArgs e)
+        {
+            var vimrcFile  = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Monaco","src","vimrc.js");
+            var text = File.ReadAllText(vimrcFile);
+             await webView.CoreWebView2.ExecuteScriptAsync(text);
+
+            //if (webView.CoreWebView2 != null)
+            //{
+            //    string vimrcPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,".vimrc"); // 実際の.vimrcファイルのパスに置き換えてください
+            //    Dictionary<string, string> keyBindings = VimConfigParser.ParseVimrc(vimrcPath);
+            //    string keyBindingsJson = JsonConvert.SerializeObject(keyBindings);
+            //    await webView.CoreWebView2.ExecuteScriptAsync($"updateVimKeyBindings({keyBindingsJson});");
+            //}
+        }
     }
 
 }
