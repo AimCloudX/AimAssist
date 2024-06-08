@@ -1,7 +1,11 @@
 ﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -48,6 +52,30 @@ namespace Common.UI.Editor
     {
         webView.CoreWebView2.ExecuteScriptAsync("toggleVimMode(false);");
     }
+        private async void LoadFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string filePath = openFileDialog.FileName;
+                string fileContent = await File.ReadAllTextAsync(filePath);
+                string script = $"setEditorContent({JsonConvert.SerializeObject(fileContent)});";
+                webView.CoreWebView2.ExecuteScriptAsync(script);
+            }
+        }
+
+        private async void SaveFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string filePath = saveFileDialog.FileName;
+                string fileContent = await webView.CoreWebView2.ExecuteScriptAsync("getEditorContent();");
+                fileContent = fileContent.Trim('"').Replace("\\n", "\n").Replace("\\r", "\r"); // JSON文字列から実際の内容を取得
+                string decodedContent = JsonConvert.DeserializeObject<string>($"\"{fileContent}\"");
+                await File.WriteAllTextAsync(filePath, decodedContent);
+            }
+        }
     }
 
 }

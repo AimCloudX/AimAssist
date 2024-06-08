@@ -21,5 +21,20 @@ function toggleVimMode(enable) {
   }
 }
 
+// リサイズイベントのハンドル
+window.addEventListener('resize', () => {
+    editor.layout();
+});
+
+function setEditorContent(content) {
+  editor.setValue(content);
+}
+
+function getEditorContent() {
+  return editor.getValue();
+}
+
 // グローバルスコープに関数を追加して、C#から呼び出せるようにする
 window.toggleVimMode = toggleVimMode;
+window.setEditorContent = setEditorContent;
+window.getEditorContent = getEditorContent;
