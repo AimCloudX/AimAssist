@@ -2,6 +2,7 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using AimAssist.Core.Options;
 using ClipboardAnalyzer.DomainModels;
 using ClipboardAnalyzer.Services;
 
@@ -17,6 +18,7 @@ namespace ClipboardAnalyzer
         {
             InitializeComponent();
             UpdateClipboard();
+            this.editor.SetOption(EditorOptionService.Option);
         }
 
         private void UpdateClipboard()
@@ -43,7 +45,7 @@ namespace ClipboardAnalyzer
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var selectedFormat = this.ComboBox.SelectedItem as string;
-            Clipboard.SetData(selectedFormat, this.PreviewText.Text);
+            Clipboard.SetData(selectedFormat, this.editor.GetText().Result);
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -57,20 +59,20 @@ namespace ClipboardAnalyzer
 
             if (string.IsNullOrEmpty(selectedFormat))
             {
-                this.PreviewText.Text = string.Empty;
+                this.editor.SetText(string.Empty);
                 return;
             }
 
             var foramtData = Items.FirstOrDefault(x => x.Format == selectedFormat);
             if (foramtData != null)
             {
-                this.PreviewText.Text = foramtData.Data.ToString();
+                this.editor.SetText(foramtData.Data.ToString());
             }
         }
 
         private void JsonConvert_Click(object sender, RoutedEventArgs e)
         {
-            var text = this.PreviewText.Text;
+            var text = this.editor.GetText().Result;
             if (string.IsNullOrEmpty(text))
             {
                 return;
@@ -95,7 +97,7 @@ namespace ClipboardAnalyzer
                 sb.AppendLine($"{{\"{key}\" : \"{value}\"}}");
             }
 
-            this.PreviewText.Text = sb.ToString().TrimEnd('\r', '\n');
+            this.editor.SetText(sb.ToString().TrimEnd('\r', '\n'));
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)
@@ -111,14 +113,14 @@ namespace ClipboardAnalyzer
 
         private void Convert_Click(object sender, RoutedEventArgs e)
         {
-            var text = this.PreviewText.Text;
+            var text = this.editor.GetText().Result;
             if (string.IsNullOrEmpty(text))
             {
                 return;
             }
 
             var replacedText = text.Replace(this.beforeText.Text, this.afterText.Text);
-            this.PreviewText.Text = replacedText;
+            this.editor.SetText(replacedText);
         }
     }
 }

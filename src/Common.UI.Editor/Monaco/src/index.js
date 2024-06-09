@@ -1,7 +1,6 @@
 ﻿import * as monaco from 'monaco-editor';
 import * as monacoVim from 'monaco-vim';
 import 'monaco-editor/min/vs/editor/editor.main.css';
-//import './editor.main.nord.css';
 
 // カスタムNordテーマの定義
 monaco.editor.defineTheme('nord', {
@@ -31,27 +30,27 @@ monaco.editor.defineTheme('nord', {
     }
 });
 
-// Monaco Environmentの設定
-self.MonacoEnvironment = {
-    getWorkerUrl: function (moduleId, label) {
-        if (label === 'json') {
-            return './vs/language/json/json.worker.js';
-        }
-        if (label === 'css') {
-            return './vs/language/css/css.worker.js';
-        }
-        if (label === 'html') {
-            return './vs/language/html/html.worker.js';
-        }
-        if (label === 'typescript' || label === 'javascript') {
-            return './vs/language/typescript/ts.worker.js';
-        }
-        return './vs/editor/editor.worker.js';
-    }
-};
+//// Monaco Environmentの設定
+//self.MonacoEnvironment = {
+//    getWorkerUrl: function (moduleId, label) {
+//        if (label === 'json') {
+//            return './vs/language/json/json.worker.js';
+//        }
+//        if (label === 'css') {
+//            return './vs/language/css/css.worker.js';
+//        }
+//        if (label === 'html') {
+//            return './vs/language/html/html.worker.js';
+//        }
+//        if (label === 'typescript' || label === 'javascript') {
+//            return './vs/language/typescript/ts.worker.js';
+//        }
+//        return './vs/editor/editor.worker.js';
+//    }
+//};
 
 const editor = monaco.editor.create(document.getElementById('container'), {
-  value: 'aa',
+  value: '',
   language: 'javascript',
   theme: 'nord',
 });
@@ -80,7 +79,11 @@ function setEditorContent(content) {
 }
 
 function getEditorContent() {
-  return editor.getValue();
+    console.log('aabb')
+    test3 = editor.getValue();
+    console.log('ccdd')
+    console.log(test3);
+  return test3;
 }
 
 function updateVimMap(before, after, mode) {

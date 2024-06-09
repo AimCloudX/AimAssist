@@ -1,22 +1,21 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
 using System.IO;
-using System.Windows.Controls;
 
 namespace Common.UI.Editor
 {
     /// <summary>
     /// MonacoEitor.xaml の相互作用ロジック
     /// </summary>
-    public partial class MonacoEditor : UserControl
+    public partial class MonacoEditor : System.Windows.Controls.UserControl
     {
         private EditorOption option = new EditorOption();
         private string text = string.Empty;
 
         public MonacoEditor()
         {
-            InitializeComponent();
-            webView.NavigationCompleted += InitializeCoreWebView2Completed;
+            this.InitializeComponent();
+            this.webView.NavigationCompleted += InitializeCoreWebView2Completed;
             InitializeAsync();
         }
 
@@ -73,7 +72,8 @@ namespace Common.UI.Editor
 
         public async Task<string> GetText()
         {
-            string fileContent = await webView.CoreWebView2.ExecuteScriptAsync("getEditorContent();");
+            var fileContent = await webView.CoreWebView2.ExecuteScriptAsync("getEditorContent();");
+
             fileContent = fileContent.Trim('"').Replace("\\n", "\n").Replace("\\r", "\r"); // JSON文字列から実際の内容を取得
             return JsonConvert.DeserializeObject<string>($"\"{fileContent}\"");
         }
@@ -82,7 +82,8 @@ namespace Common.UI.Editor
         {
             await webView.EnsureCoreWebView2Async(null);
             string htmlFilePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Monaco", "src", "index.html");
-            webView.CoreWebView2.Navigate(htmlFilePath);
+            webView.Source = new Uri($"file:///{htmlFilePath}");
+            //webView.CoreWebView2.Navigate(htmlFilePath);
         }
     }
 }

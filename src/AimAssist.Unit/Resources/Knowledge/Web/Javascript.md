@@ -8,3 +8,6 @@
 [次世代バンドルツールの競争の今 Turbopack vs Vite - GMOインターネットグループ グループ研究開発本部](https://recruit.gmo.jp/engineer/jisedai/blog/turbopack-vs-vite/)
 
 [Monaco Editorをwebpackのプロジェクトに追加する | Public Theta Blog](https://blog.publictheta.com/memos/v1KEEcdCsYMQaTDzyBlS6)
+
+
+[monaco-editor 周りの調査](https://zenn.dev/mizchi/scraps/87c2c5a37cbd6a)

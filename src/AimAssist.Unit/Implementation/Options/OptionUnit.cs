@@ -32,6 +32,8 @@ namespace AimAssist.Unit.Implementation.Options
         public UIElement GetUiElement()
         {
             var editor =  new MonacoEditor();
+            editor.MinHeight = 500;
+            editor.MinWidth = 500;
             var text = File.ReadAllText(FilePath);
             editor.SetOption(EditorOptionService.Option);
             editor.SetText(text);
