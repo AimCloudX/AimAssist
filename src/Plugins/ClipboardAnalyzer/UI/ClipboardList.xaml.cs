@@ -45,6 +45,11 @@ namespace ClipboardAnalyzer
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var selectedFormat = this.ComboBox.SelectedItem as string;
+            if(selectedFormat == null)
+            {
+                selectedFormat = "Text"; ;
+            }
+
             Clipboard.SetData(selectedFormat, await this.editor.GetText());
         }
 

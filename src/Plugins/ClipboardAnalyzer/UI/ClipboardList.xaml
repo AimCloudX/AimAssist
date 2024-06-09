@@ -44,8 +44,13 @@
             </ListView.View>
         </ListView>
         </ScrollViewer>
-        <StackPanel Grid.Row="1">
-            <StackPanel Orientation="Vertical">
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical" Grid.Row="0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="JsonConvert" Content="Json形式に変換" HorizontalAlignment="Right" Click="JsonConvert_Click" Margin="0,0,5,0"></Button>
                     <Button x:Name="Clear" Content="変換Clear" Click="Clear_Click" Margin="0,0,5,0" HorizontalAlignment="Right"></Button>
@@ -58,13 +63,13 @@
                 <Button x:Name="Convert" Content="置換" Click="Convert_Click" Margin="0,0,5,0"></Button>
                     </StackPanel>
             </StackPanel>
-            <monaco1:MonacoEditor x:Name="editor" MinHeight="150"></monaco1:MonacoEditor>
-            <StackPanel Orientation="Horizontal">
-            <ComboBox x:Name="ComboBox" SelectionChanged="ComboBox_SelectionChanged" Margin="0,0,5,0"></ComboBox>
-            <Button Content="Copy" Click="Button_Click" Margin="0,0,5,0"></Button>
-            <Button x:Name="Update" Content="Clipboard更新" Click="Update_Click"></Button>
-                
+            <monaco1:MonacoEditor Grid.Row="1" x:Name="editor" MinHeight="150"></monaco1:MonacoEditor>
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <ComboBox x:Name="ComboBox" SelectionChanged="ComboBox_SelectionChanged" Margin="0,0,5,0"></ComboBox>
+                <Button Content="Copy" Click="Button_Click" Margin="0,0,5,0"></Button>
+                <Button x:Name="Update" Content="Clipboard更新" Click="Update_Click"></Button>
+
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
