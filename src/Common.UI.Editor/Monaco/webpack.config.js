@@ -1,5 +1,6 @@
 ﻿const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
+const MonacoEditorWebpackPlugin = require("monaco-editor-webpack-plugin")
 
 module.exports = {
   mode: 'production',  // 'development' も可能です
@@ -9,14 +10,20 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     clean: true,  // 出力ディレクトリをクリーンアップ
   },
-  module: {
-    rules: [
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-    ],
-  },
+    resolve: {
+        extensions: ['.ts', '.js'],
+    },
+    plugins: [new MonacoEditorWebpackPlugin({
+        languages: ['javascript', 'typescript']
+    })],
+	module: {
+		rules: [
+			{
+				test: /\.css$/,
+				use: ['style-loader', 'css-loader']
+			},
+		]
+	},
   optimization: {
     minimize: true,
     minimizer: [new TerserPlugin({

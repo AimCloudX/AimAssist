@@ -1,7 +1,6 @@
 ﻿import * as monaco from 'monaco-editor';
 import * as monacoVim from 'monaco-vim';
 import 'monaco-editor/min/vs/editor/editor.main.css';
-//import './editor.main.nord.css';
 
 // カスタムNordテーマの定義
 monaco.editor.defineTheme('nord', {
@@ -31,27 +30,19 @@ monaco.editor.defineTheme('nord', {
     }
 });
 
-// Monaco Environmentの設定
-self.MonacoEnvironment = {
-    getWorkerUrl: function (moduleId, label) {
-        if (label === 'json') {
-            return './vs/language/json/json.worker.js';
-        }
-        if (label === 'css') {
-            return './vs/language/css/css.worker.js';
-        }
-        if (label === 'html') {
-            return './vs/language/html/html.worker.js';
-        }
-        if (label === 'typescript' || label === 'javascript') {
-            return './vs/language/typescript/ts.worker.js';
-        }
-        return './vs/editor/editor.worker.js';
+window.MonacoEnvironment = {
+    getWorkerUrl: function (workerId, label) {
+        return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+            self.MonacoEnvironment = {
+                baseUrl: 'https://unpkg.com/monaco-editor@0.21.2/min/'
+            };
+            importScripts('https://unpkg.com/monaco-editor@0.21.2/min/vs/base/worker/workerMain.js');
+        `)}`;
     }
 };
 
 const editor = monaco.editor.create(document.getElementById('container'), {
-  value: 'aa',
+  value: '',
   language: 'javascript',
   theme: 'nord',
 });
@@ -80,7 +71,22 @@ function setEditorContent(content) {
 }
 
 function getEditorContent() {
-  return editor.getValue();
+    console.log('Entering getEditorContent');
+
+    if (typeof editor === 'undefined') {
+        console.error('Editor is not defined');
+        return '';
+    }
+
+    try {
+        console.log('Before getting value');
+        var value = editor.getValue();
+        console.log('Editor value:', value);
+        return value;
+    } catch (error) {
+        console.error('Error getting editor value:', error);
+        return '';
+    }
 }
 
 function updateVimMap(before, after, mode) {

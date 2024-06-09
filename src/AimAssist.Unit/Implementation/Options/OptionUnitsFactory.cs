@@ -13,8 +13,7 @@ namespace AimAssist.Unit.Implementation.Options
 
         public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
-            var editorOptionPath = EditorOptionService.OptionPath;
-            yield return new OptionUnit("EditorOption", editorOptionPath, "Editor");
+            yield return new OptionUnit("Option", "Option");
         }
     }
 }

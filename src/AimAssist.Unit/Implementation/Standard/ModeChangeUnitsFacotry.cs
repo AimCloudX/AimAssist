@@ -22,7 +22,6 @@ namespace AimAssist.Unit.Implementation.Standard
             yield return WorkFlowMode.Instance.ModeChangeUnits;
             yield return BookSearchMode.Instance.ModeChangeUnits;
             yield return BookmarkMode.Instance.ModeChangeUnits;
-            yield return OptionMode.Instance.ModeChangeUnits;
         }
     }
 }
