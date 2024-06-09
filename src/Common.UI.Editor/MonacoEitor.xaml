@@ -3,17 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Common.UI.Editor" xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
+             xmlns:local="clr-namespace:Common.UI.Editor" 
+             MinWidth="800"
+             MinHeight="700"
+             xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             >
     <Grid>
 <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <Button Content="Load vimrc" Click="LoadVimrc_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"/>
-            <CheckBox Name="VimModeCheckBox" Content="Enable Vim Mode" Checked="VimModeCheckBox_Checked" Unchecked="VimModeCheckBox_Unchecked"/>
-            <Button Content="Load File" Click="LoadFileButton_Click"/>
-            <Button Content="Save File" Click="SaveFileButton_Click"/>
         </StackPanel>
     <wpf:WebView2 Grid.Row="1" x:Name="webView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ></wpf:WebView2>
     </Grid>

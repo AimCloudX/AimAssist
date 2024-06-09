@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.UI.Editor", "Common.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AimAssist", "AimAssist", "{1A537514-6D88-444F-88E3-ED44BB9C2F08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AimAssist.Core", "AimAssist.Core\AimAssist.Core.csproj", "{344A33C2-D272-46D1-A12C-AA4D6FAED040}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{DB5AC664-CDB4-4541-BDFB-41225FE93D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB5AC664-CDB4-4541-BDFB-41225FE93D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB5AC664-CDB4-4541-BDFB-41225FE93D60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{344A33C2-D272-46D1-A12C-AA4D6FAED040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{344A33C2-D272-46D1-A12C-AA4D6FAED040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{344A33C2-D272-46D1-A12C-AA4D6FAED040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{344A33C2-D272-46D1-A12C-AA4D6FAED040}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{34DE80F1-1E29-42CE-A12D-37B151F982C8} = {1A537514-6D88-444F-88E3-ED44BB9C2F08}
 		{FD885AF7-C292-4DE9-9453-699B11737F96} = {1A537514-6D88-444F-88E3-ED44BB9C2F08}
 		{DB5AC664-CDB4-4541-BDFB-41225FE93D60} = {203FFC69-EDE5-467E-9953-E10984D5BA12}
+		{344A33C2-D272-46D1-A12C-AA4D6FAED040} = {1A537514-6D88-444F-88E3-ED44BB9C2F08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90FDF691-BAB3-4955-9A7C-4C323F4344C3}

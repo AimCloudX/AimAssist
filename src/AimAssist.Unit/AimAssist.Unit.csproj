@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common.UI.Editor\Common.UI.Editor.csproj" />
+    <ProjectReference Include="..\AimAssist.Core\AimAssist.Core.csproj" />
     <ProjectReference Include="..\Snippet\Snippet.csproj" />
   </ItemGroup>
 
