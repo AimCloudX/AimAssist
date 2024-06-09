@@ -1,8 +1,10 @@
 ﻿using AimAssist.Commands;
+using AimAssist.Core.Options;
 using AimAssist.Plugins;
 using AimAssist.Service;
 using AimAssist.UI.Tools.HotKeys;
 using AimAssist.Unit.Implementation.Knoledges;
+using AimAssist.Unit.Implementation.Options;
 using AimAssist.Unit.Implementation.Snippets;
 using AimAssist.Unit.Implementation.Standard;
 using AimAssist.Unit.Implementation.Web.Bookmarks;
@@ -19,6 +21,7 @@ namespace AimAssist
     {
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
         {
+            EditorOptionService.LoadOption();
             RegisterUnitsFactory();
 
             GenelateNotifyIcon();
@@ -54,6 +57,7 @@ namespace AimAssist
             factory.RegisterFactory(new KnowledgeUnitsFactory());
             factory.RegisterFactory(new BookmarkUnitsFacotry());
             factory.RegisterFactory(new UrlUnitsFacotry());
+            factory.RegisterFactory(new OptionUnitsFactory());
 
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();
@@ -80,6 +84,11 @@ namespace AimAssist
         private void Exit_Click(object? sender, EventArgs e)
         {
             Shutdown();
+        }
+
+        private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
+        {
+            EditorOptionService.SaveOption();
         }
     }
 
