@@ -37,7 +37,6 @@ namespace Common.UI.Editor
                 string script = $"setEditorContent({JsonConvert.SerializeObject(text)});";
                 await webView.CoreWebView2.ExecuteScriptAsync(script);
             }
-
         }
 
         public async void SetOption(EditorOption option)
@@ -67,21 +66,25 @@ namespace Common.UI.Editor
 
                     break;
             }
-
         }
 
         public async Task<string> GetText()
         {
-            var fileContent = await webView.CoreWebView2.ExecuteScriptAsync("getEditorContent();");
-
-            fileContent = fileContent.Trim('"').Replace("\\n", "\n").Replace("\\r", "\r"); // JSON文字列から実際の内容を取得
-            return JsonConvert.DeserializeObject<string>($"\"{fileContent}\"");
+            try
+            {
+                var fileContent = await webView.CoreWebView2.ExecuteScriptAsync("getEditorContent();");
+                return JsonConvert.DeserializeObject<string>(fileContent);
+            }
+            catch 
+            {
+                return string.Empty;
+            }
         }
 
         private async void InitializeAsync()
         {
             await webView.EnsureCoreWebView2Async(null);
-            string htmlFilePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Monaco", "src", "index.html");
+            string htmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Monaco", "src", "index.html");
             webView.Source = new Uri($"file:///{htmlFilePath}");
             //webView.CoreWebView2.Navigate(htmlFilePath);
         }

@@ -42,10 +42,10 @@ namespace ClipboardAnalyzer
             this.ComboBox.SelectedItem = "Text";
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var selectedFormat = this.ComboBox.SelectedItem as string;
-            Clipboard.SetData(selectedFormat, this.editor.GetText().Result);
+            Clipboard.SetData(selectedFormat, await this.editor.GetText());
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -70,9 +70,9 @@ namespace ClipboardAnalyzer
             }
         }
 
-        private void JsonConvert_Click(object sender, RoutedEventArgs e)
+        private async void JsonConvert_Click(object sender, RoutedEventArgs e)
         {
-            var text = this.editor.GetText().Result;
+            var text = await this.editor.GetText();
             if (string.IsNullOrEmpty(text))
             {
                 return;
@@ -111,9 +111,9 @@ namespace ClipboardAnalyzer
             SetPreviewText();
         }
 
-        private void Convert_Click(object sender, RoutedEventArgs e)
+        private async void Convert_Click(object sender, RoutedEventArgs e)
         {
-            var text = this.editor.GetText().Result;
+            var text = await this.editor.GetText();
             if (string.IsNullOrEmpty(text))
             {
                 return;

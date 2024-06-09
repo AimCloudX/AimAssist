@@ -11,3 +11,6 @@
 
 
 [monaco-editor 周りの調査](https://zenn.dev/mizchi/scraps/87c2c5a37cbd6a)
+
+
+[monaco-editor/docs/integrate-esm.md at main · microsoft/monaco-editor](https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md)
