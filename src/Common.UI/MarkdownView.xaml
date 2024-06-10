@@ -6,8 +6,7 @@
              xmlns:local="clr-namespace:AimAssist.UI.Combos"
              xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              mc:Ignorable="d" 
-
-             Height="600" Width="800">
+             >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>

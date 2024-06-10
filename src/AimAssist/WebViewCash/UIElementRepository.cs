@@ -21,8 +21,6 @@ namespace AimAssist.WebViewCash
 
         public static string RescentText { get; set; }
 
-        public static PreviewWindow PreviewWindow { get; set; }
-
         public static UIElement GetUIElement(string workName)
         {
             if (_elements.ContainsKey(workName))

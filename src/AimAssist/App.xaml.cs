@@ -70,14 +70,14 @@ namespace AimAssist
 
         private void Show_Click(object? sender, EventArgs e)
         {
-            PickerCommands.ShowWindowCommand.Execute(e);
+            PickerCommands.ToggleAssistWindowCommand.Execute(e);
         }
 
         private void NotifyIcon_Click(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                PickerCommands.ShowWindowCommand.Execute(e);
+                PickerCommands.ToggleAssistWindowCommand.Execute(e);
             }
         }
 

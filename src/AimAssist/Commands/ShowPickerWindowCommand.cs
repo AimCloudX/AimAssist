@@ -5,19 +5,10 @@ namespace AimAssist.Commands
 {
     public static class PickerCommands
     {
-        private static bool isPickerServiceActivated;
-        public static RelayCommand ShowWindowCommand = new RelayCommand((o) =>
+        public static RelayCommand ToggleAssistWindowCommand = new RelayCommand((o) =>
         {
-            if (isPickerServiceActivated)
-            {
-                return;
-            }
+            WindowHandleService.ToggleMainWindow();
 
-            isPickerServiceActivated = true;
-
-            PickerService.Run();
-
-            isPickerServiceActivated = false;
         })
         {
         };
