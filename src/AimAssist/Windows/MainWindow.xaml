@@ -78,9 +78,10 @@
             </Grid>
             <StackPanel x:Name="FilterContents"/>
         </Grid>
-            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
-        <ListBox  x:Name="ComboListBox" ItemsSource="{Binding Source={StaticResource GroupedItems}}" SelectionChanged="ComboListBox_SelectionChanged"
-                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Standard">
+        <ListBox  Grid.Row="1" x:Name="ComboListBox" ItemsSource="{Binding Source={StaticResource GroupedItems}}" SelectionChanged="ComboListBox_SelectionChanged"
+                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Standard"
+                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel/>
@@ -150,7 +151,6 @@
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>
-            </ScrollViewer>
     </Grid>
         </Expander>
         <GridSplitter x:Name="GridSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch"></GridSplitter>
