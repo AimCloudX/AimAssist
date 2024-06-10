@@ -6,8 +6,6 @@
              xmlns:local="clr-namespace:AimAssist.UI.Combos.Commands" xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              mc:Ignorable="d" 
              Loaded="UserControl_Loaded"
-             MinWidth="800"
-             MinHeight="700"
              >
     <Grid>
         <Grid.RowDefinitions>

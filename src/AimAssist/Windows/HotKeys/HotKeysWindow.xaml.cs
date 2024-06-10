@@ -20,10 +20,10 @@ namespace AimAssist.UI.Tools.HotKeys
            // HotKeyの登録
             this.hotkeyController = new HotKeyController(this);
             this.hotkeyController.Register( ModifierKeys.Alt,
-                                  Key.P,
+                                  Key.A,
                                   (_, __) =>
                                       {
-                                          PickerCommands.ShowWindowCommand.Execute(this);
+                                          PickerCommands.ToggleAssistWindowCommand.Execute(this);
                                       });
         }
 

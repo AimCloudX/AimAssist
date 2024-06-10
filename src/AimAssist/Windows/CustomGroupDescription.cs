@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AimAssist.Windows.PickerWindows
+namespace AimAssist.Windows
 {
     using AimAssist.Unit.Core;
     using AimAssist.Unit.Core.Mode;
@@ -35,7 +35,7 @@ namespace AimAssist.Windows.PickerWindows
 
         public override bool NamesMatch(object groupName, object itemName)
         {
-            return object.Equals(groupName, itemName);
+            return Equals(groupName, itemName);
         }
     }
 }

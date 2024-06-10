@@ -6,7 +6,6 @@ using AimAssist.Unit.Implementation.Standard;
 using AimAssist.Unit.Implementation.Web.BookSearch;
 using AimAssist.Unit.Implementation.Web.Urls;
 using AimAssist.WebViewCash;
-using AimAssist.Windows.PickerWindows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -16,9 +15,9 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace AimAssist.UI.Tools.Snippets
+namespace AimAssist.Windows
 {
-    public partial class PickerWindow : INotifyPropertyChanged
+    public partial class MainWindow : INotifyPropertyChanged
     {
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
         private IPickerMode mode = StandardMode.Instance;
@@ -91,17 +90,16 @@ namespace AimAssist.UI.Tools.Snippets
         }
     }
 
-    public partial class PickerWindow : Window
+    public partial class MainWindow : Window
     {
         public bool IsClosing { get; set; }
 
         DispatcherTimer? typingTimer;
         private string beforeText = string.Empty;
-        private PreviewWindow previewWindow;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public PickerWindow()
+        public MainWindow()
         {
             this.InitializeComponent();
             this.DataContext = this;
@@ -315,53 +313,14 @@ namespace AimAssist.UI.Tools.Snippets
 
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(this.previewWindow == null)
-            {
-                return;
-            }
-
             if (this.ComboListBox.SelectedItem is IUnit combo)
             {
-                this.PreviewWindow.Contents.Children.Clear();
+                this.Preview.Children.Clear();
 
                 var uiElement = combo.GetOrCreateUiElemnt();
-                this.previewWindow?.Contents?.Children.Add(uiElement);
+                this.Preview.Children.Add(uiElement);
             }
         }
-
-        public PreviewWindow PreviewWindow 
-        { 
-            get
-            {
-                if(this.previewWindow == null)
-                {
-                    var previewWindow = UIElementRepository.PreviewWindow;
-                    if(previewWindow != null) 
-                    {
-                        this.previewWindow = previewWindow;
-                    }
-                    else
-                    {
-                        previewWindow = new PreviewWindow();
-
-                        // MainWindowの位置とサイズを取得
-                        double mainWindowLeft = this.Left;
-                        double mainWindowTop = this.Top;
-                        double mainWindowWidth = this.Width;
-                        double mainWindowHeight = this.Height;
-
-                        // SecondaryWindowの位置を設定
-                        previewWindow.Left = mainWindowLeft + mainWindowWidth;
-                        previewWindow.Top = mainWindowTop + mainWindowHeight + 130;
-                        //secondaryWindow.Top = mainWindowTop;
-
-                        UIElementRepository.PreviewWindow = previewWindow;
-                        this.previewWindow = previewWindow;
-                    }
-                }
-
-                return this.previewWindow;
-            } }
 
         private void AppDeacivated(object? sender, EventArgs e)
         {
@@ -380,22 +339,19 @@ namespace AimAssist.UI.Tools.Snippets
 
             UIElementRepository.RescentText = this.FilterTextBox.Text;
             this.IsClosing = true; ;
-            this.previewWindow.Visibility = Visibility.Hidden;
             this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.PreviewWindow.Show();
             if (this.ComboListBox.SelectedItem is IUnit combo)
             {
-                this.PreviewWindow.Contents.Children.Clear();
+                this.Preview.Children.Clear();
 
                 var uiElement = combo.GetOrCreateUiElemnt();
-                this.previewWindow?.Contents?.Children.Add(uiElement);
+                this.Preview.Children.Add(uiElement);
             }
 
-            AjustWindowCommand = new RelayCommand((o) => { CenterWindowsOnScreen(this, this.previewWindow); });
             OnPropertyChanged(nameof(AjustWindowCommand));
 
             this.Activate();
@@ -408,7 +364,6 @@ namespace AimAssist.UI.Tools.Snippets
         }
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            InitializeCenterWindowsOnScreen(this, this.previewWindow);
         }
 
         public ICommand AjustWindowCommand { get; set; }
@@ -472,6 +427,31 @@ namespace AimAssist.UI.Tools.Snippets
             // Set the position of the secondary window
             secondaryWindow.Left = secondaryWindowLeft;
             secondaryWindow.Top = topPosition;
+        }
+
+        private GridLength columnWidth = new GridLength(1, GridUnitType.Star);
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            // GridSplitterを可視化
+            if(GridSplitter != null)
+            {
+                // 前に閉じたときの高さ値が残っていたらそれを復元
+                LeftColumn.Width = columnWidth;
+                GridSplitter.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void Expander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            // GridSplitterを非表示に
+            if(GridSplitter != null )
+            {
+                // 閉じる前の高さを保存し
+                // 高さをAutoに戻す
+                columnWidth = LeftColumn.Width;
+                LeftColumn.Width = GridLength.Auto;
+                GridSplitter.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }
