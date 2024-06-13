@@ -2,7 +2,6 @@
 using Common.UI.Editor;
 using System.IO;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace AimAssist.Core.Editors
 {

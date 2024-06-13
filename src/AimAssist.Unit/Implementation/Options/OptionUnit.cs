@@ -2,6 +2,7 @@
 using AimAssist.Core.Options;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
+using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -28,7 +29,7 @@ namespace AimAssist.Unit.Implementation.Options
         {
             var editor =  new AimEditor();
             editor.NewTab(EditorOptionService.OptionPath);
-            if (EditorOptionService.Option.Mode == Common.UI.Editor.EditorMode.Vim)
+            if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
             {
                 editor.NewTab(EditorOptionService.Option.CustomVimKeybindingPath);
             }
