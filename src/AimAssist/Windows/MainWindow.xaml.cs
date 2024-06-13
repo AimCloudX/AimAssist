@@ -35,21 +35,26 @@ namespace AimAssist.Windows
 
                 this.mode = value;
                 // CollectionViewSourceの取得
-                CollectionViewSource groupedItems = (CollectionViewSource)this.Resources["GroupedItems"];
-
-                if (groupedItems != null)
-                {
-                    groupedItems.GroupDescriptions.Clear();
-                    if(this.mode == StandardMode.Instance)
-                    {
-                        groupedItems.GroupDescriptions.Add(new CustomGroupDescription());
-                    }
-                    else
-                    {
-                        groupedItems.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
-                    }
-                }
+                UpdateGroupDescription();
                 OnPropertyChanged();
+            }
+        }
+
+        private void UpdateGroupDescription()
+        {
+            CollectionViewSource groupedItems = (CollectionViewSource)this.Resources["GroupedItems"];
+
+            if (groupedItems != null)
+            {
+                groupedItems.GroupDescriptions.Clear();
+                if (this.mode == StandardMode.Instance)
+                {
+                    groupedItems.GroupDescriptions.Add(new CustomGroupDescription());
+                }
+                else
+                {
+                    groupedItems.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
+                }
             }
         }
 
@@ -104,7 +109,6 @@ namespace AimAssist.Windows
             this.InitializeComponent();
             this.DataContext = this;
             
-            this.Mode = StandardMode.Instance;
             this.UpdateCandidate();
             this.FilterTextBox.Text = UIElementRepository.RescentText;
             this.FilterTextBox.Focus();
@@ -344,6 +348,7 @@ namespace AimAssist.Windows
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            UpdateGroupDescription();
             if (this.ComboListBox.SelectedItem is IUnit combo)
             {
                 this.Preview.Children.Clear();
@@ -368,70 +373,14 @@ namespace AimAssist.Windows
 
         public ICommand AjustWindowCommand { get; set; }
 
-        private void CenterWindowsOnScreen(Window mainWindow, Window secondaryWindow)
-        {
-            // Get the screen width and height
-            double screenWidth = SystemParameters.PrimaryScreenWidth;
-            double screenHeight = SystemParameters.PrimaryScreenHeight;
-
-            // Get the width and height of both windows
-            double mainWindowWidth = mainWindow.ActualWidth;
-            double mainWindowHeight = mainWindow.ActualHeight;
-            double secondaryWindowWidth = secondaryWindow.ActualWidth;
-            double secondaryWindowHeight = secondaryWindow.ActualHeight;
-
-            // Calculate the total width of both windows
-            double totalWidth = mainWindowWidth + secondaryWindowWidth;
-
-            // Calculate the left position for each window
-            double mainWindowLeft = (screenWidth - totalWidth) / 2;
-            double secondaryWindowLeft = mainWindowLeft + mainWindowWidth;
-
-            // Calculate the top position for both windows
-            double topPosition = (screenHeight - Math.Max(mainWindowHeight, secondaryWindowHeight)) / 2;
-
-            // Set the position of the main window
-            mainWindow.Left = mainWindowLeft;
-            mainWindow.Top = topPosition;
-
-            // Set the position of the secondary window
-            secondaryWindow.Left = secondaryWindowLeft;
-            secondaryWindow.Top = topPosition;
-        }
-        private void InitializeCenterWindowsOnScreen(Window mainWindow, Window secondaryWindow)
-        {
-            // Get the screen width and height
-            double screenWidth = SystemParameters.PrimaryScreenWidth;
-            double screenHeight = SystemParameters.PrimaryScreenHeight;
-
-            // Get the width and height of both windows
-            double mainWindowWidth = mainWindow.ActualWidth;
-            double mainWindowHeight = mainWindow.ActualHeight;
-            double secondaryWindowWidth = 400;
-            double secondaryWindowHeight = 500;
-
-            // Calculate the total width of both windows
-            double totalWidth = mainWindowWidth + secondaryWindowWidth;
-
-            // Calculate the left position for each window
-            double mainWindowLeft = (screenWidth - totalWidth) / 2;
-            double secondaryWindowLeft = mainWindowLeft + mainWindowWidth;
-
-            // Calculate the top position for both windows
-            double topPosition = (screenHeight - Math.Max(mainWindowHeight, secondaryWindowHeight)) / 2;
-
-            // Set the position of the main window
-            mainWindow.Left = mainWindowLeft;
-            mainWindow.Top = topPosition;
-
-            // Set the position of the secondary window
-            secondaryWindow.Left = secondaryWindowLeft;
-            secondaryWindow.Top = topPosition;
-        }
-
         private GridLength columnWidth = new GridLength(1, GridUnitType.Star);
         private void Expander_Expanded(object sender, RoutedEventArgs e)
         {
+            if(e.Source is System.Windows.Controls.ListBox)
+            {
+                return;
+            }
+
             // GridSplitterを可視化
             if(GridSplitter != null)
             {
@@ -443,8 +392,13 @@ namespace AimAssist.Windows
 
         private void Expander_Collapsed(object sender, RoutedEventArgs e)
         {
+            if(e.Source is System.Windows.Controls.ListBox)
+            {
+                return;
+            }
+
             // GridSplitterを非表示に
-            if(GridSplitter != null )
+            if (GridSplitter != null )
             {
                 // 閉じる前の高さを保存し
                 // 高さをAutoに戻す

@@ -43,119 +43,127 @@
             <ColumnDefinition  Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <Expander IsExpanded="true" ExpandDirection="Left" Expanded="Expander_Expanded" Collapsed="Expander_Collapsed"  x:Name="LeftExpander"  >
+        <Expander IsExpanded="true" ExpandDirection="Left" Expanded="Expander_Expanded" Collapsed="Expander_Collapsed"  x:Name="LeftExpander"  HorizontalAlignment="Stretch">
             <Expander.Header>
-                <TextBlock Text="Contens" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="" VerticalAlignment="Center" HorizontalAlignment="Center" Width="3">
                     <TextBlock.LayoutTransform>
                         <RotateTransform Angle="90"/>
                     </TextBlock.LayoutTransform>
                 </TextBlock>
             </Expander.Header>
-    <Grid x:Name="Root">
-        <Grid.InputBindings>
-            <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding AjustWindowCommand}"/>
-        </Grid.InputBindings>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" x:Name="PackgeTextBorder" BorderBrush="Gray" BorderThickness="2" Padding="5" Margin="2" Visibility="Collapsed">
-                <TextBlock  Margin="0,0,5,0" x:Name="PackageText" Visibility="Collapsed"></TextBlock>
-                </Border>
-                <TextBox Grid.Column="1" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
+            <Expander.HeaderTemplate>
+                <DataTemplate>
+                </DataTemplate>
+            </Expander.HeaderTemplate>
+            <Grid x:Name="Root" HorizontalAlignment="Stretch">
+                <Grid.InputBindings>
+                    <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding AjustWindowCommand}"/>
+                </Grid.InputBindings>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" x:Name="PackgeTextBorder" BorderBrush="Gray" BorderThickness="2" Padding="5" Margin="2" Visibility="Collapsed">
+                            <TextBlock  Margin="0,0,5,0" x:Name="PackageText" Visibility="Collapsed"></TextBlock>
+                        </Border>
+                        <TextBox Grid.Column="1" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
                      InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
 
-            </Grid>
-            <StackPanel x:Name="FilterContents"/>
-        </Grid>
-        <ListBox  Grid.Row="1" x:Name="ComboListBox" ItemsSource="{Binding Source={StaticResource GroupedItems}}" SelectionChanged="ComboListBox_SelectionChanged"
-                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Standard"
-                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                  ScrollViewer.VerticalScrollBarVisibility="Visible">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
+                    </Grid>
+                    <StackPanel x:Name="FilterContents"/>
+                </Grid>
+                <ListBox  Grid.Row="1" x:Name="ComboListBox" 
+                          ItemsSource="{Binding Source={StaticResource GroupedItems}}" 
+                          SelectionChanged="ComboListBox_SelectionChanged"
+                          VirtualizingPanel.IsVirtualizing="True" 
+                          VirtualizingPanel.VirtualizationMode="Standard"
+                          HorizontalAlignment="Stretch"
+                          ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                          ScrollViewer.VerticalScrollBarVisibility="Visible">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"  Foreground="Gray" IsHitTestVisible="False"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                    <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"  Foreground="Gray" IsHitTestVisible="False"/>
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
-                </GroupStyle>
-            </ListBox.GroupStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="4"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <Image Source="{Binding Icon}" Width="30" Height="30"></Image>
-                        </Grid>
-                        <Grid Grid.Column="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="2"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="2"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0">
-                                <TextBlock Text="{Binding Name}"  FontSize="18"/>
-                            </StackPanel>
-                            <StackPanel Grid.Row="2">
-                                <TextBlock FontSize="14" Text="{Binding Text}" Height="17"
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="4"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Image Source="{Binding Icon}" Width="30" Height="30"></Image>
+                                </Grid>
+                                <Grid Grid.Column="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="2"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="2"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0">
+                                        <TextBlock Text="{Binding Name}"  FontSize="18"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2">
+                                        <TextBlock FontSize="14" Text="{Binding Text}" Height="17"
                                            Foreground="Gray"
                                            TextTrimming="CharacterEllipsis"
                                            TextWrapping="NoWrap"
                                            HorizontalAlignment="Left" InputMethod.PreferredImeConversionMode="FullShape"/>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border BorderThickness="{TemplateBinding BorderThickness}"
                                         BorderBrush="{TemplateBinding BorderBrush}"
                                         Background="{TemplateBinding Background}"
                                         Padding="{TemplateBinding Padding}" CornerRadius="10"
                                         ClipToBounds="True">
-                                    <ContentPresenter />
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Foreground" Value="Orange"></Setter>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListBox.ItemContainerStyle>
-        </ListBox>
-    </Grid>
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Foreground" Value="Orange"></Setter>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
         </Expander>
-        <GridSplitter x:Name="GridSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch"></GridSplitter>
+        <GridSplitter x:Name="GridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Stretch"></GridSplitter>
         <Grid x:Name="Preview" Grid.Column="2">
-            
+
         </Grid>
     </Grid>
 </Window>
