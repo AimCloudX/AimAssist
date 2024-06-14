@@ -11,7 +11,6 @@ namespace AimAssist.Core.Options
 
         public static string OptionPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "editor.option.json");
 
-
         public static void LoadOption() 
         { 
             if(File.Exists(OptionPath))

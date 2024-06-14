@@ -1,5 +1,5 @@
 ﻿
-using AimAssist.Windows;
+using AimAssist.UI.MainWindows;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 

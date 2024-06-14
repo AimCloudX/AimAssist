@@ -1,6 +1,14 @@
-﻿using AimAssist.Unit.Core;
+﻿using AimAssist.Plugins;
+using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
+using AimAssist.Unit.Implementation.Knoledges;
+using AimAssist.Unit.Implementation.Options;
+using AimAssist.Unit.Implementation.Snippets;
 using AimAssist.Unit.Implementation.Standard;
+using AimAssist.Unit.Implementation.Web.Bookmarks;
+using AimAssist.Unit.Implementation.Web.BookSearch;
+using AimAssist.Unit.Implementation.Web.Urls;
+using AimAssist.Unit.Implementation.WorkFlows;
 
 namespace AimAssist.Service
 {
@@ -21,6 +29,27 @@ namespace AimAssist.Service
                 return instance;
             }
         }
+
+        public void Initialize()
+        {
+            Instnace.RegisterFactory(new ModeChangeUnitsFacotry());
+            Instnace.RegisterFactory(new SnippetUnitsFactory());
+            Instnace.RegisterFactory(new ChatGPTUnitsFactory());
+            Instnace.RegisterFactory(new BookSearchUnitsFactory());
+            Instnace.RegisterFactory(new KnowledgeUnitsFactory());
+            Instnace.RegisterFactory(new BookmarkUnitsFacotry());
+            Instnace.RegisterFactory(new UrlUnitsFacotry());
+            Instnace.RegisterFactory(new OptionUnitsFactory());
+
+            var pluginService = new PluginsService();
+            pluginService.LoadCommandPlugins();
+            var facotries = pluginService.GetFactories();
+            foreach (var item in facotries)
+            {
+                Instnace.RegisterFactory(item);
+            }
+        }
+
 
         private IList<IUnitsFacotry> factories = new List<IUnitsFacotry>();
 

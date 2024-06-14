@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AimAssist.Plugins\AimAssist.Plugins.csproj" />
   </ItemGroup>
   <Target Name="CopyReadMe" AfterTargets="AfterBuild">

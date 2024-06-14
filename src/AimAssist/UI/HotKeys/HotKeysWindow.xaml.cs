@@ -23,7 +23,7 @@ namespace AimAssist.UI.Tools.HotKeys
                                   Key.A,
                                   (_, __) =>
                                       {
-                                          PickerCommands.ToggleAssistWindowCommand.Execute(this);
+                                          AimAssistCommands.ToggleAssistWindowCommand.Execute(this);
                                       });
         }
 

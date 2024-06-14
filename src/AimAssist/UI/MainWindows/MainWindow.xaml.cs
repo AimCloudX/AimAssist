@@ -15,7 +15,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace AimAssist.Windows
+namespace AimAssist.UI.MainWindows
 {
     public partial class MainWindow : INotifyPropertyChanged
     {

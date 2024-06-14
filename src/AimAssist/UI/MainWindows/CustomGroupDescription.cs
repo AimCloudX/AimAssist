@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AimAssist.Windows
+namespace AimAssist.UI.MainWindows
 {
     using AimAssist.Unit.Core;
     using AimAssist.Unit.Core.Mode;

@@ -1,16 +1,10 @@
 ﻿using AimAssist.Commands;
 using AimAssist.Core.Options;
-using AimAssist.Plugins;
 using AimAssist.Service;
+using AimAssist.UI.SystemTray;
 using AimAssist.UI.Tools.HotKeys;
-using AimAssist.Unit.Implementation.Knoledges;
-using AimAssist.Unit.Implementation.Options;
-using AimAssist.Unit.Implementation.Snippets;
-using AimAssist.Unit.Implementation.Standard;
-using AimAssist.Unit.Implementation.Web.Bookmarks;
-using AimAssist.Unit.Implementation.Web.BookSearch;
-using AimAssist.Unit.Implementation.Web.Urls;
-using AimAssist.Unit.Implementation.WorkFlows;
+using System.IO;
+using System.IO.Pipes;
 
 namespace AimAssist
 {
@@ -19,77 +13,70 @@ namespace AimAssist
     /// </summary>
     public partial class App : System.Windows.Application
     {
+        private static Mutex mutex;
+        const string appName = "AimAssist";
+        private const string PipeName = "AimAssist";
+
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
         {
-            EditorOptionService.LoadOption();
-            RegisterUnitsFactory();
+            mutex = new Mutex(true, appName, out var createdNew);
+            if (createdNew)
+            {
+                Initialize();
+                AimAssistCommands.ToggleAssistWindowCommand.Execute();
 
-            GenelateNotifyIcon();
+                // 名前付きパイプサーバーを起動
+                ThreadPool.QueueUserWorkItem(ServerThread);
+
+                Exit += (object sender, System.Windows.ExitEventArgs e) => {
+                    EditorOptionService.SaveOption();
+                    mutex.ReleaseMutex();
+                };
+            }
+            else
+            {
+                using (var client = new NamedPipeClientStream(PipeName))
+                {
+                    try
+                    {
+                        client.Connect(1000); // 1秒待機
+                        using var writer = new StreamWriter(client);
+                        writer.WriteLine(PipeName);
+                        writer.Flush();
+                    }
+                    catch (TimeoutException)
+                    {
+                        // クライアントが接続できなかった場合の処理
+                    }
+                }
+
+                Shutdown();
+            }
+        }
+
+        private static void Initialize()
+        {
+            EditorOptionService.LoadOption();
+
+            SystemTrayRegister.Register();
+            UnitsService.Instnace.Initialize();
 
             var window = new HowKeysWindow();
             window.Show();
         }
 
-        private void GenelateNotifyIcon()
+        private void ServerThread(object state)
         {
-            var menu = new ContextMenuStrip();
-            menu.Items.Add("Show PickerWindow", null, Show_Click);
-            menu.Items.Add("Quit AimAssist", null, Exit_Click);
-            var icon = GetResourceStream(new Uri("Resources/Icons/AimAssist.ico", UriKind.Relative)).Stream;
-            var notifyIcon = new NotifyIcon
+            while (true)
             {
-                Visible = true,
-                Icon = new Icon(icon),
-                Text = "AimAssist",
-                ContextMenuStrip = menu,
-            };
-            notifyIcon.MouseClick += new MouseEventHandler(NotifyIcon_Click);
-        }
-
-        private static void RegisterUnitsFactory()
-        {
-            // TODO 場所の移動
-            var factory = UnitsService.Instnace;
-            factory.RegisterFactory(new ModeChangeUnitsFacotry());
-            factory.RegisterFactory(new SnippetUnitsFactory());
-            factory.RegisterFactory(new ChatGPTUnitsFactory());
-            factory.RegisterFactory(new BookSearchUnitsFactory());
-            factory.RegisterFactory(new KnowledgeUnitsFactory());
-            factory.RegisterFactory(new BookmarkUnitsFacotry());
-            factory.RegisterFactory(new UrlUnitsFacotry());
-            factory.RegisterFactory(new OptionUnitsFactory());
-
-            var pluginService = new PluginsService();
-            pluginService.LoadCommandPlugins();
-            var facotries = pluginService.GetFactories();
-            foreach (var item in facotries)
-            {
-                factory.RegisterFactory(item);
+                using var server = new NamedPipeServerStream(PipeName);
+                server.WaitForConnection();
+                using var reader = new StreamReader(server);
+                if (reader.ReadLine() == PipeName)
+                {
+                    Dispatcher.Invoke(() => AimAssistCommands.ToggleAssistWindowCommand.Execute());
+                }
             }
-        }
-
-        private void Show_Click(object? sender, EventArgs e)
-        {
-            PickerCommands.ToggleAssistWindowCommand.Execute(e);
-        }
-
-        private void NotifyIcon_Click(object? sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                PickerCommands.ToggleAssistWindowCommand.Execute(e);
-            }
-        }
-
-        private void Exit_Click(object? sender, EventArgs e)
-        {
-            Shutdown();
-        }
-
-        private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
-        {
-            EditorOptionService.SaveOption();
         }
     }
-
 }
