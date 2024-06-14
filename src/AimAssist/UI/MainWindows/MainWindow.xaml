@@ -43,7 +43,9 @@
             <ColumnDefinition  Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <Expander IsExpanded="true" ExpandDirection="Left" Expanded="Expander_Expanded" Collapsed="Expander_Collapsed"  x:Name="LeftExpander"  HorizontalAlignment="Stretch">
+        <Expander IsExpanded="true" ExpandDirection="Left" 
+                  Expanded="Expander_Expanded" Collapsed="Expander_Collapsed"  
+                  x:Name="LeftExpander"  HorizontalAlignment="Stretch" Background="DimGray">
             <Expander.Header>
                 <TextBlock Text="" VerticalAlignment="Center" HorizontalAlignment="Center" Width="3">
                     <TextBlock.LayoutTransform>

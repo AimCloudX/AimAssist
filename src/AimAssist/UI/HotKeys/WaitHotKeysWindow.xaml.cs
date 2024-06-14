@@ -1,17 +1,15 @@
 ﻿
 using AimAssist.Commands;
 using AimAssist.HotKeys;
-using AimAssist.Service;
 using System.Windows;
 using System.Windows.Input;
 
 namespace AimAssist.UI.Tools.HotKeys
 {
-    public partial class HowKeysWindow : Window
+    public partial class WaitHowKeysWindow : Window
     {
-        private bool isPickerServiceActivated;
         private HotKeyController hotkeyController;
-        public HowKeysWindow()
+        public WaitHowKeysWindow()
         {
             this.InitializeComponent();
             this.Visibility = Visibility.Hidden;
@@ -19,7 +17,7 @@ namespace AimAssist.UI.Tools.HotKeys
 
            // HotKeyの登録
             this.hotkeyController = new HotKeyController(this);
-            this.hotkeyController.Register( ModifierKeys.Alt,
+            this.hotkeyController.Register(ModifierKeys.Alt,
                                   Key.A,
                                   (_, __) =>
                                       {

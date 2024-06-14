@@ -16,7 +16,11 @@ namespace AimAssist.Core.Options
             if(File.Exists(OptionPath))
             {
                 var text = File.ReadAllText(OptionPath);
-                Option = JsonConvert.DeserializeObject<EditorOption>(text);
+                var option = JsonConvert.DeserializeObject<EditorOption>(text);
+                if(option == null)
+                {
+                    Option = new EditorOption();
+                }
             }
             else
             {

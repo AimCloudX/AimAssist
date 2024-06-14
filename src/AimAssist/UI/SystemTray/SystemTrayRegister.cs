@@ -34,7 +34,7 @@ namespace AimAssist.UI.SystemTray
 
         private static void Exit_Click(object? sender, EventArgs e)
         {
-            Application.Exit();
+            App.Current.Shutdown();
         }
 
     }

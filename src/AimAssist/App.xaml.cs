@@ -14,7 +14,7 @@ namespace AimAssist
     public partial class App : System.Windows.Application
     {
         private static Mutex mutex;
-        const string appName = "AimAssist";
+        private const string appName = "AimAssist";
         private const string PipeName = "AimAssist";
 
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
@@ -23,49 +23,51 @@ namespace AimAssist
             if (createdNew)
             {
                 Initialize();
-                AimAssistCommands.ToggleAssistWindowCommand.Execute();
 
-                // 名前付きパイプサーバーを起動
-                ThreadPool.QueueUserWorkItem(ServerThread);
+                ThreadPool.QueueUserWorkItem(WaitCallActivate);// 名前付きパイプサーバーを起動 別プロセスからのActivate用
 
-                Exit += (object sender, System.Windows.ExitEventArgs e) => {
+                Exit += (object _, System.Windows.ExitEventArgs _) => {
                     EditorOptionService.SaveOption();
                     mutex.ReleaseMutex();
                 };
+
+                AimAssistCommands.ToggleAssistWindowCommand.Execute();
             }
             else
             {
-                using (var client = new NamedPipeClientStream(PipeName))
-                {
-                    try
-                    {
-                        client.Connect(1000); // 1秒待機
-                        using var writer = new StreamWriter(client);
-                        writer.WriteLine(PipeName);
-                        writer.Flush();
-                    }
-                    catch (TimeoutException)
-                    {
-                        // クライアントが接続できなかった場合の処理
-                    }
-                }
-
+                ActivateAimAssistAnotherProcess();
                 Shutdown();
+            }
+        }
+
+        private static void ActivateAimAssistAnotherProcess()
+        {
+            using (var client = new NamedPipeClientStream(PipeName))
+            {
+                try
+                {
+                    client.Connect(1000); // 1秒待機
+                    using var writer = new StreamWriter(client);
+                    writer.WriteLine(PipeName);
+                    writer.Flush();
+                }
+                catch (TimeoutException)
+                {
+                    // クライアントが接続できなかった場合の処理
+                }
             }
         }
 
         private static void Initialize()
         {
             EditorOptionService.LoadOption();
-
             SystemTrayRegister.Register();
             UnitsService.Instnace.Initialize();
 
-            var window = new HowKeysWindow();
-            window.Show();
+            new WaitHowKeysWindow().Show();
         }
 
-        private void ServerThread(object state)
+        private void WaitCallActivate(object state)
         {
             while (true)
             {
