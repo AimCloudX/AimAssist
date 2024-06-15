@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="AimAssist.Unit.Implementation.Speech.WhisperControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AimAssist.Unit.Implementation.Speech"
+             xmlns:converter="clr-namespace:Common.UI.Conveter;assembly=Common.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.Resources>
+            <converter:BoolenConverter x:Key="BoolenConverter"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Whisper wavファイルにしてから文字起こし"/>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBlock Text="Model Path"/>
+                    <TextBox x:Name="ModelPath" Text="ggml-base.bin"></TextBox>
+                <Button Content="BaseModel DownLoad" Click="BaseModelDownload"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBlock Text="Language"/>
+                    <TextBox x:Name="Language" Text="ja"></TextBox>
+                </StackPanel>
+                <Button Content="Update" Click="UpdateClick"/>
+
+            </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="StartButton" Content="Start Recording" IsEnabled="{Binding CanRun, Mode=OneWay}" Click="Start_Recording"/>
+            <Button Content="Stop Recording" IsEnabled="{Binding IsRunning, Mode=OneWay}" Click="Storp_Recording"/>
+            <TextBox x:Name="PathTextBox" Text="temp.wav" ></TextBox>
+            <Button  Content="Clear" Click="Button_Click"/>
+            </StackPanel>
+        </StackPanel>
+        <TextBox x:Name="TextBox" Grid.Row="1"></TextBox>
+    </Grid>
+</UserControl>
