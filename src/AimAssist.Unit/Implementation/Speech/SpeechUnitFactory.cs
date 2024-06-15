@@ -26,7 +26,7 @@ namespace AimAssist.Unit.Implementation.Speech
 
         public string Category => "";
 
-        public string Name => "Real-time Transcription";
+        public string Name => "Transcription";
 
         public string Text => "文字起こし";
 
