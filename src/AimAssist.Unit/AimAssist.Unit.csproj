@@ -8,12 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Vosk" Version="0.3.38" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AimAssist.Core\AimAssist.Core.csproj" />
     <ProjectReference Include="..\Snippet\Snippet.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Resources\Knowledge\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\vosk-model-small-ja-0.22\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

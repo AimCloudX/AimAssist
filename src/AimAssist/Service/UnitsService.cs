@@ -4,6 +4,7 @@ using AimAssist.Unit.Core.Mode;
 using AimAssist.Unit.Implementation.Knoledges;
 using AimAssist.Unit.Implementation.Options;
 using AimAssist.Unit.Implementation.Snippets;
+using AimAssist.Unit.Implementation.Speech;
 using AimAssist.Unit.Implementation.Standard;
 using AimAssist.Unit.Implementation.Web.Bookmarks;
 using AimAssist.Unit.Implementation.Web.BookSearch;
@@ -40,6 +41,7 @@ namespace AimAssist.Service
             Instnace.RegisterFactory(new BookmarkUnitsFacotry());
             Instnace.RegisterFactory(new UrlUnitsFacotry());
             Instnace.RegisterFactory(new OptionUnitsFactory());
+            Instnace.RegisterFactory(new SpeechUnitFactory());
 
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();
