@@ -17,10 +17,12 @@ namespace AimAssist.Core.Options
             {
                 var text = File.ReadAllText(OptionPath);
                 var option = JsonConvert.DeserializeObject<EditorOption>(text);
-                if(option == null)
+                if (option == null)
                 {
-                    Option = new EditorOption();
+                    option = new EditorOption();
                 }
+
+                Option = option;
             }
             else
             {
