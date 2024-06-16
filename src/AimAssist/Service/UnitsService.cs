@@ -1,6 +1,7 @@
 ﻿using AimAssist.Plugins;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
+using AimAssist.Unit.Implementation.Commands;
 using AimAssist.Unit.Implementation.Knoledges;
 using AimAssist.Unit.Implementation.Options;
 using AimAssist.Unit.Implementation.Snippets;
@@ -35,6 +36,7 @@ namespace AimAssist.Service
         public void Initialize()
         {
             Instnace.RegisterFactory(new ModeChangeUnitsFacotry());
+            Instnace.RegisterFactory(new AppCommandUnitFactory());
             Instnace.RegisterFactory(new SnippetUnitsFactory());
             Instnace.RegisterFactory(new ChatGPTUnitsFactory());
             Instnace.RegisterFactory(new RssUnitsFactory());

@@ -15,6 +15,7 @@
         Loaded="Window_Loaded"
         ContentRendered="Window_ContentRendered"
         >
+
     <Window.Resources>
         <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">
             <CollectionViewSource.GroupDescriptions>

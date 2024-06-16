@@ -1,4 +1,6 @@
 ﻿using AimAssist.Combos.Mode.Snippet;
+using AimAssist.Commands;
+using AimAssist.Core.Commands;
 using AimAssist.Service;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
@@ -230,6 +232,13 @@ namespace AimAssist.UI.MainWindows
                 return;
             }
 
+            if (this.ComboListBox.SelectedItem is ICommandUnit command)
+            {
+                command.Execute();
+                e.Handled = true;
+                return;
+            }
+
             if (this.ComboListBox.SelectedItem is IUnitPackage package)
             {
                 // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
@@ -365,8 +374,9 @@ namespace AimAssist.UI.MainWindows
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            this.IsClosing = true;
+            AppCommands.AimAssistShutdown.Execute();
         }
+
         private void Window_ContentRendered(object sender, EventArgs e)
         {
         }

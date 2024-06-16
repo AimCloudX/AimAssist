@@ -63,6 +63,7 @@ namespace AimAssist
             EditorOptionService.LoadOption();
             SystemTrayRegister.Register();
             UnitsService.Instnace.Initialize();
+            CommandService.Initialize();
 
             new WaitHowKeysWindow().Show();
         }
