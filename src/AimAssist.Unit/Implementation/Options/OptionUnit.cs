@@ -2,6 +2,7 @@
 using AimAssist.Core.Options;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
+using AimAssist.Unit.Implementation.Standard;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -17,7 +18,7 @@ namespace AimAssist.Unit.Implementation.Options
         }
         public BitmapImage Icon => new BitmapImage();
 
-        public IPickerMode Mode => OptionMode.Instance;
+        public IPickerMode Mode => StandardMode.Instance;
 
         public string Category { get; }
 

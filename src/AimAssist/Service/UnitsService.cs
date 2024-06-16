@@ -36,16 +36,23 @@ namespace AimAssist.Service
         public void Initialize()
         {
             Instnace.RegisterFactory(new ModeChangeUnitsFacotry());
-            Instnace.RegisterFactory(new AppCommandUnitFactory());
-            Instnace.RegisterFactory(new SnippetUnitsFactory());
+
+            // workflow
             Instnace.RegisterFactory(new ChatGPTUnitsFactory());
+            Instnace.RegisterFactory(new SpeechUnitFactory());
+
+            Instnace.RegisterFactory(new AppCommandUnitFactory());
+            Instnace.RegisterFactory(new OptionUnitsFactory());
+
             Instnace.RegisterFactory(new RssUnitsFactory());
             Instnace.RegisterFactory(new BookSearchUnitsFactory());
-            Instnace.RegisterFactory(new KnowledgeUnitsFactory());
             Instnace.RegisterFactory(new BookmarkUnitsFacotry());
+
+            Instnace.RegisterFactory(new SnippetUnitsFactory());
+
+            Instnace.RegisterFactory(new KnowledgeUnitsFactory());
+
             Instnace.RegisterFactory(new UrlUnitsFacotry());
-            Instnace.RegisterFactory(new OptionUnitsFactory());
-            Instnace.RegisterFactory(new SpeechUnitFactory());
 
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();
@@ -55,7 +62,6 @@ namespace AimAssist.Service
                 Instnace.RegisterFactory(item);
             }
         }
-
 
         private IList<IUnitsFacotry> factories = new List<IUnitsFacotry>();
 
