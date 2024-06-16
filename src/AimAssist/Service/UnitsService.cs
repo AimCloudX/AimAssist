@@ -8,6 +8,7 @@ using AimAssist.Unit.Implementation.Speech;
 using AimAssist.Unit.Implementation.Standard;
 using AimAssist.Unit.Implementation.Web.Bookmarks;
 using AimAssist.Unit.Implementation.Web.BookSearch;
+using AimAssist.Unit.Implementation.Web.Rss;
 using AimAssist.Unit.Implementation.Web.Urls;
 using AimAssist.Unit.Implementation.WorkFlows;
 
@@ -36,6 +37,7 @@ namespace AimAssist.Service
             Instnace.RegisterFactory(new ModeChangeUnitsFacotry());
             Instnace.RegisterFactory(new SnippetUnitsFactory());
             Instnace.RegisterFactory(new ChatGPTUnitsFactory());
+            Instnace.RegisterFactory(new RssUnitsFactory());
             Instnace.RegisterFactory(new BookSearchUnitsFactory());
             Instnace.RegisterFactory(new KnowledgeUnitsFactory());
             Instnace.RegisterFactory(new BookmarkUnitsFacotry());

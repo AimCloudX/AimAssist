@@ -9,10 +9,11 @@ namespace AimAssist.Unit.Implementation.Web.Urls
     {
         public string Name { get; }
 
-        public UrlUnit(string name, string path)
+        public UrlUnit(string name, string path, string category = "")
         {
             Name = name;
             Path = path;
+            Category = category;
         }
 
         public BitmapImage Icon => new BitmapImage();
@@ -23,7 +24,7 @@ namespace AimAssist.Unit.Implementation.Web.Urls
 
         public IPickerMode Mode => UrlMode.Instance;
 
-        public string Category => string.Empty;
+        public string Category { get; }
 
         public UIElement GetUiElement()
         {
