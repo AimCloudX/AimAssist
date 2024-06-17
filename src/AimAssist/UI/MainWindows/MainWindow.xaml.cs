@@ -108,6 +108,8 @@ namespace AimAssist.UI.MainWindows
 
         public MainWindow()
         {
+            MainWindowCommands.FocusPreview  = new RelayCommand(this.FocusPreview);
+            MainWindowCommands.FocusFilterTextBox  = new RelayCommand(this.FocusFilterTextBox);
             this.InitializeComponent();
             this.DataContext = this;
             
@@ -416,6 +418,15 @@ namespace AimAssist.UI.MainWindows
                 LeftColumn.Width = GridLength.Auto;
                 GridSplitter.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void FocusPreview()
+        {
+            this.Preview.Focus();
+        }
+        private void FocusFilterTextBox()
+        {
+            this.FilterTextBox.Focus();
         }
     }
 }

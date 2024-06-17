@@ -4,6 +4,6 @@ namespace AimAssist.Core.Commands
 {
     public class AppCommands
     {
-        public static RelayCommand AimAssistShutdown;
+        public static RelayCommand AimAssistShutdown {  get; set; }
     }
 }

@@ -9,6 +9,7 @@
         Height="600"
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:commands="clr-namespace:AimAssist.Core.Commands;assembly=AimAssist.Core"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
@@ -169,4 +170,9 @@
 
         </Grid>
     </Grid>
+    <Window.InputBindings>
+        <KeyBinding Key="K" Modifiers="Ctrl" Command="{x:Static  commands:MainWindowCommands.FocusPreview}"/>
+        <KeyBinding Key="D" Modifiers="Ctrl" Command="{x:Static  commands:MainWindowCommands.FocusFilterTextBox}"/>
+    </Window.InputBindings>
+
 </Window>
