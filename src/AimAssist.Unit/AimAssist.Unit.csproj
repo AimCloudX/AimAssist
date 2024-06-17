@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AimAssist.Core\AimAssist.Core.csproj" />
-    <ProjectReference Include="..\Snippet\Snippet.csproj" />
   </ItemGroup>
 
   <ItemGroup>
