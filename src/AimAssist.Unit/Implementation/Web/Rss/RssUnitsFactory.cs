@@ -1,6 +1,7 @@
 ﻿using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
 using AimAssist.Unit.Implementation.Web.Urls;
+using System.Reflection.Metadata.Ecma335;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using static System.Net.WebRequestMethods;
@@ -53,9 +54,8 @@ new("sbbit", "https://www.sbbit.jp/rss/HotTopics.rss"),
 
         static async IAsyncEnumerable<UrlUnit> GetUrlsFromRss(CategoryUrl rssUrl)
         {
-            using (XmlReader reader = XmlReader.Create(rssUrl.Url))
+            if (TryGetFeed(rssUrl, out var feed))
             {
-                SyndicationFeed feed = SyndicationFeed.Load(reader);
                 foreach (var item in feed.Items)
                 {
                     string title = item.Title.Text;
@@ -67,7 +67,21 @@ new("sbbit", "https://www.sbbit.jp/rss/HotTopics.rss"),
                     }
                 }
             }
+        }
 
+        private static bool TryGetFeed(CategoryUrl rssUrl, out SyndicationFeed feed)
+        {
+            try
+            {
+                var reader = XmlReader.Create(rssUrl.Url);
+                feed = SyndicationFeed.Load(reader);
+                return feed != null;
+            }
+            catch
+            {
+                feed = null;
+                return false;
+            }
         }
     }
 }
