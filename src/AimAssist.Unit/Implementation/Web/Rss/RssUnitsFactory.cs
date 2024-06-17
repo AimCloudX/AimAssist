@@ -26,8 +26,8 @@ new("zenn","https://zenn.dev/feed"),
 //"https://zenn.dev/topics/トピック名/feed",
 // "https://b.hatena.ne.jp/q/トピック名?mode=rss&target=text&sort=recent"
 new("lifehacker", "https://www.lifehacker.jp/feed/index.xml"),
-new("biz-jornal", "https://biz-journal.jp/index.xml"),
-new("sbbit", "https://www.sbbit.jp/rss/HotTopics.rss"),
+new("ビジネスジャーナル", "https://biz-journal.jp/index.xml"),
+new("ビジネス+IT", "https://www.sbbit.jp/rss/HotTopics.rss"),
             };
 
             foreach (var url in urls)
