@@ -1,33 +1,46 @@
-# AimPicker
-このアプリケーションは、バックグラウンドで待機し、ホットキーを使用して起動できるツールです。
-起動するとウィンドウが表示され、そこで選択したテキストをホットキーで起動時に選択していたアプリケーションに送信する機能を提供します。
+# AimAssist
+便利なツール集です。
 
-# 機能
+# Mode
+## WorkTools
+登録されたTool一覧を表示します。
+
+## BookSearch
+入力されたテキストを元にGoogleBooksAPIsから情報を取得し、Amazonのページを表示します。
+書籍情報取得をクリックすると、経費精算用の書籍情報をクリップボードにコピーします。
+
+## Knowledge
+AimAssistの開発のナレッジを表示します。
+
+## RSS
+以下のWebサイトのRSSを表示します。
+* zenn https://zenn.dev/feed
+* lifehacker https://www.lifehacker.jp/feed/index.xml
+* ビジネスジャーナル https://biz-journal.jp/index.xml
+* ビジネス+IT https://www.sbbit.jp/rss/HotTopics.rss
+
+## Bookmark
+ChromeとViValdiのブックマークを一覧で表示します。
+
+## Snippet
+スニペット一覧を表示します。
+
+### Snippet Window
 * バックグラウンドで待機し、指定されたホットキー(Alt+P)を押すことで起動します。
 * ウィンドウが表示され、テキストを選択して"Enterキー"を押下ことで、テキストをアプリケーションに送信します。
 * ホットキーを使用してアプリケーションを起動している際に、ウィンドウで選択したテキストを直接送信できます。
 
-## Mode
-* Snippet 起動時のモードです。
-* Command テキストボックスに">"を入力するとCommandモードになります。
-* Calculation テキストボックスに"="を入力するとCalculationモードになります。 (未実装)
-
-## フィルター
-スニペットの候補をテキストボックスに入力されたテキストでフィルタリングすることができます。
-
-## キー操作
-* Enter 選択しているテキストを送信
-* Esc ウィンドウを閉じる
-* Up 選択対象を一つ上に移動
-* Down 選択対象を一つ下に移動
+## Option
+AimAssistのオプション設定
 
 # 動作環境
 Windows環境向けに開発されています。
-.NET 8が必要です。
 
 # インストール方法
 リポジトリをクローンまたはダウンロードします。
 Visual Studioでソリューションを開きます。
 ビルドして実行します。
+※.NET 8が必要です。(Visual Studio 2022)
 
 # ライセンス
+MIT

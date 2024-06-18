@@ -1,6 +1,6 @@
 ﻿using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.Wiki;
+using AimAssist.Unit.Implementation.Knowledge;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -22,8 +22,6 @@ namespace AimAssist.Combos.Mode.Wiki
         public string Text => this.Path;
 
         public string Path => fileInfo.FullName;
-
-        public MarkdownPreviewFactory PreviewFactory => new MarkdownPreviewFactory();
 
         public IPickerMode Mode => KnowledgeMode.Instance;
 

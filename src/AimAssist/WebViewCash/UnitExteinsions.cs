@@ -1,4 +1,4 @@
-﻿using AimAssist.Combos.Mode.WorkFlows;
+﻿using AimAssist.Combos.Mode.WorkTools;
 using AimAssist.Unit.Core;
 using System.Windows;
 
@@ -8,7 +8,7 @@ namespace AimAssist.WebViewCash
     {
         public static UIElement GetOrCreateUiElemnt(this IUnit unit)
         {
-            if(unit is WorkFlowUnit work)
+            if(unit is WorkToolUnit work)
             {
                 var uiElement = UIElementRepository.GetUIElement(unit.Text);
                 if(uiElement == null)

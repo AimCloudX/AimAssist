@@ -1,7 +1,7 @@
 ﻿using AimAssist.Combos.Mode.Wiki;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.Wiki;
+using AimAssist.Unit.Implementation.Knowledge;
 using System.IO;
 
 namespace AimAssist.Unit.Implementation.Knoledges

@@ -1,20 +1,20 @@
-﻿using AimAssist.Combos.Mode.WorkFlows;
+﻿using AimAssist.Combos.Mode.WorkTools;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.WorkFlows;
+using AimAssist.Unit.Implementation.WorkTools;
 
 namespace ClipboardAnalyzer
 {
     public class ClipboardUnitsFacotry : IUnitsFacotry
     {
-        public IPickerMode TargetMode => WorkFlowMode.Instance;
+        public IPickerMode TargetMode => WorkToolsMode.Instance;
 
         public bool IsShowInStnadard => true;
 
         public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
             var text = System.Windows.Clipboard.ContainsText() ? System.Windows.Clipboard.GetText() : string.Empty;
-            yield return new WorkFlowUnit("ClipboardAnalyzer", text, (unit) => new ClipboardList());
+            yield return new WorkToolUnit("ClipboardAnalyzer", text, (unit) => new ClipboardList());
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.WorkFlows;
+using AimAssist.Unit.Implementation.WorkTools;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -8,7 +8,7 @@ namespace AimAssist.Unit.Implementation.Speech
 {
     public class SpeechUnitFactory : IUnitsFacotry
     {
-        public IPickerMode TargetMode => WorkFlowMode.Instance;
+        public IPickerMode TargetMode => WorkToolsMode.Instance;
 
         public bool IsShowInStnadard => true;
 
@@ -22,7 +22,7 @@ namespace AimAssist.Unit.Implementation.Speech
     {
         public BitmapImage Icon => new BitmapImage();
 
-        public IPickerMode Mode => WorkFlowMode.Instance;
+        public IPickerMode Mode => WorkToolsMode.Instance;
 
         public string Category => "";
 

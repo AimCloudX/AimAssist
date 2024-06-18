@@ -18,7 +18,10 @@ namespace AimAssist.UI.Combos
         public MarkdownView(string filePath)
         {
             InitializeComponent();
-            markdownText = File.ReadAllText(filePath);
+            if (File.Exists(filePath))
+            {
+                markdownText = File.ReadAllText(filePath);
+            }
 
             // WebView2の初期化完了イベントを設定
             WebView.NavigationCompleted += OnNavigationCompleted;

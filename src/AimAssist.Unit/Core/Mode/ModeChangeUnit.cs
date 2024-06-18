@@ -1,4 +1,5 @@
-﻿using AimAssist.Combos;
+﻿using AimAssist.Combos.Mode.Wiki;
+using AimAssist.Unit.Implementation.Knoledges;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -6,32 +7,25 @@ namespace AimAssist.Unit.Core.Mode
 {
     public class ModeChangeUnit : IUnit
     {
-        private readonly IPickerMode pickerMode;
-
         public ModeChangeUnit(IPickerMode combo)
         {
-            this.pickerMode = combo;
+            this.Mode = combo;
             Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/AimAssist.ico"));
         }
 
-        public string Name => pickerMode.Name;
+        public string Name => Mode.Name;
 
-        public string Text => pickerMode.Prefix;
+        public string Text => Mode.Prefix;
         public string Category => "Mode";
 
         public BitmapImage Icon { get; set; }
 
-        public IPickerMode Mode => this.Mode;
+        public IPickerMode Mode { get; }
 
         public UIElement GetUiElement()
         {
-            return new System.Windows.Controls.TextBox()
-            {
-                Text = this.pickerMode.Description,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                Margin = new Thickness(0)
-            };
+            var markdownView = new MarkdownPreviewFactory().Create("Resources/Knowledge/README.md");
+            return new ModeDscriptionControl(this.Mode.Description, markdownView);
         }
     }
 }
