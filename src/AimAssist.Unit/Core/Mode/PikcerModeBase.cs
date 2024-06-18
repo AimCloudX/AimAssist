@@ -15,7 +15,7 @@
 
         public virtual bool IsApplyFiter => true;
 
-        public IUnit ModeChangeUnits=> new ModeChangeUnit(this);
+        public virtual IUnit ModeChangeUnit=> new ModeChangeUnit(this);
 
         public override bool Equals(object? obj)
         {

@@ -1,6 +1,11 @@
-﻿using AimAssist.Unit.Core.Mode;
+﻿using AimAssist.Combos.Mode.Wiki;
+using AimAssist.Unit.Core;
+using AimAssist.Unit.Core.Mode;
+using AimAssist.Unit.Implementation.Knoledges;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
-namespace AimAssist.Unit.Implementation.Wiki
+namespace AimAssist.Unit.Implementation.Knowledge
 {
     public class KnowledgeMode : PikcerModeBase
     {
@@ -11,6 +16,7 @@ namespace AimAssist.Unit.Implementation.Wiki
         public static KnowledgeMode Instance { get; } = new KnowledgeMode();
 
         public override string Prefix => "kn ";
-        public override string Description => "AimAssist開発のナレッジ";
+        public override string Description => "AimAssist開発のナレッジを表示";
     }
+
 }

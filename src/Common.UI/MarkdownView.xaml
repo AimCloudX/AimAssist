@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:AimAssist.UI.Combos"
              xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              mc:Ignorable="d" 
+             Background="Transparent"
              >
     <Grid>
         <Grid.ColumnDefinitions>
