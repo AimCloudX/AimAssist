@@ -11,7 +11,7 @@ using AimAssist.Unit.Implementation.Web.Bookmarks;
 using AimAssist.Unit.Implementation.Web.BookSearch;
 using AimAssist.Unit.Implementation.Web.Rss;
 using AimAssist.Unit.Implementation.Web.Urls;
-using AimAssist.Unit.Implementation.WorkFlows;
+using AimAssist.Unit.Implementation.WorkTools;
 
 namespace AimAssist.Service
 {
@@ -36,6 +36,7 @@ namespace AimAssist.Service
         public void Initialize()
         {
             Instnace.RegisterFactory(new ModeChangeUnitsFacotry());
+<<<<<<< HEAD
 
             // workflow
             Instnace.RegisterFactory(new ChatGPTUnitsFactory());
@@ -53,6 +54,21 @@ namespace AimAssist.Service
             Instnace.RegisterFactory(new KnowledgeUnitsFactory());
 
             Instnace.RegisterFactory(new UrlUnitsFacotry());
+=======
+            Instnace.RegisterFactory(new OptionUnitsFactory());
+
+            Instnace.RegisterFactory(new ChatGPTUnitsFactory());
+            Instnace.RegisterFactory(new SpeechUnitFactory());
+>>>>>>> master
+
+            Instnace.RegisterFactory(new KnowledgeUnitsFactory());
+            Instnace.RegisterFactory(new SnippetUnitsFactory());
+
+            Instnace.RegisterFactory(new UrlUnitsFacotry());
+
+            Instnace.RegisterFactory(new BookSearchUnitsFactory());
+            Instnace.RegisterFactory(new RssUnitsFactory());
+            Instnace.RegisterFactory(new BookmarkUnitsFacotry());
 
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();

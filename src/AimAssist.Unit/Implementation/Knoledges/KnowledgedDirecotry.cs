@@ -2,7 +2,7 @@
 using AimAssist.UI.Combos;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.Wiki;
+using AimAssist.Unit.Implementation.Knowledge;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;

@@ -8,10 +8,11 @@ namespace AimAssist.Combos.Mode.Snippet
 {
     public class SnippetUnit : IUnit
     {
-        public SnippetUnit(string name, string text)
+        public SnippetUnit(string name, string text, string category = "")
         {
             Name = name;
             Text = text;
+            Category = category;
         }
 
         public BitmapImage Icon => new BitmapImage();
@@ -23,7 +24,7 @@ namespace AimAssist.Combos.Mode.Snippet
 
         public IPickerMode Mode => SnippetMode.Instance;
 
-        public string Category => string.Empty;
+        public string Category { get; }
 
         public UIElement GetUiElement()
         {

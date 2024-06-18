@@ -1,19 +1,19 @@
 ﻿using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.WorkFlows;
+using AimAssist.Unit.Implementation.WorkTools;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
-namespace AimAssist.Combos.Mode.WorkFlows
+namespace AimAssist.Combos.Mode.WorkTools
 {
-    public class WorkFlowUnit : IUnit
+    public class WorkToolUnit : IUnit
     {
-        private readonly Func<WorkFlowUnit, UIElement> createUI;
+        private readonly Func<WorkToolUnit, UIElement> createUI;
 
         public string Name { get; }
 
         public BitmapImage Icon => new BitmapImage();
-        public WorkFlowUnit(string name, string text, Func<WorkFlowUnit, UIElement> createUI)
+        public WorkToolUnit(string name, string text, Func<WorkToolUnit, UIElement> createUI)
         {
             Name = name;
             Text = text;
@@ -21,7 +21,7 @@ namespace AimAssist.Combos.Mode.WorkFlows
         }
 
         public string Text { get; }
-        public IPickerMode Mode => WorkFlowMode.Instance;
+        public IPickerMode Mode => WorkToolsMode.Instance;
 
         public string Category => string.Empty;
 
