@@ -1,6 +1,5 @@
 ﻿namespace AimAssist.Unit.Core.Mode
 {
-
     public abstract class PikcerModeBase : IPickerMode
     {
         protected PikcerModeBase(string name)
@@ -15,7 +14,7 @@
 
         public virtual bool IsApplyFiter => true;
 
-        public virtual IUnit ModeChangeUnit=> new ModeChangeUnit(this);
+        public virtual IUnit ModeChangeUnit => new ModeChangeUnit(this);
 
         public override bool Equals(object? obj)
         {

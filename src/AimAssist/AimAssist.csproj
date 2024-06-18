@@ -9,6 +9,7 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\Icons\AimAssist.ico</ApplicationIcon>
     <SatelliteResourceLanguages>_</SatelliteResourceLanguages>
+    <AlwaysCreate>true</AlwaysCreate>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,5 +32,4 @@
     <!-- DLLのコピー先を指定 -->
     <Copy SourceFiles="..\..\README.md" DestinationFolder="$(OutputPath)\Resources\Knowledge\" />
   </Target>
-
 </Project>

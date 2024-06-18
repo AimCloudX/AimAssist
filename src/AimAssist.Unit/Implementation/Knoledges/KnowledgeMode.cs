@@ -1,9 +1,4 @@
-﻿using AimAssist.Combos.Mode.Wiki;
-using AimAssist.Unit.Core;
-using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.Knoledges;
-using System.Windows;
-using System.Windows.Media.Imaging;
+﻿using AimAssist.Unit.Core.Mode;
 
 namespace AimAssist.Unit.Implementation.Knowledge
 {
