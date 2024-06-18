@@ -28,6 +28,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{25E748D5-25B7-45CB-B5D2-B503DC8AA2A6}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		TODO.md = TODO.md
 	EndProjectSection
 EndProject
 Global
