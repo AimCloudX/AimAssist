@@ -23,6 +23,13 @@ namespace AimAssist.UI.Tools.HotKeys
                                       {
                                           AimAssistCommands.ToggleAssistWindowCommand.Execute(this);
                                       });
+
+            this.hotkeyController.Register(ModifierKeys.Alt,
+                                  Key.P,
+                                  (_, __) =>
+                                      {
+                                          AimAssistCommands.ShowPickerWIndowCommand.Execute(this);
+                                      });
         }
 
         protected override void OnClosed(EventArgs e)

@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AimAssist.Unit.Core;
+using AimAssist.Unit.Core.Mode;
+using System.ComponentModel;
+using System.Globalization;
 
-namespace AimAssist.UI.MainWindows
+namespace AimAssist.UI.Units
 {
-    using AimAssist.Unit.Core;
-    using AimAssist.Unit.Core.Mode;
-    using System;
-    using System.Collections;
-    using System.ComponentModel;
-    using System.Globalization;
-
     public class CustomGroupDescription : GroupDescription
     {
         public override object GroupNameFromItem(object item, int level, CultureInfo culture)
