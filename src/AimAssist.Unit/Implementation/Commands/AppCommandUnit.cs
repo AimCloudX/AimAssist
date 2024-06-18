@@ -15,13 +15,13 @@ namespace AimAssist.Unit.Implementation.Commands
 
         public string Category => string.Empty;
 
-        public string Name => "AimAssist Shutdown";
+        public string Name => "AimAssist Close";
 
         public string Text => "AimAssistを終了する";
 
         public void Execute()
         {
-            AppCommands.AimAssistShutdown.Execute();
+            CommandService.Execute(CommandNames.ShutdownAimAssist);
         }
 
         public UIElement GetUiElement()

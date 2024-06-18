@@ -42,7 +42,7 @@ namespace AimAssist.Core.Options
                 watcher.Filter = Path.GetFileName(EditorOptionService.OptionPath);
 
                 // イベントハンドラを追加
-                watcher.Changed += OnChanged;
+                //watcher.Changed += OnChanged;
 
                 // 監視を開始
                 watcher.EnableRaisingEvents = true;

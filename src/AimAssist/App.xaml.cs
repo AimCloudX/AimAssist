@@ -1,4 +1,4 @@
-﻿using AimAssist.Commands;
+﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Options;
 using AimAssist.Service;
 using AimAssist.UI.SystemTray;
@@ -31,7 +31,7 @@ namespace AimAssist
                     mutex.ReleaseMutex();
                 };
 
-                AimAssistCommands.ToggleAssistWindowCommand.Execute();
+                AppCommands.ToggleMainWindow.Execute();
             }
             else
             {
@@ -63,7 +63,9 @@ namespace AimAssist
             EditorOptionService.LoadOption();
             SystemTrayRegister.Register();
             UnitsService.Instnace.Initialize();
-            CommandService.Initialize();
+            CommandService.Register(AppCommands.ToggleMainWindow, "Alt+A");
+            CommandService.Register(AppCommands.ShowPickerWindow, "Alt+P");
+            CommandService.Register(AppCommands.ShutdownAimAssist, string.Empty);
 
             new WaitHowKeysWindow().Show();
         }
@@ -77,7 +79,7 @@ namespace AimAssist
                 using var reader = new StreamReader(server);
                 if (reader.ReadLine() == PipeName)
                 {
-                    Dispatcher.Invoke(() => AimAssistCommands.ToggleAssistWindowCommand.Execute());
+                    Dispatcher.Invoke(() => AppCommands.ToggleMainWindow.Execute());
                 }
             }
         }

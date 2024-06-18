@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using AimAssist.UI;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -23,6 +21,7 @@ public class HotKeyController : IDisposable
 
     public HotKeyController(Window window)
     {
+        this.window = window;
         var host = new WindowInteropHelper(window);
         _windowHandle = host.Handle;
 
@@ -34,24 +33,25 @@ public class HotKeyController : IDisposable
         if (msg.message != WM_HOTKEY) { return; }
 
         var id = msg.wParam.ToInt32();
-        var hotkey = _hotkeyList[id];
-
-        hotkey?.Handler
-            ?.Invoke(this, EventArgs.Empty);
+        if (_hotkeyList.TryGetValue(id, out var hotkey))
+        {
+            hotkey.Command.Execute();
+        }
     }
 
     private int _hotkeyID = 0x0000;
 
     private const int MAX_HOTKEY_ID = 0xC000;
+    private readonly Window window;
 
     /// <summary>
     /// 引数で指定された内容で、HotKeyを登録します。
     /// </summary>
     /// <param name="modKey"></param>
     /// <param name="key"></param>
-    /// <param name="handler"></param>
+    /// <param name="command"></param>
     /// <returns></returns>
-    public bool Register(ModifierKeys modKey, Key key, EventHandler handler)
+    public bool Register(ModifierKeys modKey, Key key, RelayCommand command)
     {
         var modKeyNum = (int)modKey;
         var vKey = KeyInterop.VirtualKeyFromKey(key);
@@ -64,7 +64,7 @@ public class HotKeyController : IDisposable
             if (ret != 0)
             {
                 // HotKeyのリストに追加
-                var hotkey = new HotKeyItem(modKey, key, handler);
+                var hotkey = new HotKeyItem(modKey, key, command);
                 _hotkeyList.Add(_hotkeyID, hotkey);
                 _hotkeyID++;
                 return true;
@@ -157,6 +157,6 @@ public class HotKeyController : IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    #endregion
 
+    #endregion
 }

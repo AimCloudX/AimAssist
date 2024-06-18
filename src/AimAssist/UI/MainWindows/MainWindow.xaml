@@ -170,9 +170,4 @@
 
         </Grid>
     </Grid>
-    <Window.InputBindings>
-        <KeyBinding Key="K" Modifiers="Ctrl" Command="{x:Static  commands:MainWindowCommands.FocusPreview}"/>
-        <KeyBinding Key="D" Modifiers="Ctrl" Command="{x:Static  commands:MainWindowCommands.FocusFilterTextBox}"/>
-    </Window.InputBindings>
-
 </Window>

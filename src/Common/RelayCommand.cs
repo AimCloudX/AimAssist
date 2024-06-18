@@ -52,10 +52,13 @@ namespace AimAssist.UI
     {
         private readonly Action _execute;
 
-        public RelayCommand(Action execute)
+        public RelayCommand(string commandName, Action execute)
         {
+            CommandName = commandName;
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
         }
+
+        public string CommandName { get; }
 
         public void Execute()
         {

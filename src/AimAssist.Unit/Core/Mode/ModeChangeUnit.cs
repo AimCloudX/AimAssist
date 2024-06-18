@@ -1,4 +1,5 @@
 ﻿using AimAssist.Combos.Mode.Wiki;
+using AimAssist.Core.Rsources;
 using AimAssist.Unit.Implementation.Knoledges;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -10,7 +11,7 @@ namespace AimAssist.Unit.Core.Mode
         public ModeChangeUnit(IPickerMode combo)
         {
             this.Mode = combo;
-            Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/AimAssist.ico"));
+            Icon = Constants.AimAssistIco;;
         }
 
         public string Name => Mode.Name;

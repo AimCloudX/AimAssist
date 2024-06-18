@@ -1,5 +1,4 @@
 ﻿using AimAssist.Combos.Mode.Snippet;
-using AimAssist.Commands;
 using AimAssist.Core.Commands;
 using AimAssist.Service;
 using AimAssist.UI.Units;
@@ -109,8 +108,8 @@ namespace AimAssist.UI.MainWindows
 
         public MainWindow()
         {
-            MainWindowCommands.FocusPreview  = new RelayCommand(this.FocusPreview);
-            MainWindowCommands.FocusFilterTextBox  = new RelayCommand(this.FocusFilterTextBox);
+            //MainWindowCommands.FocusPreview  = new RelayCommand(this.FocusPreview);
+            //MainWindowCommands.FocusFilterTextBox  = new RelayCommand(this.FocusFilterTextBox);
             this.InitializeComponent();
             this.DataContext = this;
             
@@ -122,10 +121,7 @@ namespace AimAssist.UI.MainWindows
                 this.FilterTextBox.SelectAll();
             }
 
-            //this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
             this.ComboListBox.SelectedIndex = 0;
-
-            App.Current.Deactivated += AppDeacivated;
         }
 
         private async void UpdateCandidate()
@@ -338,14 +334,6 @@ namespace AimAssist.UI.MainWindows
             }
         }
 
-        private void AppDeacivated(object? sender, EventArgs e)
-        {
-#if DEBUG
-            return;
-#endif
-            this.CloseWindow();
-        }
-
         private void CloseWindow()
         {
             if (this.IsClosing)
@@ -377,7 +365,7 @@ namespace AimAssist.UI.MainWindows
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            AppCommands.AimAssistShutdown.Execute();
+            AppCommands.ShutdownAimAssist.Execute();
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
