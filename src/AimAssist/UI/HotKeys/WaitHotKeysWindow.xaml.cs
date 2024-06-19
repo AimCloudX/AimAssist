@@ -1,8 +1,8 @@
 ﻿
-using AimAssist.Commands;
+using AimAssist.Core.Commands;
+using AimAssist.Core.Events;
 using AimAssist.HotKeys;
 using System.Windows;
-using System.Windows.Input;
 
 namespace AimAssist.UI.Tools.HotKeys
 {
@@ -15,21 +15,30 @@ namespace AimAssist.UI.Tools.HotKeys
             this.Visibility = Visibility.Hidden;
             this.ShowInTaskbar = false;
 
-           // HotKeyの登録
+            // HotKeyの登録
             this.hotkeyController = new HotKeyController(this);
-            this.hotkeyController.Register(ModifierKeys.Alt,
-                                  Key.A,
-                                  (_, __) =>
-                                      {
-                                          AimAssistCommands.ToggleAssistWindowCommand.Execute(this);
-                                      });
+            RegisterHotKey(CommandNames.ToggleMainWindow);
+            RegisterHotKey(CommandNames.ShowPickerWindow);
 
-            this.hotkeyController.Register(ModifierKeys.Alt,
-                                  Key.P,
-                                  (_, __) =>
-                                      {
-                                          AimAssistCommands.ShowPickerWIndowCommand.Execute(this);
-                                      });
+            EventPublisher.KeyUpdateEventPublisher.UpdateKeyGestureEventHandler
+                 += KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler; ;
+        }
+
+        private void KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler(object sender, KeyGestureUpdatedEventArgs e)
+        {
+            this.hotkeyController.Unregister(e.Before.Modifiers, e.Before.Key);
+            this.hotkeyController.Register(e.after.Modifiers, e.after.Key, e.Command);
+        }
+
+        private void RegisterHotKey(string commandName)
+        {
+            if (CommandService.TryGetKeyGesutre(commandName, out var command, out var keyGesture))
+            {
+                    this.hotkeyController.Register(keyGesture.Modifiers,
+                                          keyGesture.Key,
+                                              command
+                                          );
+            }
         }
 
         protected override void OnClosed(EventArgs e)
@@ -39,6 +48,5 @@ namespace AimAssist.UI.Tools.HotKeys
             // HotKeyの登録解除
             this.hotkeyController.Dispose();
         }
-
     }
 }

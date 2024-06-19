@@ -1,7 +1,5 @@
-﻿using AimAssist.Core.Options;
-using AimAssist.Unit.Core;
+﻿using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using System.IO;
 
 namespace AimAssist.Unit.Implementation.Options
 {
@@ -13,7 +11,8 @@ namespace AimAssist.Unit.Implementation.Options
 
         public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
-            yield return new OptionUnit("Option", "Option");
+            yield return new OptionUnit("Option");
+            yield return new KeyboardShortcutsOptionUnit();
         }
     }
 }

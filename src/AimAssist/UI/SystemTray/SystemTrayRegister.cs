@@ -1,4 +1,5 @@
-﻿using AimAssist.Commands;
+﻿
+using AimAssist.Core.Commands;
 
 namespace AimAssist.UI.SystemTray
 {
@@ -21,14 +22,14 @@ namespace AimAssist.UI.SystemTray
         }
         private static void Show_Click(object? sender, EventArgs e)
         {
-            AimAssistCommands.ToggleAssistWindowCommand.Execute(e);
+            AppCommands.ToggleMainWindow.Execute();
         }
 
         private static void NotifyIcon_Click(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                AimAssistCommands.ToggleAssistWindowCommand.Execute(e);
+                AppCommands.ToggleMainWindow.Execute();
             }
         }
 

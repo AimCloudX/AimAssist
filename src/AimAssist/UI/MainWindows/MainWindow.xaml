@@ -9,12 +9,14 @@
         Height="600"
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:commands="clr-namespace:AimAssist.Core.Commands;assembly=AimAssist" xmlns:ui1="clr-namespace:AimAssist.Core.UI;assembly=AimAssist.Core"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
         Loaded="Window_Loaded"
         ContentRendered="Window_ContentRendered"
         >
+
     <Window.Resources>
         <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">
             <CollectionViewSource.GroupDescriptions>
@@ -36,6 +38,9 @@
             </Setter>
         </Style>
     </Window.Resources>
+    <Window.InputBindings>
+        <ui1:CustomizeKeyBindings CommandName="ShutdownAimAssist" Command="commands:AppCommands.ShutdownAimAssist"></ui1:CustomizeKeyBindings>
+    </Window.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition  Width="*" x:Name="LeftColumn"/>

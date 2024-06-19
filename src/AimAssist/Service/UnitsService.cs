@@ -1,6 +1,7 @@
 ﻿using AimAssist.Plugins;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
+using AimAssist.Unit.Implementation.Commands;
 using AimAssist.Unit.Implementation.Knoledges;
 using AimAssist.Unit.Implementation.Options;
 using AimAssist.Unit.Implementation.Snippets;
@@ -35,7 +36,6 @@ namespace AimAssist.Service
         public void Initialize()
         {
             Instnace.RegisterFactory(new ModeChangeUnitsFacotry());
-            Instnace.RegisterFactory(new OptionUnitsFactory());
 
             Instnace.RegisterFactory(new ChatGPTUnitsFactory());
             Instnace.RegisterFactory(new SpeechUnitFactory());
@@ -49,6 +49,9 @@ namespace AimAssist.Service
             Instnace.RegisterFactory(new RssUnitsFactory());
             Instnace.RegisterFactory(new BookmarkUnitsFacotry());
 
+            Instnace.RegisterFactory(new AppCommandUnitFactory());
+            Instnace.RegisterFactory(new OptionUnitsFactory());
+
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();
             var facotries = pluginService.GetFactories();
@@ -57,7 +60,6 @@ namespace AimAssist.Service
                 Instnace.RegisterFactory(item);
             }
         }
-
 
         private IList<IUnitsFacotry> factories = new List<IUnitsFacotry>();
 

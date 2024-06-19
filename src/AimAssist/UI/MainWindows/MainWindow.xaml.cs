@@ -1,4 +1,5 @@
 ﻿using AimAssist.Combos.Mode.Snippet;
+using AimAssist.Core.Commands;
 using AimAssist.Service;
 using AimAssist.UI.Units;
 using AimAssist.Unit.Core;
@@ -107,6 +108,8 @@ namespace AimAssist.UI.MainWindows
 
         public MainWindow()
         {
+            //MainWindowCommands.FocusPreview  = new RelayCommand(this.FocusPreview);
+            //MainWindowCommands.FocusFilterTextBox  = new RelayCommand(this.FocusFilterTextBox);
             this.InitializeComponent();
             this.DataContext = this;
             
@@ -118,10 +121,7 @@ namespace AimAssist.UI.MainWindows
                 this.FilterTextBox.SelectAll();
             }
 
-            //this.FilterTextBox.SelectionStart = this.FilterTextBox.Text.Length;
             this.ComboListBox.SelectedIndex = 0;
-
-            App.Current.Deactivated += AppDeacivated;
         }
 
         private async void UpdateCandidate()
@@ -231,6 +231,13 @@ namespace AimAssist.UI.MainWindows
                 return;
             }
 
+            if (this.ComboListBox.SelectedItem is ICommandUnit command)
+            {
+                command.Execute();
+                e.Handled = true;
+                return;
+            }
+
             if (this.ComboListBox.SelectedItem is IUnitPackage package)
             {
                 // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
@@ -327,14 +334,6 @@ namespace AimAssist.UI.MainWindows
             }
         }
 
-        private void AppDeacivated(object? sender, EventArgs e)
-        {
-#if DEBUG
-            return;
-#endif
-            this.CloseWindow();
-        }
-
         private void CloseWindow()
         {
             if (this.IsClosing)
@@ -366,8 +365,9 @@ namespace AimAssist.UI.MainWindows
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            this.IsClosing = true;
+            AppCommands.ShutdownAimAssist.Execute();
         }
+
         private void Window_ContentRendered(object sender, EventArgs e)
         {
         }
@@ -407,6 +407,15 @@ namespace AimAssist.UI.MainWindows
                 LeftColumn.Width = GridLength.Auto;
                 GridSplitter.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void FocusPreview()
+        {
+            this.Preview.Focus();
+        }
+        private void FocusFilterTextBox()
+        {
+            this.FilterTextBox.Focus();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AimAssist.Core.Editors;
 using AimAssist.Core.Options;
+using AimAssist.Core.Rsources;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
 using System.IO;
@@ -10,16 +11,16 @@ namespace AimAssist.Unit.Implementation.Options
 {
     public class OptionUnit : IUnit
     {
-        public OptionUnit(string name, string category)
+        public OptionUnit(string name)
         {
             Name = name;
-            Category = category;
         }
-        public BitmapImage Icon => new BitmapImage();
+
+        public BitmapImage Icon => Constants.AimAssistIco;
 
         public IPickerMode Mode => OptionMode.Instance;
 
-        public string Category { get; }
+        public string Category => string.Empty;
 
         public string Name { get; }
 
