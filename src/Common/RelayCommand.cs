@@ -80,5 +80,27 @@ namespace AimAssist.UI
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
+
+        public override bool Equals(object? obj)
+        {
+            if(obj is RelayCommand command)
+            {
+                return Equals(command);
+            }
+
+            return false;
+        }
+
+        public bool Equals(RelayCommand command)
+        {
+            return this.CommandName == command.CommandName;
+        }
+    }
+
+    public class HotkeyCommand : RelayCommand
+    {
+        public HotkeyCommand(string commandName, Action execute) : base(commandName, execute)
+        {
+        }
     }
 }

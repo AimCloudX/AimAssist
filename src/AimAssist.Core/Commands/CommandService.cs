@@ -1,22 +1,49 @@
-﻿using AimAssist.UI;
-using System.Runtime.CompilerServices;
+﻿using AimAssist.Core.Events;
+using AimAssist.UI;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace AimAssist.Core.Commands
 {
     public static class CommandService
     {
+        private static  KeyGestureValueSerializer serializer = new KeyGestureValueSerializer();
+
 
         private static Dictionary<RelayCommand, string> dic = new Dictionary<RelayCommand, string>();
 
         public static void Register(RelayCommand command, string gesture)
         {
+            if(dic.ContainsKey(command))
+            {
+                Debug.Assert(false,"同名のコマンドがすでに登録されています");
+                return;
+            }
+
             dic.Add(command, gesture);
         }
+
         public static bool TryGetCommand(string commandName, out RelayCommand command)
         {
             command = dic.Keys.FirstOrDefault(x => x.CommandName == commandName);
             return command != null;
+        }
+
+        public static void UpdateKeyGesture(string commandName, string key)
+        {
+            if (TryGetCommand(commandName, out var command))
+            {
+                var before = dic[command];
+                var beforeKeyGesture = (KeyGesture)serializer.ConvertFromString(before, null);
+
+                dic[command] = key;
+                var after = (KeyGesture)serializer.ConvertFromString(key, null);
+
+                if(command is HotkeyCommand hotkeyCommand)
+                {
+                    EventPublisher.KeyUpdateEventPublisher.RaiseEvent(hotkeyCommand, beforeKeyGesture, after);
+                }
+            }
         }
 
         public static bool TryGetKeyGesutre(string commandName, out RelayCommand command, out KeyGesture keyGesture)

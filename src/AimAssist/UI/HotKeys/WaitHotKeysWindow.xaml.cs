@@ -1,5 +1,6 @@
 ﻿
 using AimAssist.Core.Commands;
+using AimAssist.Core.Events;
 using AimAssist.HotKeys;
 using System.Windows;
 
@@ -18,6 +19,15 @@ namespace AimAssist.UI.Tools.HotKeys
             this.hotkeyController = new HotKeyController(this);
             RegisterHotKey(CommandNames.ToggleMainWindow);
             RegisterHotKey(CommandNames.ShowPickerWindow);
+
+            EventPublisher.KeyUpdateEventPublisher.UpdateKeyGestureEventHandler
+                 += KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler; ;
+        }
+
+        private void KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler(object sender, KeyGestureUpdatedEventArgs e)
+        {
+            this.hotkeyController.Unregister(e.Before.Modifiers, e.Before.Key);
+            this.hotkeyController.Register(e.after.Modifiers, e.after.Key, e.Command);
         }
 
         private void RegisterHotKey(string commandName)

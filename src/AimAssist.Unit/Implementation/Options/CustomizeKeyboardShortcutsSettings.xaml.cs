@@ -1,4 +1,5 @@
 ﻿using AimAssist.Core.Commands;
+using AimAssist.Core.Events;
 using AimAssist.Core.Options;
 using System.Windows;
 using System.Windows.Input;
@@ -44,8 +45,14 @@ namespace AimAssist.UI.Options
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            // save
-            // 更新
+            var modifiedShortcutes = ShortcutSetting.Where(x => x.IsModified);
+            if (modifiedShortcutes.Any())
+            {
+                foreach (var shortcut in modifiedShortcutes)
+                {
+                    CommandService.UpdateKeyGesture(shortcut.CommandName, shortcut.Gesture);
+                }
+            }
         }
 
 

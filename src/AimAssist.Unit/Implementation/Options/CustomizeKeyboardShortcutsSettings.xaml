@@ -33,8 +33,7 @@
         </ListView>
 
 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-    <Button Content="OK" IsDefault="True" Margin="0,0,10,0" Click="ButtonBase_OnClick"></Button>
-    <Button Content="Cancel"  IsCancel="True" Margin="0,0,10,0"></Button>
+    <Button Content="Apply" IsDefault="True" Margin="0,0,10,0" Click="ButtonBase_OnClick"></Button>
 </StackPanel>
 
     </Grid>
