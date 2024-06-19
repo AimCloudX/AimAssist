@@ -16,6 +16,7 @@ namespace AimAssist
         private static Mutex mutex;
         private const string appName = "AimAssist";
         private const string PipeName = "AimAssist";
+        public static SettingManager SettingsManager { get; private set; }
 
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
         {
@@ -66,6 +67,9 @@ namespace AimAssist
             CommandService.Register(AppCommands.ToggleMainWindow, "Alt+A");
             CommandService.Register(AppCommands.ShowPickerWindow, "Alt+P");
             CommandService.Register(AppCommands.ShutdownAimAssist, string.Empty);
+            SettingsManager = new SettingManager();
+            var settings = SettingsManager.LoadSettings();
+            CommandService.SetKeymap(settings);
 
             new WaitHowKeysWindow().Show();
         }
@@ -82,6 +86,12 @@ namespace AimAssist
                     Dispatcher.Invoke(() => AppCommands.ToggleMainWindow.Execute());
                 }
             }
+        }
+
+        private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
+        {
+            var settings = CommandService.GetKeymap();
+            SettingsManager.SaveSettings(settings);
         }
     }
 }

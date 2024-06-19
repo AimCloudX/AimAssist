@@ -1,5 +1,4 @@
 ﻿using AimAssist.Core.Commands;
-using AimAssist.Core.Events;
 using AimAssist.Core.Options;
 using System.Windows;
 using System.Windows.Input;
@@ -14,9 +13,9 @@ namespace AimAssist.UI.Options
         public CustomizeKeyboardShortcutsSettings()
         {
             InitializeComponent();
-            foreach (var shortcut in CommandService.Commands)
+            foreach (var shortcut in CommandService.GetKeymap())
             {
-                this.ShortcutSetting.Add(new ShortcutSource(shortcut.Key.CommandName, shortcut.Value));
+                this.ShortcutSetting.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
             }
 
             this.DataContext = this;

@@ -9,34 +9,69 @@ namespace AimAssist.Core.Commands
     {
         private static  KeyGestureValueSerializer serializer = new KeyGestureValueSerializer();
 
+        private static Dictionary<string, string> keymap = new Dictionary<string, string>();
 
-        private static Dictionary<RelayCommand, string> dic = new Dictionary<RelayCommand, string>();
+        private static List<RelayCommand> dic = new List<RelayCommand>();
 
-        public static void Register(RelayCommand command, string gesture)
+        public static void SetKeymap(Dictionary<string,string> maps)
         {
-            if(dic.ContainsKey(command))
+            foreach (var map in maps)
+            {
+
+                if (keymap.TryGetValue(map.Key, out var value))
+                {
+                    keymap[map.Key] = map.Value;
+                }
+                else
+                {
+                    keymap.Add(map.Key, map.Value);
+                }
+            }
+        }
+
+    public static Dictionary<string, string> GetKeymap() {
+            return keymap;
+        }
+
+
+        public static void Register(RelayCommand command, string defaultKeyMap)
+        {
+            if(dic.Any(x=>x == command))
             {
                 Debug.Assert(false,"同名のコマンドがすでに登録されています");
                 return;
             }
 
-            dic.Add(command, gesture);
+            if (keymap.TryGetValue(command.CommandName, out _))
+            {
+                keymap[command.CommandName] = defaultKeyMap;
+            }
+            else
+            {
+                keymap.Add(command.CommandName, defaultKeyMap);
+            }
+
+            dic.Add(command);
         }
 
         public static bool TryGetCommand(string commandName, out RelayCommand command)
         {
-            command = dic.Keys.FirstOrDefault(x => x.CommandName == commandName);
+            command = dic.FirstOrDefault(x => x.CommandName == commandName);
             return command != null;
         }
 
         public static void UpdateKeyGesture(string commandName, string key)
         {
-            if (TryGetCommand(commandName, out var command))
+            if(!TryGetCommand(commandName, out var command))
             {
-                var before = dic[command];
+                return;
+            }
+
+            if (keymap.TryGetValue(commandName, out var before))
+            {
                 var beforeKeyGesture = (KeyGesture)serializer.ConvertFromString(before, null);
 
-                dic[command] = key;
+                keymap[commandName] = key;
                 var after = (KeyGesture)serializer.ConvertFromString(key, null);
 
                 if(command is HotkeyCommand hotkeyCommand)
@@ -50,7 +85,7 @@ namespace AimAssist.Core.Commands
         {
             if(TryGetCommand(commandName, out command))
             {
-                var gesture = dic[command];
+                var gesture = keymap[commandName];
                 var serializer = new KeyGestureValueSerializer();
                 var comvertFromString = serializer.ConvertFromString(gesture, null);
                 if (comvertFromString is KeyGesture key)
@@ -67,10 +102,10 @@ namespace AimAssist.Core.Commands
 
         public static bool TryGetCommandAndGesture(string commandName, out RelayCommand command, out string gesture)
         {
-            command = dic.Keys.FirstOrDefault(x => x.CommandName == commandName);
+            command = dic.FirstOrDefault(x => x.CommandName == commandName);
             if(command != null)
             {
-                gesture = dic[command];
+                gesture = keymap[commandName];
             }
             else
             {
@@ -82,13 +117,11 @@ namespace AimAssist.Core.Commands
 
         public static void Execute(string commandName)
         {
-            var command = dic.Keys.FirstOrDefault(x => x.CommandName == commandName);
+            var command = dic.FirstOrDefault(x => x.CommandName == commandName);
             if(command != null)
             {
                 command.Execute();
             }
         }
-
-        public static IReadOnlyDictionary<RelayCommand, string> Commands => dic;
     }
 }
