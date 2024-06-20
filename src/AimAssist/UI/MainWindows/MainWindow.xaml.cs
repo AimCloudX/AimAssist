@@ -212,11 +212,6 @@ namespace AimAssist.UI.MainWindows
             {
                 ExecuteUnit(e);
             }
-
-            else if (e.Key == Key.Escape)
-            {
-                this.CloseWindow();
-            }
         }
 
         private void ExecuteUnit(System.Windows.Input.KeyEventArgs e)

@@ -115,17 +115,5 @@ namespace ClipboardAnalyzer
             UpdateClipboard();
             SetPreviewText();
         }
-
-        private async void Convert_Click(object sender, RoutedEventArgs e)
-        {
-            var text = await this.editor.GetText();
-            if (string.IsNullOrEmpty(text))
-            {
-                return;
-            }
-
-            var replacedText = text.Replace(this.beforeText.Text, this.afterText.Text);
-            this.editor.SetText(replacedText);
-        }
     }
 }

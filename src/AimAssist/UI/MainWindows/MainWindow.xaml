@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="{Binding Mode.Name, Mode=OneWay}"
         Width="1000"
-        Height="600"
+        Height="700"
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:commands="clr-namespace:AimAssist.Core.Commands;assembly=AimAssist" xmlns:ui1="clr-namespace:AimAssist.Core.UI;assembly=AimAssist.Core"
@@ -106,7 +106,7 @@
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"  Foreground="Gray" IsHitTestVisible="False"/>
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"  Foreground="Gray" IsHitTestVisible="False" Focusable="False"/>
                                 </DataTemplate>
                             </GroupStyle.HeaderTemplate>
                         </GroupStyle>
