@@ -64,14 +64,14 @@ namespace ClipboardAnalyzer
 
             if (string.IsNullOrEmpty(selectedFormat))
             {
-                this.editor.SetText(string.Empty);
+                this.editor.SetTextAsync(string.Empty);
                 return;
             }
 
             var foramtData = Items.FirstOrDefault(x => x.Format == selectedFormat);
             if (foramtData != null)
             {
-                this.editor.SetText(foramtData.Data.ToString());
+                this.editor.SetTextAsync(foramtData.Data.ToString());
             }
         }
 
@@ -102,7 +102,7 @@ namespace ClipboardAnalyzer
                 sb.AppendLine($"{{\"{key}\" : \"{value}\"}}");
             }
 
-            this.editor.SetText(sb.ToString().TrimEnd('\r', '\n'));
+            this.editor.SetTextAsync(sb.ToString().TrimEnd('\r', '\n'));
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)

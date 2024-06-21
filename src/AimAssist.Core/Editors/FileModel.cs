@@ -13,7 +13,7 @@ namespace AimAssist.Core.Editors
             this.FilePath = filePath;
             this.monacoEditor = new MonacoEditor();
             this.monacoEditor.SetOption(EditorOptionService.Option);
-            this.monacoEditor.SetText(File.ReadAllText(filePath));
+            this.monacoEditor.SetTextAsync(File.ReadAllText(filePath));
             this.Content = this.monacoEditor;
 
             // style

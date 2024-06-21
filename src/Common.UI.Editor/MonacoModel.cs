@@ -45,3 +45,12 @@ public class keyChange(string key, string command, string mode)
     public string command { get; set; }
     public string mode { get; set; } = mode;
 }
+
+public class KeyEventMessage
+{
+    public string type { get; set; }
+    public string key { get; set; }
+    public bool ctrlKey { get; set; }
+    public bool shiftKey { get; set; }
+    public bool altKey { get; set; }
+}

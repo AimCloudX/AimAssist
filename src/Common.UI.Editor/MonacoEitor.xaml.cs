@@ -1,6 +1,7 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
 using System.IO;
+using System.Windows.Input;
 
 namespace Common.UI.Editor
 {
@@ -11,30 +12,90 @@ namespace Common.UI.Editor
     {
         private EditorOption option = new EditorOption();
         private string text = string.Empty;
+        private string language = "javascript";
 
         public MonacoEditor()
         {
             this.InitializeComponent();
             this.webView.NavigationCompleted += InitializeCoreWebView2Completed;
             InitializeAsync();
+
         }
 
-        private void InitializeCoreWebView2Completed(object? sender, CoreWebView2NavigationCompletedEventArgs e)
+        private async void InitializeCoreWebView2Completed(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            SetOptionInner();
+            await SetOptionInner();
             if (!string.IsNullOrEmpty(text))
             {
-                string script = $"setEditorContent({JsonConvert.SerializeObject(text)});";
-                webView.CoreWebView2.ExecuteScriptAsync(script);
+                await SetEditorContentAsync(text, language);
             }
         }
 
-        public async void SetText(string text)
+        public async Task SetTextAsync(string text, string language = null)
         {
             this.text = text;
-            if(webView.CoreWebView2 != null)
+            if (language != null)
             {
-                string script = $"setEditorContent({JsonConvert.SerializeObject(text)});";
+                this.language = language;
+            }
+            if (webView.CoreWebView2 != null)
+            {
+                SetEditorContentAsync(text, this.language);
+            }
+        }
+        private async Task SetEditorContentAsync(string content, string lang)
+        {
+            string script = $"setEditorContent({JsonConvert.SerializeObject(content)}, {JsonConvert.SerializeObject(lang)});";
+            await webView.CoreWebView2.ExecuteScriptAsync(script);
+        }
+
+        public async Task SetOptionAsync(EditorOption option)
+        {
+            this.option = option;
+            if (webView.CoreWebView2 != null)
+            {
+                await SetOptionInner();
+            }
+        }
+
+        private async Task SetOptionInner()
+        {
+            switch (option.Mode)
+            {
+                case EditorMode.Standard:
+                    await webView.CoreWebView2.ExecuteScriptAsync("toggleVimMode(false);");
+                    break;
+                case EditorMode.Vim:
+                    await webView.CoreWebView2.ExecuteScriptAsync("toggleVimMode(true);");
+                    if (!string.IsNullOrEmpty(option.CustomVimKeybindingPath))
+                    {
+                        var keybindingScript = await File.ReadAllTextAsync(option.CustomVimKeybindingPath);
+                        await webView.CoreWebView2.ExecuteScriptAsync(keybindingScript);
+                    }
+                    break;
+            }
+        }
+
+        public async Task<string> GetTextAsync()
+        {
+            try
+            {
+                var fileContent = await webView.CoreWebView2.ExecuteScriptAsync("getEditorContent();");
+                return JsonConvert.DeserializeObject<string>(fileContent);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting editor content: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
+        public async Task SetLanguageAsync(string language)
+        {
+            this.language = language;
+            if (webView.CoreWebView2 != null)
+            {
+                string script = $"setEditorLanguage({JsonConvert.SerializeObject(language)});";
                 await webView.CoreWebView2.ExecuteScriptAsync(script);
             }
         }
@@ -45,26 +106,6 @@ namespace Common.UI.Editor
             if(webView.CoreWebView2 != null)
             {
                 SetOptionInner();
-            }
-        }
-
-        private async void SetOptionInner()
-        {
-            switch (option.Mode)
-            {
-                case EditorMode.Standard:
-                    await webView.CoreWebView2.ExecuteScriptAsync("toggleVimMode(false);");
-                    break;
-                case EditorMode.Vim:
-                    await webView.CoreWebView2.ExecuteScriptAsync("toggleVimMode(true);");
-
-                    if (!string.IsNullOrEmpty(option.CustomVimKeybindingPath))
-                    {
-                        var text = File.ReadAllText(option.CustomVimKeybindingPath);
-                        await webView.CoreWebView2.ExecuteScriptAsync(text);
-                    }
-
-                    break;
             }
         }
 
@@ -87,6 +128,46 @@ namespace Common.UI.Editor
             string htmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Monaco", "src", "index.html");
             webView.Source = new Uri($"file:///{htmlFilePath}");
             //webView.CoreWebView2.Navigate(htmlFilePath);
+
+            webView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+
+            await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@"
+                window.addEventListener('keydown', (e) => {
+                    window.chrome.webview.postMessage({
+                        type: 'keydown',
+                        key: e.key,
+                        ctrlKey: e.ctrlKey,
+                        shiftKey: e.shiftKey,
+                        altKey: e.altKey
+                    });
+                });
+            ");
+
+            // WPFのキーイベントをハンドル
+            this.PreviewKeyDown += MainWindow_PreviewKeyDown;
+
+        }
+
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.P && (Keyboard.Modifiers & ModifierKeys.Control) != 0 && (Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+            {
+                e.Handled = true; // イベントが処理されたことを示す
+                webView.CoreWebView2.ExecuteScriptAsync("openMonacoCommandPalette();");
+            }
+        }
+
+        private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            var jsonMessage = System.Text.Json.JsonSerializer.Deserialize<KeyEventMessage>(e.WebMessageAsJson);
+            if (jsonMessage.type == "keydown" &&
+                jsonMessage.key == "P" &&
+                jsonMessage.ctrlKey &&
+                jsonMessage.shiftKey)
+            {
+                // WebView2内でCtrl+Shift+Pが押されたときの処理
+                webView.CoreWebView2.ExecuteScriptAsync("openMonacoCommandPalette();");
+            }
         }
     }
 }
