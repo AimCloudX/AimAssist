@@ -1,5 +1,6 @@
 ﻿using AimAssist.Core.Events;
 using AimAssist.UI;
+using Common;
 using System.Diagnostics;
 using System.Windows.Input;
 
@@ -7,13 +8,11 @@ namespace AimAssist.Core.Commands
 {
     public static class CommandService
     {
-        private static  KeyGestureValueSerializer serializer = new KeyGestureValueSerializer();
-
-        private static Dictionary<string, string> keymap = new Dictionary<string, string>();
+        private static Dictionary<string, KeySequence> keymap = new Dictionary<string, KeySequence>();
 
         private static List<RelayCommand> dic = new List<RelayCommand>();
 
-        public static void SetKeymap(Dictionary<string,string> maps)
+        public static void SetKeymap(Dictionary<string, KeySequence> maps)
         {
             foreach (var map in maps)
             {
@@ -29,12 +28,49 @@ namespace AimAssist.Core.Commands
             }
         }
 
-    public static Dictionary<string, string> GetKeymap() {
+        public static Dictionary<string, KeySequence> GetKeymap()
+        {
             return keymap;
         }
 
+        public static bool TryGetFirstOnlyKeyCommand(KeyGesture keyGesture, out RelayCommand command)
+        {
+            foreach(var keyValuePair in keymap)
+            {
+                var keySequence = keyValuePair.Value;
+                if (keySequence.FirstKey == keyGesture.Key && keySequence.FirstModifiers == keyGesture.Modifiers && keySequence.SecondKey == null && keySequence.SecondModifiers == null)
+                {
+                    if(TryGetCommand(keyValuePair.Key, out command))
+                    {
+                        return true;
+                    }
+                }
+            }
 
-        public static void Register(RelayCommand command, string defaultKeyMap)
+            command = null;
+            return false;
+        }
+
+        public static bool TryGetFirstSecontKeyCommand(KeySequence input, out RelayCommand command)
+        {
+            foreach(var keyValuePair in keymap)
+            {
+                var keySequence = keyValuePair.Value;
+                if (keySequence.FirstKey == input.FirstKey && keySequence.FirstModifiers == input.FirstModifiers && keySequence.SecondKey == input.SecondKey && keySequence.SecondModifiers == input.SecondModifiers)
+                {
+                    if(TryGetCommand(keyValuePair.Key, out command))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            command = null;
+            return false;
+        }
+
+
+        public static void Register(RelayCommand command, KeySequence defaultKeyMap)
         {
             if(dic.Any(x=>x == command))
             {
@@ -60,7 +96,7 @@ namespace AimAssist.Core.Commands
             return command != null;
         }
 
-        public static void UpdateKeyGesture(string commandName, string key)
+        public static void UpdateKeyGesture(string commandName, KeySequence key)
         {
             if(!TryGetCommand(commandName, out var command))
             {
@@ -69,50 +105,24 @@ namespace AimAssist.Core.Commands
 
             if (keymap.TryGetValue(commandName, out var before))
             {
-                var beforeKeyGesture = (KeyGesture)serializer.ConvertFromString(before, null);
-
                 keymap[commandName] = key;
-                var after = (KeyGesture)serializer.ConvertFromString(key, null);
-
                 if(command is HotkeyCommand hotkeyCommand)
                 {
-                    EventPublisher.KeyUpdateEventPublisher.RaiseEvent(hotkeyCommand, beforeKeyGesture, after);
+                    EventPublisher.KeyUpdateEventPublisher.RaiseEvent(hotkeyCommand, before, key);
                 }
             }
         }
 
-        public static bool TryGetKeyGesutre(string commandName, out RelayCommand command, out KeyGesture keyGesture)
+        public static bool TryGetKeyGesutre(string commandName, out RelayCommand command, out KeySequence keyGesture)
         {
             if(TryGetCommand(commandName, out command))
             {
-                var gesture = keymap[commandName];
-                var serializer = new KeyGestureValueSerializer();
-                var comvertFromString = serializer.ConvertFromString(gesture, null);
-                if (comvertFromString is KeyGesture key)
-                {
-                    keyGesture = key;
-                    return true;
-                }
+                 keyGesture = keymap[commandName];
+                return true;
             }
 
             keyGesture = null;
             return false;
-        }
-
-
-        public static bool TryGetCommandAndGesture(string commandName, out RelayCommand command, out string gesture)
-        {
-            command = dic.FirstOrDefault(x => x.CommandName == commandName);
-            if(command != null)
-            {
-                gesture = keymap[commandName];
-            }
-            else
-            {
-                gesture = string.Empty;
-            }
-
-            return command != null;
         }
 
         public static void Execute(string commandName)

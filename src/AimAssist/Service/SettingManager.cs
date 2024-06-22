@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Common;
+using System.IO;
 using System.Text.Json;
 
 namespace AimAssist.Service
@@ -20,9 +21,10 @@ namespace AimAssist.Service
         }
 
         // 設定を保存するメソッド
-        public void SaveSettings(Dictionary<string,string> settings)
+        public void SaveSettings(Dictionary<string, KeySequence> settings)
         {
             var options = new JsonSerializerOptions();
+            options.Converters.Add(new KeySequenceConverter());
             options.WriteIndented = true;
             options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
@@ -31,18 +33,19 @@ namespace AimAssist.Service
         }
 
         // 設定を読み込むメソッド
-        public Dictionary<string, string> LoadSettings()
+        public Dictionary<string, KeySequence> LoadSettings()
         {
             if (File.Exists(_settingsFilePath))
             {
                 var options = new JsonSerializerOptions();
+                options.Converters.Add(new KeySequenceConverter());
                 options.WriteIndented = true;
                 options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
                 string json = File.ReadAllText(_settingsFilePath);
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(json,options);
+                return JsonSerializer.Deserialize<Dictionary<string, KeySequence>>(json, options);
             }
 
-            return new Dictionary<string, string>(); // デフォルト設定を返す
+            return new Dictionary<string, KeySequence>(); // デフォルト設定を返す
         }
     }
 }

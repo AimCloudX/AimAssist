@@ -1,5 +1,6 @@
 ﻿
 using AimAssist.UI;
+using Common;
 using System.Windows.Input;
 
 namespace AimAssist.Core.Events
@@ -11,7 +12,7 @@ namespace AimAssist.Core.Events
 }
     public class KeyGestureUpdatedEventArgs : EventArgs
     {
-        public KeyGestureUpdatedEventArgs(RelayCommand command, KeyGesture before,KeyGesture after)
+        public KeyGestureUpdatedEventArgs(RelayCommand command, KeySequence before,KeySequence after)
         {
             Command = command;
             Before = before;
@@ -19,8 +20,8 @@ namespace AimAssist.Core.Events
         }
 
         public RelayCommand Command { get; }
-        public KeyGesture Before { get; }
-        public KeyGesture after { get; }
+        public KeySequence Before { get; }
+        public KeySequence after { get; }
     }
 
     public class KeyGesutureUpdatedEventPublisher
@@ -33,7 +34,7 @@ namespace AimAssist.Core.Events
 
         // Wrap the event in a protected virtual method
         // to enable derived classes to raise the event.
-        public void RaiseEvent(RelayCommand command, KeyGesture before, KeyGesture after)
+        public void RaiseEvent(RelayCommand command, KeySequence before, KeySequence after)
         {
             // Raise the event in a thread-safe manner using the ?. operator.
             this.UpdateKeyGestureEventHandler?.Invoke(this, new KeyGestureUpdatedEventArgs(command, before, after));

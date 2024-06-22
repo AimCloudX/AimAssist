@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Common.UI.Editor\Common.UI.Editor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UI\" />
+  </ItemGroup>
+
 </Project>

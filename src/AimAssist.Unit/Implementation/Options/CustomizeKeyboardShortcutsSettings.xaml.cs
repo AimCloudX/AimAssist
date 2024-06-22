@@ -1,6 +1,9 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Options;
+using Common;
+using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace AimAssist.UI.Options
@@ -15,13 +18,54 @@ namespace AimAssist.UI.Options
             InitializeComponent();
             foreach (var shortcut in CommandService.GetKeymap())
             {
-                this.ShortcutSetting.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
+                this.ShortcutSettings.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
             }
 
             this.DataContext = this;
         }
 
-        public List<ShortcutSource> ShortcutSetting { get; set; } = new List<ShortcutSource>();
+        private bool _isFirstKeyEntered = false;
+        private void ShortcutTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox && textBox.DataContext is ShortcutSource setting)
+            {
+                // リセット
+                _isFirstKeyEntered = false;
+            }
+        }
+        private void ShortcutTextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            e.Handled = true;
+            if (sender is TextBox textBox && textBox.DataContext is ShortcutSource setting)
+            {
+                var key = e.Key == Key.System ? e.SystemKey : e.Key;
+                var modifiers = Keyboard.Modifiers;
+
+                // モディファイアキーのみの場合は無視
+                if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.LeftAlt ||
+                    key == Key.RightAlt || key == Key.LeftShift || key == Key.RightShift|| key == Key.Escape)
+                {
+                    return;
+                }
+
+                if (!_isFirstKeyEntered)
+                {
+                    // 最初のキー入力
+                    setting.Gesture = new KeySequence(key, modifiers);
+                    textBox.Text = setting.Gesture.ToString();
+                    _isFirstKeyEntered = true;
+                }
+                else
+                {
+                    // 2つ目のキー入力
+                    setting.Gesture = new KeySequence(setting.Gesture.FirstKey, setting.Gesture.FirstModifiers, key, modifiers);
+                    textBox.Text = setting.Gesture.ToString();
+                    _isFirstKeyEntered = false; // リセット
+                }
+            }
+        }
+
+        public ObservableCollection<ShortcutSource> ShortcutSettings { get; set; } = new ObservableCollection<ShortcutSource>();
 
         private static string GetKeyString(Key key, ModifierKeys modifierKeys)
         {
@@ -44,7 +88,7 @@ namespace AimAssist.UI.Options
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var modifiedShortcutes = ShortcutSetting.Where(x => x.IsModified);
+            var modifiedShortcutes = ShortcutSettings.Where(x => x.IsModified);
             if (modifiedShortcutes.Any())
             {
                 foreach (var shortcut in modifiedShortcutes)

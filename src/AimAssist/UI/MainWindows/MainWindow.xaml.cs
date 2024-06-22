@@ -8,6 +8,7 @@ using AimAssist.Unit.Implementation.Standard;
 using AimAssist.Unit.Implementation.Web.BookSearch;
 using AimAssist.Unit.Implementation.Web.Urls;
 using AimAssist.WebViewCash;
+using Common;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -19,10 +20,11 @@ using System.Windows.Threading;
 
 namespace AimAssist.UI.MainWindows
 {
-    public partial class MainWindow : INotifyPropertyChanged
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
         private IPickerMode mode = StandardMode.Instance;
+        private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
         public List<IUnitPackage> UsingPackages { get; } = new List<IUnitPackage>();
         public IPickerMode Mode
@@ -78,7 +80,7 @@ namespace AimAssist.UI.MainWindows
             {
                 return true;
             }
-            if(this.mode== UrlMode.Instance || this.mode == BookSearchMode.Instance)
+            if (this.mode == UrlMode.Instance || this.mode == BookSearchMode.Instance)
             {
                 return true;
             }
@@ -95,10 +97,7 @@ namespace AimAssist.UI.MainWindows
 
             return true;
         }
-    }
 
-    public partial class MainWindow : Window
-    {
         public bool IsClosing { get; set; }
 
         DispatcherTimer? typingTimer;
@@ -112,23 +111,25 @@ namespace AimAssist.UI.MainWindows
             //MainWindowCommands.FocusFilterTextBox  = new RelayCommand(this.FocusFilterTextBox);
             this.InitializeComponent();
             this.DataContext = this;
-            
+
             this.UpdateCandidate();
             this.FilterTextBox.Text = UIElementRepository.RescentText;
             this.FilterTextBox.Focus();
-            if(!string.IsNullOrEmpty(this.FilterTextBox.Text))
+            if (!string.IsNullOrEmpty(this.FilterTextBox.Text))
             {
                 this.FilterTextBox.SelectAll();
             }
 
             this.ComboListBox.SelectedIndex = 0;
+
+            PreviewKeyDown += MainWindow_PreviewKeyDown;
         }
 
         private async void UpdateCandidate()
         {
             // packageがあったらPacageから取得する
             var lastPackage = this.UsingPackages.LastOrDefault();
-            if(lastPackage != null)
+            if (lastPackage != null)
             {
                 UnitLists.Clear();
                 foreach (var unit in lastPackage.GetChildren())
@@ -140,18 +141,18 @@ namespace AimAssist.UI.MainWindows
 
             //なければ モードから取得する
             string inputText;
-            if(this.mode != UrlMode.Instance)
+            if (this.mode != UrlMode.Instance)
             {
                 inputText = this.FilterTextBox.Text.Substring(this.mode.Prefix.Length);
             }
             else
             {
-                inputText = this.FilterTextBox.Text;    
+                inputText = this.FilterTextBox.Text;
             }
 
             UnitLists.Clear();
             var units = UnitsService.Instnace.CreateUnits(this.Mode, inputText);
-            await foreach ( var unit in units )
+            await foreach (var unit in units)
             {
                 UnitLists.Add(unit);
             }
@@ -208,7 +209,7 @@ namespace AimAssist.UI.MainWindows
 
                 ExecuteUnit(e);
             }
-            else if(e.Key == Key.Tab)
+            else if (e.Key == Key.Tab)
             {
                 ExecuteUnit(e);
             }
@@ -274,7 +275,7 @@ namespace AimAssist.UI.MainWindows
                     if (this.UsingPackages.Any())
                     {
                         this.UsingPackages.Remove(this.UsingPackages.Last());
-                        var  lastPackage = this.UsingPackages.LastOrDefault();
+                        var lastPackage = this.UsingPackages.LastOrDefault();
                         if (lastPackage == null)
                         {
                             this.Mode = StandardMode.Instance;
@@ -302,7 +303,7 @@ namespace AimAssist.UI.MainWindows
                     Tag = null
                 };
 
-                if(this.mode == BookSearchMode.Instance)
+                if (this.mode == BookSearchMode.Instance)
                 {
                     this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
                 }
@@ -372,13 +373,13 @@ namespace AimAssist.UI.MainWindows
         private GridLength columnWidth = new GridLength(1, GridUnitType.Star);
         private void Expander_Expanded(object sender, RoutedEventArgs e)
         {
-            if(e.Source is System.Windows.Controls.ListBox)
+            if (e.Source is System.Windows.Controls.ListBox)
             {
                 return;
             }
 
             // GridSplitterを可視化
-            if(GridSplitter != null)
+            if (GridSplitter != null)
             {
                 // 前に閉じたときの高さ値が残っていたらそれを復元
                 LeftColumn.Width = columnWidth;
@@ -388,13 +389,13 @@ namespace AimAssist.UI.MainWindows
 
         private void Expander_Collapsed(object sender, RoutedEventArgs e)
         {
-            if(e.Source is System.Windows.Controls.ListBox)
+            if (e.Source is System.Windows.Controls.ListBox)
             {
                 return;
             }
 
             // GridSplitterを非表示に
-            if (GridSplitter != null )
+            if (GridSplitter != null)
             {
                 // 閉じる前の高さを保存し
                 // 高さをAutoに戻す
@@ -411,6 +412,14 @@ namespace AimAssist.UI.MainWindows
         private void FocusFilterTextBox()
         {
             this.FilterTextBox.Focus();
+        }
+
+        private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers))
+            {
+                e.Handled = true;
+            }
         }
     }
 }
