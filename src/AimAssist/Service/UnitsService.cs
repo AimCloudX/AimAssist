@@ -19,6 +19,8 @@ namespace AimAssist.Service
     {
         private static UnitsService? instance;
 
+        private List<IUnit> FavoUnits = new List<IUnit>();
+
         public static UnitsService Instnace
         {
             get

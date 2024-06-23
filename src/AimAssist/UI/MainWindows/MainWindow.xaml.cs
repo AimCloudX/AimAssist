@@ -27,6 +27,7 @@ namespace AimAssist.UI.MainWindows
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
+        public ObservableCollection<IUnit> ActiveUnits { get; } = new ObservableCollection<IUnit>();
         private IPickerMode mode = StandardMode.Instance;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
@@ -92,11 +93,7 @@ namespace AimAssist.UI.MainWindows
            if (ModeList.SelectedItem is IPickerMode mode)
             {
                 this.mode = mode;
-                var units = UnitsService.Instnace.CreateUnits(mode, string.Empty);
-                await foreach (var unit in units)
-                {
-                    UnitLists.Add(unit);
-                }
+                UpdateCandidate();
 
                 UpdateGroupDescription();
                 this.ComboListBox.SelectedIndex = 0;
@@ -175,6 +172,16 @@ namespace AimAssist.UI.MainWindows
             inputText = this.FilterTextBox.Text;
 
             UnitLists.Clear();
+            if(this.mode == EditorMode.Instance)
+            {
+                foreach(var unit in ActiveUnits)
+                {
+                    UnitLists.Add(unit);
+                }
+
+                return;
+            }
+
             var units = UnitsService.Instnace.CreateUnits(this.mode, inputText);
             await foreach (var unit in units)
             {
@@ -207,17 +214,23 @@ namespace AimAssist.UI.MainWindows
         {
             if (e.Key == Key.Enter)
             {
-                if (this.ComboListBox.SelectedItem is SnippetUnit combo)
+                if(this.mode != EditorMode.Instance)
                 {
-                    this.SnippetText = combo.Text;
-                    this.CloseWindow();
-                }
 
-                ExecuteUnit(e);
-            }
-            else if (e.Key == Key.Tab)
-            {
-                ExecuteUnit(e);
+                    if (this.ComboListBox.SelectedItem is IUnit unit)
+                    {
+                        if (!ActiveUnits.Contains(unit))
+                        {
+                            ActiveUnits.Add(unit);
+                        }
+
+                        this.mode = EditorMode.Instance;
+                        UpdateCandidate();
+                        UpdateGroupDescription();
+                        this.ComboListBox.SelectedItem = unit;
+                    }
+
+                }
             }
         }
 

@@ -28,7 +28,7 @@
                 <GridView>
                     <GridViewColumn  Header="Commangs" Width="250"
                                     DisplayMemberBinding="{Binding CommandName}" />
-                    <GridViewColumn  Header="First Key" Width="180" >
+                    <GridViewColumn  Header="Key" Width="180" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
