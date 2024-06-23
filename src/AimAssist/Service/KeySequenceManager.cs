@@ -20,7 +20,7 @@ namespace AimAssist.Service
         {
             var now = DateTime.Now;
 
-            if (IsModifierKeyOnly(key) || IsIgnoredModifierCombination(modifiers))
+            if (IsModifierKeyOnly(key) || IsIgnoredModifierCombination(modifiers) || modifiers == ModifierKeys.None)
             {
                 return false;
             }

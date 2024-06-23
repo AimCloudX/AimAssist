@@ -1,4 +1,6 @@
 ﻿using AimAssist.Unit.Core.Mode;
+using MaterialDesignThemes.Wpf;
+using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Snippets
 {
@@ -6,11 +8,11 @@ namespace AimAssist.Unit.Implementation.Snippets
     {
         private SnippetMode() : base(ModeName) { }
 
+        public override Control Icon => CreateIcon(PackIconKind.Text);
         public const string ModeName = "Snippet";
 
         public static SnippetMode Instance { get; } = new SnippetMode();
 
-        public override string Prefix => "sn ";
 
         public override string Description => "スニペットモード";
     }

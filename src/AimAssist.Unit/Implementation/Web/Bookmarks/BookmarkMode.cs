@@ -1,4 +1,7 @@
 ﻿using AimAssist.Unit.Core.Mode;
+using MaterialDesignThemes.Wpf;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace AimAssist.Unit.Implementation.Web.Bookmarks
 {
@@ -10,7 +13,8 @@ namespace AimAssist.Unit.Implementation.Web.Bookmarks
 
         public static BookmarkMode Instance { get; } = new BookmarkMode();
 
-        public override string Prefix => "bm ";
         public override string Description => "ブックマークのPreview";
+
+        public override Control Icon => CreateIcon(PackIconKind.Link);
     }
 }

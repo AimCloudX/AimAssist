@@ -1,6 +1,7 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Options;
 using AimAssist.Service;
+using AimAssist.UI.MainWindows;
 using AimAssist.UI.SystemTray;
 using AimAssist.UI.Tools.HotKeys;
 using System.IO;

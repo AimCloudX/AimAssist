@@ -32,10 +32,6 @@ namespace AimAssist.UI.PickerWindows
         private bool Filter(object obj)
         {
             var filterText = this.FilterTextBox.Text;
-            if (filterText.StartsWith(this.Mode.Prefix))
-            {
-                filterText = filterText.Substring(this.Mode.Prefix.Length);
-            }
 
             if (string.IsNullOrEmpty(filterText))
             {

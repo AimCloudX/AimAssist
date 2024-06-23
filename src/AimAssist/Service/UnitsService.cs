@@ -35,8 +35,6 @@ namespace AimAssist.Service
 
         public void Initialize()
         {
-            Instnace.RegisterFactory(new ModeChangeUnitsFacotry());
-
             Instnace.RegisterFactory(new ChatGPTUnitsFactory());
             Instnace.RegisterFactory(new SpeechUnitFactory());
 
@@ -74,14 +72,6 @@ namespace AimAssist.Service
         }
         public IPickerMode GetModeFromText(string text)
         {
-            foreach (var mode in AllMode().Where(x => !string.IsNullOrEmpty(x.Prefix)))
-            {
-                if (text.StartsWith(mode.Prefix))
-                {
-                    return mode;
-                }
-            }
-
             return StandardMode.Instance;
         }
 

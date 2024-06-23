@@ -1,4 +1,6 @@
 ﻿using AimAssist.Unit.Core.Mode;
+using MaterialDesignThemes.Wpf;
+using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Standard
 {
@@ -6,12 +8,11 @@ namespace AimAssist.Unit.Implementation.Standard
     {
         private StandardMode() : base(ModeName) { }
 
-        public const string ModeName = "AimAssist";
+        public override Control Icon => CreateIcon(PackIconKind.AllInclusive);
+        public const string ModeName = "AllInclusive";
 
         public static StandardMode Instance { get; } = new StandardMode();
 
-        public override string Prefix => "";
-
-        public override string Description => "モード選択";
+        public override string Description => "";
     }
 }

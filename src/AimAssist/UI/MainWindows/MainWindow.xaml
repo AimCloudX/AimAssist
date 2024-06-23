@@ -38,55 +38,31 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid>
+<Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition  Width="*" x:Name="LeftColumn"/>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition  Width="3*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Expander IsExpanded="true" ExpandDirection="Left" 
-                  Expanded="Expander_Expanded" Collapsed="Expander_Collapsed"  
-                  x:Name="LeftExpander"  HorizontalAlignment="Stretch" Background="DimGray">
-            <Expander.Header>
-                <TextBlock Text="" VerticalAlignment="Center" HorizontalAlignment="Center" Width="3">
-                    <TextBlock.LayoutTransform>
-                        <RotateTransform Angle="90"/>
-                    </TextBlock.LayoutTransform>
-                </TextBlock>
-            </Expander.Header>
-            <Expander.HeaderTemplate>
+        <!-- アイコンカラム -->
+        <ListBox  Grid.Column="0" x:Name="ModeList" SelectionChanged="IconListBox_SelectionChanged">
+            <ListBox.ItemTemplate>
                 <DataTemplate>
+                    <ContentControl Content="{Binding Icon}" ></ContentControl>
                 </DataTemplate>
-            </Expander.HeaderTemplate>
-            <Grid x:Name="Root" HorizontalAlignment="Stretch">
-                <Grid.InputBindings>
-                    <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding AjustWindowCommand}"/>
-                </Grid.InputBindings>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Grid.Column="0" x:Name="PackgeTextBorder" BorderBrush="Gray" BorderThickness="2" Padding="5" Margin="2" Visibility="Collapsed">
-                            <TextBlock  Margin="0,0,5,0" x:Name="PackageText" Visibility="Collapsed"></TextBlock>
-                        </Border>
-                        <TextBox Grid.Column="1" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
-                     InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
-                    </Grid>
-                    <StackPanel x:Name="FilterContents"/>
-                </Grid>
-                <ListBox  Grid.Row="1" x:Name="ComboListBox" 
+        <!-- 項目リスト -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"></TextBox>
+
+                <ListBox  x:Name="ComboListBox"  Grid.Row="1"
                           ItemsSource="{Binding Source={StaticResource GroupedItems}}" 
                           SelectionChanged="ComboListBox_SelectionChanged"
                           VirtualizingPanel.IsVirtualizing="True" 
@@ -163,11 +139,10 @@
                         </Style>
                     </ListBox.ItemContainerStyle>
                 </ListBox>
-            </Grid>
-        </Expander>
-        <GridSplitter x:Name="GridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Stretch"></GridSplitter>
-        <Grid x:Name="Preview" Grid.Column="2">
-
+            
         </Grid>
+
+        <!-- メインコンテンツエリア -->
+        <ContentControl Grid.Column="2" x:Name="MainContent"/>
     </Grid>
 </Window>
