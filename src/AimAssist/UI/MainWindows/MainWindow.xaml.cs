@@ -38,9 +38,9 @@ namespace AimAssist.UI.MainWindows
             this.UpdateCandidate();
             this.ComboListBox.SelectedIndex = 0;
             PreviewKeyDown += MainWindow_PreviewKeyDown;
+            this.FilterTextBox.Focus();
 
-            var aa = new CommandBinding();
-            CommandBinding binding = new CommandBinding(AimAssistCommands.SendUnitCommand, ExecuteReceiveData);
+            var binding = new CommandBinding(AimAssistCommands.SendUnitCommand, ExecuteReceiveData);
             CommandManager.RegisterClassCommandBinding(typeof(Window), binding);
 
         }
