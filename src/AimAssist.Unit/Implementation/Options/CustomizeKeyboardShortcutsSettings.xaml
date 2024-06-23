@@ -6,35 +6,48 @@
              xmlns:local="clr-namespace:AimAssist.UI.Options"
              >
     <Grid>
-    <Grid.RowDefinitions>
-<RowDefinition></RowDefinition>
-<RowDefinition Height="Auto"></RowDefinition>
-    </Grid.RowDefinitions>
-        <ListView ItemsSource="{Binding ShortcutSetting}">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <!--<DataGrid x:Name="ShortcutsDataGrid" AutoGenerateColumns="False" Margin="10" ItemsSource="{Binding ShortcutSetting}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Command" Binding="{Binding CommandName}" Width="*"/>
+                <DataGridTemplateColumn Header="Shortcut" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Gesture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     PreviewKeyDown="ShortcutTextBox_PreviewKeyDown"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>-->
+        <ListView ItemsSource="{Binding ShortcutSettings}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn  Header="Commangs" Width="250"
                                     DisplayMemberBinding="{Binding CommandName}" />
-                    <!--<GridViewColumn Width="60" Header="Shortcut"
-                                    DisplayMemberBinding="{Binding Gesture}" />-->
-                    <GridViewColumn  Header="Shortcut Key" Width="120" >
+                    <GridViewColumn  Header="Key" Width="180" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <TextBox PreviewKeyDown="UIElement_OnPreviewKeyDown" Text="{Binding Path=Gesture, UpdateSourceTrigger=PropertyChanged }" />
+                                    <TextBox Text="{Binding Gesture, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}" LostFocus="ShortcutTextBox_LostFocus"
+                                     PreviewKeyDown="ShortcutTextBox_PreviewKeyDown"/>
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
                     <GridViewColumn  Header="Default"  Width="120" DisplayMemberBinding="{Binding Command.Attribute.DefaultKeyGesture}">
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
 
-<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-    <Button Content="Apply" IsDefault="True" Margin="0,0,10,0" Click="ButtonBase_OnClick"></Button>
-</StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Apply" IsDefault="True" Margin="0,0,10,0" Click="ButtonBase_OnClick"></Button>
+        </StackPanel>
 
     </Grid>
 </UserControl>

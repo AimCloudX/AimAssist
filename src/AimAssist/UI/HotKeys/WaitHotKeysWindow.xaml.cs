@@ -26,16 +26,16 @@ namespace AimAssist.UI.Tools.HotKeys
 
         private void KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler(object sender, KeyGestureUpdatedEventArgs e)
         {
-            this.hotkeyController.Unregister(e.Before.Modifiers, e.Before.Key);
-            this.hotkeyController.Register(e.after.Modifiers, e.after.Key, e.Command);
+            this.hotkeyController.Unregister(e.Before.FirstModifiers, e.Before.FirstKey);
+            this.hotkeyController.Register(e.after.FirstModifiers, e.after.FirstKey, e.Command);
         }
 
         private void RegisterHotKey(string commandName)
         {
             if (CommandService.TryGetKeyGesutre(commandName, out var command, out var keyGesture))
             {
-                    this.hotkeyController.Register(keyGesture.Modifiers,
-                                          keyGesture.Key,
+                    this.hotkeyController.Register(keyGesture.FirstModifiers,
+                                          keyGesture.FirstKey,
                                               command
                                           );
             }

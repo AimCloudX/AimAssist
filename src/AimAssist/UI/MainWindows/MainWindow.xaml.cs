@@ -1,12 +1,17 @@
 ﻿using AimAssist.Combos.Mode.Snippet;
 using AimAssist.Core.Commands;
 using AimAssist.Service;
-using AimAssist.UI.Units;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
+using AimAssist.Unit.Implementation.Knowledge;
+using AimAssist.Unit.Implementation.Options;
+using AimAssist.Unit.Implementation.Snippets;
 using AimAssist.Unit.Implementation.Standard;
+using AimAssist.Unit.Implementation.Web.Bookmarks;
 using AimAssist.Unit.Implementation.Web.BookSearch;
+using AimAssist.Unit.Implementation.Web.Rss;
 using AimAssist.Unit.Implementation.Web.Urls;
+using AimAssist.Unit.Implementation.WorkTools;
 using AimAssist.WebViewCash;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -19,26 +24,88 @@ using System.Windows.Threading;
 
 namespace AimAssist.UI.MainWindows
 {
-    public partial class MainWindow : INotifyPropertyChanged
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
+        public ObservableCollection<IUnit> ActiveUnits { get; } = new ObservableCollection<IUnit>();
         private IPickerMode mode = StandardMode.Instance;
+        private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
-        public List<IUnitPackage> UsingPackages { get; } = new List<IUnitPackage>();
-        public IPickerMode Mode
+        public MainWindow()
         {
-            get { return this.mode; }
-            set
+            InitializeComponent();
+            LoadIcons();
+            this.DataContext = this;
+            this.UpdateCandidate();
+            this.ComboListBox.SelectedIndex = 0;
+            PreviewKeyDown += MainWindow_PreviewKeyDown;
+            this.FilterTextBox.Focus();
+
+            var binding = new CommandBinding(AimAssistCommands.SendUnitCommand, ExecuteReceiveData);
+            CommandManager.RegisterClassCommandBinding(typeof(Window), binding);
+
+        }
+        private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Parameter is UnitsArgs unitsArgs)
             {
-                if (value == this.mode)
+                if (unitsArgs.NeedSetMode)
                 {
-                    return;
+                    if(this.mode != unitsArgs.Mode)
+                    {
+                        this.mode = unitsArgs.Mode;
+                    }
                 }
 
-                this.mode = value;
-                // CollectionViewSourceの取得
+                UpdateCandidate();
                 UpdateGroupDescription();
-                OnPropertyChanged();
+                this.ComboListBox.SelectedIndex = 0;
+
+                foreach (var unit in unitsArgs.Units)
+                {
+                    UnitLists.Add(unit);
+                }
+            }
+        }
+
+        private void LoadIcons()
+        {
+            var icons = new List<IPickerMode>
+        {
+                StandardMode.Instance,
+                EditorMode.Instance,
+                WorkToolsMode.Instance,
+                BookSearchMode.Instance,
+                BookmarkMode.Instance,
+                OptionMode.Instance,
+                CalculationMode.Instance,
+                RssMode.Instance,
+                SnippetMode.Instance,
+                KnowledgeMode.Instance,
+        };
+
+            ModeList.ItemsSource = icons;
+        }
+
+        private async void IconListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UnitLists.Clear();
+           if (ModeList.SelectedItem is IPickerMode mode)
+            {
+                this.mode = mode;
+                UpdateCandidate();
+
+                UpdateGroupDescription();
+                this.ComboListBox.SelectedIndex = 0;
+            }
+        }
+
+        private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.ComboListBox.SelectedItem is IUnit combo)
+            {
+                var uiElement = combo.GetOrCreateUiElemnt();
+                this.MainContent.Content = uiElement;
             }
         }
 
@@ -51,7 +118,7 @@ namespace AimAssist.UI.MainWindows
                 groupedItems.GroupDescriptions.Clear();
                 if (this.mode == StandardMode.Instance)
                 {
-                    groupedItems.GroupDescriptions.Add(new CustomGroupDescription());
+                    groupedItems.GroupDescriptions.Add(new PropertyGroupDescription("Mode.Name"));
                 }
                 else
                 {
@@ -66,19 +133,16 @@ namespace AimAssist.UI.MainWindows
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
         private bool Filter(object obj)
         {
             var filterText = this.FilterTextBox.Text;
-            if (filterText.StartsWith(this.mode.Prefix))
-            {
-                filterText = filterText.Substring(this.mode.Prefix.Length);
-            }
 
             if (string.IsNullOrEmpty(filterText))
             {
                 return true;
             }
-            if(this.mode== UrlMode.Instance || this.mode == BookSearchMode.Instance)
+            if (this.mode == UrlMode.Instance || this.mode == BookSearchMode.Instance)
             {
                 return true;
             }
@@ -86,7 +150,6 @@ namespace AimAssist.UI.MainWindows
             var combo = obj as IUnit;
             if (combo != null)
             {
-
                 if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
@@ -95,10 +158,7 @@ namespace AimAssist.UI.MainWindows
 
             return true;
         }
-    }
 
-    public partial class MainWindow : Window
-    {
         public bool IsClosing { get; set; }
 
         DispatcherTimer? typingTimer;
@@ -106,52 +166,24 @@ namespace AimAssist.UI.MainWindows
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public MainWindow()
-        {
-            //MainWindowCommands.FocusPreview  = new RelayCommand(this.FocusPreview);
-            //MainWindowCommands.FocusFilterTextBox  = new RelayCommand(this.FocusFilterTextBox);
-            this.InitializeComponent();
-            this.DataContext = this;
-            
-            this.UpdateCandidate();
-            this.FilterTextBox.Text = UIElementRepository.RescentText;
-            this.FilterTextBox.Focus();
-            if(!string.IsNullOrEmpty(this.FilterTextBox.Text))
-            {
-                this.FilterTextBox.SelectAll();
-            }
-
-            this.ComboListBox.SelectedIndex = 0;
-        }
-
         private async void UpdateCandidate()
         {
-            // packageがあったらPacageから取得する
-            var lastPackage = this.UsingPackages.LastOrDefault();
-            if(lastPackage != null)
+            string inputText;
+            inputText = this.FilterTextBox.Text;
+
+            UnitLists.Clear();
+            if(this.mode == EditorMode.Instance)
             {
-                UnitLists.Clear();
-                foreach (var unit in lastPackage.GetChildren())
+                foreach(var unit in ActiveUnits)
                 {
                     UnitLists.Add(unit);
                 }
+
                 return;
             }
 
-            //なければ モードから取得する
-            string inputText;
-            if(this.mode != UrlMode.Instance)
-            {
-                inputText = this.FilterTextBox.Text.Substring(this.mode.Prefix.Length);
-            }
-            else
-            {
-                inputText = this.FilterTextBox.Text;    
-            }
-
-            UnitLists.Clear();
-            var units = UnitsService.Instnace.CreateUnits(this.Mode, inputText);
-            await foreach ( var unit in units )
+            var units = UnitsService.Instnace.CreateUnits(this.mode, inputText);
+            await foreach (var unit in units)
             {
                 UnitLists.Add(unit);
             }
@@ -170,24 +202,6 @@ namespace AimAssist.UI.MainWindows
                 return;
             }
 
-            if (!UsingPackages.Any())
-            {
-                var resentMode = this.mode;
-                var mode = UnitsService.Instnace.GetModeFromText(this.FilterTextBox.Text);
-                if (mode == resentMode)
-                {
-                    if (mode == BookSearchMode.Instance)
-                    {
-                        UpdateCandidate();
-                    }
-                }
-                else
-                {
-                    this.Mode = mode;
-                    this.UpdateCandidate();
-                }
-            }
-
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
             view.Filter = this.Filter;
             this.typingTimer = null;
@@ -200,32 +214,28 @@ namespace AimAssist.UI.MainWindows
         {
             if (e.Key == Key.Enter)
             {
-                if (this.ComboListBox.SelectedItem is SnippetUnit combo)
+                if(this.mode != EditorMode.Instance)
                 {
-                    this.SnippetText = combo.Text;
-                    this.CloseWindow();
-                }
 
-                ExecuteUnit(e);
-            }
-            else if(e.Key == Key.Tab)
-            {
-                ExecuteUnit(e);
+                    if (this.ComboListBox.SelectedItem is IUnit unit)
+                    {
+                        if (!ActiveUnits.Contains(unit))
+                        {
+                            ActiveUnits.Add(unit);
+                        }
+
+                        this.mode = EditorMode.Instance;
+                        UpdateCandidate();
+                        UpdateGroupDescription();
+                        this.ComboListBox.SelectedItem = unit;
+                    }
+
+                }
             }
         }
 
         private void ExecuteUnit(System.Windows.Input.KeyEventArgs e)
         {
-            if (this.ComboListBox.SelectedItem is ModeChangeUnit mode)
-            {
-                // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
-                var currentText = this.FilterTextBox.Text;
-                this.FilterTextBox.Text = mode.Text;
-                FilterTextBox.CaretIndex = FilterTextBox.Text.Length;
-                e.Handled = true;
-                return;
-            }
-
             if (this.ComboListBox.SelectedItem is ICommandUnit command)
             {
                 command.Execute();
@@ -233,23 +243,23 @@ namespace AimAssist.UI.MainWindows
                 return;
             }
 
-            if (this.ComboListBox.SelectedItem is IUnitPackage package)
-            {
-                // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
-                var currentText = this.FilterTextBox.Text;
-                this.FilterTextBox.Text = string.Empty;
+            //if (this.ComboListBox.SelectedItem is IUnitPackage package)
+            //{
+            //    // TODO modeの切り替えをショートカットキーでできるようにした際に、Text部分をどうするのか
+            //    var currentText = this.FilterTextBox.Text;
+            //    this.FilterTextBox.Text = string.Empty;
 
-                UsingPackages.Add(package);
-                this.Mode = package.Mode;
-                this.PackageText.Text = package.Name;
-                this.PackageText.Visibility = Visibility.Visible;
-                this.PackgeTextBorder.Visibility = Visibility.Visible;
-                UpdateCandidate();
+            //    UsingPackages.Add(package);
+            //    this.Mode = package.Mode;
+            //    this.PackageText.Text = package.Name;
+            //    this.PackageText.Visibility = Visibility.Visible;
+            //    this.PackgeTextBorder.Visibility = Visibility.Visible;
+            //    UpdateCandidate();
 
-                e.Handled = true;
+            //    e.Handled = true;
 
-                return;
-            }
+            //    return;
+            //}
         }
 
         private void TextBox_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -269,23 +279,6 @@ namespace AimAssist.UI.MainWindows
             }
             else if (e.Key == Key.Back)
             {
-                if (string.IsNullOrEmpty(this.FilterTextBox.Text))
-                {
-                    if (this.UsingPackages.Any())
-                    {
-                        this.UsingPackages.Remove(this.UsingPackages.Last());
-                        var  lastPackage = this.UsingPackages.LastOrDefault();
-                        if (lastPackage == null)
-                        {
-                            this.Mode = StandardMode.Instance;
-                            PackgeTextBorder.Visibility = Visibility.Collapsed;
-                            this.PackageText.Visibility = Visibility.Collapsed;
-                            this.PackageText.Text = string.Empty;
-                        }
-
-                        UpdateCandidate();
-                    }
-                }
             }
 
             this.ComboListBox.ScrollIntoView(this.ComboListBox.SelectedItem);
@@ -302,7 +295,7 @@ namespace AimAssist.UI.MainWindows
                     Tag = null
                 };
 
-                if(this.mode == BookSearchMode.Instance)
+                if (this.mode == BookSearchMode.Instance)
                 {
                     this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
                 }
@@ -316,17 +309,6 @@ namespace AimAssist.UI.MainWindows
 
             this.typingTimer.Stop(); // Resets the timer
             this.typingTimer.Start();
-        }
-
-        private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (this.ComboListBox.SelectedItem is IUnit combo)
-            {
-                this.Preview.Children.Clear();
-
-                var uiElement = combo.GetOrCreateUiElemnt();
-                this.Preview.Children.Add(uiElement);
-            }
         }
 
         private void CloseWindow()
@@ -344,15 +326,6 @@ namespace AimAssist.UI.MainWindows
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateGroupDescription();
-            if (this.ComboListBox.SelectedItem is IUnit combo)
-            {
-                this.Preview.Children.Clear();
-
-                var uiElement = combo.GetOrCreateUiElemnt();
-                this.Preview.Children.Add(uiElement);
-            }
-
-            OnPropertyChanged(nameof(AjustWindowCommand));
 
             this.Activate();
             this.Focus();
@@ -367,50 +340,12 @@ namespace AimAssist.UI.MainWindows
         {
         }
 
-        public ICommand AjustWindowCommand { get; set; }
-
-        private GridLength columnWidth = new GridLength(1, GridUnitType.Star);
-        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if(e.Source is System.Windows.Controls.ListBox)
+            if(_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers))
             {
-                return;
+                e.Handled = true;
             }
-
-            // GridSplitterを可視化
-            if(GridSplitter != null)
-            {
-                // 前に閉じたときの高さ値が残っていたらそれを復元
-                LeftColumn.Width = columnWidth;
-                GridSplitter.Visibility = Visibility.Visible;
-            }
-        }
-
-        private void Expander_Collapsed(object sender, RoutedEventArgs e)
-        {
-            if(e.Source is System.Windows.Controls.ListBox)
-            {
-                return;
-            }
-
-            // GridSplitterを非表示に
-            if (GridSplitter != null )
-            {
-                // 閉じる前の高さを保存し
-                // 高さをAutoに戻す
-                columnWidth = LeftColumn.Width;
-                LeftColumn.Width = GridLength.Auto;
-                GridSplitter.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private void FocusPreview()
-        {
-            this.Preview.Focus();
-        }
-        private void FocusFilterTextBox()
-        {
-            this.FilterTextBox.Focus();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Options;
 using AimAssist.Service;
+using AimAssist.UI.MainWindows;
 using AimAssist.UI.SystemTray;
 using AimAssist.UI.Tools.HotKeys;
 using System.IO;
@@ -64,9 +65,9 @@ namespace AimAssist
             EditorOptionService.LoadOption();
             SystemTrayRegister.Register();
             UnitsService.Instnace.Initialize();
-            CommandService.Register(AppCommands.ToggleMainWindow, "Alt+A");
-            CommandService.Register(AppCommands.ShowPickerWindow, "Alt+P");
-            CommandService.Register(AppCommands.ShutdownAimAssist, string.Empty);
+            CommandService.Register(AppCommands.ToggleMainWindow, new Common.KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
+            CommandService.Register(AppCommands.ShowPickerWindow, new Common.KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
+            CommandService.Register(AppCommands.ShutdownAimAssist, new Common.KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
             SettingsManager = new SettingManager();
             var settings = SettingsManager.LoadSettings();
             CommandService.SetKeymap(settings);
