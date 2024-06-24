@@ -133,12 +133,12 @@ namespace AimAssist.UI.MainWindows
                 EditorMode.Instance,
                 WorkToolsMode.Instance,
                 BookSearchMode.Instance,
-                BookmarkMode.Instance,
-                OptionMode.Instance,
-                CalculationMode.Instance,
                 RssMode.Instance,
                 SnippetMode.Instance,
                 KnowledgeMode.Instance,
+                OptionMode.Instance,
+                //BookmarkMode.Instance,
+                //CalculationMode.Instance,
         };
 
             ModeList.ItemsSource = icons;
