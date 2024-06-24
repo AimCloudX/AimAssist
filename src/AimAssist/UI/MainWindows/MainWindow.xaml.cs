@@ -28,14 +28,17 @@ namespace AimAssist.UI.MainWindows
     {
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
         public ObservableCollection<IUnit> ActiveUnits { get; } = new ObservableCollection<IUnit>();
-        private IPickerMode mode = StandardMode.Instance;
+        private IPickerMode mode;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
         public MainWindow()
         {
             InitializeComponent();
+            RegisterCommands();
+
             LoadIcons();
             this.DataContext = this;
+            this.ModeList.SelectedItem = StandardMode.Instance;
             this.UpdateCandidate();
             this.ComboListBox.SelectedIndex = 0;
             PreviewKeyDown += MainWindow_PreviewKeyDown;
@@ -45,13 +48,67 @@ namespace AimAssist.UI.MainWindows
             CommandManager.RegisterClassCommandBinding(typeof(Window), binding);
 
         }
+
+        private void RegisterCommands()
+        {
+            ChangeMode.FavoriteMode = new RelayCommand(nameof(ChangeMode.FavoriteMode), () =>
+            {
+
+                this.ModeList.SelectedItem = EditorMode.Instance;
+            });
+            ChangeMode.AllInclusiveMode = new RelayCommand(nameof(ChangeMode.AllInclusiveMode), () =>
+            {
+                this.ModeList.SelectedItem = StandardMode.Instance;
+            });
+            ChangeMode.BookSearchMode = new RelayCommand(nameof(ChangeMode.BookSearchMode), () =>
+            {
+                this.ModeList.SelectedItem = BookSearchMode.Instance;
+            });
+            ChangeMode.KeyboardShortcut = new RelayCommand(nameof(ChangeMode.KeyboardShortcut), () =>
+            {
+                this.ModeList.SelectedItem = OptionMode.Instance;
+                this.ComboListBox.SelectedItem = this.ComboListBox.Items.OfType<KeyboardShortcutsOptionUnit>().FirstOrDefault();
+            });
+            ChangeMode.NextMode = new RelayCommand(nameof(ChangeMode.NextMode), () =>
+            {
+                var index = this.ModeList.SelectedIndex;
+                if (index == this.ModeList.Items.Count - 1)
+                {
+                    this.ModeList.SelectedIndex = 0;
+                }
+                else
+                {
+                    this.ModeList.SelectedIndex = index + 1;
+                }
+            });
+            ChangeMode.PreviousMode = new RelayCommand(nameof(ChangeMode.PreviousMode), () =>
+            {
+                var index = this.ModeList.SelectedIndex;
+                if (index == 0)
+                {
+                    this.ModeList.SelectedIndex = this.ModeList.Items.Count - 1;
+                }
+                else
+                {
+                    this.ModeList.SelectedIndex = index - 1;
+                }
+            });
+
+            CommandService.Register(ChangeMode.FavoriteMode, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.K, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.AllInclusiveMode, new Common.KeySequence(Key.L, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.BookSearchMode, new Common.KeySequence(Key.B, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.KeyboardShortcut, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.S, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.NextMode, new Common.KeySequence(Key.N, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.PreviousMode, new Common.KeySequence(Key.P, ModifierKeys.Control));
+        }
+
         private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
         {
             if (e.Parameter is UnitsArgs unitsArgs)
             {
                 if (unitsArgs.NeedSetMode)
                 {
-                    if(this.mode != unitsArgs.Mode)
+                    if (this.mode != unitsArgs.Mode)
                     {
                         this.mode = unitsArgs.Mode;
                     }
@@ -90,7 +147,7 @@ namespace AimAssist.UI.MainWindows
         private async void IconListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UnitLists.Clear();
-           if (ModeList.SelectedItem is IPickerMode mode)
+            if (ModeList.SelectedItem is IPickerMode mode)
             {
                 this.mode = mode;
                 UpdateCandidate();
@@ -172,9 +229,9 @@ namespace AimAssist.UI.MainWindows
             inputText = this.FilterTextBox.Text;
 
             UnitLists.Clear();
-            if(this.mode == EditorMode.Instance)
+            if (this.mode == EditorMode.Instance)
             {
-                foreach(var unit in ActiveUnits)
+                foreach (var unit in ActiveUnits)
                 {
                     UnitLists.Add(unit);
                 }
@@ -214,7 +271,7 @@ namespace AimAssist.UI.MainWindows
         {
             if (e.Key == Key.Enter)
             {
-                if(this.mode != EditorMode.Instance)
+                if (this.mode != EditorMode.Instance)
                 {
 
                     if (this.ComboListBox.SelectedItem is IUnit unit)
@@ -342,7 +399,7 @@ namespace AimAssist.UI.MainWindows
 
         private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if(_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers))
+            if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers))
             {
                 e.Handled = true;
             }
