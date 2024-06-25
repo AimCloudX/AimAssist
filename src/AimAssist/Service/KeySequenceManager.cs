@@ -77,6 +77,7 @@ namespace AimAssist.Service
 
         private bool IsIgnoredModifierCombination(ModifierKeys modifiers)
         {
+            return false;
             // Ctrl+Alt の組み合わせを無視
             if ((modifiers & ModifierKeys.Control) != 0 && (modifiers & ModifierKeys.Alt) != 0)
             {

@@ -35,7 +35,7 @@ namespace AimAssist.UI.MainWindows
             this.ModeList.SelectedItem = AllInclusiveMode.Instance;
             this.UpdateCandidate();
             this.ComboListBox.SelectedIndex = 0;
-            PreviewKeyDown += MainWindow_PreviewKeyDown;
+            KeyDown += MainWindow_PreviewKeyDown;
             this.FilterTextBox.Focus();
 
             var binding = new CommandBinding(AimAssistCommands.SendUnitCommand, ExecuteReceiveData);
@@ -56,6 +56,7 @@ namespace AimAssist.UI.MainWindows
                 this.ModeList.SelectedItem = OptionMode.Instance;
                 this.ComboListBox.SelectedItem = this.ComboListBox.Items.OfType<KeyboardShortcutsOptionUnit>().FirstOrDefault();
             });
+
             ChangeMode.NextMode = new RelayCommand(nameof(ChangeMode.NextMode), () =>
             {
                 var index = this.ModeList.SelectedIndex;
@@ -80,10 +81,36 @@ namespace AimAssist.UI.MainWindows
                     this.ModeList.SelectedIndex = index - 1;
                 }
             });
+            ChangeMode.NextUnit = new RelayCommand(nameof(ChangeMode.NextUnit), () =>
+            {
+                var index = this.ComboListBox.SelectedIndex;
+                if (index == this.ComboListBox.Items.Count - 1)
+                {
+                    this.ComboListBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    this.ComboListBox.SelectedIndex = index + 1;
+                }
+            });
+            ChangeMode.PreviousUnit = new RelayCommand(nameof(ChangeMode.PreviousUnit), () =>
+            {
+                var index = this.ComboListBox.SelectedIndex;
+                if (index == 0)
+                {
+                    this.ComboListBox.SelectedIndex = this.ComboListBox.Items.Count - 1;
+                }
+                else
+                {
+                    this.ComboListBox.SelectedIndex = index - 1;
+                }
+            });
 
             CommandService.Register(ChangeMode.KeyboardShortcut, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.S, ModifierKeys.Control));
-            CommandService.Register(ChangeMode.NextMode, new Common.KeySequence(Key.N, ModifierKeys.Control));
-            CommandService.Register(ChangeMode.PreviousMode, new Common.KeySequence(Key.P, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.NextMode, new Common.KeySequence(Key.N, ModifierKeys.Control|ModifierKeys.Shift));
+            CommandService.Register(ChangeMode.PreviousMode, new Common.KeySequence(Key.P, ModifierKeys.Control|ModifierKeys.Shift));
+            CommandService.Register(ChangeMode.NextUnit, new Common.KeySequence(Key.N, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.PreviousUnit, new Common.KeySequence(Key.P, ModifierKeys.Control));
         }
 
         private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
@@ -367,6 +394,7 @@ namespace AimAssist.UI.MainWindows
 
         private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
+
             if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers))
             {
                 e.Handled = true;

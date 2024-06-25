@@ -63,6 +63,9 @@ namespace AimAssist.UI.Options
                     _isFirstKeyEntered = false; // リセット
                 }
             }
+            else{
+
+            }
         }
 
         public ObservableCollection<ShortcutSource> ShortcutSettings { get; set; } = new ObservableCollection<ShortcutSource>();

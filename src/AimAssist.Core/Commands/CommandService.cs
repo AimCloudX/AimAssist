@@ -80,7 +80,7 @@ namespace AimAssist.Core.Commands
 
             if (keymap.TryGetValue(command.CommandName, out _))
             {
-                keymap[command.CommandName] = defaultKeyMap;
+                //keymap[command.CommandName] = defaultKeyMap;
             }
             else
             {

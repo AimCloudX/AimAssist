@@ -12,5 +12,7 @@ namespace AimAssist.Core.Commands
             public static RelayCommand KeyboardShortcut { get; set; }
             public static RelayCommand NextMode { get; set; }
             public static RelayCommand PreviousMode { get; set; }
+            public static RelayCommand NextUnit { get; set; }
+            public static RelayCommand PreviousUnit { get; set; }
         }
 }
