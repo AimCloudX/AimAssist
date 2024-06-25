@@ -7,7 +7,7 @@ namespace ClipboardAnalyzer
 {
     public class ClipboardUnitsFacotry : IUnitsFacotry
     {
-        public IPickerMode TargetMode => WorkToolsMode.Instance;
+        public IMode TargetMode => WorkToolsMode.Instance;
 
         public bool IsShowInStnadard => true;
 

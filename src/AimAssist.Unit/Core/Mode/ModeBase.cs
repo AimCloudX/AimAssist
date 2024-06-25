@@ -1,24 +1,27 @@
-﻿using MaterialDesignThemes.Wpf;
-using System.Drawing.Printing;
+﻿using AimAssist.UI;
+using Common;
+using MaterialDesignThemes.Wpf;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Xml.Linq;
 
 namespace AimAssist.Unit.Core.Mode
 {
-    public abstract class PikcerModeBase : IPickerMode
+    public abstract class ModeBase : IMode
     {
-        protected PikcerModeBase(string name)
+        protected ModeBase(string name)
         {
             Name = name;
         }
 
-
-
         public string Name { get; }
+
+        public string ImplementationClassName => GetType().Name;
+
+        public virtual RelayCommand ModeChangeCommand { get; private set; }
+
+        public virtual KeySequence DefaultKeySequence => KeySequence.None;
 
         public virtual string Description => string.Empty;
 
@@ -26,9 +29,16 @@ namespace AimAssist.Unit.Core.Mode
 
         public abstract Control Icon { get; }
 
+        public virtual void SetModeChangeCommandAction(Action action)
+        {
+            Debug.Assert(this.ModeChangeCommand == null, "Command登録済み");
+            var commandName = $"{GetImplementationClassName()}.ChangeMode";
+            this.ModeChangeCommand = new RelayCommand(commandName, action);
+        }
+
         public override bool Equals(object? obj)
         {
-            if (obj is IPickerMode pickerMode)
+            if (obj is IMode pickerMode)
             {
                 return Name.Equals(pickerMode.Name, StringComparison.OrdinalIgnoreCase);
             }
@@ -39,6 +49,11 @@ namespace AimAssist.Unit.Core.Mode
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        protected string GetImplementationClassName()
+        {
+            return this.GetType().Name;
         }
 
 

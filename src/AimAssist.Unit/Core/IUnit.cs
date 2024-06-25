@@ -8,7 +8,7 @@ namespace AimAssist.Unit.Core
     {
         BitmapImage Icon { get; }
 
-        IPickerMode Mode { get; }
+        IMode Mode { get; }
         string Category { get; }
 
         string Name { get; }

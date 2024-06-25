@@ -6,7 +6,7 @@ namespace AimAssist.Unit.Implementation.Snippets
 {
     public class SnippetUnitsFactory : IUnitsFacotry
     {
-        public IPickerMode TargetMode => SnippetMode.Instance;
+        public IMode TargetMode => SnippetMode.Instance;
 
         public bool IsShowInStnadard => true;
 

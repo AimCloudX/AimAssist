@@ -11,7 +11,7 @@ namespace AimAssist.Unit.Implementation.Commands
     {
         public BitmapImage Icon => new BitmapImage();
 
-        public IPickerMode Mode => StandardMode.Instance;
+        public IMode Mode => AllInclusiveMode.Instance;
 
         public string Category => string.Empty;
 

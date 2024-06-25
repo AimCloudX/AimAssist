@@ -19,7 +19,7 @@ namespace AimAssist.Unit.Implementation.Knoledges
 
         public BitmapImage Icon =>new BitmapImage();
 
-        public IPickerMode Mode => KnowledgeMode.Instance;
+        public IMode Mode => KnowledgeMode.Instance;
 
         public string Category => Directory.Parent.Name;
 

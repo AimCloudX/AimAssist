@@ -5,7 +5,7 @@ namespace AimAssist.Unit.Implementation.Options
 {
     public class OptionUnitsFactory : IUnitsFacotry
     {
-        public IPickerMode TargetMode => OptionMode.Instance;
+        public IMode TargetMode => OptionMode.Instance;
 
         public bool IsShowInStnadard => true;
 

@@ -5,7 +5,7 @@ namespace AimAssist.Unit.Implementation.Web.Urls
 {
     public class UrlUnitsFacotry : IUnitsFacotry
     {
-        public IPickerMode TargetMode => UrlMode.Instance;
+        public IMode TargetMode => UrlMode.Instance;
 
         public bool IsShowInStnadard => false;
 

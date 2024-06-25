@@ -9,7 +9,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Options
 {
-    public class OptionMode : PikcerModeBase
+    public class OptionMode : ModeBase
     {
         private OptionMode() : base(ModeName)
         {

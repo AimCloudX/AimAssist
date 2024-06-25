@@ -14,7 +14,7 @@ namespace AimAssist.Unit.Implementation.Web.Rss
     {
         public BitmapImage Icon => new BitmapImage();
 
-        public IPickerMode Mode => RssMode.Instance;
+        public IMode Mode => RssMode.Instance;
 
         public string Category => string.Empty;
 

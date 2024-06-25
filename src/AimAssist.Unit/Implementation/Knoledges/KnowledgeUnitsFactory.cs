@@ -10,7 +10,7 @@ namespace AimAssist.Unit.Implementation.Knoledges
     {
         public bool IsShowInStnadard => true;
 
-        public IPickerMode TargetMode => KnowledgeMode.Instance;
+        public IMode TargetMode => KnowledgeMode.Instance;
 
         public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {

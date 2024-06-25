@@ -22,7 +22,7 @@ namespace AimAssist.Unit.Implementation.Web.Urls
 
         public WebViewPreviewFactory PreviewFactory { get; } = new WebViewPreviewFactory();
 
-        public IPickerMode Mode => UrlMode.Instance;
+        public IMode Mode => UrlMode.Instance;
 
         public string Category { get; }
 

@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Web.Urls
 {
-    public class UrlMode : PikcerModeBase
+    public class UrlMode : ModeBase
     {
         private UrlMode() : base(ModeName) { }
         public override Control Icon => CreateIcon(PackIconKind.Link);

@@ -23,7 +23,7 @@ namespace AimAssist.Combos.Mode.Wiki
 
         public string Path => fileInfo.FullName;
 
-        public IPickerMode Mode => KnowledgeMode.Instance;
+        public IMode Mode => KnowledgeMode.Instance;
 
         public string Category => string.Empty;
 

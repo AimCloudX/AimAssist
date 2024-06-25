@@ -6,7 +6,7 @@ namespace AimAssist.Unit.Implementation.Commands
 {
     public class AppCommandUnitFactory : IUnitsFacotry
     {
-        public IPickerMode TargetMode => StandardMode.Instance;
+        public IMode TargetMode => AllInclusiveMode.Instance;
 
         public bool IsShowInStnadard => true;
 

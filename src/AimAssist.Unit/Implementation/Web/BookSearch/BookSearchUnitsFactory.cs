@@ -5,7 +5,7 @@ namespace AimAssist.Unit.Implementation.Web.BookSearch
 {
     public class BookSearchUnitsFactory : IUnitsFacotry
     {
-        public IPickerMode TargetMode => BookSearchMode.Instance;
+        public IMode TargetMode => BookSearchMode.Instance;
 
         public bool IsShowInStnadard => true;
 

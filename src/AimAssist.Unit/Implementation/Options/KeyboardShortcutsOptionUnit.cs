@@ -11,7 +11,7 @@ namespace AimAssist.Unit.Implementation.Options
     {
         public BitmapImage Icon => Constants.AimAssistIco;
 
-        public IPickerMode Mode => OptionMode.Instance;
+        public IMode Mode => OptionMode.Instance;
 
         public string Category => string.Empty;
 

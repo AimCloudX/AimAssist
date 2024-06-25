@@ -8,7 +8,7 @@ namespace AimAssist.Unit.Implementation.Web.Bookmarks
 {
     public class BookmarkUnitsFacotry : IUnitsFacotry
     {
-        public IPickerMode TargetMode => BookmarkMode.Instance;
+        public IMode TargetMode => BookmarkMode.Instance;
 
         public bool IsShowInStnadard => false;
 

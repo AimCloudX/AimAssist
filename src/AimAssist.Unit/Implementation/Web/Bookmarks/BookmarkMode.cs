@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 
 namespace AimAssist.Unit.Implementation.Web.Bookmarks
 {
-    public class BookmarkMode : PikcerModeBase
+    public class BookmarkMode : ModeBase
     {
         private BookmarkMode() : base(ModeName) { }
 

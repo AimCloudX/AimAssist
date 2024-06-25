@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Snippets
 {
-    public class SnippetMode : PikcerModeBase
+    public class SnippetMode : ModeBase
     {
         private SnippetMode() : base(ModeName) { }
 

@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.WorkTools
 {
-    public class WorkToolsMode : PikcerModeBase
+    public class WorkToolsMode : ModeBase
     {
         private WorkToolsMode() : base(ModeName) { }
 

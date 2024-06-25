@@ -22,7 +22,7 @@ namespace AimAssist.Combos.Mode.Snippet
 
         public string Code => this.Text;
 
-        public IPickerMode Mode => SnippetMode.Instance;
+        public IMode Mode => SnippetMode.Instance;
 
         public string Category { get; }
 

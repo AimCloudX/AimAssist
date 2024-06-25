@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Web.Rss
 {
-    public class RssMode : PikcerModeBase
+    public class RssMode : ModeBase
     {
         private RssMode() : base(ModeName)
         {

@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Core.Mode
 {
-    public class CalculationMode : PikcerModeBase
+    public class CalculationMode : ModeBase
     {
         private CalculationMode() : base(ModeName) { }
 

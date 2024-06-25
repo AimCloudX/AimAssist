@@ -4,7 +4,7 @@ namespace AimAssist.Unit.Core
 {
     public interface IUnitsFacotry
     {
-        IPickerMode TargetMode { get; }
+        IMode TargetMode { get; }
         IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater);
         bool IsShowInStnadard { get; }
     }

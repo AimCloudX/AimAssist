@@ -5,7 +5,7 @@ namespace AimAssist.Unit.Implementation.Web.Rss
 {
     public class RssUnitsFactory : IUnitsFacotry
     {
-        public IPickerMode TargetMode => RssMode.Instance;
+        public IMode TargetMode => RssMode.Instance;
 
         public bool IsShowInStnadard => true;
 

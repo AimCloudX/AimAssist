@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Knowledge
 {
-    public class KnowledgeMode : PikcerModeBase
+    public class KnowledgeMode : ModeBase
     {
         private KnowledgeMode() : base(ModeName) { }
         public override Control Icon => CreateIcon(PackIconKind.Wikipedia);

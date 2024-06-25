@@ -14,7 +14,7 @@ namespace AimAssist.Unit.Implementation.Web.BookSearch
     {
         public BitmapImage Icon => new BitmapImage();
 
-        public IPickerMode Mode => BookSearchMode.Instance;
+        public IMode Mode => BookSearchMode.Instance;
 
         public string Category => string.Empty;
 

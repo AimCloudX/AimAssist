@@ -21,7 +21,7 @@ namespace AimAssist.UI.PickerWindows
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
 
         public List<IUnitPackage> UsingPackages { get; } = new List<IUnitPackage>();
-        public IPickerMode Mode { get; set; }
+        public IMode Mode { get; set; }
 
         public string SnippetText { get; set; } = string.Empty;
 

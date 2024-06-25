@@ -158,14 +158,14 @@ namespace AimAssist.Unit.Implementation.Web.BookSearch
 
     public class UnitsArgs
     {
-        public UnitsArgs(IPickerMode mode, IEnumerable<IUnit> units, bool needSetMode)
+        public UnitsArgs(IMode mode, IEnumerable<IUnit> units, bool needSetMode)
         {
             Mode = mode;
             Units = units;
             NeedSetMode = needSetMode;
         }
 
-        public IPickerMode Mode { get; }
+        public IMode Mode { get; }
         public IEnumerable<IUnit> Units { get; }
         public bool NeedSetMode { get; }
     }

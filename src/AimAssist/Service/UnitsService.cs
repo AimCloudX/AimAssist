@@ -3,6 +3,7 @@ using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
 using AimAssist.Unit.Implementation.Commands;
 using AimAssist.Unit.Implementation.Knoledges;
+using AimAssist.Unit.Implementation.Knowledge;
 using AimAssist.Unit.Implementation.Options;
 using AimAssist.Unit.Implementation.Snippets;
 using AimAssist.Unit.Implementation.Speech;
@@ -12,6 +13,7 @@ using AimAssist.Unit.Implementation.Web.BookSearch;
 using AimAssist.Unit.Implementation.Web.Rss;
 using AimAssist.Unit.Implementation.Web.Urls;
 using AimAssist.Unit.Implementation.WorkTools;
+using System.Diagnostics;
 
 namespace AimAssist.Service
 {
@@ -20,6 +22,17 @@ namespace AimAssist.Service
         private static UnitsService? instance;
 
         private List<IUnit> FavoUnits = new List<IUnit>();
+        private List<IMode> modes = new List<IMode>();
+
+        public void Register(IMode mode)
+        {
+            modes.Add(mode);
+        }
+
+        public IReadOnlyCollection<IMode> GetAllModes()
+        {
+            return modes;
+        }
 
         public static UnitsService Instnace
         {
@@ -37,6 +50,15 @@ namespace AimAssist.Service
 
         public void Initialize()
         {
+            Register(AllInclusiveMode.Instance);
+            Register(ActiveUnitMode.Instance);
+            Register(WorkToolsMode.Instance);
+            Register(BookSearchMode.Instance);
+            Register(RssMode.Instance);
+            Register(SnippetMode.Instance);
+            Register(KnowledgeMode.Instance);
+            Register(OptionMode.Instance);
+
             Instnace.RegisterFactory(new ChatGPTUnitsFactory());
             Instnace.RegisterFactory(new SpeechUnitFactory());
 
@@ -68,21 +90,21 @@ namespace AimAssist.Service
             factories.Add(factory);
         }
 
-        public IEnumerable<IPickerMode> AllMode()
+        public IEnumerable<IMode> AllMode()
         {
             return this.factories.Select(x=>x.TargetMode).Distinct().ToList();
         }
-        public IPickerMode GetModeFromText(string text)
+        public IMode GetModeFromText(string text)
         {
-            return StandardMode.Instance;
+            return AllInclusiveMode.Instance;
         }
 
-        public async IAsyncEnumerable<IUnit> CreateUnits(IPickerMode mode, string inputText)
+        public async IAsyncEnumerable<IUnit> CreateUnits(IMode mode, string inputText)
         {
             var paramter = new UnitsFactoryParameter(inputText);
             switch (mode)
             {
-                case StandardMode:
+                case AllInclusiveMode:
                     foreach (var factory in this.factories.Where(x=>x.IsShowInStnadard))
                     {
                         await foreach (var units in factory.GetUnits(paramter))

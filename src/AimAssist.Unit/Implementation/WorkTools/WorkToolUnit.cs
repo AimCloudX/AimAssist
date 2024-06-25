@@ -21,7 +21,7 @@ namespace AimAssist.Combos.Mode.WorkTools
         }
 
         public string Text { get; }
-        public IPickerMode Mode => WorkToolsMode.Instance;
+        public IMode Mode => WorkToolsMode.Instance;
 
         public string Category => string.Empty;
 

@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace AimAssist.Unit.Implementation.Web.BookSearch
 {
-    public class BookSearchMode : PikcerModeBase
+    public class BookSearchMode : ModeBase
     {
         private BookSearchMode() : base(ModeName) { }
 

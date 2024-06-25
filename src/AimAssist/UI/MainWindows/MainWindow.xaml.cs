@@ -1,17 +1,11 @@
-﻿using AimAssist.Combos.Mode.Snippet;
-using AimAssist.Core.Commands;
+﻿using AimAssist.Core.Commands;
 using AimAssist.Service;
 using AimAssist.Unit.Core;
 using AimAssist.Unit.Core.Mode;
-using AimAssist.Unit.Implementation.Knowledge;
 using AimAssist.Unit.Implementation.Options;
-using AimAssist.Unit.Implementation.Snippets;
 using AimAssist.Unit.Implementation.Standard;
-using AimAssist.Unit.Implementation.Web.Bookmarks;
 using AimAssist.Unit.Implementation.Web.BookSearch;
-using AimAssist.Unit.Implementation.Web.Rss;
 using AimAssist.Unit.Implementation.Web.Urls;
-using AimAssist.Unit.Implementation.WorkTools;
 using AimAssist.WebViewCash;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -28,7 +22,7 @@ namespace AimAssist.UI.MainWindows
     {
         public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
         public ObservableCollection<IUnit> ActiveUnits { get; } = new ObservableCollection<IUnit>();
-        private IPickerMode mode;
+        private IMode mode;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
         public MainWindow()
@@ -38,7 +32,7 @@ namespace AimAssist.UI.MainWindows
 
             LoadIcons();
             this.DataContext = this;
-            this.ModeList.SelectedItem = StandardMode.Instance;
+            this.ModeList.SelectedItem = AllInclusiveMode.Instance;
             this.UpdateCandidate();
             this.ComboListBox.SelectedIndex = 0;
             PreviewKeyDown += MainWindow_PreviewKeyDown;
@@ -51,19 +45,12 @@ namespace AimAssist.UI.MainWindows
 
         private void RegisterCommands()
         {
-            ChangeMode.FavoriteMode = new RelayCommand(nameof(ChangeMode.FavoriteMode), () =>
+            foreach(var mode in UnitsService.Instnace.GetAllModes())
             {
+                mode.SetModeChangeCommandAction(() => ModeList.SelectedItem = mode);
+                CommandService.Register(mode.ModeChangeCommand, mode.DefaultKeySequence);
+            }
 
-                this.ModeList.SelectedItem = EditorMode.Instance;
-            });
-            ChangeMode.AllInclusiveMode = new RelayCommand(nameof(ChangeMode.AllInclusiveMode), () =>
-            {
-                this.ModeList.SelectedItem = StandardMode.Instance;
-            });
-            ChangeMode.BookSearchMode = new RelayCommand(nameof(ChangeMode.BookSearchMode), () =>
-            {
-                this.ModeList.SelectedItem = BookSearchMode.Instance;
-            });
             ChangeMode.KeyboardShortcut = new RelayCommand(nameof(ChangeMode.KeyboardShortcut), () =>
             {
                 this.ModeList.SelectedItem = OptionMode.Instance;
@@ -94,9 +81,6 @@ namespace AimAssist.UI.MainWindows
                 }
             });
 
-            CommandService.Register(ChangeMode.FavoriteMode, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.K, ModifierKeys.Control));
-            CommandService.Register(ChangeMode.AllInclusiveMode, new Common.KeySequence(Key.L, ModifierKeys.Control));
-            CommandService.Register(ChangeMode.BookSearchMode, new Common.KeySequence(Key.B, ModifierKeys.Control));
             CommandService.Register(ChangeMode.KeyboardShortcut, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.S, ModifierKeys.Control));
             CommandService.Register(ChangeMode.NextMode, new Common.KeySequence(Key.N, ModifierKeys.Control));
             CommandService.Register(ChangeMode.PreviousMode, new Common.KeySequence(Key.P, ModifierKeys.Control));
@@ -127,27 +111,13 @@ namespace AimAssist.UI.MainWindows
 
         private void LoadIcons()
         {
-            var icons = new List<IPickerMode>
-        {
-                StandardMode.Instance,
-                EditorMode.Instance,
-                WorkToolsMode.Instance,
-                BookSearchMode.Instance,
-                RssMode.Instance,
-                SnippetMode.Instance,
-                KnowledgeMode.Instance,
-                OptionMode.Instance,
-                //BookmarkMode.Instance,
-                //CalculationMode.Instance,
-        };
-
-            ModeList.ItemsSource = icons;
+            ModeList.ItemsSource = UnitsService.Instnace.GetAllModes();
         }
 
         private async void IconListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UnitLists.Clear();
-            if (ModeList.SelectedItem is IPickerMode mode)
+            if (ModeList.SelectedItem is IMode mode)
             {
                 this.mode = mode;
                 UpdateCandidate();
@@ -173,7 +143,7 @@ namespace AimAssist.UI.MainWindows
             if (groupedItems != null)
             {
                 groupedItems.GroupDescriptions.Clear();
-                if (this.mode == StandardMode.Instance)
+                if (this.mode == AllInclusiveMode.Instance)
                 {
                     groupedItems.GroupDescriptions.Add(new PropertyGroupDescription("Mode.Name"));
                 }
@@ -229,7 +199,7 @@ namespace AimAssist.UI.MainWindows
             inputText = this.FilterTextBox.Text;
 
             UnitLists.Clear();
-            if (this.mode == EditorMode.Instance)
+            if (this.mode == ActiveUnitMode.Instance)
             {
                 foreach (var unit in ActiveUnits)
                 {
@@ -271,7 +241,7 @@ namespace AimAssist.UI.MainWindows
         {
             if (e.Key == Key.Enter)
             {
-                if (this.mode != EditorMode.Instance)
+                if (this.mode != ActiveUnitMode.Instance)
                 {
 
                     if (this.ComboListBox.SelectedItem is IUnit unit)
@@ -281,9 +251,7 @@ namespace AimAssist.UI.MainWindows
                             ActiveUnits.Add(unit);
                         }
 
-                        this.mode = EditorMode.Instance;
-                        UpdateCandidate();
-                        UpdateGroupDescription();
+                        ActiveUnitMode.Instance.ModeChangeCommand.Execute();
                         this.ComboListBox.SelectedItem = unit;
                     }
 

@@ -7,7 +7,7 @@ namespace AimAssist.Unit.Implementation.WorkTools
 {
     public class ChatGPTUnitsFactory : IUnitsFacotry
     {
-        public IPickerMode TargetMode => WorkToolsMode.Instance;
+        public IMode TargetMode => WorkToolsMode.Instance;
 
         public bool IsShowInStnadard => true;
 
