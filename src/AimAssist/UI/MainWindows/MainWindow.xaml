@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{Binding Mode.Name, Mode=OneWay}"
-        Width="1000"
-        Height="700"
+        Width="1100"
+        Height="800"
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:commands="clr-namespace:AimAssist.Core.Commands;assembly=AimAssist" 
@@ -43,7 +43,7 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3.5*"/>
         </Grid.ColumnDefinitions>
 
         <!-- アイコンカラム -->
@@ -61,7 +61,7 @@
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"></TextBox>
+            <TextBox Grid.Row="0" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" KeyDown="FilterTextBox_KeyDown" TextChanged="TextBox_OnTextChanged"></TextBox>
 
                 <ListBox  x:Name="ComboListBox"  Grid.Row="1"
                           ItemsSource="{Binding Source={StaticResource GroupedItems}}" 

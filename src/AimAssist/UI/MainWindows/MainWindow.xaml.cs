@@ -7,6 +7,7 @@ using AimAssist.Unit.Implementation.Standard;
 using AimAssist.Unit.Implementation.Web.BookSearch;
 using AimAssist.Unit.Implementation.Web.Urls;
 using AimAssist.WebViewCash;
+using Common.UI;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -45,9 +46,14 @@ namespace AimAssist.UI.MainWindows
 
         private void RegisterCommands()
         {
-            foreach(var mode in UnitsService.Instnace.GetAllModes())
+            foreach (var mode in UnitsService.Instnace.GetAllModes())
             {
-                mode.SetModeChangeCommandAction(() => ModeList.SelectedItem = mode);
+                mode.SetModeChangeCommandAction(() =>
+                {
+                    ModeList.SelectedItem = mode;
+                    this.FilterTextBox.Focus();
+                }
+                    );
                 CommandService.Register(mode.ModeChangeCommand, mode.DefaultKeySequence);
             }
 
@@ -83,6 +89,11 @@ namespace AimAssist.UI.MainWindows
             });
             ChangeMode.NextUnit = new RelayCommand(nameof(ChangeMode.NextUnit), () =>
             {
+                if (this.ModeList.Items.Count == 0)
+                {
+                    return;
+                }
+
                 var index = this.ComboListBox.SelectedIndex;
                 if (index == this.ComboListBox.Items.Count - 1)
                 {
@@ -95,6 +106,11 @@ namespace AimAssist.UI.MainWindows
             });
             ChangeMode.PreviousUnit = new RelayCommand(nameof(ChangeMode.PreviousUnit), () =>
             {
+                if (this.ModeList.Items.Count == 0)
+                {
+                    return;
+                }
+
                 var index = this.ComboListBox.SelectedIndex;
                 if (index == 0)
                 {
@@ -106,11 +122,24 @@ namespace AimAssist.UI.MainWindows
                 }
             });
 
+            ChangeMode.FocusContent = new RelayCommand(nameof(ChangeMode.FocusContent), () =>
+            {
+                this.FocusContent();
+            });
+
+            ChangeMode.FocusUnits = new RelayCommand(nameof(ChangeMode.FocusUnits), () =>
+            {
+                this.FilterTextBox.Focus();
+            });
+
             CommandService.Register(ChangeMode.KeyboardShortcut, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.S, ModifierKeys.Control));
-            CommandService.Register(ChangeMode.NextMode, new Common.KeySequence(Key.N, ModifierKeys.Control|ModifierKeys.Shift));
-            CommandService.Register(ChangeMode.PreviousMode, new Common.KeySequence(Key.P, ModifierKeys.Control|ModifierKeys.Shift));
+            CommandService.Register(ChangeMode.NextMode, new Common.KeySequence(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
+            CommandService.Register(ChangeMode.PreviousMode, new Common.KeySequence(Key.P, ModifierKeys.Control | ModifierKeys.Shift));
             CommandService.Register(ChangeMode.NextUnit, new Common.KeySequence(Key.N, ModifierKeys.Control));
             CommandService.Register(ChangeMode.PreviousUnit, new Common.KeySequence(Key.P, ModifierKeys.Control));
+
+            CommandService.Register(ChangeMode.FocusContent, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
+            CommandService.Register(ChangeMode.FocusUnits, new Common.KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
         }
 
         private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
@@ -398,6 +427,22 @@ namespace AimAssist.UI.MainWindows
             if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers))
             {
                 e.Handled = true;
+            }
+        }
+
+        private void FocusContent()
+        {
+            if (this.MainContent.Content is IFocasable focusable)
+            {
+                focusable.Focus();
+            }
+        }
+
+        private void FilterTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key == Key.Escape)
+            {
+                this.FilterTextBox.Text = string.Empty;
             }
         }
     }

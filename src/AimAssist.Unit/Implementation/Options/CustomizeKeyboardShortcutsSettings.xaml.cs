@@ -36,6 +36,12 @@ namespace AimAssist.UI.Options
         private void ShortcutTextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             e.Handled = true;
+            if(e.Key == Key.Enter)
+            {
+                ApplyKey();
+                return;
+            }
+
             if (sender is TextBox textBox && textBox.DataContext is ShortcutSource setting)
             {
                 var key = e.Key == Key.System ? e.SystemKey : e.Key;
@@ -44,6 +50,11 @@ namespace AimAssist.UI.Options
                 // モディファイアキーのみの場合は無視
                 if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.LeftAlt ||
                     key == Key.RightAlt || key == Key.LeftShift || key == Key.RightShift|| key == Key.Escape)
+                {
+                    return;
+                }
+
+                if(modifiers == ModifierKeys.None)
                 {
                     return;
                 }
@@ -91,6 +102,11 @@ namespace AimAssist.UI.Options
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
+            ApplyKey();
+        }
+
+        private void ApplyKey()
+        {
             var modifiedShortcutes = ShortcutSettings.Where(x => x.IsModified);
             if (modifiedShortcutes.Any())
             {
@@ -100,7 +116,6 @@ namespace AimAssist.UI.Options
                 }
             }
         }
-
 
         private void UIElement_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
