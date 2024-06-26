@@ -14,6 +14,8 @@ namespace AimAssist.Unit.Implementation.WorkTools
         public async IAsyncEnumerable<IUnit> GetUnits(UnitsFactoryParameter pamater)
         {
             yield return new WorkToolUnit("ChatGPT", "https://chatgpt.com/", (unit) => new WebViewPreviewFactory().Create(unit.Text));
+
+            yield return new WorkToolUnit("Claude", "https://claude.ai/", (unit) => new WebViewPreviewFactory().Create(unit.Text));
         }
     }
 }

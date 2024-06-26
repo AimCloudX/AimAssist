@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="ChatGPT\ClaudeControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MarkdownView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

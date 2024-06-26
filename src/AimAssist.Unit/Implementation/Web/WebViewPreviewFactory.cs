@@ -15,6 +15,10 @@ namespace AimAssist.Unit.Implementation.Web
             {
                 return new ChatGptControl(url);
             }
+            if (url.StartsWith("https://claude.ai/"))
+            {
+                return new ClaudeControl(url);
+            }
 
             if (url.StartsWith("https://www.amazon"))
             {
