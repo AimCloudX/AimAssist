@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+    <ApplicationIcon>Resources\Icons\AimAssist.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>_</SatelliteResourceLanguages>
+    <AlwaysCreate>true</AlwaysCreate>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Icons\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AimAssist.Plugins\AimAssist.Plugins.csproj" />
+  </ItemGroup>
+  <Target Name="CopyReadMe" AfterTargets="AfterBuild">
+    <!-- DLLのコピー先を指定 -->
+    <Copy SourceFiles="..\..\..\README.md" DestinationFolder="$(OutputPath)\Resources\Knowledge\" />
+  </Target>
+</Project>
