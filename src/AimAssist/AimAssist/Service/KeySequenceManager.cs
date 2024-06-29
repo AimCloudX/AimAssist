@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace AimAssist.Service
@@ -17,7 +18,7 @@ namespace AimAssist.Service
         private DateTime _lastKeyPressTime;
         private bool _isWaitingForSecondKey = false;
 
-        public bool HandleKeyPress(Key key, ModifierKeys modifiers)
+        public bool HandleKeyPress(Key key, ModifierKeys modifiers, Window window)
         {
             var now = DateTime.Now;
 
@@ -32,7 +33,7 @@ namespace AimAssist.Service
                 var keySequence = new KeySequence(_lastKey, _lastModifiers, key, modifiers);
                 if (CommandService.TryGetFirstSecontKeyCommand(keySequence, out var doubleKeyCommand))
                 {
-                    doubleKeyCommand.Execute(null);
+                    doubleKeyCommand.Execute(window);
                     ResetKeySequence();
                     return true;
                 }
@@ -47,7 +48,7 @@ namespace AimAssist.Service
             var singleKeySequence = new KeyGesture(key, modifiers);
             if (CommandService.TryGetFirstOnlyKeyCommand(singleKeySequence, out var command))
             {
-                command.Execute(null);
+                command.Execute(window);
                 ResetKeySequence();
                 return true;
             }

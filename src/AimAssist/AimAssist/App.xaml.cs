@@ -33,7 +33,7 @@ namespace AimAssist
                     mutex.ReleaseMutex();
                 };
 
-                AppCommands.ToggleMainWindow.Execute();
+                AppCommands.ToggleMainWindow.Execute(this);
             }
             else
             {
@@ -84,7 +84,7 @@ namespace AimAssist
                 using var reader = new StreamReader(server);
                 if (reader.ReadLine() == PipeName)
                 {
-                    Dispatcher.Invoke(() => AppCommands.ToggleMainWindow.Execute());
+                    Dispatcher.Invoke(() => AppCommands.ToggleMainWindow.Execute(this));
                 }
             }
         }

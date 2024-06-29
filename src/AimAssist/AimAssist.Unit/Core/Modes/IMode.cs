@@ -1,5 +1,6 @@
 ﻿using Common.Commands;
 using Common.Commands.Shortcus;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace AimAssist.Units.Core.Mode
@@ -12,7 +13,7 @@ namespace AimAssist.Units.Core.Mode
 
         bool IsApplyFiter { get; }
 
-        void SetModeChangeCommandAction(Action action);
+        void SetModeChangeCommandAction(Action<Window> action);
 
         KeySequence DefaultKeySequence { get; }
 

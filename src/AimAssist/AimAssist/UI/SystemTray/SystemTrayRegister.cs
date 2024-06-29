@@ -22,14 +22,14 @@ namespace AimAssist.UI.SystemTray
         }
         private static void Show_Click(object? sender, EventArgs e)
         {
-            AppCommands.ToggleMainWindow.Execute();
+            AppCommands.ToggleMainWindow.Execute(null);
         }
 
         private static void NotifyIcon_Click(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                AppCommands.ToggleMainWindow.Execute();
+                AppCommands.ToggleMainWindow.Execute(null);
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Service;
+using AimAssist.UI.PickerWindows;
 using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
@@ -48,10 +49,13 @@ namespace AimAssist.UI.MainWindows
         {
             foreach (var mode in UnitsService.Instnace.GetAllModes())
             {
-                mode.SetModeChangeCommandAction(() =>
+                mode.SetModeChangeCommandAction((window) =>
                 {
-                    ModeList.SelectedItem = mode;
-                    this.FilterTextBox.Focus();
+                    if(window is MainWindow mainWindow)
+                    {
+                        mainWindow.ModeList.SelectedItem = mode;
+                        mainWindow.FilterTextBox.Focus();
+                    }
                 }
                     );
                 CommandService.Register(mode.ModeChangeCommand, mode.DefaultKeySequence);
@@ -59,92 +63,127 @@ namespace AimAssist.UI.MainWindows
 
             await foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
             {
-                var unitChangeCommand = new RelayCommand(unit.Name, () =>
+                var unitChangeCommand = new RelayCommand(unit.Name, (Window window) =>
                 {
-                    this.ModeList.SelectedItem = unit.Mode;
-                    this.ComboListBox.SelectedItem = unit;
+                    if (window is MainWindow mainWindow)
+                    {
+                        mainWindow.ModeList.SelectedItem = unit.Mode;
+                        mainWindow.ComboListBox.SelectedItem = unit;
+                    }
                 });
 
                 CommandService.Register(unitChangeCommand, KeySequence.None);
             }
 
-            MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), () =>
+            MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), (Window window) =>
             {
-                var index = this.ModeList.SelectedIndex;
-                if (index == this.ModeList.Items.Count - 1)
+                if (window is MainWindow mainWindow)
                 {
-                    this.ModeList.SelectedIndex = 0;
-                }
-                else
-                {
-                    this.ModeList.SelectedIndex = index + 1;
-                }
-            });
-            MainWindowCommands.PreviousMode = new RelayCommand(nameof(MainWindowCommands.PreviousMode), () =>
-            {
-                var index = this.ModeList.SelectedIndex;
-                if (index == 0)
-                {
-                    this.ModeList.SelectedIndex = this.ModeList.Items.Count - 1;
-                }
-                else
-                {
-                    this.ModeList.SelectedIndex = index - 1;
-                }
-            });
-            MainWindowCommands.NextUnit = new RelayCommand(nameof(MainWindowCommands.NextUnit), () =>
-            {
-                if (this.ModeList.Items.Count == 0)
-                {
-                    return;
-                }
-
-                var index = this.ComboListBox.SelectedIndex;
-                if (index == this.ComboListBox.Items.Count - 1)
-                {
-                    this.ComboListBox.SelectedIndex = 0;
-                }
-                else
-                {
-                    this.ComboListBox.SelectedIndex = index + 1;
-                }
-            });
-            MainWindowCommands.PreviousUnit = new RelayCommand(nameof(MainWindowCommands.PreviousUnit), () =>
-            {
-                if (this.ModeList.Items.Count == 0)
-                {
-                    return;
-                }
-
-                var index = this.ComboListBox.SelectedIndex;
-                if (index == 0)
-                {
-                    this.ComboListBox.SelectedIndex = this.ComboListBox.Items.Count - 1;
-                }
-                else
-                {
-                    this.ComboListBox.SelectedIndex = index - 1;
-                }
-            });
-
-            MainWindowCommands.FocusContent = new RelayCommand(nameof(MainWindowCommands.FocusContent), () =>
-            {
-                this.FocusContent();
-            });
-
-            MainWindowCommands.FocusUnits = new RelayCommand(nameof(MainWindowCommands.FocusUnits), () =>
-            {
-                this.FilterTextBox.Focus();
-            });
-
-            MainWindowCommands.RemoveActiveView = new RelayCommand(nameof(MainWindowCommands.RemoveActiveView), () =>
-            {
-                if(this.mode == ActiveUnitMode.Instance)
-                {
-                    if(this.ComboListBox.SelectedItem is IUnit unit)
+                    var index = mainWindow.ModeList.SelectedIndex;
+                    if (index == mainWindow.ModeList.Items.Count - 1)
                     {
-                        this.ActiveUnits.Remove(unit);
-                        this.UnitLists.Remove(unit);
+                        mainWindow.ModeList.SelectedIndex = 0;
+                    }
+                    else
+                    {
+                        mainWindow.ModeList.SelectedIndex = index + 1;
+                    }
+                }
+            });
+
+            MainWindowCommands.PreviousMode = new RelayCommand(nameof(MainWindowCommands.PreviousMode), (Window window) =>
+            {
+                if (window is MainWindow mainWindow)
+                {
+                    var index = mainWindow.ModeList.SelectedIndex;
+                    if (index == 0)
+                    {
+                        mainWindow.ModeList.SelectedIndex = mainWindow.ModeList.Items.Count - 1;
+                    }
+                    else
+                    {
+                        mainWindow.ModeList.SelectedIndex = index - 1;
+                    }
+                }
+            });
+            MainWindowCommands.NextUnit = new RelayCommand(nameof(MainWindowCommands.NextUnit), (Window window) =>
+            {
+                if (window is MainWindow mainWindow)
+                {
+                    if (this.ModeList.Items.Count == 0)
+                    {
+                        return;
+                    }
+
+                    var index = this.ComboListBox.SelectedIndex;
+                    if (index == this.ComboListBox.Items.Count - 1)
+                    {
+                        this.ComboListBox.SelectedIndex = 0;
+                    }
+                    else
+                    {
+                        this.ComboListBox.SelectedIndex = index + 1;
+                    }
+                }
+            });
+            MainWindowCommands.PreviousUnit = new RelayCommand(nameof(MainWindowCommands.PreviousUnit), (Window window) =>
+            {
+                if (window is MainWindow mainWindow)
+                {
+                    if (mainWindow.ModeList.Items.Count == 0)
+                    {
+                        return;
+                    }
+
+                    var index = mainWindow.ComboListBox.SelectedIndex;
+                    if (index == 0)
+                    {
+                        mainWindow.ComboListBox.SelectedIndex = mainWindow.ComboListBox.Items.Count - 1;
+                    }
+                    else
+                    {
+                        mainWindow.ComboListBox.SelectedIndex = index - 1;
+                    }
+                }
+            });
+
+            MainWindowCommands.FocusContent = new RelayCommand(nameof(MainWindowCommands.FocusContent), (Window window) =>
+            {
+                if (window is MainWindow mainWindow)
+                {
+                    mainWindow.FocusContent();
+                }
+
+                if (window is PickerWindow pickerWindow)
+                {
+                    pickerWindow.FocusContent();
+                }
+            });
+
+            MainWindowCommands.FocusUnits = new RelayCommand(nameof(MainWindowCommands.FocusUnits), (Window window)  =>
+            {
+                if (window is MainWindow mainWindow)
+                {
+                    mainWindow.FilterTextBox.Focus();
+                }
+
+                if (window is PickerWindow pickerWindow)
+                {
+                    pickerWindow.FilterTextBox.Focus();
+                }
+            });
+
+            MainWindowCommands.RemoveActiveView = new RelayCommand(nameof(MainWindowCommands.RemoveActiveView), (Window window) =>
+            {
+                if (window is MainWindow mainWindow)
+                {
+                    if (mainWindow.mode == ActiveUnitMode.Instance)
+                    {
+                        if (mainWindow.ComboListBox.SelectedItem is IUnit unit)
+                        {
+                            mainWindow.ActiveUnits.Remove(unit);
+                            mainWindow.UnitLists.Remove(unit);
+                        }
                     }
                 }
             });
@@ -313,14 +352,14 @@ namespace AimAssist.UI.MainWindows
                 if (this.mode != ActiveUnitMode.Instance)
                 {
 
-                    if (this.ComboListBox.SelectedItem is IUnit  unit)
+                    if (this.ComboListBox.SelectedItem is IUnit unit)
                     {
                         if (!ActiveUnits.Contains(unit))
                         {
                             ActiveUnits.Add(unit);
                         }
 
-                        ActiveUnitMode.Instance.ModeChangeCommand.Execute();
+                        ActiveUnitMode.Instance.ModeChangeCommand.Execute(this);
                         this.ComboListBox.SelectedItem = unit;
                     }
 
@@ -387,7 +426,7 @@ namespace AimAssist.UI.MainWindows
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            AppCommands.ShutdownAimAssist.Execute();
+            AppCommands.ShutdownAimAssist.Execute(this);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -396,13 +435,13 @@ namespace AimAssist.UI.MainWindows
 
         private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers))
+            if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
             {
                 e.Handled = true;
             }
         }
 
-        private void FocusContent()
+        public void FocusContent()
         {
             if (this.MainContent.Content is IFocasable focusable)
             {

@@ -61,6 +61,8 @@ const createEditor = (initialContent = '', language = 'javascript') => {
     window.addEventListener('resize', () => {
         editor.layout();
     });
+
+    editor.focus();
 };
 
 //editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyP, () => {
@@ -153,6 +155,7 @@ window.updateVimMap = updateVimMap;
 window.updateVimMapCommand = updateVimMapCommand;
 window.updateVimMapCommand2 = updateVimMapCommand2;
 window.openMonacoCommandPalette = openMonacoCommandPalette;
+window.editor = editor;
 
 // 初期化関数の実行
 init();

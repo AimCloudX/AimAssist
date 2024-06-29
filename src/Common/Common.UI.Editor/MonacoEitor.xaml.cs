@@ -8,7 +8,7 @@ namespace Common.UI.Editor
     /// <summary>
     /// MonacoEitor.xaml の相互作用ロジック
     /// </summary>
-    public partial class MonacoEditor : System.Windows.Controls.UserControl
+    public partial class MonacoEditor : System.Windows.Controls.UserControl, IFocasable
     {
         private EditorOption option = new EditorOption();
         private string text = string.Empty;
@@ -168,6 +168,15 @@ namespace Common.UI.Editor
                 // WebView2内でCtrl+Shift+Pが押されたときの処理
                 webView.CoreWebView2.ExecuteScriptAsync("openMonacoCommandPalette();");
             }
+        }
+
+        public void Focus()
+        {
+            webView.Focus();
+
+            // Monaco EditorのTextにフォーカスを設定するJavaScriptを実行
+var script = @"window.editor.focus();";
+        webView.CoreWebView2.ExecuteScriptAsync(script);
         }
     }
 }

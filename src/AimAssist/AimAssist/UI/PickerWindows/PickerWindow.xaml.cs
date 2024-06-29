@@ -4,6 +4,8 @@ using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
+using Common.UI;
+using Common.UI.Editor;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -58,7 +60,21 @@ namespace AimAssist.UI.PickerWindows
 
         public PickerWindow()
         {
+
             this.InitializeComponent();
+
+            var editor = EditorCash.Editor;
+            if(editor != null)
+            {
+                this.MainContent.Content = editor;
+            }
+            else
+            {
+                var monacoEditor = new MonacoEditor();
+                this.MainContent.Content = monacoEditor;
+                EditorCash.Editor = monacoEditor;
+            }
+
             this.DataContext = this;
 
             this.Mode = SnippetMode.Instance;
@@ -99,13 +115,13 @@ namespace AimAssist.UI.PickerWindows
             this.ComboListBox.SelectedIndex = 0;
         }
 
-        private void Window_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        private void TextBox_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                if (this.ComboListBox.SelectedItem is SnippetModel combo)
+                if (this.ComboListBox.SelectedItem is SnippetUnit unit)
                 {
-                    this.SnippetText = combo.Code;
+                    this.SnippetText = unit.Model.Code;
                     this.CloseWindow();
                 }
             }
@@ -114,10 +130,7 @@ namespace AimAssist.UI.PickerWindows
             {
                 this.CloseWindow();
             }
-        }
 
-        private void TextBox_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
             if (e.Key == Key.Up)
             {
                 var index = this.ComboListBox.SelectedIndex;
@@ -170,7 +183,16 @@ namespace AimAssist.UI.PickerWindows
             }
 
             this.IsClosing = true;
+            EditorCash.Editor = (MonacoEditor)this.MainContent.Content;
             this.Close();
+        }
+
+        public void FocusContent()
+        {
+            if (this.MainContent.Content is IFocasable focusable)
+            {
+                focusable.Focus();
+            }
         }
 
 
@@ -181,8 +203,25 @@ namespace AimAssist.UI.PickerWindows
 
         private void Window_LostFocus(object sender, EventArgs e)
         {
-            this.CloseWindow();
-
+            //this.CloseWindow();
         }
+
+        private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.ComboListBox.SelectedItem is SnippetUnit unit)
+            {
+                EditorCash.Editor.SetTextAsync(unit.Model.Code);
+            }
+        }
+
+        private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
+        private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
+            {
+                e.Handled = true;
+            }
+        }
+
     }
 }

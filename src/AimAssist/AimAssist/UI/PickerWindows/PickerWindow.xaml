@@ -5,22 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{Binding Mode.Name, Mode=OneWay}"
-        Width="400"
+        Width="800"
         Height="310"
-        KeyDown="Window_OnKeyUp"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:monaco1="clr-namespace:Common.UI.Editor;assembly=Common.UI.Editor"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Closing="Window_Closing"
         Deactivated="Window_LostFocus"
+        KeyDown="OnKeyDown"
         Topmost="True"
         >
     <Grid>
         <Grid x:Name="Root" HorizontalAlignment="Stretch">
-            <Grid.InputBindings>
-                <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding AjustWindowCommand}"/>
-            </Grid.InputBindings>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
@@ -48,6 +49,7 @@
                           ItemsSource="{Binding UnitLists}" 
                           VirtualizingPanel.IsVirtualizing="True" 
                           VirtualizingPanel.VirtualizationMode="Standard"
+                          SelectionChanged="ComboListBox_SelectionChanged"
                           HorizontalAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Visible"
                           ScrollViewer.VerticalScrollBarVisibility="Visible">
@@ -82,7 +84,7 @@
                                     <TextBlock Text="{Binding Name}"  FontSize="18"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                                    <TextBlock FontSize="14" Text="{Binding Text}" 
+                                    <TextBlock FontSize="14" Text="{Binding Description}" 
                                            Foreground="Gray"
                                            TextTrimming="CharacterEllipsis"
                                            TextWrapping="NoWrap"
@@ -122,6 +124,8 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>
+            <ContentControl x:Name="MainContent" Grid.Column="1" Grid.RowSpan="2"></ContentControl>
+            <!--<monaco1:MonacoEditor Grid.Column="1" Grid.RowSpan="2" x:Name="Editor"></monaco1:MonacoEditor>-->
         </Grid>
     </Grid>
 </Window>

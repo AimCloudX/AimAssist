@@ -35,7 +35,7 @@ public class HotKeyController : IDisposable
         var id = msg.wParam.ToInt32();
         if (_hotkeyList.TryGetValue(id, out var hotkey))
         {
-            hotkey.Command.Execute();
+            hotkey.Command.Execute(null);
         }
     }
 

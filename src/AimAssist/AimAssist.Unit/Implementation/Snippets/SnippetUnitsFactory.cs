@@ -1,7 +1,7 @@
-﻿using AimAssist.Combos.Mode.Snippet;
-using AimAssist.Units.Core;
+﻿using AimAssist.Units.Core;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
+using System.Windows;
 
 namespace AimAssist.Units.Implementation.Snippets
 {
@@ -14,12 +14,16 @@ namespace AimAssist.Units.Implementation.Snippets
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
             // TODO:設定ファイルからのLoad
-            yield return new Unit(TargetMode, "aim", new SnippetModel("aim", "AimNext","Aim"));
-            yield return new Unit(TargetMode, "Today", "DateTime", new SnippetModel("Today", DateTime.Now.ToString("d"),"DateTime"));
-            yield return new Unit(TargetMode, "Now", new SnippetModel("Now", DateTime.Now.ToString("d")));
-            yield return new Unit(TargetMode, "AppData", new SnippetModel("AppData", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
-            yield return new Unit(TargetMode, "Downloads", new SnippetModel("Downloads", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads")));
-            yield return new Unit(TargetMode, "環境変数", new SnippetModel("環境変数", "control.exe sysdm.cpl,,3"));
+            yield return SnippetUnit.Create("aim", "AimNext","Aim");
+            yield return SnippetUnit.Create("Today", DateTime.Now.ToString("d"),"DateTime");
+            yield return SnippetUnit.Create("Now",DateTime.Now.ToString("d"), "DateTime");
+            yield return SnippetUnit.Create("AppData", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            yield return SnippetUnit.Create("Downloads", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads"));
+            yield return SnippetUnit.Create("環境変数","control.exe sysdm.cpl,,3");
+            if (Clipboard.ContainsText())
+            {
+                yield return SnippetUnit.Create("クリップボード", Clipboard.GetText());
+            }
         }
     }
 }

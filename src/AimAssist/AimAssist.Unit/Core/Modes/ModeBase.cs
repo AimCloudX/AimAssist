@@ -29,7 +29,7 @@ namespace AimAssist.Units.Core.Mode
 
         public abstract Control Icon { get; }
 
-        public virtual void SetModeChangeCommandAction(Action action)
+        public virtual void SetModeChangeCommandAction(Action<Window> action)
         {
             Debug.Assert(this.ModeChangeCommand == null, "Command登録済み");
             var commandName = $"{GetImplementationClassName()}.ChangeMode";

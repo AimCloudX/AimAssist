@@ -2,6 +2,7 @@
 using Common.Commands;
 using Common.Commands.Shortcus;
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 
 namespace AimAssist.Core.Commands
@@ -125,12 +126,12 @@ namespace AimAssist.Core.Commands
             return false;
         }
 
-        public static void Execute(string commandName)
+        public static void Execute(string commandName, Window window)
         {
             var command = dic.FirstOrDefault(x => x.CommandName == commandName);
             if(command != null)
             {
-                command.Execute();
+                command.Execute(window);
             }
         }
     }
