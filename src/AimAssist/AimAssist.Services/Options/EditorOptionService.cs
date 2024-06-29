@@ -15,14 +15,21 @@ namespace Library.Options
         {
             if (File.Exists(OptionPath))
             {
-                var text = File.ReadAllText(OptionPath);
-                var option = JsonConvert.DeserializeObject<EditorOption>(text);
-                if (option == null)
-                {
-                    option = new EditorOption();
-                }
+                try {
 
-                Option = option;
+                    var text = File.ReadAllText(OptionPath);
+                    var option = JsonConvert.DeserializeObject<EditorOption>(text);
+                    if (option == null)
+                    {
+                        option = new EditorOption();
+                    }
+
+                    Option = option;
+                }
+                catch(Exception _)
+                {
+                    Option = new EditorOption();
+                }
             }
             else
             {
@@ -42,7 +49,7 @@ namespace Library.Options
             watcher.Filter = Path.GetFileName(OptionPath);
 
             // イベントハンドラを追加
-            //watcher.Changed += OnChanged;
+            watcher.Changed += OnChanged;
 
             // 監視を開始
             watcher.EnableRaisingEvents = true;

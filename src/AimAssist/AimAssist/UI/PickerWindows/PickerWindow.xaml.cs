@@ -6,6 +6,7 @@ using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.UI;
 using Common.UI.Editor;
+using Library.Options;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -67,12 +68,14 @@ namespace AimAssist.UI.PickerWindows
             if(editor != null)
             {
                 this.MainContent.Content = editor;
+                editor.SetOption(EditorOptionService.Option);
             }
             else
             {
                 var monacoEditor = new MonacoEditor();
                 this.MainContent.Content = monacoEditor;
                 EditorCash.Editor = monacoEditor;
+                monacoEditor.SetOption(EditorOptionService.Option);
             }
 
             this.DataContext = this;
