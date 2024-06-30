@@ -85,6 +85,7 @@ namespace AimAssist.UI.PickerWindows
             this.FilterTextBox.Focus();
 
             this.ComboListBox.SelectedIndex = 0;
+            RegisterSnippets();
         }
 
         private async void UpdateCandidate()
@@ -118,13 +119,13 @@ namespace AimAssist.UI.PickerWindows
             this.ComboListBox.SelectedIndex = 0;
         }
 
-        private void TextBox_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private async void TextBox_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 if (this.ComboListBox.SelectedItem is SnippetUnit unit)
                 {
-                    this.SnippetText = unit.Model.Code;
+                    this.SnippetText = await EditorCash.Editor.GetText();
                     this.CloseWindow();
                 }
             }
@@ -224,6 +225,46 @@ namespace AimAssist.UI.PickerWindows
             {
                 e.Handled = true;
             }
+        }
+
+        private void RegisterSnippets()
+        {
+            var snippetVariables = new List<Snippet>
+{
+    //new Snippet { Label = "TM_SELECTED_TEXT", InsertText = "${TM_SELECTED_TEXT}", Documentation = "The currently selected text or the empty string" },
+    //new Snippet { Label = "TM_CURRENT_LINE", InsertText = "${TM_CURRENT_LINE}", Documentation = "The contents of the current line" },
+    //new Snippet { Label = "TM_CURRENT_WORD", InsertText = "${TM_CURRENT_WORD}", Documentation = "The contents of the word under cursor or the empty string" },
+    //new Snippet { Label = "TM_LINE_INDEX", InsertText = "${TM_LINE_INDEX}", Documentation = "The zero-index based line number" },
+    //new Snippet { Label = "TM_LINE_NUMBER", InsertText = "${TM_LINE_NUMBER}", Documentation = "The one-index based line number" },
+    //new Snippet { Label = "TM_FILENAME", InsertText = "${TM_FILENAME}", Documentation = "The filename of the current document" },
+    //new Snippet { Label = "TM_FILENAME_BASE", InsertText = "${TM_FILENAME_BASE}", Documentation = "The filename of the current document without its extensions" },
+    //new Snippet { Label = "TM_DIRECTORY", InsertText = "${TM_DIRECTORY}", Documentation = "The directory of the current document" },
+    //new Snippet { Label = "TM_FILEPATH", InsertText = "${TM_FILEPATH}", Documentation = "The full file path of the current document" },
+    //new Snippet { Label = "WORKSPACE_NAME", InsertText = "${WORKSPACE_NAME}", Documentation = "The name of the opened workspace or folder" },
+    
+    // Date and Time variables
+    //new Snippet { Label = "CURRENT_YEAR", InsertText = "${CURRENT_YEAR}", Documentation = "The current year" },
+    //new Snippet { Label = "CURRENT_YEAR_SHORT", InsertText = "${CURRENT_YEAR_SHORT}", Documentation = "The current year's last two digits" },
+    //new Snippet { Label = "CURRENT_MONTH", InsertText = "${CURRENT_MONTH}", Documentation = "The month as two digits (example '02')" },
+    //new Snippet { Label = "CURRENT_MONTH_NAME", InsertText = "${CURRENT_MONTH_NAME}", Documentation = "The full name of the month (example 'July')" },
+    //new Snippet { Label = "CURRENT_MONTH_NAME_SHORT", InsertText = "${CURRENT_MONTH_NAME_SHORT}", Documentation = "The short name of the month (example 'Jul')" },
+    //new Snippet { Label = "CURRENT_DATE", InsertText = "${CURRENT_DATE}", Documentation = "The day of the month" },
+    //new Snippet { Label = "CURRENT_DAY_NAME", InsertText = "${CURRENT_DAY_NAME}", Documentation = "The name of day (example 'Monday')" },
+    //new Snippet { Label = "CURRENT_DAY_NAME_SHORT", InsertText = "${CURRENT_DAY_NAME_SHORT}", Documentation = "The short name of the day (example 'Mon')" },
+    //new Snippet { Label = "CURRENT_HOUR", InsertText = "${CURRENT_HOUR}", Documentation = "The current hour in 24-hour clock format" },
+    //new Snippet { Label = "CURRENT_MINUTE", InsertText = "${CURRENT_MINUTE}", Documentation = "The current minute" },
+    //new Snippet { Label = "CURRENT_SECOND", InsertText = "${CURRENT_SECOND}", Documentation = "The current second" },
+    //new Snippet { Label = "CURRENT_SECONDS_UNIX", InsertText = "${CURRENT_SECONDS_UNIX}", Documentation = "The number of seconds since the Unix epoch" }
+
+    new Snippet { Label = "CURRENT_YEAR", InsertText = "\\\\${CURRENT_YEAR}", Documentation = "The current year" },
+    new Snippet { Label = "CURRENT_MONTH", InsertText = "\\\\${CURRENT_MONTH}", Documentation = "The month as two digits (example '02')" },
+    new Snippet { Label = "CURRENT_DATE", InsertText = "\\\\${CURRENT_DATE}", Documentation = "The day of the month" },
+    new Snippet { Label = "CURRENT_HOUR", InsertText = "\\\\${CURRENT_HOUR}", Documentation = "The current hour in 24-hour clock format" },
+    new Snippet { Label = "CURRENT_MINUTE", InsertText = "\\\\${CURRENT_MINUTE}", Documentation = "The current minute" },
+    new Snippet { Label = "CURRENT_SECOND", InsertText = "\\\\${CURRENT_SECOND}", Documentation = "The current second" },
+};
+
+            //EditorCash.Editor.RegisterSnippets(snippetVariables);
         }
 
     }

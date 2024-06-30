@@ -1,5 +1,6 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Windows.Input;
 
@@ -12,7 +13,8 @@ namespace Common.UI.Editor
     {
         private EditorOption option = new EditorOption();
         private string text = string.Empty;
-        private string language = "javascript";
+        private string language = "plaintext";
+        private IEnumerable<Snippet> snippets;
 
         public MonacoEditor()
         {
@@ -29,9 +31,14 @@ namespace Common.UI.Editor
             {
                 await SetEditorContentAsync(text, language);
             }
+
+            if(snippets != null)
+            {
+                SetSnippets(this.snippets);
+            }
         }
 
-        public async Task SetTextAsync(string text, string language = null)
+        public async Task SetTextAsync(string text, string language = "plaintext")
         {
             this.text = text;
             if (language != null)
@@ -103,7 +110,7 @@ namespace Common.UI.Editor
         public async void SetOption(EditorOption option)
         {
             this.option = option;
-            if(webView.CoreWebView2 != null)
+            if (webView.CoreWebView2 != null)
             {
                 SetOptionInner();
             }
@@ -116,7 +123,7 @@ namespace Common.UI.Editor
                 var fileContent = await webView.CoreWebView2.ExecuteScriptAsync("getEditorContent();");
                 return JsonConvert.DeserializeObject<string>(fileContent);
             }
-            catch 
+            catch
             {
                 return string.Empty;
             }
@@ -175,8 +182,35 @@ namespace Common.UI.Editor
             webView.Focus();
 
             // Monaco EditorのTextにフォーカスを設定するJavaScriptを実行
-var script = @"window.editor.focus();";
-        webView.CoreWebView2.ExecuteScriptAsync(script);
+            var script = @"window.editor.focus();";
+            webView.CoreWebView2.ExecuteScriptAsync(script);
+        }
+
+        public void RegisterSnippets(IEnumerable<Snippet> snippets)
+        {
+            this.snippets = snippets;
+            if(webView.CoreWebView2 != null)
+            {
+                SetSnippets(snippets);
+            }
+        }
+
+        private void SetSnippets(IEnumerable<Snippet> snippets)
+        {
+            string snippetsJson = JsonConvert.SerializeObject(snippets);
+            snippetsJson = snippetsJson.Replace("\"", "\\\""); // ダブルクォートをエスケープ
+            string script = $"registerSnippets(\"{snippetsJson}\");";
+            webView.CoreWebView2.ExecuteScriptAsync(script);
         }
     }
+
+    public class Snippet
+    {
+        public string Label { get; set; }
+        public string Kind { get; set; }
+        public string InsertText { get; set; }
+        public string Documentation { get; set; }
+    }
 }
+
+

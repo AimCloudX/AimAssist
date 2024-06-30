@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="{Binding Mode.Name, Mode=OneWay}"
         Width="800"
-        Height="310"
+        Height="500"
         xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:monaco1="clr-namespace:Common.UI.Editor;assembly=Common.UI.Editor"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"

@@ -13,7 +13,7 @@
   "description": "",
   "devDependencies": {
     "css-loader": "^7.1.2",
-    "monaco-editor": "^0.49.0",
+    "monaco-editor": "^0.50.0",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "monaco-vim": "^0.4.1",
     "style-loader": "^4.0.0",

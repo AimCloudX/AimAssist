@@ -37,9 +37,9 @@ const setupMonacoEditor = () => {
         getWorkerUrl: function (workerId, label) {
             return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
                 self.MonacoEnvironment = {
-                    baseUrl: 'https://unpkg.com/monaco-editor@0.21.2/min/'
+                    baseUrl: 'https://unpkg.com/monaco-editor@0.50.0/min/'
                 };
-                importScripts('https://unpkg.com/monaco-editor@0.21.2/min/vs/base/worker/workerMain.js');
+                importScripts('https://unpkg.com/monaco-editor@0.50.0/min/vs/base/worker/workerMain.js');
             `)}`;
         }
     };
@@ -47,14 +47,41 @@ const setupMonacoEditor = () => {
 
 // エディタのインスタンス作成
 let editor;
-const createEditor = (initialContent = '', language = 'javascript') => {
+const createEditor = (initialContent = '', language = 'plaintext') => {
     editor = monaco.editor.create(document.getElementById('container'), {
         value: initialContent,
         language: language,
         theme: 'nord',
         fontFamily: "'Consolas', 'Courier New', monospace, 'Codicon'",
         fontSize: 14,
-        platform: 'windows'
+        platform: 'windows',
+        suggestOnTriggerCharacters: true,
+        snippetSuggestions: "top",
+        suggest: {
+            insertMode: 'insert',
+            showScrollbar: true,
+            filterGraceful: false,
+            matchOnWordStartOnly: false,
+            snippetsPreventQuickSuggestions: true,
+            localityBonus: true,
+            shareSuggestSelections: true,
+            showIcons: true,
+            snippetsPreventQuickSuggestions: true,
+        },
+        quickSuggestions: {
+            other: true,
+            comments: true,
+            strings: false
+        },
+        wordBasedSuggestions: true,
+        suggestOnTriggerCharacters: true,
+        acceptSuggestionOnEnter: "on",
+        acceptSuggestionOnCommitCharacter: true,
+        wordSeparators: "~!@#$%^&*()-=+[{]}|;:'\",.<>/?",
+        suggestSelection: "recentlyUsed",
+        suggestFontSize: 14,
+        suggestLineHeight: 24,
+        tabCompletion: "on",
     });
 
     // リサイズイベントのハンドル
@@ -65,9 +92,6 @@ const createEditor = (initialContent = '', language = 'javascript') => {
     editor.focus();
 };
 
-//editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyP, () => {
-//    editor.trigger('', 'editor.action.quickCommand', null);
-//});
 
 // Vim モードの管理
 let vimMode = null;
@@ -139,6 +163,55 @@ function openMonacoCommandPalette() {
     }
 }
 
+function registerSnippets(snippetsJson) {
+    let snippets;
+    try {
+        snippets = JSON.parse(snippetsJson);
+        console.log('Parsed snippets:', snippets);
+    } catch (error) {
+        console.error('Failed to parse JSON:', error);
+        console.log('Raw snippetsJson:', snippetsJson);
+        return;
+    }
+
+    monaco.languages.getLanguages().forEach(lang => {
+        monaco.languages.registerCompletionItemProvider(lang.id, {
+            provideCompletionItems: async (model, position) => {
+                const word = model.getWordUntilPosition(position);
+                const range = {
+                    startLineNumber: position.lineNumber,
+                    endLineNumber: position.lineNumber,
+                    startColumn: word.startColumn,
+                    endColumn: word.endColumn
+                };
+
+                // カスタムスニペットの提案を作成
+                const customSuggestions = snippets.map(snippet => ({
+                    label: snippet.Label,
+                    kind: monaco.languages.CompletionItemKind.Snippet,
+                    insertText: snippet.InsertText,
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    documentation: snippet.Documentation,
+                    range: range
+                }));
+
+                console.log('custom snippets:', customSuggestions);
+
+                // 入力テキストに基づいてフィルタリング
+                //const prefix = word.word.toLowerCase();
+                //const allSuggestions = customSuggestions.filter(suggestion =>
+                //    suggestion.label.toLowerCase().startsWith(prefix)
+                //);
+
+                // フィルタリングされた候補がある場合のみ返す
+                //return allSuggestions.length > 0 ? { incomplete: true,suggestions: allSuggestions } : {incomplete: true, suggestions: [] };
+
+                return { incomplete: true, suggestions: customSuggestions };
+            }
+        });
+    });
+}
+
 // 初期化
 const init = () => {
     setupMonacoEditor();
@@ -155,6 +228,7 @@ window.updateVimMap = updateVimMap;
 window.updateVimMapCommand = updateVimMapCommand;
 window.updateVimMapCommand2 = updateVimMapCommand2;
 window.openMonacoCommandPalette = openMonacoCommandPalette;
+window.registerSnippets = registerSnippets;
 window.editor = editor;
 
 // 初期化関数の実行
