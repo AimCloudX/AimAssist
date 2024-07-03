@@ -1,5 +1,5 @@
-﻿using AimAssist.Combos.Mode.Wiki;
-using AimAssist.Core.Editors;
+﻿using AimAssist.Core.Editors;
+using AimAssist.UI.Combos;
 using AimAssist.UI.Combos.Commands;
 using AimAssist.UI.Options;
 using AimAssist.Units.Core.Units;
@@ -44,7 +44,7 @@ namespace AimAssist.UI.UnitContentsView
             switch (unit.Content)
             {
                 case MarkdownPath markdownPath:
-                    return new MarkdownPreviewFactory().Create(markdownPath.FullPath);
+                    return new MarkdownView(markdownPath.FullPath);
                 case SpeechModel speechModel:
                     return new SpeechControl();
                 case BookSearchSetting:

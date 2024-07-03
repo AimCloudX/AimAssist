@@ -1,9 +1,7 @@
 ﻿using AimAssist.Service;
-using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.Snippets;
-using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.UI;
 using Common.UI.Editor;
 using Library.Options;
@@ -163,14 +161,7 @@ namespace AimAssist.UI.PickerWindows
                     Tag = null
                 };
 
-                if (this.Mode == BookSearchMode.Instance)
-                {
-                    this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
-                }
-                else
-                {
-                    this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
-                }
+                this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
 
                 this.typingTimer.Tick += this.HandleTypingTimerTimeout;
             }
