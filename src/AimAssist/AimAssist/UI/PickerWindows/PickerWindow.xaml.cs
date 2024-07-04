@@ -18,7 +18,7 @@ namespace AimAssist.UI.PickerWindows
 {
     public partial class PickerWindow : Window, INotifyPropertyChanged
     {
-        public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
+        public ObservableCollection<UnitViewModel> UnitLists { get; } = new ObservableCollection<UnitViewModel>();
 
         public IMode Mode { get; set; }
 
@@ -37,7 +37,7 @@ namespace AimAssist.UI.PickerWindows
                 return true;
             }
 
-            var combo = obj as IUnit;
+            var combo = obj as UnitViewModel;
             if (combo != null)
             {
 
@@ -92,7 +92,7 @@ namespace AimAssist.UI.PickerWindows
             var units = UnitsService.Instnace.CreateUnits(this.Mode);
             await foreach (var unit in units)
             {
-                UnitLists.Add(unit);
+                UnitLists.Add(new UnitViewModel(unit));
             }
         }
 
@@ -121,7 +121,7 @@ namespace AimAssist.UI.PickerWindows
         {
             if (e.Key == Key.Enter)
             {
-                if (this.ComboListBox.SelectedItem is SnippetUnit unit)
+                if (this.ComboListBox.SelectedItem is UnitViewModel unit  && unit.Content is SnippetUnit model)
                 {
                     this.SnippetText = await EditorCash.Editor.GetText();
                     this.CloseWindow();
@@ -203,9 +203,9 @@ namespace AimAssist.UI.PickerWindows
 
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.ComboListBox.SelectedItem is SnippetUnit unit)
+            if (this.ComboListBox.SelectedItem is UnitViewModel unit && unit.Content is SnippetUnit model)
             {
-                EditorCash.Editor.SetTextAsync(unit.Model.Code);
+                EditorCash.Editor.SetTextAsync(model.Code);
             }
         }
 

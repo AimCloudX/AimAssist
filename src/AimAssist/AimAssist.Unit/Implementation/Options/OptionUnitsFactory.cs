@@ -12,7 +12,7 @@ namespace AimAssist.Units.Implementation.Options
 
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
-            yield return new Unit(TargetMode, "Option Settings", new OptionContent());
+            yield return new OptionUnit();
         }
     }
     public class ShortcutUnitsFacotry  : IUnitsFacotry
@@ -23,7 +23,7 @@ namespace AimAssist.Units.Implementation.Options
 
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
-            yield return new Unit(TargetMode, "Shortcut Settings", new ShortcutOptionContent());
+            yield return new ShortcutOptionUnit();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace ClipboardAnalyzer
         public Dictionary<Type, Func<IUnit, UIElement>> GetUIElementConverters()
         {
             return new Dictionary<Type, Func<IUnit, UIElement>> {
-                {typeof(ClipboardItem), (unit)=>new ClipboardList() } };
+                {typeof(ClipboardUnit), (unit)=>new ClipboardList() } };
         }
 
         public IEnumerable<IUnitsFacotry> GetUnitsFactory()

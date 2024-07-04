@@ -90,7 +90,7 @@ namespace AimAssist.Service
             switch (mode)
             {
                 case AllInclusiveMode:
-                    foreach (var factory in this.facotry.Where(x=>x.IsShowInStnadard))
+                    foreach (var factory in this.facotry)
                     {
                         await foreach (var units in factory.GetUnits())
                         {

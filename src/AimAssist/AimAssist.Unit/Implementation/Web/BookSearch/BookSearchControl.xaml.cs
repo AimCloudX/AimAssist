@@ -114,7 +114,7 @@ namespace AimAssist.Units.Implementation.Web.BookSearch
                         if (bb.type == "ISBN_10")
                         {
                             var url = $"https://www.amazon.co.jp/dp/{bb.identifier}";
-                            yield return new Unit(BookSearchMode.Instance, titlte, new UrlPath(url));
+                            yield return new UrlUnit(BookSearchMode.Instance, titlte, url);
                         }
                     }
                 }

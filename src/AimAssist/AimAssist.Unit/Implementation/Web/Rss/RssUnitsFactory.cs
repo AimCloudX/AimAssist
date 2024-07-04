@@ -13,11 +13,18 @@ namespace AimAssist.Units.Implementation.Web.Rss
 
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
-            yield return new Unit(TargetMode, "Rss Setting", new RssSetting());
+            yield return new RssSettingUnit();
         }
     }
 
-    public class RssSetting : IUnitContent
+    public class RssSettingUnit : IUnit
     {
+        public IMode Mode => RssMode.Instance;
+
+        public string Name => "Rss Setting";
+
+        public string Description => string.Empty;
+
+        public string Category => string.Empty;
     }
 }

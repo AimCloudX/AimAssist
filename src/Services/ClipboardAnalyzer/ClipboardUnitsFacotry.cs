@@ -14,11 +14,18 @@ namespace ClipboardAnalyzer
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
             var text = System.Windows.Clipboard.ContainsText() ? System.Windows.Clipboard.GetText() : string.Empty;
-            yield return new Unit(WorkToolsMode.Instance,"ClipboardAnalyzer", text, new ClipboardItem());
+            yield return new ClipboardUnit();
         }
     }
 
-    public class ClipboardItem : IUnitContent
+    public class ClipboardUnit : IUnit
     {
+        public IMode Mode => WorkToolsMode.Instance;
+
+        public string Name => "ClipboardAnalyzer";
+
+        public string Description => System.Windows.Clipboard.ContainsText() ? System.Windows.Clipboard.GetText() : string.Empty;
+
+        public string Category => string.Empty;
     }
 }

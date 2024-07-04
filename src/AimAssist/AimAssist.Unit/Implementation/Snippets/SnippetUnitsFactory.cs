@@ -14,15 +14,15 @@ namespace AimAssist.Units.Implementation.Snippets
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
             // TODO:設定ファイルからのLoad
-            yield return SnippetUnit.Create("aim", "AimNext","Aim");
-            yield return SnippetUnit.Create("Today", DateTime.Now.ToString("d"),"DateTime");
-            yield return SnippetUnit.Create("Now",DateTime.Now.ToString("d"), "DateTime");
-            yield return SnippetUnit.Create("AppData", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
-            yield return SnippetUnit.Create("Downloads", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads"));
-            yield return SnippetUnit.Create("環境変数","control.exe sysdm.cpl,,3");
+            yield return new SnippetUnit("aim", "AimNext", "Aim");
+            yield return new SnippetUnit("Today", DateTime.Now.ToString("d"), "DateTime");
+            yield return new SnippetUnit("Now", DateTime.Now.ToString("d"), "DateTime");
+            yield return new SnippetUnit("AppData", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            yield return new SnippetUnit("Downloads", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads"));
+            yield return new SnippetUnit("環境変数", "control.exe sysdm.cpl,,3");
             if (Clipboard.ContainsText())
             {
-                yield return SnippetUnit.Create("クリップボード", Clipboard.GetText());
+                yield return new SnippetUnit("クリップボード", Clipboard.GetText());
             }
         }
     }

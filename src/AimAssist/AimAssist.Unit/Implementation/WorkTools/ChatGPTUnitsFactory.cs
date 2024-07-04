@@ -12,8 +12,8 @@ namespace AimAssist.Units.Implementation.WorkTools
 
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
-            yield return new Unit(WorkToolsMode.Instance,"ChatGPT", new UrlPath("https://chatgpt.com/"));
-            yield return new Unit(WorkToolsMode.Instance,"Claude", new UrlPath("https://claude.ai/"));
+            yield return new UrlUnit(WorkToolsMode.Instance, "ChatGPT", "https://chatgpt.com/");
+            yield return new UrlUnit(WorkToolsMode.Instance,"Claude", "https://claude.ai/");
         }
     }
 }

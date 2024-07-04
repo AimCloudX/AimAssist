@@ -1,21 +1,26 @@
-﻿using AimAssist.Units.Core.Units;
-using System.Windows.Media.Imaging;
+﻿using AimAssist.Units.Core.Mode;
+using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Snippets
 {
-    public class SnippetUnit : Unit
+    public class SnippetUnit : IUnit
     {
-        private SnippetUnit(string category, SnippetModel model) 
-            : base(SnippetMode.Instance, model.Name, model.Code, model.Category, new BitmapImage(), model)
+        public SnippetUnit(string name, string text, string category = "")
         {
-            this.Model = model;
+            Name = name;
+            Code = text;
+            Category = category;
         }
 
-        public static SnippetUnit Create(string name, string code, string category = "")
-        {
-            return new SnippetUnit(category, new SnippetModel(name, code, category));
-        }
+        public string Name { get; }
 
-        public SnippetModel Model { get; }
+
+        public string Code { get; }
+
+        public string Category { get; }
+
+        public IMode Mode => SnippetMode.Instance;
+
+        public string Description => string.Empty;
     }
 }

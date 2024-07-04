@@ -13,10 +13,6 @@ namespace AimAssist.Units.Core.Mode
 
         bool IsApplyFiter { get; }
 
-        void SetModeChangeCommandAction(Action<Window> action);
-
         KeySequence DefaultKeySequence { get; }
-
-        RelayCommand ModeChangeCommand { get; }
     }
 }
