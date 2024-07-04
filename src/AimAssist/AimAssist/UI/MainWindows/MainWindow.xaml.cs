@@ -22,8 +22,8 @@ namespace AimAssist.UI.MainWindows
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public ObservableCollection<IUnit> UnitLists { get; } = new ObservableCollection<IUnit>();
-        public ObservableCollection<IUnit> ActiveUnits { get; } = new ObservableCollection<IUnit>();
+        public ObservableCollection<UnitViewModel> UnitLists { get; } = new ObservableCollection<UnitViewModel>();
+        public ObservableCollection<UnitViewModel> ActiveUnits { get; } = new ObservableCollection<UnitViewModel>();
         private IMode mode;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
@@ -49,16 +49,16 @@ namespace AimAssist.UI.MainWindows
         {
             foreach (var mode in UnitsService.Instnace.GetAllModes())
             {
-                mode.SetModeChangeCommandAction((window) =>
+                var modeChangeCommand = new RelayCommand(mode.GetModeChnageCommandName(), (window) =>
                 {
-                    if(window is MainWindow mainWindow)
+                    if (window is MainWindow mainWindow)
                     {
                         mainWindow.ModeList.SelectedItem = mode;
                         mainWindow.FilterTextBox.Focus();
                     }
                 }
-                    );
-                CommandService.Register(mode.ModeChangeCommand, mode.DefaultKeySequence);
+ );
+                CommandService.Register(modeChangeCommand, mode.DefaultKeySequence);
             }
 
             await foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
@@ -179,7 +179,7 @@ namespace AimAssist.UI.MainWindows
                 {
                     if (mainWindow.mode == ActiveUnitMode.Instance)
                     {
-                        if (mainWindow.ComboListBox.SelectedItem is IUnit unit)
+                        if (mainWindow.ComboListBox.SelectedItem is UnitViewModel unit)
                         {
                             mainWindow.ActiveUnits.Remove(unit);
                             mainWindow.UnitLists.Remove(unit);
@@ -216,7 +216,7 @@ namespace AimAssist.UI.MainWindows
 
                 foreach (var unit in unitsArgs.Units)
                 {
-                    UnitLists.Add(unit);
+                    UnitLists.Add(new UnitViewModel(unit));
                 }
             }
         }
@@ -241,7 +241,7 @@ namespace AimAssist.UI.MainWindows
 
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.ComboListBox.SelectedItem is IUnit unit)
+            if (this.ComboListBox.SelectedItem is UnitViewModel unit)
             {
                 var view = new UnitViewFactory().Create(unit);
                 this.MainContent.Content = view;
@@ -282,7 +282,7 @@ namespace AimAssist.UI.MainWindows
                 return true;
             }
 
-            var combo = obj as IUnit;
+            var combo = obj as UnitViewModel;
             if (combo != null)
             {
                 if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
@@ -320,7 +320,7 @@ namespace AimAssist.UI.MainWindows
             var units = UnitsService.Instnace.CreateUnits(this.mode);
             await foreach (var unit in units)
             {
-                UnitLists.Add(unit);
+                UnitLists.Add(new UnitViewModel(unit));
             }
         }
 
@@ -352,17 +352,16 @@ namespace AimAssist.UI.MainWindows
                 if (this.mode != ActiveUnitMode.Instance)
                 {
 
-                    if (this.ComboListBox.SelectedItem is IUnit unit)
+                    if (this.ComboListBox.SelectedItem is UnitViewModel unit)
                     {
                         if (!ActiveUnits.Contains(unit))
                         {
                             ActiveUnits.Add(unit);
                         }
 
-                        ActiveUnitMode.Instance.ModeChangeCommand.Execute(this);
+                        CommandService.Execute(ActiveUnitMode.Instance.GetModeChnageCommandName(), this);
                         this.ComboListBox.SelectedItem = unit;
                     }
-
                 }
             }
         }

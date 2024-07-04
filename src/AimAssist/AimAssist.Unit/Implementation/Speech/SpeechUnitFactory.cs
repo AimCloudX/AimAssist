@@ -13,7 +13,7 @@ namespace AimAssist.Units.Implementation.Speech
 
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
-            yield return new Unit(WorkToolsMode.Instance, "Transcription", new SpeechModel());
+            yield return new TranscriptionUnit();
         }
     }
 }

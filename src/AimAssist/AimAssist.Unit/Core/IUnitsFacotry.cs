@@ -7,6 +7,5 @@ namespace AimAssist.Units.Core
     {
         IMode TargetMode { get; }
         IAsyncEnumerable<IUnit> GetUnits();
-        bool IsShowInStnadard { get; }
     }
 }

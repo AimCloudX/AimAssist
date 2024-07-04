@@ -1,7 +1,5 @@
-﻿using Common.Commands;
-using Common.Commands.Shortcus;
+﻿using Common.Commands.Shortcus;
 using MaterialDesignThemes.Wpf;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -19,8 +17,6 @@ namespace AimAssist.Units.Core.Mode
 
         public string ImplementationClassName => GetType().Name;
 
-        public virtual RelayCommand ModeChangeCommand { get; private set; }
-
         public virtual KeySequence DefaultKeySequence => KeySequence.None;
 
         public virtual string Description => string.Empty;
@@ -28,13 +24,6 @@ namespace AimAssist.Units.Core.Mode
         public virtual bool IsApplyFiter => true;
 
         public abstract Control Icon { get; }
-
-        public virtual void SetModeChangeCommandAction(Action<Window> action)
-        {
-            Debug.Assert(this.ModeChangeCommand == null, "Command登録済み");
-            var commandName = $"{GetImplementationClassName()}.ChangeMode";
-            this.ModeChangeCommand = new RelayCommand(commandName, action);
-        }
 
         public override bool Equals(object? obj)
         {

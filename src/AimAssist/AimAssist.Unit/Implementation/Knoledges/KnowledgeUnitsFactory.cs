@@ -18,7 +18,7 @@ namespace AimAssist.Units.Implementation.Knoledges
             var dictInfo = new DirectoryInfo("Resources/Knowledge/");
             foreach (var file in dictInfo.GetFiles())
             {
-                yield return new Unit(KnowledgeMode.Instance, file.Name, new MarkdownPath(file));
+                yield return new MarkdownPathUnit(file, string.Empty);
             }
 
             foreach (var directory in dictInfo.GetDirectories())
@@ -26,7 +26,7 @@ namespace AimAssist.Units.Implementation.Knoledges
                 foreach (var file in directory.GetFiles())
                 {
 
-                    yield return new Unit(KnowledgeMode.Instance, file.Name, string.Empty, directory.Name, new BitmapImage(), new MarkdownPath(file));
+                    yield return new MarkdownPathUnit(file, directory.Name);
                 }
             }
 

@@ -12,7 +12,7 @@ namespace AimAssist.Units.Implementation.Web.BookSearch
 
         public async IAsyncEnumerable<IUnit> GetUnits()
         {
-            yield return new Unit(TargetMode, "Book Search", new BookSearchSetting());
+            yield return new BookSearchSettingUnit();
         }
     }
 }

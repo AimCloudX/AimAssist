@@ -22,7 +22,7 @@ namespace AimAssist.UI.UnitContentsView
 
         private static Dictionary<string, UIElement> cash = new();
         
-        public UIElement Create(IUnit unit, bool createNew = false)
+        public UIElement Create(UnitViewModel unit, bool createNew = false)
         {
             if (createNew)
             {
@@ -39,19 +39,19 @@ namespace AimAssist.UI.UnitContentsView
             return element;
         }
 
-        private static UIElement CreateInner(IUnit unit)
+        private static UIElement CreateInner(UnitViewModel unit)
         {
             switch (unit.Content)
             {
-                case MarkdownPath markdownPath:
+                case MarkdownPathUnit markdownPath:
                     return new MarkdownView(markdownPath.FullPath);
-                case SpeechModel speechModel:
+                case TranscriptionUnit speechModel:
                     return new SpeechControl();
-                case BookSearchSetting:
+                case BookSearchSettingUnit:
                     return new BookSearchControl();
-                case RssSetting:
+                case RssSettingUnit:
                     return new RssControl();
-                case OptionContent:
+                case OptionUnit:
                     var editor = new AimEditor();
                     editor.NewTab(EditorOptionService.OptionPath);
                     if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
@@ -60,9 +60,9 @@ namespace AimAssist.UI.UnitContentsView
                     }
 
                     return editor;
-                case ShortcutOptionContent:
+                case ShortcutOptionUnit:
                     return new CustomizeKeyboardShortcutsSettings();
-                case SnippetModel model:
+                case SnippetUnit model:
                     return new System.Windows.Controls.TextBox()
                     {
                         Text = model.Code,
@@ -70,7 +70,7 @@ namespace AimAssist.UI.UnitContentsView
                         VerticalAlignment = VerticalAlignment.Stretch,
                         Margin = new Thickness(0)
                     };
-                case UrlPath urlPath:
+                case UrlUnit urlPath:
                     var url = urlPath.Url;
                     if (url.StartsWith("https://chatgpt"))
                     {
@@ -94,7 +94,7 @@ namespace AimAssist.UI.UnitContentsView
 
             if(UnitToUIElementDicotionary.TryGetValue(unit.Content.GetType(), out var value))
             {
-                return value.Invoke(unit);
+                return value.Invoke(unit.Content);
             }
 
             return null;
