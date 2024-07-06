@@ -4,7 +4,7 @@ using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace AimAssist.Units.Implementation.Standard
+namespace AimAssist.Units.Core.Modes
 {
     public class AllInclusiveMode : ModeBase
     {
@@ -16,6 +16,6 @@ namespace AimAssist.Units.Implementation.Standard
         public static AllInclusiveMode Instance { get; } = new AllInclusiveMode();
 
         public override string Description => "";
-        public override KeySequence DefaultKeySequence =>  new KeySequence(Key.K, ModifierKeys.Control, Key.I, ModifierKeys.Control);
+        public override KeySequence DefaultKeySequence => new KeySequence(Key.K, ModifierKeys.Control, Key.I, ModifierKeys.Control);
     }
 }

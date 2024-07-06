@@ -18,6 +18,6 @@
   </ItemGroup>
   <Target Name="CopyExtensions" AfterTargets="AfterBuild">
     <!-- DLLのコピー先を指定 -->
-    <Copy SourceFiles="$(OutputPath)\ClipboardAnalyzer.dll" DestinationFolder="..\..\AimAssist\bin\Debug\net8.0-windows\Plugins" />
+    <Copy SourceFiles="$(OutputPath)\ClipboardAnalyzer.dll" DestinationFolder="..\..\AimAssist\AimAssist\bin\Debug\net8.0-windows\Plugins" />
   </Target>
 </Project>

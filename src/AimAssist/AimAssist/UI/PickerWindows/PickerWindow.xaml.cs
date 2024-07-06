@@ -90,9 +90,14 @@ namespace AimAssist.UI.PickerWindows
         {
             UnitLists.Clear();
             var units = UnitsService.Instnace.CreateUnits(this.Mode);
-            await foreach (var unit in units)
+            foreach (var unit in units)
             {
                 UnitLists.Add(new UnitViewModel(unit));
+            }
+
+            if (System.Windows.Clipboard.ContainsText())
+            {
+                UnitLists.Add(new UnitViewModel(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
             }
         }
 

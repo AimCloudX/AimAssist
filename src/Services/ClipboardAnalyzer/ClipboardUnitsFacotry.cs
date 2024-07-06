@@ -7,13 +7,8 @@ namespace ClipboardAnalyzer
 {
     public class ClipboardUnitsFacotry : IUnitsFacotry
     {
-        public IMode TargetMode => WorkToolsMode.Instance;
-
-        public bool IsShowInStnadard => true;
-
-        public async IAsyncEnumerable<IUnit> GetUnits()
+        public IEnumerable<IUnit> GetUnits()
         {
-            var text = System.Windows.Clipboard.ContainsText() ? System.Windows.Clipboard.GetText() : string.Empty;
             yield return new ClipboardUnit();
         }
     }

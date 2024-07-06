@@ -3,6 +3,7 @@ using AimAssist.UI.Combos;
 using AimAssist.UI.Combos.Commands;
 using AimAssist.UI.Options;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.ApplicationLog;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
@@ -87,6 +88,8 @@ namespace AimAssist.UI.UnitContentsView
                     }
 
                     return new WebViewControl(url);
+                case AppLogUnit:
+                    return new ApplicationLogControl();
 
                 default:
                     break;
