@@ -1,8 +1,5 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Service;
-using AimAssist.UI.SystemTray;
-using AimAssist.UI.Tools.HotKeys;
-using Common.Commands.Shortcus;
 using Library.Options;
 using System.IO;
 using System.IO.Pipes;
@@ -17,21 +14,16 @@ namespace AimAssist
         private static Mutex mutex;
         private const string appName = "AimAssist";
         private const string PipeName = "AimAssist";
-        public static SettingManager SettingsManager { get; private set; }
-
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
         {
             mutex = new Mutex(true, appName, out var createdNew);
             if (createdNew)
             {
-                Initialize();
+                new Initializer().Initialize();
+                var settings = new SettingManager().LoadSettings();
+                CommandService.SetKeymap(settings);
 
                 ThreadPool.QueueUserWorkItem(WaitCallActivate);// 名前付きパイプサーバーを起動 別プロセスからのActivate用
-
-                Exit += (object _, System.Windows.ExitEventArgs _) => {
-                    EditorOptionService.SaveOption();
-                    mutex.ReleaseMutex();
-                };
 
                 AppCommands.ToggleMainWindow.Execute(this);
             }
@@ -60,20 +52,6 @@ namespace AimAssist
             }
         }
 
-        private static void Initialize()
-        {
-            EditorOptionService.LoadOption();
-            SystemTrayRegister.Register();
-            UnitsService.Instnace.Initialize();
-            CommandService.Register(AppCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
-            CommandService.Register(AppCommands.ShowPickerWindow, new KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
-            CommandService.Register(AppCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
-            SettingsManager = new SettingManager();
-            var settings = SettingsManager.LoadSettings();
-            CommandService.SetKeymap(settings);
-
-            new WaitHowKeysWindow().Show();
-        }
 
         private void WaitCallActivate(object state)
         {
@@ -92,7 +70,10 @@ namespace AimAssist
         private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
         {
             var settings = CommandService.GetKeymap();
-            SettingsManager.SaveSettings(settings);
+            new SettingManager().SaveSettings(settings);
+            EditorOptionService.SaveOption();
+            mutex.ReleaseMutex();
+
         }
     }
 }

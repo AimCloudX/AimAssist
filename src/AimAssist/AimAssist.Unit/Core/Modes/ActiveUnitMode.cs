@@ -4,7 +4,7 @@ using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace AimAssist.Units.Implementation.Standard
+namespace AimAssist.Units.Core.Modes
 {
     public class ActiveUnitMode : ModeBase
     {
@@ -20,6 +20,6 @@ namespace AimAssist.Units.Implementation.Standard
 
         public override string Description => "Active Units";
 
-        public override KeySequence DefaultKeySequence =>  new KeySequence(Key.K, ModifierKeys.Control, Key.K, ModifierKeys.Control);
+        public override KeySequence DefaultKeySequence => new KeySequence(Key.K, ModifierKeys.Control, Key.K, ModifierKeys.Control);
     }
 }

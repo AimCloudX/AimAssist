@@ -1,11 +1,9 @@
-﻿using AimAssist.Units.Core.Mode;
-using AimAssist.Units.Core.Units;
+﻿using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Core
 {
     public interface IUnitsFacotry
     {
-        IMode TargetMode { get; }
-        IAsyncEnumerable<IUnit> GetUnits();
+        IEnumerable<IUnit> GetUnits();
     }
 }

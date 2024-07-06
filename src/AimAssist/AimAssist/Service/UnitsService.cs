@@ -1,17 +1,7 @@
-﻿using AimAssist.Plugins;
-using AimAssist.UI.UnitContentsView;
-using AimAssist.Units.Core;
+﻿using AimAssist.Units.Core;
 using AimAssist.Units.Core.Mode;
+using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Knoledges;
-using AimAssist.Units.Implementation.Knowledge;
-using AimAssist.Units.Implementation.Options;
-using AimAssist.Units.Implementation.Snippets;
-using AimAssist.Units.Implementation.Speech;
-using AimAssist.Units.Implementation.Standard;
-using AimAssist.Units.Implementation.Web.BookSearch;
-using AimAssist.Units.Implementation.Web.Rss;
-using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Service
 {
@@ -19,18 +9,13 @@ namespace AimAssist.Service
     {
         private static UnitsService? instance;
 
-        private List<IMode> modes = new List<IMode>();
-
-        private List<IUnitsFacotry> facotry  = new(); 
-
-        public void Register(IMode mode)
-        {
-            modes.Add(mode);
-        }
+        private Dictionary<IMode, IList<IUnit>> modeDic = new() {
+            { AllInclusiveMode.Instance, new List<IUnit>() },
+            {ActiveUnitMode.Instance, new List<IUnit>() } };
 
         public IReadOnlyCollection<IMode> GetAllModes()
         {
-            return modes;
+            return modeDic.Keys;
         }
 
         public static UnitsService Instnace
@@ -47,79 +32,35 @@ namespace AimAssist.Service
             }
         }
 
-        public void Initialize()
+        public void RegisterUnits(IUnitsFacotry facotry)
         {
-
-            Register(AllInclusiveMode.Instance);
-            Register(ActiveUnitMode.Instance);
-            Register(WorkToolsMode.Instance);
-            Register(BookSearchMode.Instance);
-            Register(RssMode.Instance);
-            Register(SnippetMode.Instance);
-            Register(KnowledgeMode.Instance);
-            Register(OptionMode.Instance);
-
-            Instnace.facotry.Add(new ChatGPTUnitsFactory());
-            Instnace.facotry.Add(new SpeechUnitFactory());
-            Instnace.facotry.Add(new KnowledgeUnitsFactory());
-
-            Instnace.facotry.Add(new SnippetUnitsFactory());
-            Instnace.facotry.Add(new BookSearchUnitsFactory());
-            Instnace.facotry.Add(new RssUnitsFactory());
-
-            Instnace.facotry.Add(new OptionUnitsFactory());
-            Instnace.facotry.Add(new ShortcutUnitsFacotry());
-
-            var pluginService = new PluginsService();
-            pluginService.LoadCommandPlugins();
-            var facotries = pluginService.GetFactories();
-            foreach (var item in facotries)
+            var units = facotry.GetUnits();
+            foreach (var unit in units)
             {
-                facotry.Add(item);
-            }
+                if (modeDic.TryGetValue(AllInclusiveMode.Instance, out var allUnits))
+                {
+                    allUnits.Add(unit);
+                }
 
-            var converters = pluginService.GetConterters();
-            foreach (var item in converters)
-            {
-                UnitViewFactory.UnitToUIElementDicotionary.TryAdd(item.Key, item.Value);
+                if (modeDic.TryGetValue(unit.Mode, out var unitLists))
+                {
+                    unitLists.Add(unit);
+                }
+                else
+                {
+                    modeDic.Add(unit.Mode, new List<IUnit>() { unit });
+                }
             }
         }
 
-        public async IAsyncEnumerable<IUnit> CreateUnits(IMode mode)
+        public IEnumerable<IUnit> CreateUnits(IMode mode)
         {
-            switch (mode)
+            if(modeDic.TryGetValue(mode, out var units))
             {
-                case AllInclusiveMode:
-                    foreach (var factory in this.facotry)
-                    {
-                        await foreach (var units in factory.GetUnits())
-                        {
-                            yield return units;
-                        }
-                    }
-
-                    break;
-                default:
-                    foreach (var fac in this.facotry.Where(x=>x.TargetMode == mode))
-                    {
-                        var units = fac.GetUnits();
-                        await foreach (var unit in units)
-                        {
-                            yield return unit;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        public void Dispose()
-        {
-            foreach (var disposable in facotry.OfType<IDisposable>())
-            {
-                disposable.Dispose();
+                return units;
             }
 
-            facotry.Clear();
+            return Enumerable.Empty<IUnit>();
         }
     }
 }

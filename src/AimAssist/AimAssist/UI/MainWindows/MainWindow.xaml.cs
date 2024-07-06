@@ -3,8 +3,8 @@ using AimAssist.Service;
 using AimAssist.UI.PickerWindows;
 using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Mode;
+using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Standard;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.Commands;
 using Common.Commands.Shortcus;
@@ -61,7 +61,7 @@ namespace AimAssist.UI.MainWindows
                 CommandService.Register(modeChangeCommand, mode.DefaultKeySequence);
             }
 
-            await foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
+            foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
             {
                 var unitChangeCommand = new RelayCommand(unit.Name, (Window window) =>
                 {
@@ -318,7 +318,7 @@ namespace AimAssist.UI.MainWindows
             }
 
             var units = UnitsService.Instnace.CreateUnits(this.mode);
-            await foreach (var unit in units)
+            foreach (var unit in units)
             {
                 UnitLists.Add(new UnitViewModel(unit));
             }
