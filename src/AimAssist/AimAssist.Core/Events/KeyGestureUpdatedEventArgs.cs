@@ -1,6 +1,5 @@
 ﻿using Common.Commands;
 using Common.Commands.Shortcus;
-using System.Windows.Input;
 
 namespace AimAssist.Core.Events
 {

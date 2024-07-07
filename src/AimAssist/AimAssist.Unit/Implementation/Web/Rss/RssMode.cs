@@ -17,7 +17,5 @@ namespace AimAssist.Units.Implementation.Web.Rss
         public static RssMode Instance { get; } = new RssMode();
 
         public override string Description => "主要ニュースサイトRSSから最新記事の取得";
-
-        public override bool IsApplyFiter => false; 
     }
 }

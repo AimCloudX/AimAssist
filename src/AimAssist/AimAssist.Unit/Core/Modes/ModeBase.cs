@@ -15,13 +15,10 @@ namespace AimAssist.Units.Core.Mode
 
         public string Name { get; }
 
-        public string ImplementationClassName => GetType().Name;
-
         public virtual KeySequence DefaultKeySequence => KeySequence.None;
 
         public virtual string Description => string.Empty;
 
-        public virtual bool IsApplyFiter => true;
 
         public abstract Control Icon { get; }
 
@@ -44,7 +41,6 @@ namespace AimAssist.Units.Core.Mode
         {
             return this.GetType().Name;
         }
-
 
         protected PackIcon CreateIcon(PackIconKind kind)
         {

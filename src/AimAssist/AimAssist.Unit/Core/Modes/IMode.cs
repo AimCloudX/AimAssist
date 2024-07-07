@@ -1,6 +1,4 @@
-﻿using Common.Commands;
-using Common.Commands.Shortcus;
-using System.Windows;
+﻿using Common.Commands.Shortcus;
 using System.Windows.Controls;
 
 namespace AimAssist.Units.Core.Mode
@@ -10,8 +8,6 @@ namespace AimAssist.Units.Core.Mode
         Control Icon { get; }
         string Name { get; }
         string Description { get; }
-
-        bool IsApplyFiter { get; }
 
         KeySequence DefaultKeySequence { get; }
     }
