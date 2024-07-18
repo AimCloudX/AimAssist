@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Services\CheatSheet\CheatSheet.csproj" />
     <ProjectReference Include="..\AimAssist.Plugins\AimAssist.Plugins.csproj" />
   </ItemGroup>
   <Target Name="CopyReadMe" AfterTargets="AfterBuild">
