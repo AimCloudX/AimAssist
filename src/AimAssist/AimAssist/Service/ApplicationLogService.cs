@@ -100,20 +100,17 @@ namespace AimAssist.Service
             Debug.WriteLine($"Active Window: {activeWindowInfo.WindowTitle} (App: {activeWindowInfo.AppName}) at {logEntry.Time}");
 
             // JSONファイルにログを保存
-            SaveLogToFile();
+            SaveLogToFile(logEntry);
         }
 
-        private void SaveLogToFile()
+        private void SaveLogToFile(LogEntry logEntry)
         {
             string fileName = $"ActiveWindowLog_{DateTime.Now:yyyy_MM}.json";
             string filePath = System.IO.Path.Combine(_logDirectoryPath, fileName);
             using (StreamWriter writer = new StreamWriter(filePath, true)) // Append mode
             {
-                foreach (var logEntry in _logEntries)
-                {
-                    var json = JsonConvert.SerializeObject(logEntry, Formatting.None);
-                    writer.WriteLine(json);
-                }
+                var json = JsonConvert.SerializeObject(logEntry, Formatting.None);
+                writer.WriteLine(json);
             }
         }
 

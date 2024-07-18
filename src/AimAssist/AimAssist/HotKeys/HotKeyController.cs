@@ -1,4 +1,5 @@
-﻿using Common.Commands;
+﻿using CheatSheet.Services;
+using Common.Commands;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -10,6 +11,7 @@ public class HotKeyController : IDisposable
 {
     private nint _windowHandle;
     private Dictionary<int, HotKeyItem> _hotkeyList = new Dictionary<int, HotKeyItem>();
+    private CheatSheetController cheatSheetController;
 
     private const int WM_HOTKEY = 0x0312;
 
@@ -24,6 +26,7 @@ public class HotKeyController : IDisposable
         this.window = window;
         var host = new WindowInteropHelper(window);
         _windowHandle = host.Handle;
+        cheatSheetController = new CheatSheetController(window.Dispatcher);
 
         ComponentDispatcher.ThreadPreprocessMessage += ComponentDispatcher_ThreadPreprocessMessage;
     }
@@ -154,6 +157,7 @@ public class HotKeyController : IDisposable
 
     public void Dispose()
     {
+        cheatSheetController.Dispose();
         Dispose(true);
         GC.SuppressFinalize(this);
     }
