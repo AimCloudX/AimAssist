@@ -13,25 +13,26 @@ public partial  class CheatsheetPopup : Window
         public CheatsheetPopup(string content, string title)
         {
             Title = $"{title} Shortcut Keys Cheatsheet";
-            Width = 250;
-            Height = SystemParameters.PrimaryScreenHeight;
+
+            Width = SystemParameters.PrimaryScreenWidth; // 画面の幅いっぱいに設定
+            Height = 200; // ポップアップの高さを設定（必要に応じて調整）
             ShowInTaskbar = false;
             Topmost = true;
             WindowStyle = WindowStyle.None;
             AllowsTransparency = true;
-            Background = System.Windows.Media.Brushes.Transparent; // 背景を透明に設定
+            Background = System.Windows.Media.Brushes.Transparent;
 
             // ツールウィンドウとして設定
             ShowActivated = false;
             WindowStartupLocation = WindowStartupLocation.Manual;
-            Left = SystemParameters.PrimaryScreenWidth - Width;
-            Top = 0;
+            Left = 0; // 左端に配置
+            Top = SystemParameters.PrimaryScreenHeight - Height; // 画面の下部に配置
 
             // コンテンツを設定
             Border border = new Border
             {
                 Background = System.Windows.Media.Brushes.Black,
-                Opacity = 0.5, // 少し透明に
+                Opacity = 0.8, // 少し透明に
                 Child = new ScrollViewer
                 {
                     Content = new TextBlock
