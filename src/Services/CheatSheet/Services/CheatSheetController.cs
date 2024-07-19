@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
+using System.Windows.Forms;
 
 namespace CheatSheet.Services
 {
@@ -188,7 +189,7 @@ Ctrl+P 前のユニット
             }
 
             string activeAppName = GetActiveApplicationName();
-            if (_cheatsheets.TryGetValue(activeAppName, out string cheatsheetContent))
+            if (_cheatsheets.TryGetValue(activeAppName.ToLower(), out string cheatsheetContent))
             {
                 _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName);
             }
@@ -196,6 +197,21 @@ Ctrl+P 前のユニット
             {
                 _cheatsheetPopup = new CheatsheetPopup(_cheatsheets["windows"], "Windows (Default)");
             }
+
+            // アクティブウィンドウの位置を取得
+            IntPtr activeWindow = GetForegroundWindow();
+            RECT activeWindowRect;
+            GetWindowRect(activeWindow, out activeWindowRect);
+
+            // アクティブウィンドウが表示されているスクリーンを特定
+            System.Windows.Forms.Screen activeScreen = System.Windows.Forms.Screen.FromHandle(activeWindow);
+
+            // チートシートポップアップの位置とサイズを設定
+            _cheatsheetPopup.Width = activeScreen.WorkingArea.Width;
+            _cheatsheetPopup.Height = 200; // 必要に応じて調整
+            _cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
+            _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
+
             _cheatsheetPopup.Show();
         }
 
@@ -236,6 +252,18 @@ Ctrl+P 前のユニット
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
         public void Dispose()
         {
             UnhookWindowsHookEx(_hookID);
