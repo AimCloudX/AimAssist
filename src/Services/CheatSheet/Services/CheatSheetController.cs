@@ -174,7 +174,7 @@ Ctrl+P 前のユニット
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (_isCtrlPressed && (DateTime.Now - _ctrlKeyPressStart).TotalSeconds >= 0.5)
+            if (_isCtrlPressed && (DateTime.Now - _ctrlKeyPressStart).TotalSeconds >= 1)
             {
                 dispatcher.Invoke(() => ShowCheatsheet());
                 _timer.Stop();

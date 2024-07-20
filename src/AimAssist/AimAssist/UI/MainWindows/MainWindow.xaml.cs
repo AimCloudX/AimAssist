@@ -9,13 +9,17 @@ using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.Commands;
 using Common.Commands.Shortcus;
 using Common.UI;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace AimAssist.UI.MainWindows
@@ -214,9 +218,23 @@ namespace AimAssist.UI.MainWindows
                 UpdateGroupDescription();
                 this.ComboListBox.SelectedIndex = 0;
 
-                foreach (var unit in unitsArgs.Units)
+
+                ConcurrentBag<UnitViewModel> concurrentBag = new ConcurrentBag<UnitViewModel> ();
+                unitsArgs.Units.AsParallel().ForAll(x => {
+                    if (x is UrlUnit unitUrlUnit)
+                    {
+                        var icon = GetUrlIcon(unitUrlUnit);
+                        concurrentBag.Add(new UnitViewModel(icon, x));
+                    }
+                    else
+                    {
+                        concurrentBag.Add(new UnitViewModel(x));
+                    }
+                });
+
+                foreach(var unit in concurrentBag)
                 {
-                    UnitLists.Add(new UnitViewModel(unit));
+                    UnitLists.Add(unit);
                 }
             }
         }
@@ -320,8 +338,57 @@ namespace AimAssist.UI.MainWindows
             var units = UnitsService.Instnace.CreateUnits(this.mode);
             foreach (var unit in units)
             {
-                UnitLists.Add(new UnitViewModel(unit));
+                if(unit is UrlUnit unitUrlUnit)
+                {
+                    var icon = GetUrlIcon(unitUrlUnit);
+                    UnitLists.Add(new UnitViewModel(icon, unit));
+                }
+                else
+                {
+                    UnitLists.Add(new UnitViewModel(unit));
+                }
+
             }
+        }
+
+        public static BitmapImage GetUrlIcon(UrlUnit urlUnit)
+        {
+            string url = urlUnit.Description;
+            try
+            {
+                Uri uri = new Uri(url);
+                //string faviconUrl = $"{uri.Scheme}://{uri.Host}/favicon.ico";
+                string faviconUrl = GetFaviconUrl(urlUnit.Description);
+
+                using (WebClient client = new WebClient())
+                {
+                    // User-Agentヘッダーを追加
+                    client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+                    byte[] data = client.DownloadData(faviconUrl);
+
+                    using (MemoryStream ms = new MemoryStream(data))
+                    {
+                        BitmapImage bitmap = new BitmapImage();
+                        bitmap.BeginInit();
+                        bitmap.StreamSource = ms;
+                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmap.EndInit();
+                        bitmap.Freeze();
+
+                        Console.WriteLine("ChatGPTのアイコンを正常に取得しました。");
+                        return bitmap;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ChatGPTのアイコンの取得に失敗しました: {ex.Message}");
+                return null;
+            }
+        }
+        public static string GetFaviconUrl(string domain)
+        {
+            return $"http://www.google.com/s2/favicons?domain={domain}";
         }
 
         private void HandleTypingTimerTimeout(object sender, EventArgs e)

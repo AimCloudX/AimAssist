@@ -16,12 +16,13 @@
             <StackPanel Orientation="Vertical">
                 <DataGrid x:Name="SearchParamsGrid" AutoGenerateColumns="False" 
                   CanUserAddRows="False" CanUserDeleteRows="False" 
+                  ItemsSource="{Binding SearchParams, Mode=TwoWay}"
                   Margin="10">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header=""  Width="Auto">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsEnabled}" />
+                                    <CheckBox IsChecked="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

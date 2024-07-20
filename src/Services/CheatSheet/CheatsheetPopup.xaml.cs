@@ -8,14 +8,11 @@ namespace CheatSheet
     /// <summary>
     /// CheatSheetWindow.xaml の相互作用ロジック
     /// </summary>
-public partial  class CheatsheetPopup : Window
+public partial class CheatsheetPopup : Window
     {
         public CheatsheetPopup(string content, string title)
         {
             Title = $"{title} Shortcut Keys Cheatsheet";
-
-            Width = SystemParameters.PrimaryScreenWidth; // 画面の幅いっぱいに設定
-            Height = 200; // ポップアップの高さを設定（必要に応じて調整）
             ShowInTaskbar = false;
             Topmost = true;
             WindowStyle = WindowStyle.None;
@@ -25,25 +22,12 @@ public partial  class CheatsheetPopup : Window
             // ツールウィンドウとして設定
             ShowActivated = false;
             WindowStartupLocation = WindowStartupLocation.Manual;
-            Left = 0; // 左端に配置
-            Top = SystemParameters.PrimaryScreenHeight - Height; // 画面の下部に配置
 
             // コンテンツを設定
             Border border = new Border
             {
                 Background = System.Windows.Media.Brushes.Black,
-                Opacity = 0.8, // 少し透明に
-                Child = new ScrollViewer
-                {
-                    Content = new TextBlock
-                    {
-                        Text = content,
-                        Foreground = System.Windows.Media.Brushes.White,
-                        TextWrapping = TextWrapping.Wrap,
-                        Opacity = 1,
-                        Margin = new Thickness(10)
-                    }
-                }
+                Child = CreateMultiColumnContent(content)
             };
 
             Content = border;
@@ -56,6 +40,39 @@ public partial  class CheatsheetPopup : Window
                 exStyle |= WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT;
                 SetWindowLong(wih.Handle, GWL_EXSTYLE, exStyle);
             };
+        }
+
+        private UIElement CreateMultiColumnContent(string content)
+        {
+            var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            int itemsPerColumn = (int)Math.Ceiling(lines.Length / 8.0);  // 3列に分割
+
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            for (int i = 0; i < 8; i++)
+            {
+                var column = new StackPanel { Margin = new Thickness(10) };
+                var columnItems = lines.Skip(i * itemsPerColumn).Take(itemsPerColumn);
+                foreach (var item in columnItems)
+                {
+                    column.Children.Add(new TextBlock { Text = item, 
+                        Foreground = System.Windows.Media.Brushes.White,
+                        Margin = new Thickness(0, 0, 0, 5) });
+                }
+                Grid.SetColumn(column, i);
+                grid.Children.Add(column);
+            }
+
+            return grid;
         }
 
         protected override void OnDeactivated(EventArgs e)
