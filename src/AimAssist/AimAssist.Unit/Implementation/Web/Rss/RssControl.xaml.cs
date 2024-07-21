@@ -20,23 +20,24 @@ namespace AimAssist.Units.Implementation.Web.Rss
             InitializeComponent();
             Initialize();
             InitializeSearchParams();
+            this.DataContext = this;
         }
-        private ObservableCollection<RssItemUnit> _searchParams;
+        public ObservableCollection<RssItemUnit> SearchParams { get; set; } = new ObservableCollection<RssItemUnit>();
 
         private void InitializeSearchParams()
         {
-            _searchParams = new ObservableCollection<RssItemUnit>() { 
-            new RssItemUnit("zenn","zenn","https://zenn.dev/feed"){ IsEnabled = true},
-            new RssItemUnit("lifehacker","lifehacker", "https://www.lifehacker.jp/feed/index.xml"){ IsEnabled = true},
-            new RssItemUnit("ビジネスジャーナル","ビジネスジャーナル","https://biz-journal.jp/index.xml") { IsEnabled = true },
-            new RssItemUnit("ビジネス+IT","ビジネス+IT", "https://www.sbbit.jp/rss/HotTopics.rss") { IsEnabled = true },
-            };
-            for (int i = 4; i < 10; i++)
+            SearchParams.Add(new RssItemUnit("zenn", "zenn", "https://zenn.dev/feed") { IsEnabled = true });
+            SearchParams.Add(new RssItemUnit("CodeZine", "CodeZine", "https://codezine.jp/rss/new/20/index.xml") { IsEnabled = true });
+            SearchParams.Add(new RssItemUnit("lifehacker", "lifehacker", "https://www.lifehacker.jp/feed/index.xml") { IsEnabled = true });
+            SearchParams.Add(new RssItemUnit("ビジネスジャーナル", "ビジネスジャーナル", "https://biz-journal.jp/index.xml") { IsEnabled = true });
+            SearchParams.Add(new RssItemUnit("ビジネス+IT", "ビジネス+IT", "https://www.sbbit.jp/rss/HotTopics.rss") { IsEnabled = true });
+            SearchParams.Add(new RssItemUnit("企業テックブログRSS", "企業テックブログRSS", "https://yamadashy.github.io/tech-blog-rss-feed/feeds/rss.xml") { IsEnabled = false });
+            SearchParams.Add(new RssItemUnit("現代ビジネス", "現代ビジネス", "https://gendai.media/list/feed/rss"));
+            SearchParams.Add(new RssItemUnit("GIGAZINE", "GIGAZINE", "https://gigazine.net/news/rss_2.0/"));
+            for (int i = 0; i < 5; i++)
             {
-                _searchParams.Add(new RssItemUnit("","", ""));
+                SearchParams.Add(new RssItemUnit("","", ""));
             }
-
-            SearchParamsGrid.ItemsSource = _searchParams;
         }
 
         public async void Initialize()
@@ -60,7 +61,7 @@ namespace AimAssist.Units.Implementation.Web.Rss
             }
 
 
-            foreach (var inputText in _searchParams.Where(x => x.IsEnabled && !string.IsNullOrEmpty(x.SearchUrl)).Select(y => y.GetCategoryUrl))
+            foreach (var inputText in SearchParams.Where(x => x.IsEnabled && !string.IsNullOrEmpty(x.SearchUrl)).Select(y => y.GetCategoryUrl))
             {
                 var units  = GetUnitsInner(inputText);
                 await foreach(var unit in units)
@@ -82,7 +83,7 @@ namespace AimAssist.Units.Implementation.Web.Rss
 
                     if (!string.IsNullOrEmpty(url))
                     {
-                        yield return new UrlUnit(RssMode.Instance, title, url);
+                        yield return new UrlUnit(RssMode.Instance, title, url, rssUrl.Category);
                     }
                 }
             }
