@@ -1,6 +1,7 @@
 ﻿using AimAssist.Service;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.Caluculation;
 using AimAssist.Units.Implementation.Snippets;
 using Common.UI;
 using Common.UI.Editor;
@@ -114,8 +115,26 @@ namespace AimAssist.UI.PickerWindows
                 return;
             }
 
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
-            view.Filter = this.Filter;
+            if (this.FilterTextBox.Text.StartsWith('='))
+            {
+                this.Mode = CalcMode.Instance;
+                // ComboListの内容を更新する
+                
+                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
+                view.Filter = (obj) => true;
+            }
+            else
+            {
+                if(this.Mode != SnippetMode.Instance)
+                {
+                    this.Mode = SnippetMode.Instance;
+                    UpdateCandidate();
+                }
+
+                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
+                view.Filter = this.Filter;
+            }
+
             this.typingTimer = null;
             this.beforeText = this.FilterTextBox.Text;
             this.OnPropertyChanged(nameof(this.UnitLists));
