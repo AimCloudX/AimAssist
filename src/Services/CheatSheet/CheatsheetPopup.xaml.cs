@@ -12,7 +12,6 @@ public partial class CheatsheetPopup : Window
     {
         public CheatsheetPopup(string content, string title)
         {
-            Title = $"{title} Shortcut Keys Cheatsheet";
             ShowInTaskbar = false;
             Topmost = true;
             WindowStyle = WindowStyle.None;
@@ -27,6 +26,7 @@ public partial class CheatsheetPopup : Window
             Border border = new Border
             {
                 Background = System.Windows.Media.Brushes.Black,
+                Opacity = 0.8,
                 Child = CreateMultiColumnContent(content)
             };
 
