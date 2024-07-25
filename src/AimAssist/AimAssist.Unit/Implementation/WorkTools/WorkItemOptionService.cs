@@ -1,16 +1,20 @@
-﻿using Common.UI.Editor;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Library.Options
+namespace AimAssist.Units.Implementation.WorkTools
 {
-    public class EditorOptionService
+    public class WorkItemOptionService
     {
-        public static EditorOption Option;
+        public static ConfigModel Option;
         private static FileSystemWatcher watcher;
 
         public static string OptionPath => 
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimAssist", "editor.option.json");
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimAssist", "workitem.option.json");
 
         public static void LoadOption()
         {
@@ -19,22 +23,22 @@ namespace Library.Options
                 try {
 
                     var text = File.ReadAllText(OptionPath);
-                    var option = JsonConvert.DeserializeObject<EditorOption>(text);
+                    var option = JsonConvert.DeserializeObject<ConfigModel>(text);
                     if (option == null)
                     {
-                        option = new EditorOption();
+                        option = new ConfigModel();
                     }
 
                     Option = option;
                 }
                 catch(Exception _)
                 {
-                    Option = new EditorOption();
+                    Option = new ConfigModel();
                 }
             }
             else
             {
-                var option = new EditorOption();
+                var option = new ConfigModel();
                 Option = option;
                 SaveOption();
             }
@@ -65,4 +69,4 @@ namespace Library.Options
             File.WriteAllText(OptionPath, text);
         }
     }
-}
+    }

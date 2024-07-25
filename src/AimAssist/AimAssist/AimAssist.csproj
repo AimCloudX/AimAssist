@@ -18,6 +18,10 @@
 
   <ItemGroup>
     <Resource Include="Resources\Icons\**" />
+    <None Update="Resources\Settings\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+
   </ItemGroup>
 
   <ItemGroup>

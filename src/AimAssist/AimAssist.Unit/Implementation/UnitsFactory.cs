@@ -16,14 +16,14 @@ namespace AimAssist.Units.Implementation
     {
         public IEnumerable<IUnit> GetUnits()
         {
-            string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string targetPath = Path.Combine(roamingPath, "AimAssist", "WorkItem.md");
-
-            var links  = new MarkdownService().GetLinks(targetPath);
-
-            foreach (var link in links)
+            foreach(var workItemPath in WorkItemOptionService.Option.WorkItemPaths)
             {
-                yield return new UrlUnit(WorkToolsMode.Instance, link.Text, link.Url, link.ContainingHeader);
+                var links = new MarkdownService().GetLinks(workItemPath.GetActualPath());
+
+                foreach (var link in links)
+                {
+                    yield return new UrlUnit(WorkToolsMode.Instance, link.Text, link.Url, link.ContainingHeader);
+                }
             }
 
             yield return new TranscriptionUnit();
@@ -56,7 +56,12 @@ namespace AimAssist.Units.Implementation
 
             yield return new OptionUnit();
             yield return new ShortcutOptionUnit();
-            yield return new EditorUnit(targetPath, string.Empty, OptionMode.Instance);
+
+            foreach (var workItemPath in WorkItemOptionService.Option.WorkItemPaths)
+            {
+                yield return new EditorUnit(workItemPath.GetActualPath(), string.Empty, OptionMode.Instance);
+            }
+
         }
     }
 }

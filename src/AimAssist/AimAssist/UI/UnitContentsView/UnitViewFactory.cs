@@ -9,6 +9,7 @@ using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using AimAssist.Units.Implementation.Web.Rss;
+using AimAssist.Units.Implementation.WorkTools;
 using Common.UI;
 using Common.UI.ChatGPT;
 using Library.Options;
@@ -54,6 +55,8 @@ namespace AimAssist.UI.UnitContentsView
                     return new RssControl();
                 case OptionUnit:
                     var optionEditor = new AimEditor();
+
+                    optionEditor.NewTab(WorkItemOptionService.OptionPath);
                     optionEditor.NewTab(EditorOptionService.OptionPath);
                     if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
                     {
