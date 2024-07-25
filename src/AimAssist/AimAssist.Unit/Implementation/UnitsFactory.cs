@@ -1,6 +1,8 @@
-﻿using AimAssist.Units.Core;
+﻿using AimAssist.Services.Markdown;
+using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.ApplicationLog;
+using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
@@ -14,8 +16,16 @@ namespace AimAssist.Units.Implementation
     {
         public IEnumerable<IUnit> GetUnits()
         {
-            yield return new UrlUnit(WorkToolsMode.Instance, "ChatGPT", "https://chatgpt.com/");
-            yield return new UrlUnit(WorkToolsMode.Instance, "Claude", "https://claude.ai/");
+            string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string targetPath = Path.Combine(roamingPath, "AimAssist", "WorkItem.md");
+
+            var links  = new MarkdownService().GetLinks(targetPath);
+
+            foreach (var link in links)
+            {
+                yield return new UrlUnit(WorkToolsMode.Instance, link.Text, link.Url, link.ContainingHeader);
+            }
+
             yield return new TranscriptionUnit();
             yield return new BookSearchSettingUnit();
             yield return new RssSettingUnit();
@@ -24,7 +34,7 @@ namespace AimAssist.Units.Implementation
             var dictInfo = new DirectoryInfo("Resources/Knowledge/");
             foreach (var file in dictInfo.GetFiles())
             {
-                yield return new MarkdownPathUnit(file, string.Empty);
+                yield return new MarkdownUnit(file, string.Empty, KnowledgeMode.Instance);
             }
 
             foreach (var directory in dictInfo.GetDirectories())
@@ -32,7 +42,7 @@ namespace AimAssist.Units.Implementation
                 foreach (var file in directory.GetFiles())
                 {
 
-                    yield return new MarkdownPathUnit(file, directory.Name);
+                    yield return new MarkdownUnit(file, directory.Name, KnowledgeMode.Instance);
                 }
             }
 
@@ -46,6 +56,7 @@ namespace AimAssist.Units.Implementation
 
             yield return new OptionUnit();
             yield return new ShortcutOptionUnit();
+            yield return new EditorUnit(targetPath, string.Empty, OptionMode.Instance);
         }
     }
 }

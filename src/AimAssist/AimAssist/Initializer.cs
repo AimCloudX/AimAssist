@@ -7,6 +7,7 @@ using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Implementation;
 using Common.Commands.Shortcus;
 using Library.Options;
+using System.IO;
 
 namespace AimAssist
 {
@@ -16,6 +17,15 @@ namespace AimAssist
         {
             EditorOptionService.LoadOption();
             SystemTrayRegister.Register();
+            string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string targetPath = Path.Combine(roamingPath, "AimAssist", "WorkItem.md");
+            string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "WorkItems", "WorkItem.md");
+            if (!File.Exists(targetPath))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+                File.Copy(sourcePath, targetPath);
+            }
+
             var unitsService = UnitsService.Instnace;
             unitsService.RegisterUnits(new UnitsFactory());
 

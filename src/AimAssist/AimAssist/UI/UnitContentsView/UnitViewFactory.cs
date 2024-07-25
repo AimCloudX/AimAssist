@@ -44,7 +44,7 @@ namespace AimAssist.UI.UnitContentsView
         {
             switch (unit.Content)
             {
-                case MarkdownPathUnit markdownPath:
+                case MarkdownUnit markdownPath:
                     return new MarkdownView(markdownPath.FullPath);
                 case TranscriptionUnit speechModel:
                     return new SpeechControl();
@@ -53,13 +53,17 @@ namespace AimAssist.UI.UnitContentsView
                 case RssSettingUnit:
                     return new RssControl();
                 case OptionUnit:
-                    var editor = new AimEditor();
-                    editor.NewTab(EditorOptionService.OptionPath);
+                    var optionEditor = new AimEditor();
+                    optionEditor.NewTab(EditorOptionService.OptionPath);
                     if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
                     {
-                        editor.NewTab(EditorOptionService.Option.CustomVimKeybindingPath);
+                        optionEditor.NewTab(EditorOptionService.Option.CustomVimKeybindingPath);
                     }
 
+                    return optionEditor;
+                case EditorUnit editorUnit:
+                    var editor = new AimEditor();
+                    editor.NewTab(editorUnit.FullPath);
                     return editor;
                 case ShortcutOptionUnit:
                     return new CustomizeKeyboardShortcutsSettings();
