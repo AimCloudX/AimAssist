@@ -5,6 +5,7 @@ using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.Commands;
 using Common.Commands.Shortcus;
@@ -342,6 +343,12 @@ namespace AimAssist.UI.MainWindows
                 {
                     var icon = GetUrlIcon(unitUrlUnit);
                     UnitLists.Add(new UnitViewModel(icon, unit));
+                }else if(unit is SnippetModelUnit)
+                {
+                    if(this.mode == SnippetMode.Instance)
+                    {
+                        UnitLists.Add(new UnitViewModel(unit));
+                    }
                 }
                 else
                 {

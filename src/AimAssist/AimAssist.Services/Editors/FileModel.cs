@@ -7,13 +7,27 @@ namespace Library.Editors
 {
     public class FileModel : TabItem
     {
+        private Dictionary<string, string> _extensions = new Dictionary<string, string>()
+        {{".md", "markdown" },
+            { ".json","json"}
+        };
+
         public FileModel(string filePath)
         {
             FileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
             FilePath = filePath;
             monacoEditor = new MonacoEditor();
             monacoEditor.SetOption(EditorOptionService.Option);
-            monacoEditor.SetTextAsync(File.ReadAllText(filePath));
+            var extension = Path.GetExtension(filePath);
+            if(_extensions.TryGetValue(extension, out var language))
+            {
+                monacoEditor.SetTextAsync(File.ReadAllText(filePath), language);
+            }
+            else
+            {
+                monacoEditor.SetTextAsync(File.ReadAllText(filePath));
+            }
+
             Content = monacoEditor;
 
             // style

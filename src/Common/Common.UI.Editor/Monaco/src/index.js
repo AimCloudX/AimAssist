@@ -2,6 +2,13 @@
 import * as monacoVim from 'monaco-vim';
 import 'monaco-editor/min/vs/editor/editor.main.css';
 
+// 言語のサポートをインポート
+import 'monaco-editor/esm/vs/basic-languages/markdown/markdown.contribution';
+import 'monaco-editor/esm/vs/language/json/monaco.contribution';
+// エディタを作成する前に、言語機能を登録
+monaco.languages.register({ id: 'markdown' });
+monaco.languages.register({ id: 'json' });
+
 // Monaco Editor の設定
 const setupMonacoEditor = () => {
     // Nord テーマの定義

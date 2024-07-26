@@ -5,6 +5,7 @@ using AimAssist.UI.SystemTray;
 using AimAssist.UI.Tools.HotKeys;
 using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Implementation;
+using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.WorkTools;
 using Common.Commands.Shortcus;
 using Library.Options;
@@ -41,6 +42,24 @@ namespace AimAssist
             }
 
             WorkItemOptionService.LoadOption();
+
+            string snippetoption = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "snippet.option.json");
+            if (!File.Exists(SnippetOptionServce.OptionPath))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(SnippetOptionServce.OptionPath));
+                File.Copy(snippetoption, SnippetOptionServce.OptionPath);
+            }
+
+            string snippetDefault = Path.Combine(roamingPath, "AimAssist", "standard.md");
+            string snippetSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "standard.md");
+            if (!File.Exists(snippetDefault))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(snippetDefault));
+                File.Copy(snippetSource, snippetDefault);
+            }
+
+            SnippetOptionServce.LoadOption();
+
 
             EditorOptionService.LoadOption();
 

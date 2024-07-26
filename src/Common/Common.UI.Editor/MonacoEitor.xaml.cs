@@ -14,7 +14,7 @@ namespace Common.UI.Editor
         private EditorOption option = new EditorOption();
         private string text = string.Empty;
         private string language = "plaintext";
-        private IEnumerable<Snippet> snippets;
+        private IEnumerable<EditorSnippet> snippets;
 
         public MonacoEditor()
         {
@@ -38,7 +38,7 @@ namespace Common.UI.Editor
             }
         }
 
-        public async Task SetTextAsync(string text, string language = "plaintext")
+        public async Task SetTextAsync(string text, string language = "markdown")
         {
             this.text = text;
             if (language != null)
@@ -186,7 +186,7 @@ namespace Common.UI.Editor
             webView.CoreWebView2.ExecuteScriptAsync(script);
         }
 
-        public void RegisterSnippets(IEnumerable<Snippet> snippets)
+        public void RegisterSnippets(IEnumerable<EditorSnippet> snippets)
         {
             this.snippets = snippets;
             if(webView.CoreWebView2 != null)
@@ -195,7 +195,7 @@ namespace Common.UI.Editor
             }
         }
 
-        private void SetSnippets(IEnumerable<Snippet> snippets)
+        private void SetSnippets(IEnumerable<EditorSnippet> snippets)
         {
             string snippetsJson = JsonConvert.SerializeObject(snippets);
             snippetsJson = snippetsJson.Replace("\"", "\\\""); // ダブルクォートをエスケープ
@@ -204,7 +204,7 @@ namespace Common.UI.Editor
         }
     }
 
-    public class Snippet
+    public class EditorSnippet
     {
         public string Label { get; set; }
         public string Kind { get; set; }

@@ -26,6 +26,9 @@
     <None Update="Resources\WorkItems\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Snippets\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\vosk-model-small-ja-0.22\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
