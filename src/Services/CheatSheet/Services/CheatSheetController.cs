@@ -105,7 +105,7 @@ private const int WH_KEYBOARD_LL = 13;
             }
             else
             {
-                _cheatsheetPopup = new CheatsheetPopup(_cheatsheets["windows"], "Windows (Default)");
+                return;
             }
 
             // アクティブウィンドウの位置を取得
