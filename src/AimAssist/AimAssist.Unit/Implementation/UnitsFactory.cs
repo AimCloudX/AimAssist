@@ -26,10 +26,11 @@ namespace AimAssist.Units.Implementation
                 }
             }
 
-            yield return new TranscriptionUnit();
+            //yield return new TranscriptionUnit();
             yield return new BookSearchSettingUnit();
             yield return new RssSettingUnit();
-            yield return new AppLogUnit();
+
+            //yield return new AppLogUnit();
 
             var dictInfo = new DirectoryInfo("Resources/Knowledge/");
             foreach (var file in dictInfo.GetFiles())

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
-using System.Windows.Forms;
 using System.IO;
 
 namespace CheatSheet.Services
