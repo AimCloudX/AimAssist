@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{Binding Mode.Name, Mode=OneWay}"
-        Width="1000"
-        Height="600"
+        Width="1200"
+        Height="800"
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:commands="clr-namespace:AimAssist.Core.Commands;assembly=AimAssist" 
@@ -41,7 +41,7 @@
 <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="3"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -94,25 +94,26 @@
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <Grid Grid.Column="0">
-                                    <Image Source="{Binding Icon}" Width="20" Height="20"></Image>
+                                    <Image Source="{Binding Icon}" Width="30" Height="30"></Image>
                                 </Grid>
-                                <Grid Grid.Column="2">
+                                <Grid Grid.Column="2" >
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="7"></RowDefinition>
                                         <RowDefinition Height="Auto"></RowDefinition>
-                                        <RowDefinition Height="2"></RowDefinition>
-                                        <RowDefinition Height="Auto"></RowDefinition>
-                                        <RowDefinition Height="2"></RowDefinition>
+                                        <RowDefinition Height="7"></RowDefinition>
+                                        <!--<RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="2"></RowDefinition>-->
                                     </Grid.RowDefinitions>
-                                    <StackPanel Grid.Row="0">
-                                        <TextBlock Text="{Binding Name}"  FontSize="16"/>
+                                    <StackPanel Grid.Row="1">
+                                        <TextBlock Text="{Binding Name}"  FontSize="20"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Row="2">
+                                    <!--<StackPanel Grid.Row="2">
                                         <TextBlock FontSize="14" Text="{Binding Text}" Height="17"
                                            Foreground="Gray"
                                            TextTrimming="CharacterEllipsis"
                                            TextWrapping="NoWrap"
                                            HorizontalAlignment="Left" InputMethod.PreferredImeConversionMode="FullShape"/>
-                                    </StackPanel>
+                                    </StackPanel>-->
                                 </Grid>
                             </Grid>
                         </DataTemplate>

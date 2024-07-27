@@ -11,7 +11,6 @@ namespace AimAssist.Units.Core.Units
             Category = category;
             FullPath = fileInfo.FullName;
             Mode = mode;
-
         }
 
         public string FullPath { get; }
@@ -20,7 +19,7 @@ namespace AimAssist.Units.Core.Units
 
         public IMode Mode { get; }
 
-        public string Name => FileInfo.Name;
+        public string Name => Path.GetFileNameWithoutExtension(FileInfo.Name);
 
         public string Description => FullPath;
 
