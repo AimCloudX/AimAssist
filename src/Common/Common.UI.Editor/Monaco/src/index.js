@@ -5,9 +5,16 @@ import 'monaco-editor/min/vs/editor/editor.main.css';
 // 言語のサポートをインポート
 import 'monaco-editor/esm/vs/basic-languages/markdown/markdown.contribution';
 import 'monaco-editor/esm/vs/language/json/monaco.contribution';
+import 'monaco-editor/esm/vs/basic-languages/cpp/cpp.contribution';
+import 'monaco-editor/esm/vs/basic-languages/csharp/csharp.contribution';
+import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution';
+
 // エディタを作成する前に、言語機能を登録
 monaco.languages.register({ id: 'markdown' });
 monaco.languages.register({ id: 'json' });
+monaco.languages.register({ id: 'cpp' }); // C言語とC++言語の両方をサポート
+monaco.languages.register({ id: 'csharp' });
+monaco.languages.register({ id: 'javascript' });
 
 // Monaco Editor の設定
 const setupMonacoEditor = () => {

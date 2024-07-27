@@ -10,6 +10,7 @@ using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.Commands;
 using Common.Commands.Shortcus;
 using Common.UI;
+using Common.UI.WebUI;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -220,11 +221,12 @@ namespace AimAssist.UI.MainWindows
                 this.ComboListBox.SelectedIndex = 0;
 
 
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
                 ConcurrentBag<UnitViewModel> concurrentBag = new ConcurrentBag<UnitViewModel> ();
                 unitsArgs.Units.AsParallel().ForAll(x => {
                     if (x is UrlUnit unitUrlUnit)
                     {
-                        var icon = GetUrlIcon(unitUrlUnit);
+                        var icon = FaviconFetcher.GetUrlIconAsync(unitUrlUnit.Description);
                         concurrentBag.Add(new UnitViewModel(icon, x));
                     }
                     else
@@ -237,6 +239,8 @@ namespace AimAssist.UI.MainWindows
                 {
                     UnitLists.Add(unit);
                 }
+
+                Mouse.OverrideCursor = null;
             }
         }
 
@@ -337,11 +341,12 @@ namespace AimAssist.UI.MainWindows
             }
 
             var units = UnitsService.Instnace.CreateUnits(this.mode);
+
             foreach (var unit in units)
             {
                 if(unit is UrlUnit unitUrlUnit)
                 {
-                    var icon = GetUrlIcon(unitUrlUnit);
+                    var icon = FaviconFetcher.GetUrlIconAsync(unitUrlUnit.Description);
                     UnitLists.Add(new UnitViewModel(icon, unit));
                 }else if(unit is SnippetModelUnit)
                 {

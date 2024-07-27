@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
 
         <wpf:WebView2 Name="WebView" NavigationStarting="WebView_NavigationStarting" Grid.Column="0"/>
-        <Expander ExpandDirection="Left" Grid.Column="1" IsExpanded="False">
+        <Expander ExpandDirection="Left" Grid.Column="1" IsExpanded="True">
             <Expander.Header >
                 <TextBlock Margin="0,10,0,0" Text="OutLine" VerticalAlignment="Center" HorizontalAlignment="Center" >
                     <TextBlock.LayoutTransform>
