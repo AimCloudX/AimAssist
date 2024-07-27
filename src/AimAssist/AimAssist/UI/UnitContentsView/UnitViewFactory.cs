@@ -53,14 +53,11 @@ namespace AimAssist.UI.UnitContentsView
                     return new BookSearchControl();
                 case RssSettingUnit:
                     return new RssControl();
-                case OptionUnit:
+                case OptionUnit option:
                     var optionEditor = new AimEditor();
-
-                    optionEditor.NewTab(WorkItemOptionService.OptionPath);
-                    optionEditor.NewTab(EditorOptionService.OptionPath);
-                    if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
+                    foreach(var filePath in option.OptionFilePaths)
                     {
-                        optionEditor.NewTab(EditorOptionService.Option.CustomVimKeybindingPath);
+                        optionEditor.NewTab(filePath);
                     }
 
                     return optionEditor;
@@ -71,6 +68,14 @@ namespace AimAssist.UI.UnitContentsView
                 case ShortcutOptionUnit:
                     return new CustomizeKeyboardShortcutsSettings();
                 case SnippetUnit model:
+                    return new System.Windows.Controls.TextBox()
+                    {
+                        Text = model.Code,
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        Margin = new Thickness(0)
+                    };
+                case SnippetModelUnit model:
                     return new System.Windows.Controls.TextBox()
                     {
                         Text = model.Code,

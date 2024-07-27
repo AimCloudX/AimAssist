@@ -10,7 +10,7 @@ namespace AimAssist.Units.Implementation.WorkTools
     public class ConfigModel
     {
         [JsonProperty("workItemPaths")]
-        public List<WorkItemPath> WorkItemPaths { get; set; }
+        public List<WorkItemPath> ItemPaths { get; set; }
     }
 
     public class WorkItemPath

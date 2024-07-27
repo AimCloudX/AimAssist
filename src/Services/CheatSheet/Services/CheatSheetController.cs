@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
-using System.Windows.Forms;
 using System.IO;
 
 namespace CheatSheet.Services
@@ -105,7 +104,7 @@ private const int WH_KEYBOARD_LL = 13;
             }
             else
             {
-                _cheatsheetPopup = new CheatsheetPopup(_cheatsheets["windows"], "Windows (Default)");
+                return;
             }
 
             // アクティブウィンドウの位置を取得
