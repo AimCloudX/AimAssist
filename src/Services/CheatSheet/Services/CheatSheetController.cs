@@ -117,9 +117,14 @@ private const int WH_KEYBOARD_LL = 13;
 
             // チートシートポップアップの位置とサイズを設定
             _cheatsheetPopup.Width = activeScreen.WorkingArea.Width;
-            _cheatsheetPopup.Height = 130; // 必要に応じて調整
+            _cheatsheetPopup.Height = 220; // 必要に応じて調整
             _cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
             _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
+
+            //_cheatsheetPopup.Width = 200;
+            //_cheatsheetPopup.Height = 800; // 必要に応じて調整
+            //_cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
+            //_cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
 
             _cheatsheetPopup.Show();
         }

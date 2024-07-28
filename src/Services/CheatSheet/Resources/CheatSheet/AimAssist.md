@@ -1,10 +1,17 @@
-﻿# AimAssist
-Alt+A AimAssistの表示切り替え
-Alt+P ピッカーウィンドウ表示
-Ctrl+D AimAssiを閉じる
-Ctrl+K,Ctrl+S ショートカット設定
-Ctrl+K,Ctrl+L コンテンツにフォーカス
-Ctrl+K,Ctrl+J ユニットにフォーカス
-Ctrl+N 次のユニット
-Ctrl+P 前のユニット
+﻿# ウィンドウ操作
+- AimAssistの表示/非表示  Alt + A
+- ピッカーウィンドウの表示  Alt + P
+- AimAssistを閉じる  Ctrl + D
+
+# ナビゲーション
+- 次のユニット  Ctrl + N
+- 前のユニット  Ctrl + P
+- 次のモード  Ctrl + Shift + N
+- 前のモード  Ctrl + Shift + P
+- コンテンツにフォーカス  Ctrl + K, Ctrl + L
+- ユニットにフォーカス  Ctrl + K, Ctrl + J
+
+# ツール
+- ショートカット設定を開く  Ctrl + K, Ctrl + S
+
 

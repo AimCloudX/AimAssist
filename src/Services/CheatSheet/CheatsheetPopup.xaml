@@ -6,10 +6,13 @@
         xmlns:local="clr-namespace:CheatSheet"
         mc:Ignorable="d"
         WindowStyle="None"
-        Opacity="0.2"
-        AllowsTransparency="True"
-        Title="CheatSheetWindow" Height="450" Width="800">
+        >
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" x:Name="TitleGrid" > </Grid>
+        <Grid x:Name="SheetGrid" Grid.Row="1"></Grid>
     </Grid>
 </Window>

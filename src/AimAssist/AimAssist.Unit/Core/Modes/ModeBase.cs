@@ -48,6 +48,7 @@ namespace AimAssist.Units.Core.Mode
             packIcon.Kind = kind;
             packIcon.Width = 35;
             packIcon.Height = 35;
+            packIcon.Margin = new Thickness(-8);
 
             var toolTip = new CustomToolTip
             {

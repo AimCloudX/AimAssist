@@ -1,14 +1,20 @@
 ﻿using AimAssist.Units.Core.Mode;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 namespace AimAssist.Units.Core.Units
 {
     public class UnitViewModel 
     {
-        public UnitViewModel(IUnit content) : this(new BitmapImage(), content)
+        public UnitViewModel(IUnit content) : this(content.Mode.Icon, content)
         {
         }
-        public UnitViewModel(BitmapImage icon, IUnit content)
+        public UnitViewModel(BitmapImage bitmapImage, IUnit content) : this(new System.Windows.Controls.Image() {Source= bitmapImage }, content)
+        {
+        }
+
+        public UnitViewModel(DependencyObject icon, IUnit content)
         {
             Icon = icon;
             Content = content;
@@ -18,7 +24,7 @@ namespace AimAssist.Units.Core.Units
         public string Name =>Content.Name;
         public string Description => Content.Description;
         public string Category => Content.Category;
-        public BitmapImage Icon { get; }
+        public DependencyObject Icon { get; }
         public IUnit Content { get; }
 
         public override bool Equals(object? obj)

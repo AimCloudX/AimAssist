@@ -1,7 +1,7 @@
 # フレームワーク
 
 # Webブラウザ
-## URLについて
+## URL
 
 ### Amazon
 [AmazonのURLを知ろう！｜Internets-21st](https://note.com/internets21st/n/ne3dda3c40065)
@@ -29,3 +29,7 @@
 
 [monaco-editor/docs/integrate-esm.md at main · microsoft/monaco-editor](https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md)
 
+
+# REST API
+## GoogleBooksAPI
+[書籍検索APIはGoogleBooksAPIsがオススメ【導入も楽ちんです】](https://manablog.org/google-books-apis/)

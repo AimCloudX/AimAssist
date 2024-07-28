@@ -50,7 +50,7 @@
         <ListBox  Grid.Column="0" x:Name="ModeList" SelectionChanged="IconListBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <ContentControl Content="{Binding Icon}" Margin="-8"></ContentControl>
+                    <ContentControl Content="{Binding Icon}"></ContentControl>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
@@ -94,7 +94,7 @@
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <Grid Grid.Column="0">
-                                    <Image Source="{Binding Icon}" Width="30" Height="30"></Image>
+                                <ContentControl Content="{Binding Icon}" Width="30" Height="30"></ContentControl>
                                 </Grid>
                                 <Grid Grid.Column="2" >
                                     <Grid.RowDefinitions>

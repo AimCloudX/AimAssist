@@ -12,6 +12,7 @@ public partial class CheatsheetPopup : Window
     {
         public CheatsheetPopup(string content, string title)
         {
+            InitializeComponent();
             ShowInTaskbar = false;
             Topmost = true;
             WindowStyle = WindowStyle.None;
@@ -22,6 +23,19 @@ public partial class CheatsheetPopup : Window
             ShowActivated = false;
             WindowStartupLocation = WindowStartupLocation.Manual;
 
+            Border titleBorder = new Border
+            {
+                Background = System.Windows.Media.Brushes.Black,
+                Opacity = 0.8,
+                Child = new TextBlock()
+                {
+                    Text = title,
+                    Foreground = System.Windows.Media.Brushes.White,
+                }
+            };
+
+            TitleGrid.Children.Add(titleBorder);
+
             // コンテンツを設定
             Border border = new Border
             {
@@ -30,7 +44,7 @@ public partial class CheatsheetPopup : Window
                 Child = CreateMultiColumnContent(content)
             };
 
-            Content = border;
+            SheetGrid.Children.Add(border);
 
             // ウィンドウの拡張スタイルを設定
             Loaded += (sender, e) =>
@@ -44,36 +58,82 @@ public partial class CheatsheetPopup : Window
 
         private UIElement CreateMultiColumnContent(string content)
         {
-            var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            int itemsPerColumn = (int)Math.Ceiling(lines.Length / 8.0);  // 3列に分割
-
+            var sections = content.Split(new[] { "#" }, StringSplitOptions.RemoveEmptyEntries);
             var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
 
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < sections.Length; i++)
             {
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 var column = new StackPanel { Margin = new Thickness(10) };
-                var columnItems = lines.Skip(i * itemsPerColumn).Take(itemsPerColumn);
-                foreach (var item in columnItems)
+
+                var lines = sections[i].Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                // ヘッダーを追加
+                if (lines.Length > 0)
                 {
-                    column.Children.Add(new TextBlock { Text = item, 
-                        Foreground = System.Windows.Media.Brushes.White,
-                        Margin = new Thickness(0, 0, 0, 5) });
+                    column.Children.Add(new TextBlock
+                    {
+                        Text = lines[0].Trim(),
+                        FontWeight = FontWeights.Bold,
+                        Foreground = System.Windows.Media.Brushes.Yellow,
+                        Margin = new Thickness(0, 0, 0, 10)
+                    });
                 }
+
+                // 内容を追加
+                for (int j = 1; j < lines.Length; j++)
+                {
+                    var item = lines[j].Trim();
+                    if (item.StartsWith("-"))
+                    {
+                        item = item.Substring(1).Trim();
+                    }
+                    column.Children.Add(new TextBlock
+                    {
+                        Text = item,
+                        Foreground = System.Windows.Media.Brushes.White,
+                        Margin = new Thickness(0, 0, 0, 5)
+                    });
+                }
+
                 Grid.SetColumn(column, i);
                 grid.Children.Add(column);
             }
 
             return grid;
         }
+        //private UIElement CreateMultiColumnContent(string content)
+        //{
+        //    var lines = content.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        //    int itemsPerColumn = (int)Math.Ceiling(lines.Length / 8.0);  
+
+        //    var grid = new Grid();
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+        //    for (int i = 0; i < 8; i++)
+        //    {
+        //        var column = new StackPanel { Margin = new Thickness(10) };
+        //        var columnItems = lines.Skip(i * itemsPerColumn).Take(itemsPerColumn);
+        //        foreach (var item in columnItems)
+        //        {
+        //            column.Children.Add(new TextBlock { Text = item, 
+        //                Foreground = System.Windows.Media.Brushes.White,
+        //                Margin = new Thickness(0, 0, 0, 5) });
+        //        }
+        //        Grid.SetColumn(column, i);
+        //        grid.Children.Add(column);
+        //    }
+
+        //    return grid;
+        //}
 
         protected override void OnDeactivated(EventArgs e)
         {
