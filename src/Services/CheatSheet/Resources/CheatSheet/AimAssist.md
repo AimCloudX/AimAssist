@@ -11,7 +11,4 @@
 - コンテンツにフォーカス  Ctrl + K, Ctrl + L
 - ユニットにフォーカス  Ctrl + K, Ctrl + J
 
-# ツール
-- ショートカット設定を開く  Ctrl + K, Ctrl + S
-
 

@@ -67,20 +67,6 @@ namespace AimAssist.UI.MainWindows
                 CommandService.Register(modeChangeCommand, mode.DefaultKeySequence);
             }
 
-            foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
-            {
-                var unitChangeCommand = new RelayCommand(unit.Name, (Window window) =>
-                {
-                    if (window is MainWindow mainWindow)
-                    {
-                        mainWindow.ModeList.SelectedItem = unit.Mode;
-                        mainWindow.ComboListBox.SelectedItem = unit;
-                    }
-                });
-
-                CommandService.Register(unitChangeCommand, KeySequence.None);
-            }
-
             MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), (Window window) =>
             {
                 if (window is MainWindow mainWindow)
@@ -202,6 +188,21 @@ namespace AimAssist.UI.MainWindows
             CommandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
             CommandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
             CommandService.Register(MainWindowCommands.RemoveActiveView, new KeySequence(Key.W, ModifierKeys.Control));
+
+            foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
+            {
+                var unitChangeCommand = new RelayCommand(unit.Name, (Window window) =>
+                {
+                    if (window is MainWindow mainWindow)
+                    {
+                        mainWindow.ModeList.SelectedItem = unit.Mode;
+                        mainWindow.ComboListBox.SelectedItem = UnitLists.FirstOrDefault(x => x.Name == unit.Name);
+                    }
+                });
+
+                CommandService.Register(unitChangeCommand, KeySequence.None);
+            }
+
         }
 
         private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)

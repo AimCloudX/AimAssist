@@ -22,7 +22,7 @@ namespace AimAssist.Service
         {
             var now = DateTime.Now;
 
-            if (IsModifierKeyOnly(key) || modifiers == ModifierKeys.None)
+            if (IsModifierKeyOnly(key) || modifiers == ModifierKeys.None|| modifiers == ModifierKeys.Shift)
             {
                 return false;
             }
@@ -61,6 +61,7 @@ namespace AimAssist.Service
 
             return false;
         }
+
         private void ResetKeySequence()
         {
             _lastKey = Key.None;
