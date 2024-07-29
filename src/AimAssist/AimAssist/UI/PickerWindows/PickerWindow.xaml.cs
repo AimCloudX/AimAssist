@@ -103,6 +103,11 @@ namespace AimAssist.UI.PickerWindows
                 UnitLists.Add(new UnitViewModel(unit));
             }
 
+            if (System.Windows.Clipboard.ContainsText())
+            {
+                UnitLists.Add(new UnitViewModel(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
+            }
+
             var keyUnits = UnitsService.Instnace.CreateUnits(KeyHelpMode.Instance);
             foreach (var unit in keyUnits)
             {
@@ -117,10 +122,6 @@ namespace AimAssist.UI.PickerWindows
                 UnitLists.Add(new UnitViewModel(unit));
             }
 
-            if (System.Windows.Clipboard.ContainsText())
-            {
-                UnitLists.Add(new UnitViewModel(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
-            }
         }
 
         private void HandleTypingTimerTimeout(object sender, EventArgs e)
