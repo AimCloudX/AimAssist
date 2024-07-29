@@ -22,6 +22,8 @@ namespace AimAssist.Units.Core.Mode
 
         public abstract Control Icon { get; }
 
+        public virtual bool IsIncludeAllInclusive => true;
+
         public override bool Equals(object? obj)
         {
             if (obj is IMode pickerMode)

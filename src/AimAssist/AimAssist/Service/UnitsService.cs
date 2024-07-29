@@ -15,7 +15,7 @@ namespace AimAssist.Service
 
         public IReadOnlyCollection<IMode> GetAllModes()
         {
-            return modeDic.Keys;
+            return modeDic.Keys.Where(x => x.IsIncludeAllInclusive).ToList();
         }
 
         public static UnitsService Instnace
@@ -39,7 +39,10 @@ namespace AimAssist.Service
             {
                 if (modeDic.TryGetValue(AllInclusiveMode.Instance, out var allUnits))
                 {
-                    allUnits.Add(unit);
+                    if(unit.Mode.IsIncludeAllInclusive)
+                    {
+                        allUnits.Add(unit);
+                    }
                 }
 
                 if (modeDic.TryGetValue(unit.Mode, out var unitLists))

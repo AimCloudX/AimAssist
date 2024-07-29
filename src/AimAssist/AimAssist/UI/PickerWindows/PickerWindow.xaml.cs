@@ -1,7 +1,9 @@
 ﻿using AimAssist.Service;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Snippets;
+using Common.Commands.Shortcus;
 using Common.UI;
 using Common.UI.Editor;
 using Library.Options;
@@ -23,6 +25,8 @@ namespace AimAssist.UI.PickerWindows
         public IMode Mode { get; set; }
 
         public string SnippetText { get; set; } = string.Empty;
+
+        public KeySequence KeySequence { get; set; }
 
         protected void OnPropertyChanged([CallerMemberName] string name = "")
         {
@@ -57,10 +61,10 @@ namespace AimAssist.UI.PickerWindows
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public PickerWindow()
+        public PickerWindow(string processName)
         {
-
             this.InitializeComponent();
+            this.processName = processName;
 
             var editor = EditorCash.Editor;
             if(editor != null)
@@ -86,12 +90,27 @@ namespace AimAssist.UI.PickerWindows
             RegisterSnippets();
         }
 
-        private async void UpdateCandidate()
+        public async void UpdateCandidate()
         {
             UnitLists.Clear();
             var units = UnitsService.Instnace.CreateUnits(this.Mode);
+
             foreach (var unit in units)
             {
+                UnitLists.Add(new UnitViewModel(unit));
+            }
+
+            var keyUnits = UnitsService.Instnace.CreateUnits(KeyHelpMode.Instance);
+            foreach (var unit in keyUnits)
+            {
+                if (unit is KeyHelpUnit keyHelpUnit)
+                {
+                    if(keyHelpUnit.Category != processName)
+                    {
+                        continue;
+                    }
+                }
+
                 UnitLists.Add(new UnitViewModel(unit));
             }
 
@@ -126,16 +145,28 @@ namespace AimAssist.UI.PickerWindows
         {
             if (e.Key == Key.Enter)
             {
-                if (this.ComboListBox.SelectedItem is UnitViewModel unit  && unit.Content is SnippetUnit model)
+                e.Handled = true;
+                if (this.ComboListBox.SelectedItem is UnitViewModel unit)
                 {
-                    this.SnippetText = await EditorCash.Editor.GetText();
-                    this.CloseWindow();
+                    if (unit.Content is SnippetUnit model)
+                    {
+                        this.SnippetText = await EditorCash.Editor.GetText();
+                        this.CloseWindow();
+                    }
+
+                    if (unit.Content is SnippetModelUnit snippetModel)
+                    {
+                        this.SnippetText = await EditorCash.Editor.GetText();
+                        this.CloseWindow();
+                    }
+
+                    if (unit.Content is KeyHelpUnit keyHelpUnit)
+                    {
+                        this.KeySequence = keyHelpUnit.KeyItem.Sequence;
+                        this.CloseWindow();
+                    }
                 }
-                if (this.ComboListBox.SelectedItem is UnitViewModel unitViewModel  && unitViewModel.Content is SnippetModelUnit snippetModel)
-                {
-                    this.SnippetText = await EditorCash.Editor.GetText();
-                    this.CloseWindow();
-                }
+
             }
 
             else if (e.Key == Key.Escape)
@@ -226,6 +257,8 @@ namespace AimAssist.UI.PickerWindows
         }
 
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
+        private readonly string processName;
+
         private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))

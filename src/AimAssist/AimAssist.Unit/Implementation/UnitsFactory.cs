@@ -1,12 +1,14 @@
 ﻿using AimAssist.Services.Markdown;
 using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
+using Common.UI.Commands.Shortcus;
 using Library.Options;
 using System.IO;
 
@@ -54,6 +56,18 @@ namespace AimAssist.Units.Implementation
                 foreach (var snippet in snippets)
                 {
                     yield return new SnippetModelUnit(snippet);
+                }
+            }
+
+            var cheatSheetDirectory = new DirectoryInfo("Resources/CheatSheet/");
+            foreach (var file in cheatSheetDirectory.GetFiles())
+            {
+                var name = Path.GetFileNameWithoutExtension(file.Name);
+                var text = File.ReadAllText(file.FullName);
+                var items  =  KeySequenceParser.Parse(text, name);
+                foreach(var item in items)
+                {
+                    yield return new KeyHelpUnit(item);
                 }
             }
 

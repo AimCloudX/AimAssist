@@ -5,6 +5,7 @@ using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.Commands;
@@ -98,6 +99,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 }
             });
+
             MainWindowCommands.NextUnit = new RelayCommand(nameof(MainWindowCommands.NextUnit), (Window window) =>
             {
                 if (window is MainWindow mainWindow)
