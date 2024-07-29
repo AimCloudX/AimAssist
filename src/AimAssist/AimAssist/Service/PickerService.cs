@@ -9,6 +9,7 @@ namespace AimAssist.Service;
 internal static class PickerService
 {
     private static IntPtr beforeWindow;
+    private static bool isActive;
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -20,6 +21,9 @@ internal static class PickerService
 
     public static void ShowPickerWindow()
     {
+        if(isActive) { return; }
+        isActive = true;
+
         // HotKey押下時のウィンドウのハンドルを取得
         beforeWindow = GetForegroundWindow();
 
@@ -37,6 +41,7 @@ internal static class PickerService
 
     private static void DoAction(object? sender, EventArgs e)
     {
+        isActive = false;
 
         string text = string.Empty;
         KeySequence keySequence = null;

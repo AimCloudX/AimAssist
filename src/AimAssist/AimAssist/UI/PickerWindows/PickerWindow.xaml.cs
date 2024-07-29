@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 
 namespace AimAssist.UI.PickerWindows
@@ -65,6 +66,8 @@ namespace AimAssist.UI.PickerWindows
         {
             this.InitializeComponent();
             this.processName = processName;
+            SourceInitialized += MainWindow_SourceInitialized;
+
 
             var editor = EditorCash.Editor;
             if(editor != null)
@@ -254,7 +257,29 @@ namespace AimAssist.UI.PickerWindows
             {
                 EditorCash.Editor.SetTextAsync(snippetModel.Code);
             }
+
         }
+
+        private void MainWindow_SourceInitialized(object sender, EventArgs e)
+        {
+            var handle = new WindowInteropHelper(this).Handle;
+            HwndSource.FromHwnd(handle)?.AddHook(new HwndSourceHook(WndProc));
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_SYSKEYDOWN = 0x0104;
+            const int VK_MENU = 0x12; // Alt key
+
+            if (msg == WM_SYSKEYDOWN && wParam.ToInt32() == VK_MENU)
+            {
+                handled = true;
+                return IntPtr.Zero;
+            }
+
+            return IntPtr.Zero;
+        }
+
 
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
         private readonly string processName;
