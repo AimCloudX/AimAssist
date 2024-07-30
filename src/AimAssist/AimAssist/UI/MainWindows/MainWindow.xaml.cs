@@ -247,22 +247,29 @@ namespace AimAssist.UI.MainWindows
 
 
                 Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
-                ConcurrentBag<UnitViewModel> concurrentBag = new ConcurrentBag<UnitViewModel> ();
+                ConcurrentBag<(BitmapImage, IUnit)> concurrentBag = new ConcurrentBag<(BitmapImage, IUnit)>();
                 unitsArgs.Units.AsParallel().ForAll(x => {
                     if (x is UrlUnit unitUrlUnit)
                     {
                         var icon = FaviconFetcher.GetUrlIconAsync(unitUrlUnit.Description);
-                        concurrentBag.Add(new UnitViewModel(icon, x));
+                        concurrentBag.Add((icon, x));
                     }
                     else
                     {
-                        concurrentBag.Add(new UnitViewModel(x));
+                        concurrentBag.Add((null, x));
                     }
                 });
 
                 foreach(var unit in concurrentBag)
                 {
-                    UnitLists.Add(unit);
+                    if(unit.Item1 == null)
+                    {
+                        UnitLists.Add(new UnitViewModel(unit.Item2));
+                    }
+                    else
+                    {
+                        UnitLists.Add(new UnitViewModel(unit.Item1, unit.Item2));
+                    }
                 }
 
                 Mouse.OverrideCursor = null;
