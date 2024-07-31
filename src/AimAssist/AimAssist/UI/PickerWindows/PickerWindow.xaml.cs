@@ -332,7 +332,7 @@ namespace AimAssist.UI.PickerWindows
         private void RegisterSnippets()
         {
 
-            var snippetVariables = new List<EditorSnippet>
+            var snippetVariables = new List<EditorSnippet> { 
 
     //new Snippet { Label = "TM_SELECTED_TEXT", InsertText = "${TM_SELECTED_TEXT}", Documentation = "The currently selected text or the empty string" },
     //new Snippet { Label = "TM_CURRENT_LINE", InsertText = "${TM_CURRENT_LINE}", Documentation = "The contents of the current line" },
