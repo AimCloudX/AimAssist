@@ -282,6 +282,19 @@ namespace AimAssist.UI.MainWindows
             }
         }
 
+        public IUnit GetCurrentUnit
+        {
+            get
+            {
+                if (this.ComboListBox.SelectedItem is UnitViewModel unitViewModel)
+                {
+                    return unitViewModel.Content;
+                }
+
+                return null;
+            }
+        }
+
         private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (this.ComboListBox.SelectedItem is UnitViewModel unit)

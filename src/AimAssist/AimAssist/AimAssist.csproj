@@ -30,8 +30,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Services\CheatSheet\CheatSheet.csproj" />
     <ProjectReference Include="..\AimAssist.Plugins\AimAssist.Plugins.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\CheatSheet\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Target Name="CopyReadMe" AfterTargets="AfterBuild">
     <!-- DLLのコピー先を指定 -->

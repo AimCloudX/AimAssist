@@ -2,19 +2,31 @@
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
 using System.IO;
+using AimAssist.Service;
+using AimAssist.Units.Core.Units;
 
 namespace CheatSheet.Services
 {
     public class CheatSheetController : IDisposable
     {
-private const int WH_KEYBOARD_LL = 13;
+        private const int WH_KEYBOARD_LL = 13;
+        private const int WH_MOUSE_LL = 14;
         private const int WM_KEYDOWN = 0x0100;
         private const int WM_KEYUP = 0x0101;
-        private IntPtr _hookID = IntPtr.Zero;
-        private LowLevelKeyboardProc _proc;
+        private const int WM_MOUSEWHEEL = 0x020A;
+        private const int WM_LBUTTONDOWN = 0x0201;
+        private const int WM_RBUTTONDOWN = 0x0204;
+        private const int WM_MBUTTONDOWN = 0x0207;
+        private IntPtr _keyboardHookID = IntPtr.Zero;
+        private IntPtr _mouseHookID = IntPtr.Zero;
+        private LowLevelKeyboardProc _keyboardProc;
+        private LowLevelMouseProc _mouseProc;
         private DateTime _ctrlKeyPressStart;
         private bool _isCtrlPressed = false;
+
         private Dictionary<string, string> _cheatsheets;
+        private Dictionary<string, string> _webcCheatsheets;
+
         private CheatsheetPopup _cheatsheetPopup;
         private DispatcherTimer _timer;
 
@@ -22,8 +34,10 @@ private const int WH_KEYBOARD_LL = 13;
 
         public CheatSheetController(Dispatcher dispatcher)
         {
-            _proc = HookCallback;
-            _hookID = SetHook(_proc);
+            _keyboardProc = KeyboardHookCallback;
+            _mouseProc = MouseHookCallback;
+            _keyboardHookID = SetKeyboardHook(_keyboardProc);
+            _mouseHookID = SetMouseHook(_mouseProc);
             InitializeCheatsheets();
 
             _timer = new DispatcherTimer();
@@ -39,13 +53,22 @@ private const int WH_KEYBOARD_LL = 13;
             var dictInfo = new DirectoryInfo("Resources/CheatSheet/");
             foreach (var file in dictInfo.GetFiles())
             {
-                var name =   Path.GetFileNameWithoutExtension(file.Name);
+                var name = Path.GetFileNameWithoutExtension(file.Name);
                 var text = File.ReadAllText(file.FullName);
                 _cheatsheets.Add(name, text);
             }
+
+            _webcCheatsheets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var web = new DirectoryInfo("Resources/CheatSheet/Web/");
+            foreach (var file in web.GetFiles())
+            {
+                var name = Path.GetFileNameWithoutExtension(file.Name);
+                var text = File.ReadAllText(file.FullName);
+                _webcCheatsheets.Add(name, text);
+            }
         }
 
-        private IntPtr SetHook(LowLevelKeyboardProc proc)
+        private IntPtr SetKeyboardHook(LowLevelKeyboardProc proc)
         {
             using (Process curProcess = Process.GetCurrentProcess())
             using (ProcessModule curModule = curProcess.MainModule)
@@ -54,9 +77,19 @@ private const int WH_KEYBOARD_LL = 13;
             }
         }
 
-        private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+        private IntPtr SetMouseHook(LowLevelMouseProc proc)
+        {
+            using (Process curProcess = Process.GetCurrentProcess())
+            using (ProcessModule curModule = curProcess.MainModule)
+            {
+                return SetWindowsHookEx(WH_MOUSE_LL, proc, GetModuleHandle(curModule.ModuleName), 0);
+            }
+        }
 
-        private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+        private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
+
+        private IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode >= 0)
             {
@@ -78,7 +111,32 @@ private const int WH_KEYBOARD_LL = 13;
                     }
                 }
             }
-            return CallNextHookEx(_hookID, nCode, wParam, lParam);
+
+            return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
+        }
+
+        private IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0 && _isCtrlPressed)
+            {
+                if (wParam == (IntPtr)WM_MOUSEWHEEL ||
+                    wParam == (IntPtr)WM_LBUTTONDOWN ||
+                    wParam == (IntPtr)WM_RBUTTONDOWN ||
+                    wParam == (IntPtr)WM_MBUTTONDOWN)
+                {
+                    // Ctrl押下中にスクロールまたはクリックが検出された場合、タイマーをリセット
+                    ResetTimer();
+                }
+            }
+
+            return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+        }
+
+        private void ResetTimer()
+        {
+            _timer.Stop();
+            _ctrlKeyPressStart = DateTime.Now;
+            _timer.Start();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -89,6 +147,19 @@ private const int WH_KEYBOARD_LL = 13;
                 _timer.Stop();
             }
         }
+        public static string GetDomainFromUrl(string url)
+        {
+            try
+            {
+                Uri uri = new Uri(url);
+                return uri.Host;
+            }
+            catch (UriFormatException)
+            {
+                return "Invalid URL";
+            }
+        }
+
 
         private void ShowCheatsheet()
         {
@@ -100,7 +171,28 @@ private const int WH_KEYBOARD_LL = 13;
             string activeAppName = GetActiveApplicationName();
             if (_cheatsheets.TryGetValue(activeAppName, out string cheatsheetContent))
             {
-                _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName);
+                if(activeAppName == "AimAssist")
+                {
+                    var unit = WindowHandleService.Window.GetCurrentUnit; 
+                    if(unit is UrlUnit urlUnit)
+                    {
+                        var domainName = GetDomainFromUrl(urlUnit.Description);
+                        if(_webcCheatsheets.TryGetValue(domainName, out var webCheatSheet))
+                        {
+                            cheatsheetContent += webCheatSheet;
+
+                            _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName+" / "+ domainName);
+                        }
+                    }
+                    else
+                    {
+                        _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName);
+                    }
+                }
+                else
+                {
+                    _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName);
+                }
             }
             else
             {
@@ -120,11 +212,6 @@ private const int WH_KEYBOARD_LL = 13;
             _cheatsheetPopup.Height = 220; // 必要に応じて調整
             _cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
             _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
-
-            //_cheatsheetPopup.Width = 200;
-            //_cheatsheetPopup.Height = 800; // 必要に応じて調整
-            //_cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
-            //_cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
 
             _cheatsheetPopup.Show();
         }
@@ -149,6 +236,9 @@ private const int WH_KEYBOARD_LL = 13;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -178,9 +268,11 @@ private const int WH_KEYBOARD_LL = 13;
             public int Right;
             public int Bottom;
         }
+
         public void Dispose()
         {
-            UnhookWindowsHookEx(_hookID);
+            UnhookWindowsHookEx(_keyboardHookID);
+            UnhookWindowsHookEx(_mouseHookID);
         }
     }
 

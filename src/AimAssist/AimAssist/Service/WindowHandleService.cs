@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace AimAssist.Service;
 internal static class WindowHandleService
 {
-    private static MainWindow window = new MainWindow();
+    public static MainWindow Window { get; private set; } = new MainWindow();
     private static IntPtr beforeWindow;
     private static bool isActivate;
 
@@ -20,8 +20,8 @@ internal static class WindowHandleService
         if (isActivate)
         {
             isActivate = false;
-            window.Closed -= DoAction;
-            window.Visibility = System.Windows.Visibility.Collapsed;
+            Window.Closed -= DoAction;
+            Window.Visibility = System.Windows.Visibility.Collapsed;
             return;
         }
 
@@ -32,14 +32,14 @@ internal static class WindowHandleService
         // 自身のウィンドウハンドルをアクティブにする
         SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
 
-        if (window.IsClosing)
+        if (Window.IsClosing)
         {
-            window = new MainWindow();
+            Window = new MainWindow();
         }
 
-        window.Visibility = System.Windows.Visibility.Visible;
-        window.Closed += DoAction;
-        window.Show();
+        Window.Visibility = System.Windows.Visibility.Visible;
+        Window.Closed += DoAction;
+        Window.Show();
     }
 
     private static void DoAction(object? sender, EventArgs e)
