@@ -124,12 +124,12 @@ namespace AimAssist.UI.PickerWindows
                 CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
                 view.Filter = (obj) => true;
 
-                MathParser parser = new MathParser();
+                var parser = new MathParser();
                 try
                 {
                     String expression = this.FilterTextBox.Text.Remove(0, 1);
                     double result = parser.Parse(expression);
-                    UnitViewModel unitViewModel = new UnitViewModel(new SnippetUnit(result.ToString(), result.ToString()));
+                    var unitViewModel = new UnitViewModel(new SnippetUnit(result.ToString(), result.ToString()));
 
                     this.UnitLists.Clear();
                     this.UnitLists.Add(unitViewModel);
@@ -252,7 +252,6 @@ namespace AimAssist.UI.PickerWindows
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
         private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            return;
             if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
             {
                 e.Handled = true;
@@ -261,7 +260,7 @@ namespace AimAssist.UI.PickerWindows
 
         private void RegisterSnippets()
         {
-            var snippetVariables = new List<Snippet>
+            //var snippetVariables = new List<AimAssist.Combos.Mode.Snippet>
 {
     //new Snippet { Label = "TM_SELECTED_TEXT", InsertText = "${TM_SELECTED_TEXT}", Documentation = "The currently selected text or the empty string" },
     //new Snippet { Label = "TM_CURRENT_LINE", InsertText = "${TM_CURRENT_LINE}", Documentation = "The contents of the current line" },
@@ -288,12 +287,12 @@ namespace AimAssist.UI.PickerWindows
     //new Snippet { Label = "CURRENT_SECOND", InsertText = "${CURRENT_SECOND}", Documentation = "The current second" },
     //new Snippet { Label = "CURRENT_SECONDS_UNIX", InsertText = "${CURRENT_SECONDS_UNIX}", Documentation = "The number of seconds since the Unix epoch" }
 
-    new Snippet { Label = "CURRENT_YEAR", InsertText = "\\\\${CURRENT_YEAR}", Documentation = "The current year" },
-    new Snippet { Label = "CURRENT_MONTH", InsertText = "\\\\${CURRENT_MONTH}", Documentation = "The month as two digits (example '02')" },
-    new Snippet { Label = "CURRENT_DATE", InsertText = "\\\\${CURRENT_DATE}", Documentation = "The day of the month" },
-    new Snippet { Label = "CURRENT_HOUR", InsertText = "\\\\${CURRENT_HOUR}", Documentation = "The current hour in 24-hour clock format" },
-    new Snippet { Label = "CURRENT_MINUTE", InsertText = "\\\\${CURRENT_MINUTE}", Documentation = "The current minute" },
-    new Snippet { Label = "CURRENT_SECOND", InsertText = "\\\\${CURRENT_SECOND}", Documentation = "The current second" },
+    //new Snippet { Label = "CURRENT_YEAR", InsertText = "\\\\${CURRENT_YEAR}", Documentation = "The current year" },
+    //new Snippet { Label = "CURRENT_MONTH", InsertText = "\\\\${CURRENT_MONTH}", Documentation = "The month as two digits (example '02')" },
+    //new Snippet { Label = "CURRENT_DATE", InsertText = "\\\\${CURRENT_DATE}", Documentation = "The day of the month" },
+    //new Snippet { Label = "CURRENT_HOUR", InsertText = "\\\\${CURRENT_HOUR}", Documentation = "The current hour in 24-hour clock format" },
+    //new Snippet { Label = "CURRENT_MINUTE", InsertText = "\\\\${CURRENT_MINUTE}", Documentation = "The current minute" },
+    //new Snippet { Label = "CURRENT_SECOND", InsertText = "\\\\${CURRENT_SECOND}", Documentation = "The current second" },
 };
 
             //EditorCash.Editor.RegisterSnippets(snippetVariables);
