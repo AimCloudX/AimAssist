@@ -6,6 +6,7 @@ using AimAssist.Units.Implementation.Snippets;
 using Common.UI;
 using Common.UI.Editor;
 using Library.Options;
+using Mathos.Parser;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -122,6 +123,21 @@ namespace AimAssist.UI.PickerWindows
                 
                 CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
                 view.Filter = (obj) => true;
+
+                MathParser parser = new MathParser();
+                try
+                {
+                    String expression = this.FilterTextBox.Text.Remove(0, 1);
+                    double result = parser.Parse(expression);
+                    UnitViewModel unitViewModel = new UnitViewModel(new SnippetUnit(result.ToString(), result.ToString()));
+
+                    this.UnitLists.Clear();
+                    this.UnitLists.Add(unitViewModel);
+                }
+                catch (Exception)
+                {
+
+                }
             }
             else
             {
@@ -236,6 +252,7 @@ namespace AimAssist.UI.PickerWindows
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
         private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            return;
             if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
             {
                 e.Handled = true;
