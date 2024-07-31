@@ -247,28 +247,16 @@ namespace AimAssist.UI.MainWindows
 
 
                 Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
-                ConcurrentBag<(BitmapImage, IUnit)> concurrentBag = new ConcurrentBag<(BitmapImage, IUnit)>();
-                unitsArgs.Units.AsParallel().ForAll(x => {
-                    if (x is UrlUnit unitUrlUnit)
-                    {
-                        var icon = FaviconFetcher.GetUrlIconAsync(unitUrlUnit.Description);
-                        concurrentBag.Add((icon, x));
-                    }
-                    else
-                    {
-                        concurrentBag.Add((null, x));
-                    }
-                });
 
-                foreach(var unit in concurrentBag)
+                foreach(var unit in unitsArgs.Units)
                 {
-                    if(unit.Item1 == null)
+                    if(unit is UrlUnit urlUnit)
                     {
-                        UnitLists.Add(new UnitViewModel(unit.Item2));
+                        UnitLists.Add(new UnitViewModel(urlUnit, this));
                     }
                     else
                     {
-                        UnitLists.Add(new UnitViewModel(unit.Item1, unit.Item2));
+                        UnitLists.Add(new UnitViewModel(unit));
                     }
                 }
 
@@ -376,13 +364,13 @@ namespace AimAssist.UI.MainWindows
 
             foreach (var unit in units)
             {
-                if(unit is UrlUnit unitUrlUnit)
+                if (unit is UrlUnit urlUnit)
                 {
-                    var icon = FaviconFetcher.GetUrlIconAsync(unitUrlUnit.Description);
-                    UnitLists.Add(new UnitViewModel(icon, unit));
-                }else if(unit is SnippetModelUnit)
+                    UnitLists.Add(new UnitViewModel(urlUnit, this));
+                }
+                else if (unit is SnippetModelUnit)
                 {
-                    if(this.mode == SnippetMode.Instance)
+                    if (this.mode == SnippetMode.Instance)
                     {
                         UnitLists.Add(new UnitViewModel(unit));
                     }
@@ -391,7 +379,6 @@ namespace AimAssist.UI.MainWindows
                 {
                     UnitLists.Add(new UnitViewModel(unit));
                 }
-
             }
         }
 

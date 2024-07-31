@@ -50,7 +50,7 @@
         <ListBox  Grid.Column="0" x:Name="ModeList" SelectionChanged="IconListBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <ContentControl Content="{Binding Icon}"></ContentControl>
+                    <ContentControl Content="{Binding Icon, UpdateSourceTrigger=PropertyChanged}"></ContentControl>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

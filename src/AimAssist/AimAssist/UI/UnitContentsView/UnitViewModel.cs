@@ -1,17 +1,39 @@
 ﻿using AimAssist.Units.Core.Mode;
+using Common.UI.WebUI;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 namespace AimAssist.Units.Core.Units
 {
-    public class UnitViewModel 
+    public class UnitViewModel : INotifyPropertyChanged
     {
         public UnitViewModel(IUnit content) : this(content.Mode.Icon, content)
         {
         }
-        public UnitViewModel(BitmapImage bitmapImage, IUnit content) : this(new System.Windows.Controls.Image() {Source= bitmapImage }, content)
+
+        public UnitViewModel(UrlUnit urlUnit, System.Windows.Controls.Control control)
         {
+            Task.Run(async () =>
+                {
+                    try
+                    {
+                        var icon = await FaviconFetcher.GetUrlIconAsync(urlUnit.Description);
+                        control.Dispatcher.Invoke(() =>
+                        {
+                            var image = new System.Windows.Controls.Image { Source = icon };
+                            this.Icon = image;
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        // エラーハンドリング
+                    }
+                });
+
+            Content = urlUnit;
         }
 
         public UnitViewModel(DependencyObject icon, IUnit content)
@@ -24,8 +46,24 @@ namespace AimAssist.Units.Core.Units
         public string Name =>Content.Name;
         public string Description => Content.Description;
         public string Category => Content.Category;
-        public DependencyObject Icon { get; }
+        public DependencyObject Icon
+        {
+            get { return this.icon; }
+            set {
+                this.icon = value;
+                this.OnPropertyChanged(nameof(Icon));
+            }
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string name = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        private DependencyObject icon { get; set; }
         public IUnit Content { get; }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public override bool Equals(object? obj)
         {
