@@ -1,11 +1,15 @@
-﻿using AimAssist.Units.Core;
+﻿using AimAssist.Services.Markdown;
+using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.ApplicationLog;
+using AimAssist.Units.Implementation.KeyHelp;
+using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
+using Common.UI.Commands.Shortcus;
+using Library.Options;
 using System.IO;
 
 namespace AimAssist.Units.Implementation
@@ -14,17 +18,26 @@ namespace AimAssist.Units.Implementation
     {
         public IEnumerable<IUnit> GetUnits()
         {
-            yield return new UrlUnit(WorkToolsMode.Instance, "ChatGPT", "https://chatgpt.com/");
-            yield return new UrlUnit(WorkToolsMode.Instance, "Claude", "https://claude.ai/");
-            yield return new TranscriptionUnit();
+            foreach (var workItemPath in WorkItemOptionService.Option.ItemPaths)
+            {
+                var links = new MarkdownService().GetLinks(workItemPath.GetActualPath());
+
+                foreach (var link in links)
+                {
+                    yield return new UrlUnit(WorkToolsMode.Instance, link.Text, link.Url, link.ContainingHeader);
+                }
+            }
+
+            //yield return new TranscriptionUnit();
             yield return new BookSearchSettingUnit();
             yield return new RssSettingUnit();
-            yield return new AppLogUnit();
+
+            //yield return new AppLogUnit();
 
             var dictInfo = new DirectoryInfo("Resources/Knowledge/");
             foreach (var file in dictInfo.GetFiles())
             {
-                yield return new MarkdownPathUnit(file, string.Empty);
+                yield return new MarkdownUnit(file, string.Empty, KnowledgeMode.Instance);
             }
 
             foreach (var directory in dictInfo.GetDirectories())
@@ -32,19 +45,44 @@ namespace AimAssist.Units.Implementation
                 foreach (var file in directory.GetFiles())
                 {
 
-                    yield return new MarkdownPathUnit(file, directory.Name);
+                    yield return new MarkdownUnit(file, directory.Name, KnowledgeMode.Instance);
                 }
             }
 
-            // TODO:設定ファイルからのLoad
-            yield return new SnippetUnit("aim", "AimNext", "Aim");
-            yield return new SnippetUnit("Today", DateTime.Now.ToString("d"), "DateTime");
-            yield return new SnippetUnit("Now", DateTime.Now.ToString("d"), "DateTime");
-            yield return new SnippetUnit("AppData", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
-            yield return new SnippetUnit("Downloads", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace("Documents", "Downloads"));
-            yield return new SnippetUnit("環境変数", "control.exe sysdm.cpl,,3");
+            var parser = new SnippetParser();
+            foreach (var path in SnippetOptionServce.Option.ItemPaths)
+            {
+                var snippets = parser.ParseMarkdownFile(path.GetActualPath());
+                foreach (var snippet in snippets)
+                {
+                    yield return new SnippetModelUnit(snippet);
+                }
+            }
 
-            yield return new OptionUnit();
+            var cheatSheetDirectory = new DirectoryInfo("Resources/CheatSheet/");
+            foreach (var file in cheatSheetDirectory.GetFiles())
+            {
+                var name = Path.GetFileNameWithoutExtension(file.Name);
+                var text = File.ReadAllText(file.FullName);
+                var items  =  KeySequenceParser.Parse(text, name);
+                foreach(var item in items)
+                {
+                    yield return new KeyHelpUnit(item);
+                }
+            }
+
+            if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
+            {
+                yield return new OptionUnit("Editor Option", [EditorOptionService.OptionPath, EditorOptionService.Option.CustomVimKeybindingPath]);
+            }
+            else
+            {
+                yield return new OptionUnit("Editor Option", [EditorOptionService.OptionPath]);
+            }
+
+            yield return new OptionUnit("WorkItem Option", new List<string>() { WorkItemOptionService.OptionPath }.Concat(WorkItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath())));
+
+            yield return new OptionUnit("Snippet Option", new List<string>() { SnippetOptionServce.OptionPath }.Concat(SnippetOptionServce.Option.ItemPaths.Select(x => x.GetActualPath())));
             yield return new ShortcutOptionUnit();
         }
     }

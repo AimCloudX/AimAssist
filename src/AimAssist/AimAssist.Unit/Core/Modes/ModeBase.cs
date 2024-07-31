@@ -22,6 +22,8 @@ namespace AimAssist.Units.Core.Mode
 
         public abstract Control Icon { get; }
 
+        public virtual bool IsIncludeAllInclusive => true;
+
         public override bool Equals(object? obj)
         {
             if (obj is IMode pickerMode)
@@ -46,8 +48,9 @@ namespace AimAssist.Units.Core.Mode
         {
             var packIcon = new PackIcon();
             packIcon.Kind = kind;
-            packIcon.Width = 30;
-            packIcon.Height = 30;
+            packIcon.Width = 35;
+            packIcon.Height = 35;
+            packIcon.Margin = new Thickness(-8);
 
             var toolTip = new CustomToolTip
             {

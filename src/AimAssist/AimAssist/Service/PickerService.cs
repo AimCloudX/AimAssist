@@ -1,6 +1,7 @@
 ﻿
 using AimAssist.UI.MainWindows;
 using AimAssist.UI.PickerWindows;
+using Common.Commands.Shortcus;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -8,40 +9,54 @@ namespace AimAssist.Service;
 internal static class PickerService
 {
     private static IntPtr beforeWindow;
+    private static bool isActive;
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
     [DllImport("user32.dll")]
     static extern IntPtr GetForegroundWindow();
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
     public static void ShowPickerWindow()
     {
+        if(isActive) { return; }
+        isActive = true;
+
         // HotKey押下時のウィンドウのハンドルを取得
         beforeWindow = GetForegroundWindow();
 
         // 自身のウィンドウハンドルをアクティブにする
-        SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
+        //SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
 
-        var window = new PickerWindow();
+        GetWindowThreadProcessId(beforeWindow, out var processId);
+        Process process = Process.GetProcessById((int)processId);
+
+        var window = new PickerWindow(process.ProcessName);
         window.Closed += DoAction;
         window.Show();
+        window.Activate();
     }
 
     private static void DoAction(object? sender, EventArgs e)
     {
+        isActive = false;
+
+        string text = string.Empty;
+        KeySequence keySequence = null;
+
         try
         {
             if (sender is PickerWindow window)
             {
-                var text = window.SnippetText;
-                if (string.IsNullOrEmpty(text))
+                text = window.SnippetText;
+                if (!string.IsNullOrEmpty(text))
                 {
-                    // 元のプロセスをアクティブにする
-                    SetForegroundWindow(beforeWindow);
-                    return;
+                    System.Windows.Clipboard.SetText(text);
                 }
+                keySequence = window.KeySequence;
 
-                System.Windows.Clipboard.SetText(text);
             }
         }
         catch (Exception ex)
@@ -54,6 +69,15 @@ internal static class PickerService
         Thread.Sleep(100); // アクテイブになるまで少し待つ
 
         // SendKeysを使用してキーを送信するためにSystem.Windows.Formsを追加する必要がある
-        SendKeys.SendWait("^v");
+
+        if(keySequence != null)
+        {
+            var keyText = keySequence.Parse();
+            SendKeys.SendWait(keyText);
+        }
+        else if(!string.IsNullOrEmpty(text))
+        {
+            SendKeys.SendWait("^v");
+        }
     }
 }

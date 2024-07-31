@@ -5,7 +5,14 @@
              Background="Transparent"
              >
     <Grid Background="Transparent">
-        <TabControl x:Name="TabControl" ItemsSource="{Binding Models}" Background="Transparent" TabStripPlacement="Left">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <Button Content="エディタで開く" Click="Button_Click"/>
+        </StackPanel>
+        <TabControl Grid.Row="1" x:Name="TabControl" ItemsSource="{Binding Models}" Background="Transparent" TabStripPlacement="Left">
             <TabControl.Resources>
                 <Style TargetType="local:FileModel" BasedOn="{StaticResource DefaultTabItemStyle}">
                 <Style.Triggers>

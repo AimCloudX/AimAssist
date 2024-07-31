@@ -70,6 +70,12 @@ namespace AimAssist
         private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
         {
             var settings = CommandService.GetKeymap();
+            var noneSettingsKeys = settings.Where(x => x.Value.FirstModifiers == 0).Select(y=>y.Key);
+            foreach (var key in noneSettingsKeys)
+            {
+                settings.Remove(key);
+            }
+
             new SettingManager().SaveSettings(settings);
             EditorOptionService.SaveOption();
             mutex.ReleaseMutex();

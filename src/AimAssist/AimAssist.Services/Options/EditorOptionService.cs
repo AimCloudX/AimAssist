@@ -9,7 +9,8 @@ namespace Library.Options
         public static EditorOption Option;
         private static FileSystemWatcher watcher;
 
-        public static string OptionPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "editor.option.json");
+        public static string OptionPath => 
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimAssist", "editor.option.json");
 
         public static void LoadOption()
         {

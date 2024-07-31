@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
-using System.Windows.Forms;
+using System.IO;
 
 namespace CheatSheet.Services
 {
@@ -34,106 +34,15 @@ private const int WH_KEYBOARD_LL = 13;
 
         private void InitializeCheatsheets()
         {
-            _cheatsheets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            _cheatsheets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            var dictInfo = new DirectoryInfo("Resources/CheatSheet/");
+            foreach (var file in dictInfo.GetFiles())
             {
-                { "windows", @"ショートカットキー・チートシート Windows版
-Ctrl+N 新規
-Ctrl+S 保存
-Ctrl+O 開く
-Ctrl+P 印刷
-Ctrl+A すべて選択
-Ctrl+C コピー
-Ctrl+X カット
-Ctrl+V ペースト
-Ctrl+Z アンドゥ
-Ctrl+Y リドゥ
-Ctrl+Shift+N 新規フォルダなど
-Ctrl+F 検索
-Ctrl+D 削除・複製など
-Ctrl+R 更新
-Tab 次⼊⼒エリア
-Shift+Tab 前⼊⼒エリア
-Alt+→ 次⾴
-Alt+← 前⾴
-Alt+Tab 次窓
-Alt+Shift+Tab 前窓
-!+Tab タスクビュー
-⎙ 全画⾯撮影
-!+⎙ 全画⾯収録
-!+Shift+S 画⾯収録
-Ctrl+W 閉じる
-Alt+F4 終了
-Ctrl+Alt+Del ｾｷｭｱ･ｱﾃﾝｼｮﾝ
-Ctrl+Shift+Esc 強制終了
-Ctrl+🡙 拡⼤縮⼩
-Alt+↩︎ プロパティ
-Shift+F10 ⽂脈メニュー
-Alt+Space 窓メニュー
-Shift+←↑→↓ 範囲選択
-🡙 ホイールスクロール" },
-                { "excel", @"ショートカットキー・チートシート Excelfor Windows版
-Ctrl+N 新規
-Ctrl+S 保存
-Ctrl+O 開く
-Ctrl+P 印刷
-Ctrl+A すべて選択
-Ctrl+C コピー
-Ctrl+X カット
-Ctrl+V ペースト
-Ctrl+Z アンドゥ
-Ctrl+Y リドゥ
-Ctrl+F 検索
-Ctrl+D 下セルにコピー
-Ctrl+R 右セルにコピー
-Ctrl+1 書式設定
-Ctrl+↖↘ 先頭末尾
-Ctrl+⇞⇟ 次前シート
-Alt+⇞⇟ 次前画⾯
-Tab 次列
-Shift+Tab 前列
-Alt+←→ 前次⾴
-Alt+Tab 次窓
-Alt+Shift+Tab 前窓
-Alt+↩︎ 改⾏挿⼊ほか
-Ctrl+↩︎ ⼀括⼊⼒
-⎙|!+⎙|!+Shift+S 画⾯撮影
-Ctrl+W 閉じる
-Shift+F10 ⽂脈メニュー
-Alt+Space 窓メニュー
-Shift+←↑→↓ 範囲選択
-Ctrl+←↑→↓ セル移動
-Ctrl+Shift+←↑→↓ セル選択
-Ctrl+Space 列選択
-Ctrl+BackSpace セルに戻る
-Ctrl+Shift+~ 標準表⽰形式
-Ctrl+Shift+' 上セル数式コピー
-Ctrl+Shift+"" 上セル値コピー
-Ctrl+Shift+# ⽇付表⽰形式
-Ctrl+Shift+$ 通貨表⽰形式
-Ctrl+Shift+% ％表⽰形式
-Ctrl+Shift+& 外枠罫線追加
-Ctrl+Shift+_ 外枠罫線削除
-Ctrl+| ⾏不⼀致選択
-Ctrl+Shift+| 列不⼀致選択" },
-                                { "code", @"ショートカットキー・チートシート VSCode
-Ctrl+N 新規
-Ctrl+S 保存
-Ctrl+O 開く
-"},
-                                { "AimAssist", @"AimAssist
-
-Alt+A AimAssistの表示切り替え
-Alt+P ピッカーウィンドウ表示
-Ctrl+D AimAssiを閉じる
-Ctrl+K,Ctrl+S ショートカット設定
-Ctrl+K,Ctrl+L コンテンツにフォーカス
-Ctrl+K,Ctrl+J ユニットにフォーカス
-Ctrl+N 次のユニット
-Ctrl+P 前のユニット
-"},
-            };
-
-
+                var name =   Path.GetFileNameWithoutExtension(file.Name);
+                var text = File.ReadAllText(file.FullName);
+                _cheatsheets.Add(name, text);
+            }
         }
 
         private IntPtr SetHook(LowLevelKeyboardProc proc)
@@ -189,13 +98,13 @@ Ctrl+P 前のユニット
             }
 
             string activeAppName = GetActiveApplicationName();
-            if (_cheatsheets.TryGetValue(activeAppName.ToLower(), out string cheatsheetContent))
+            if (_cheatsheets.TryGetValue(activeAppName, out string cheatsheetContent))
             {
                 _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName);
             }
             else
             {
-                _cheatsheetPopup = new CheatsheetPopup(_cheatsheets["windows"], "Windows (Default)");
+                return;
             }
 
             // アクティブウィンドウの位置を取得
@@ -208,9 +117,14 @@ Ctrl+P 前のユニット
 
             // チートシートポップアップの位置とサイズを設定
             _cheatsheetPopup.Width = activeScreen.WorkingArea.Width;
-            _cheatsheetPopup.Height = 200; // 必要に応じて調整
+            _cheatsheetPopup.Height = 220; // 必要に応じて調整
             _cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
             _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
+
+            //_cheatsheetPopup.Width = 200;
+            //_cheatsheetPopup.Height = 800; // 必要に応じて調整
+            //_cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
+            //_cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
 
             _cheatsheetPopup.Show();
         }

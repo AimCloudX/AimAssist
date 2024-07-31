@@ -38,5 +38,19 @@ namespace AimAssist.Core.Editors
         {
             this.Save();
         }
+
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var firstOrDefault = this.Models.FirstOrDefault(x => x.IsSelected);
+            if(firstOrDefault != null)
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = firstOrDefault.FilePath,
+                    UseShellExecute = true
+                }); 
+            }
+
+        }
     }
 }

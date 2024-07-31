@@ -1,11 +1,5 @@
 ﻿using AimAssist.Core.Commands;
-using Common;
 using Common.Commands.Shortcus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -22,7 +16,7 @@ namespace AimAssist.Service
         {
             var now = DateTime.Now;
 
-            if (IsModifierKeyOnly(key) || modifiers == ModifierKeys.None)
+            if (IsModifierKeyOnly(key) || modifiers == ModifierKeys.None|| modifiers == ModifierKeys.Shift)
             {
                 return false;
             }
@@ -61,6 +55,7 @@ namespace AimAssist.Service
 
             return false;
         }
+
         private void ResetKeySequence()
         {
             _lastKey = Key.None;

@@ -12,6 +12,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Closing="Window_Closing"
+        ShowInTaskbar="False"
         Deactivated="Window_LostFocus"
         KeyDown="OnKeyDown"
         Topmost="True"

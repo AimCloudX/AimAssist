@@ -1,25 +1,25 @@
 ﻿using AimAssist.Units.Core.Mode;
-using AimAssist.Units.Implementation.Knowledge;
 using System.IO;
 
 namespace AimAssist.Units.Core.Units
 {
-    public class MarkdownPathUnit: IUnit
+    public class MarkdownUnit: IUnit
     {
-        public MarkdownPathUnit(FileInfo fileInfo, string category)
+        public MarkdownUnit(FileInfo fileInfo, string category, IMode mode)
         {
             FileInfo = fileInfo;
             Category = category;
             FullPath = fileInfo.FullName;
+            Mode = mode;
         }
 
         public string FullPath { get; }
 
         public FileInfo FileInfo { get; }
 
-        public IMode Mode => KnowledgeMode.Instance;
+        public IMode Mode { get; }
 
-        public string Name => FileInfo.Name;
+        public string Name => Path.GetFileNameWithoutExtension(FileInfo.Name);
 
         public string Description => FullPath;
 

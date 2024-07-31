@@ -9,6 +9,7 @@ using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using AimAssist.Units.Implementation.Web.Rss;
+using AimAssist.Units.Implementation.WorkTools;
 using Common.UI;
 using Common.UI.ChatGPT;
 using Library.Options;
@@ -44,7 +45,7 @@ namespace AimAssist.UI.UnitContentsView
         {
             switch (unit.Content)
             {
-                case MarkdownPathUnit markdownPath:
+                case MarkdownUnit markdownPath:
                     return new MarkdownView(markdownPath.FullPath);
                 case TranscriptionUnit speechModel:
                     return new SpeechControl();
@@ -52,18 +53,29 @@ namespace AimAssist.UI.UnitContentsView
                     return new BookSearchControl();
                 case RssSettingUnit:
                     return new RssControl();
-                case OptionUnit:
-                    var editor = new AimEditor();
-                    editor.NewTab(EditorOptionService.OptionPath);
-                    if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
+                case OptionUnit option:
+                    var optionEditor = new AimEditor();
+                    foreach(var filePath in option.OptionFilePaths)
                     {
-                        editor.NewTab(EditorOptionService.Option.CustomVimKeybindingPath);
+                        optionEditor.NewTab(filePath);
                     }
 
+                    return optionEditor;
+                case EditorUnit editorUnit:
+                    var editor = new AimEditor();
+                    editor.NewTab(editorUnit.FullPath);
                     return editor;
                 case ShortcutOptionUnit:
                     return new CustomizeKeyboardShortcutsSettings();
                 case SnippetUnit model:
+                    return new System.Windows.Controls.TextBox()
+                    {
+                        Text = model.Code,
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        Margin = new Thickness(0)
+                    };
+                case SnippetModelUnit model:
                     return new System.Windows.Controls.TextBox()
                     {
                         Text = model.Code,

@@ -9,6 +9,8 @@ namespace AimAssist.Units.Core.Mode
         string Name { get; }
         string Description { get; }
 
+        bool IsIncludeAllInclusive { get; }
+
         KeySequence DefaultKeySequence { get; }
     }
 }

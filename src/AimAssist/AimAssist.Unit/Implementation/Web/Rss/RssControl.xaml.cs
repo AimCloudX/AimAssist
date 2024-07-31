@@ -81,6 +81,14 @@ namespace AimAssist.Units.Implementation.Web.Rss
                     string title = item.Title.Text;
                     string url = item.Links.FirstOrDefault()?.Uri.ToString();
 
+                    if(rssUrl.Category == "企業テックブログRSS")
+                    {
+                        if (item.PublishDate < DateTime.Now.AddDays(-3) || item.PublishDate > DateTime.Now)
+                        {
+                            continue;
+                        }
+                    }
+
                     if (!string.IsNullOrEmpty(url))
                     {
                         yield return new UrlUnit(RssMode.Instance, title, url, rssUrl.Category);

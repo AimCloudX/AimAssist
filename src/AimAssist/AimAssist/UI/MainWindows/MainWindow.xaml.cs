@@ -5,10 +5,13 @@ using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.KeyHelp;
+using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.BookSearch;
 using Common.Commands;
 using Common.Commands.Shortcus;
 using Common.UI;
+using Common.UI.WebUI;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -19,6 +22,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -31,9 +35,30 @@ namespace AimAssist.UI.MainWindows
         private IMode mode;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
+ private void MainWindow_SourceInitialized(object sender, EventArgs e)
+    {
+        var handle = new WindowInteropHelper(this).Handle;
+        HwndSource.FromHwnd(handle)?.AddHook(new HwndSourceHook(WndProc));
+    }
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        const int WM_SYSKEYDOWN = 0x0104;
+        const int VK_MENU = 0x12; // Alt key
+
+        if (msg == WM_SYSKEYDOWN && wParam.ToInt32() == VK_MENU)
+        {
+            handled = true;
+            return IntPtr.Zero;
+        }
+
+        return IntPtr.Zero;
+    }
         public MainWindow()
         {
             InitializeComponent();
+            SourceInitialized += MainWindow_SourceInitialized;
+
             RegisterCommands();
 
             LoadIcons();
@@ -63,20 +88,6 @@ namespace AimAssist.UI.MainWindows
                 }
  );
                 CommandService.Register(modeChangeCommand, mode.DefaultKeySequence);
-            }
-
-            foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
-            {
-                var unitChangeCommand = new RelayCommand(unit.Name, (Window window) =>
-                {
-                    if (window is MainWindow mainWindow)
-                    {
-                        mainWindow.ModeList.SelectedItem = unit.Mode;
-                        mainWindow.ComboListBox.SelectedItem = unit;
-                    }
-                });
-
-                CommandService.Register(unitChangeCommand, KeySequence.None);
             }
 
             MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), (Window window) =>
@@ -110,6 +121,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 }
             });
+
             MainWindowCommands.NextUnit = new RelayCommand(nameof(MainWindowCommands.NextUnit), (Window window) =>
             {
                 if (window is MainWindow mainWindow)
@@ -200,6 +212,21 @@ namespace AimAssist.UI.MainWindows
             CommandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
             CommandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
             CommandService.Register(MainWindowCommands.RemoveActiveView, new KeySequence(Key.W, ModifierKeys.Control));
+
+            foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
+            {
+                var unitChangeCommand = new RelayCommand(unit.Name, (Window window) =>
+                {
+                    if (window is MainWindow mainWindow)
+                    {
+                        mainWindow.ModeList.SelectedItem = unit.Mode;
+                        mainWindow.ComboListBox.SelectedItem = UnitLists.FirstOrDefault(x => x.Name == unit.Name);
+                    }
+                });
+
+                CommandService.Register(unitChangeCommand, KeySequence.None);
+            }
+
         }
 
         private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
@@ -219,23 +246,33 @@ namespace AimAssist.UI.MainWindows
                 this.ComboListBox.SelectedIndex = 0;
 
 
-                ConcurrentBag<UnitViewModel> concurrentBag = new ConcurrentBag<UnitViewModel> ();
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                ConcurrentBag<(BitmapImage, IUnit)> concurrentBag = new ConcurrentBag<(BitmapImage, IUnit)>();
                 unitsArgs.Units.AsParallel().ForAll(x => {
                     if (x is UrlUnit unitUrlUnit)
                     {
-                        var icon = GetUrlIcon(unitUrlUnit);
-                        concurrentBag.Add(new UnitViewModel(icon, x));
+                        var icon = FaviconFetcher.GetUrlIconAsync(unitUrlUnit.Description);
+                        concurrentBag.Add((icon, x));
                     }
                     else
                     {
-                        concurrentBag.Add(new UnitViewModel(x));
+                        concurrentBag.Add((null, x));
                     }
                 });
 
                 foreach(var unit in concurrentBag)
                 {
-                    UnitLists.Add(unit);
+                    if(unit.Item1 == null)
+                    {
+                        UnitLists.Add(new UnitViewModel(unit.Item2));
+                    }
+                    else
+                    {
+                        UnitLists.Add(new UnitViewModel(unit.Item1, unit.Item2));
+                    }
                 }
+
+                Mouse.OverrideCursor = null;
             }
         }
 
@@ -336,12 +373,19 @@ namespace AimAssist.UI.MainWindows
             }
 
             var units = UnitsService.Instnace.CreateUnits(this.mode);
+
             foreach (var unit in units)
             {
                 if(unit is UrlUnit unitUrlUnit)
                 {
-                    var icon = GetUrlIcon(unitUrlUnit);
+                    var icon = FaviconFetcher.GetUrlIconAsync(unitUrlUnit.Description);
                     UnitLists.Add(new UnitViewModel(icon, unit));
+                }else if(unit is SnippetModelUnit)
+                {
+                    if(this.mode == SnippetMode.Instance)
+                    {
+                        UnitLists.Add(new UnitViewModel(unit));
+                    }
                 }
                 else
                 {
