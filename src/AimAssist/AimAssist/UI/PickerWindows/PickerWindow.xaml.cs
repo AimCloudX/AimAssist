@@ -1,12 +1,15 @@
 ﻿using AimAssist.Service;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
+
+using AimAssist.Units.Implementation.Caluculation;
 using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Snippets;
 using Common.Commands.Shortcus;
 using Common.UI;
 using Common.UI.Editor;
 using Library.Options;
+using Mathos.Parser;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -137,8 +140,41 @@ namespace AimAssist.UI.PickerWindows
                 return;
             }
 
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
-            view.Filter = this.Filter;
+            if (this.FilterTextBox.Text.StartsWith('='))
+            {
+                this.Mode = CalcMode.Instance;
+                // ComboListの内容を更新する
+                
+                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
+                view.Filter = (obj) => true;
+
+                var parser = new MathParser();
+                try
+                {
+                    String expression = this.FilterTextBox.Text.Remove(0, 1);
+                    double result = parser.Parse(expression);
+                    var unitViewModel = new UnitViewModel(new SnippetUnit(result.ToString(), result.ToString()));
+
+                    this.UnitLists.Clear();
+                    this.UnitLists.Add(unitViewModel);
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            else
+            {
+                if(this.Mode != SnippetMode.Instance)
+                {
+                    this.Mode = SnippetMode.Instance;
+                    UpdateCandidate();
+                }
+
+                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
+                view.Filter = this.Filter;
+            }
+
             this.typingTimer = null;
             this.beforeText = this.FilterTextBox.Text;
             this.OnPropertyChanged(nameof(this.UnitLists));
@@ -295,8 +331,9 @@ namespace AimAssist.UI.PickerWindows
 
         private void RegisterSnippets()
         {
+
             var snippetVariables = new List<EditorSnippet>
-{
+
     //new Snippet { Label = "TM_SELECTED_TEXT", InsertText = "${TM_SELECTED_TEXT}", Documentation = "The currently selected text or the empty string" },
     //new Snippet { Label = "TM_CURRENT_LINE", InsertText = "${TM_CURRENT_LINE}", Documentation = "The contents of the current line" },
     //new Snippet { Label = "TM_CURRENT_WORD", InsertText = "${TM_CURRENT_WORD}", Documentation = "The contents of the word under cursor or the empty string" },
@@ -328,6 +365,7 @@ namespace AimAssist.UI.PickerWindows
     new EditorSnippet { Label = "CURRENT_HOUR", InsertText = "\\\\${CURRENT_HOUR}", Documentation = "The current hour in 24-hour clock format" },
     new EditorSnippet { Label = "CURRENT_MINUTE", InsertText = "\\\\${CURRENT_MINUTE}", Documentation = "The current minute" },
     new EditorSnippet { Label = "CURRENT_SECOND", InsertText = "\\\\${CURRENT_SECOND}", Documentation = "The current second" },
+
 };
 
             //EditorCash.Editor.RegisterSnippets(snippetVariables);
