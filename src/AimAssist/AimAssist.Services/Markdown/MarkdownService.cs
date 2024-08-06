@@ -13,8 +13,30 @@ namespace AimAssist.Services.Markdown
         public IEnumerable<MarkdownLink> GetLinks(string filePath)
         {
             string currentHeader = null;
+            bool inComment = false;
             foreach (var line in File.ReadAllLines(filePath))
             {
+                // HTMLコメントの開始をチェック
+                if (line.Trim().StartsWith("<!--"))
+                {
+                    inComment = true;
+                    if (line.Trim().EndsWith("-->"))
+                    {
+                        inComment = false;
+                    }
+                    continue;
+                }
+
+                // HTMLコメントの終了をチェック
+                if (inComment)
+                {
+                    if (line.Trim().EndsWith("-->"))
+                    {
+                        inComment = false;
+                    }
+                    continue;
+                }
+
                 if (line.StartsWith("# "))
                 {
                     currentHeader = line.Substring(2).Trim();
