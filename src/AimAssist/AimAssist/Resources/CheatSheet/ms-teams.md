@@ -37,16 +37,16 @@
 - ビデオ通話を承諾: Ctrl + Shift + A
 - 音声通話を承諾: Ctrl + Shift + S
 - 通話を拒否: Ctrl + Shift + D
-- 音声通話を開始: Ctrl + Shift + C
 #  
+- 音声通話を開始: Ctrl + Shift + C
 - ビデオ通話を開始: Ctrl + Shift + U
 - 会議のスケジュールを設定: Alt + Shift + N
 - 前の日/週へ移動: Ctrl + Alt + ←
 - 次の日/週へ移動: Ctrl + Alt + →
 - 日単位の表示: Ctrl + Alt + 1
 - 稼働日単位の表示: Ctrl + Alt + 2
+#  
 - 週単位の表示: Ctrl + Alt + 3
 - 会議出席依頼の保存と送信: Ctrl + S
-#  
 - 会議の詳細から参加: Alt + Shift + J
 - 提案された時間へ移動: Alt + Shift + S
