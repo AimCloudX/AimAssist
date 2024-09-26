@@ -9,13 +9,16 @@
         Height="800"
         KeyDown="SnippetToolWindow_OnKeyUp"
         xmlns:ui="http://schemas.modernwpf.com/2019"
-        xmlns:commands="clr-namespace:AimAssist.Core.Commands;assembly=AimAssist" 
-        ui:WindowHelper.UseModernWindowStyle="True"
+        ui:TitleBar.ExtendViewIntoTitleBar="True"
         WindowStartupLocation="CenterScreen"
+        ui:WindowHelper.UseModernWindowStyle="True"
         Closing="Window_Closing"
         Loaded="Window_Loaded"
-        ContentRendered="Window_ContentRendered"
+        BorderThickness="5,1,5,5"
         >
+    <WindowChrome.WindowChrome>
+        <WindowChrome ResizeBorderThickness="15,1,15,15"  />
+    </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">

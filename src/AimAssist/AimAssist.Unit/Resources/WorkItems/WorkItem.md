@@ -5,11 +5,14 @@
 
 [Claude](https://claude.ai/)
 [Gemini](https://gemini.google.com/app)
-[Free AI Writing, PDF, Image, and other Online Tools - TinyWow](https://tinywow.com/?ref=tiny-helpers)
 [Phind](https://www.phind.com/search?home=true)
 
 -->
+
 # AIツール
+[v0 by Vercel](https://v0.dev/chat)
+[Napkin AI](https://app.napkin.ai/)
+
 # memo
 [Excalidraw](https://excalidraw.com/)
 
