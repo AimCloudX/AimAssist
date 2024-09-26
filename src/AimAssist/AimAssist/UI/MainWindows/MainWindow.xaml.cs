@@ -7,7 +7,7 @@ using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Snippets;
-using AimAssist.Units.Implementation.Web.BookSearch;
+using AimAssist.Units.Implementation.Web;
 using Common.Commands;
 using Common.Commands.Shortcus;
 using Common.UI;
@@ -510,14 +510,7 @@ namespace AimAssist.UI.MainWindows
                     Tag = null
                 };
 
-                if (this.mode == BookSearchMode.Instance)
-                {
-                    this.typingTimer.Interval = TimeSpan.FromMilliseconds(500);
-                }
-                else
-                {
-                    this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
-                }
+                this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
 
                 this.typingTimer.Tick += this.HandleTypingTimerTimeout;
             }

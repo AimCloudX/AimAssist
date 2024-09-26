@@ -1,6 +1,5 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Web.BookSearch;
 using Library.Rss;
 using System.Collections.ObjectModel;
 using System.ServiceModel.Syndication;

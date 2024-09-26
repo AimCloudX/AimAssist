@@ -7,7 +7,6 @@ using AimAssist.Units.Implementation.ApplicationLog;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
-using AimAssist.Units.Implementation.Web.BookSearch;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
 using Common.UI;
@@ -49,8 +48,6 @@ namespace AimAssist.UI.UnitContentsView
                     return new MarkdownView(markdownPath.FullPath);
                 case TranscriptionUnit speechModel:
                     return new SpeechControl();
-                case BookSearchSettingUnit:
-                    return new BookSearchControl();
                 case RssSettingUnit:
                     return new RssControl();
                 case OptionUnit option:

@@ -5,7 +5,6 @@ using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
-using AimAssist.Units.Implementation.Web.BookSearch;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
 using Common.UI.Commands.Shortcus;
@@ -29,7 +28,6 @@ namespace AimAssist.Units.Implementation
             }
 
             //yield return new TranscriptionUnit();
-            yield return new BookSearchSettingUnit();
             yield return new RssSettingUnit();
 
             //yield return new AppLogUnit();

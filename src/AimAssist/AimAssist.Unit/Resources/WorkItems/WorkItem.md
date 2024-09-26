@@ -9,7 +9,7 @@
 [Phind](https://www.phind.com/search?home=true)
 
 -->
-
+# AIツール
 # memo
 [Excalidraw](https://excalidraw.com/)
 
@@ -28,3 +28,7 @@
 [Colab](https://colab.research.google.com/?hl=ja)
 -->
 [PlayCode](https://playcode.io/new)
+
+# Utility
+[ISBN検索ツール](https://aimcloudx.github.io/ISBNLookup/)
+
