@@ -69,18 +69,22 @@ namespace AimAssist.Units.Implementation
                 }
             }
 
+            var lists = new List<string>();
+            lists.Add(WorkItemOptionService.OptionPath);
+            lists.AddRange(WorkItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
             if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
             {
-                yield return new OptionUnit("Editor Option", [EditorOptionService.OptionPath, EditorOptionService.Option.CustomVimKeybindingPath]);
+                lists.AddRange([EditorOptionService.OptionPath, EditorOptionService.Option.CustomVimKeybindingPath]);
             }
             else
             {
-                yield return new OptionUnit("Editor Option", [EditorOptionService.OptionPath]);
+                lists.AddRange([EditorOptionService.OptionPath]);
             }
 
-            yield return new OptionUnit("WorkItem Option", new List<string>() { WorkItemOptionService.OptionPath }.Concat(WorkItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath())));
+            lists.AddRange([SnippetOptionServce.OptionPath]);
+            lists.AddRange(SnippetOptionServce.Option.ItemPaths.Select(x => x.GetActualPath()));
+            yield return new OptionUnit("Option", lists);
 
-            yield return new OptionUnit("Snippet Option", new List<string>() { SnippetOptionServce.OptionPath }.Concat(SnippetOptionServce.Option.ItemPaths.Select(x => x.GetActualPath())));
             yield return new ShortcutOptionUnit();
         }
     }

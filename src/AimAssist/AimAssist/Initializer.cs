@@ -50,8 +50,8 @@ namespace AimAssist
                 File.Copy(snippetoption, SnippetOptionServce.OptionPath);
             }
 
-            string snippetDefault = Path.Combine(roamingPath, "AimAssist", "standard.md");
-            string snippetSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "standard.md");
+            string snippetDefault = Path.Combine(roamingPath, "AimAssist", "SnippetsStandard.md");
+            string snippetSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "SnippetsStandard.md");
             if (!File.Exists(snippetDefault))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(snippetDefault));
@@ -59,7 +59,6 @@ namespace AimAssist
             }
 
             SnippetOptionServce.LoadOption();
-
 
             EditorOptionService.LoadOption();
 
