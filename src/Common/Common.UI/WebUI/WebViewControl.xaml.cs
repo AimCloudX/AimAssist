@@ -48,6 +48,18 @@ namespace Common.UI
             {
                 // WebView2を初期化
                 await webView.EnsureCoreWebView2Async(null);
+                //ダイアログ表示を抑止
+                //webView.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = false;
+                //コンテキストメニューを抑止
+                //webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+                //開発者ツールを無効化
+                webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                //ブラウザに組み込まれているエラーページを無効化
+                webView.CoreWebView2.Settings.IsBuiltInErrorPageEnabled = false;
+                //ズームコントロールを無効化
+                //webView.CoreWebView2.Settings.IsZoomControlEnabled = false;
+                //ステータスバーを非表示
+                webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
 
                 // ナビゲートするURLを設定
                 webView.CoreWebView2.Navigate(url);
