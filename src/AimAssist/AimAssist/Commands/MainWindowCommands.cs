@@ -6,7 +6,6 @@ namespace AimAssist.Core.Commands
     {
         public static RelayCommand FocusPreview { get; set; }
         public static RelayCommand FocusFilterTextBox { get; set; }
-        public static RelayCommand RemoveActiveView { get; set; }
         public static RelayCommand NextMode { get; set; }
         public static RelayCommand PreviousMode { get; set; }
         public static RelayCommand NextUnit { get; set; }

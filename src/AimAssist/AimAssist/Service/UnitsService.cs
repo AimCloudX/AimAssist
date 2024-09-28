@@ -11,7 +11,7 @@ namespace AimAssist.Service
 
         private Dictionary<IMode, IList<IUnit>> modeDic = new() {
             { AllInclusiveMode.Instance, new List<IUnit>() },
-            {ActiveUnitMode.Instance, new List<IUnit>() } };
+             };
 
         public IReadOnlyCollection<IMode> GetAllModes()
         {

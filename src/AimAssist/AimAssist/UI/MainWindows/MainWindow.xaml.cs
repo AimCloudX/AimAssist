@@ -35,7 +35,6 @@ namespace AimAssist.UI.MainWindows
         private double itemListWidth = 220; // 初期幅
         private bool isAnimating = false;
         public ObservableCollection<UnitViewModel> UnitLists { get; } = new ObservableCollection<UnitViewModel>();
-        public ObservableCollection<UnitViewModel> ActiveUnits { get; } = new ObservableCollection<UnitViewModel>();
         private IMode mode;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
@@ -192,21 +191,6 @@ namespace AimAssist.UI.MainWindows
                 }
             });
 
-            MainWindowCommands.RemoveActiveView = new RelayCommand(nameof(MainWindowCommands.RemoveActiveView), (Window window) =>
-            {
-                if (window is MainWindow mainWindow)
-                {
-                    if (mainWindow.mode == ActiveUnitMode.Instance)
-                    {
-                        if (mainWindow.ComboListBox.SelectedItem is UnitViewModel unit)
-                        {
-                            mainWindow.ActiveUnits.Remove(unit);
-                            mainWindow.UnitLists.Remove(unit);
-                        }
-                    }
-                }
-            });
-
             CommandService.Register(MainWindowCommands.NextMode, new KeySequence(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
             CommandService.Register(MainWindowCommands.PreviousMode, new KeySequence(Key.P, ModifierKeys.Control | ModifierKeys.Shift));
             CommandService.Register(MainWindowCommands.NextUnit, new KeySequence(Key.N, ModifierKeys.Control));
@@ -214,7 +198,6 @@ namespace AimAssist.UI.MainWindows
 
             CommandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
             CommandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
-            CommandService.Register(MainWindowCommands.RemoveActiveView, new KeySequence(Key.W, ModifierKeys.Control));
 
             foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
             {
@@ -366,15 +349,6 @@ namespace AimAssist.UI.MainWindows
             inputText = this.FilterTextBox.Text;
 
             UnitLists.Clear();
-            if (this.mode == ActiveUnitMode.Instance)
-            {
-                foreach (var unit in ActiveUnits)
-                {
-                    UnitLists.Add(unit);
-                }
-
-                return;
-            }
 
             var units = UnitsService.Instnace.CreateUnits(this.mode);
 
@@ -457,27 +431,6 @@ namespace AimAssist.UI.MainWindows
             this.beforeText = this.FilterTextBox.Text;
             this.OnPropertyChanged(nameof(this.UnitLists));
             this.ComboListBox.SelectedIndex = 0;
-        }
-
-        private void SnippetToolWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                if (this.mode != ActiveUnitMode.Instance)
-                {
-
-                    if (this.ComboListBox.SelectedItem is UnitViewModel unit)
-                    {
-                        if (!ActiveUnits.Contains(unit))
-                        {
-                            ActiveUnits.Add(unit);
-                        }
-
-                        CommandService.Execute(ActiveUnitMode.Instance.GetModeChnageCommandName(), this);
-                        this.ComboListBox.SelectedItem = unit;
-                    }
-                }
-            }
         }
 
         private void TextBox_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
