@@ -69,7 +69,7 @@ namespace ClipboardAnalyzer
             }
 
             var foramtData = Items.FirstOrDefault(x => x.Format == selectedFormat);
-            if (foramtData != null)
+            if (foramtData?.Data != null)
             {
                 this.editor.SetTextAsync(foramtData.Data.ToString());
             }
