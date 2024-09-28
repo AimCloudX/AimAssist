@@ -20,9 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Knowledge\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\WorkItems\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
