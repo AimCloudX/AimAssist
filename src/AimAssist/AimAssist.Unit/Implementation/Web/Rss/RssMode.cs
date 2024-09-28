@@ -10,7 +10,7 @@ namespace AimAssist.Units.Implementation.Web.Rss
         {
         }
 
-        public override Control Icon => CreateIcon(PackIconKind.Journal);
+        public override Control Icon => CreateIcon(PackIconKind.Rss);
 
         public const string ModeName = "Rss";
 

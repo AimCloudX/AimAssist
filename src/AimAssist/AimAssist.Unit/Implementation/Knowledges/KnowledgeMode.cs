@@ -7,7 +7,7 @@ namespace AimAssist.Units.Implementation.Knowledge
     public class KnowledgeMode : ModeBase
     {
         private KnowledgeMode() : base(ModeName) { }
-        public override Control Icon => CreateIcon(PackIconKind.Wikipedia);
+        public override Control Icon => CreateIcon(PackIconKind.Encyclopedia);
 
         public const string ModeName = "Knowledge";
 
