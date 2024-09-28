@@ -23,6 +23,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -30,30 +31,33 @@ namespace AimAssist.UI.MainWindows
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private bool isItemListVisible = true;
+        private double itemListWidth = 220; // 初期幅
+        private bool isAnimating = false;
         public ObservableCollection<UnitViewModel> UnitLists { get; } = new ObservableCollection<UnitViewModel>();
         public ObservableCollection<UnitViewModel> ActiveUnits { get; } = new ObservableCollection<UnitViewModel>();
         private IMode mode;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
 
- private void MainWindow_SourceInitialized(object sender, EventArgs e)
-    {
-        var handle = new WindowInteropHelper(this).Handle;
-        HwndSource.FromHwnd(handle)?.AddHook(new HwndSourceHook(WndProc));
-    }
-
-    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-        const int WM_SYSKEYDOWN = 0x0104;
-        const int VK_MENU = 0x12; // Alt key
-
-        if (msg == WM_SYSKEYDOWN && wParam.ToInt32() == VK_MENU)
+        private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
-            handled = true;
-            return IntPtr.Zero;
+            var handle = new WindowInteropHelper(this).Handle;
+            HwndSource.FromHwnd(handle)?.AddHook(new HwndSourceHook(WndProc));
         }
 
-        return IntPtr.Zero;
-    }
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_SYSKEYDOWN = 0x0104;
+            const int VK_MENU = 0x12; // Alt key
+
+            if (msg == WM_SYSKEYDOWN && wParam.ToInt32() == VK_MENU)
+            {
+                handled = true;
+                return IntPtr.Zero;
+            }
+
+            return IntPtr.Zero;
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -71,7 +75,6 @@ namespace AimAssist.UI.MainWindows
 
             var binding = new CommandBinding(AimAssistCommands.SendUnitCommand, ExecuteReceiveData);
             CommandManager.RegisterClassCommandBinding(typeof(Window), binding);
-
         }
 
         private async void RegisterCommands()
@@ -176,7 +179,7 @@ namespace AimAssist.UI.MainWindows
                 }
             });
 
-            MainWindowCommands.FocusUnits = new RelayCommand(nameof(MainWindowCommands.FocusUnits), (Window window)  =>
+            MainWindowCommands.FocusUnits = new RelayCommand(nameof(MainWindowCommands.FocusUnits), (Window window) =>
             {
                 if (window is MainWindow mainWindow)
                 {
@@ -248,9 +251,9 @@ namespace AimAssist.UI.MainWindows
 
                 Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
 
-                foreach(var unit in unitsArgs.Units)
+                foreach (var unit in unitsArgs.Units)
                 {
-                    if(unit is UrlUnit urlUnit)
+                    if (unit is UrlUnit urlUnit)
                     {
                         UnitLists.Add(new UnitViewModel(urlUnit, this));
                     }
@@ -557,6 +560,131 @@ namespace AimAssist.UI.MainWindows
             if (e.Key == Key.Escape)
             {
                 this.FilterTextBox.Text = string.Empty;
+            }
+        }
+
+        // 項目リストの幅を追跡
+        private void ItemListGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (!isAnimating)
+            {
+                itemListWidth = e.NewSize.Width;
+            }
+        }
+
+        private void HamburgerButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (isAnimating)
+                return; // アニメーション中は無視
+
+            isAnimating = true;
+
+            if (isItemListVisible)
+            {
+                // 項目リストを非表示にするアニメーション
+                var animation = new GridLengthAnimation
+                {
+                    From = new GridLength(itemListWidth),
+                    To = new GridLength(0),
+                    Duration = new Duration(TimeSpan.FromMilliseconds(300)),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut },
+                    FillBehavior = FillBehavior.Stop // FillBehavior を Stop に設定
+                };
+
+                animation.Completed += (s, a) =>
+                {
+                    // アニメーション完了後に ColumnDefinition.Width を設定
+                    ItemListColumn.Width = new GridLength(0);
+                    isItemListVisible = false;
+                    isAnimating = false;
+                };
+
+                ItemListColumn.BeginAnimation(ColumnDefinition.WidthProperty, animation);
+            }
+            else
+            {
+                // 項目リストを表示するアニメーション
+                var animation = new GridLengthAnimation
+                {
+                    From = new GridLength(0),
+                    To = new GridLength(itemListWidth),
+                    Duration = new Duration(TimeSpan.FromMilliseconds(300)),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut },
+                    FillBehavior = FillBehavior.Stop // FillBehavior を Stop に設定
+                };
+
+                animation.Completed += (s, a) =>
+                {
+                    // アニメーション完了後に ColumnDefinition.Width を設定
+                    ItemListColumn.Width = new GridLength(itemListWidth);
+                    isItemListVisible = true;
+                    isAnimating = false;
+                };
+
+                ItemListColumn.BeginAnimation(ColumnDefinition.WidthProperty, animation);
+            }
+        }
+
+        public class GridLengthAnimation : AnimationTimeline
+        {
+            public override Type TargetPropertyType => typeof(GridLength);
+
+            protected override Freezable CreateInstanceCore()
+            {
+                return new GridLengthAnimation();
+            }
+
+            // From プロパティ
+            public GridLength From
+            {
+                get { return (GridLength)GetValue(FromProperty); }
+                set { SetValue(FromProperty, value); }
+            }
+
+            public static readonly DependencyProperty FromProperty =
+                DependencyProperty.Register("From", typeof(GridLength), typeof(GridLengthAnimation));
+
+            // To プロパティ
+            public GridLength To
+            {
+                get { return (GridLength)GetValue(ToProperty); }
+                set { SetValue(ToProperty, value); }
+            }
+
+            public static readonly DependencyProperty ToProperty =
+                DependencyProperty.Register("To", typeof(GridLength), typeof(GridLengthAnimation));
+
+            // EasingFunction プロパティ
+            public IEasingFunction EasingFunction
+            {
+                get { return (IEasingFunction)GetValue(EasingFunctionProperty); }
+                set { SetValue(EasingFunctionProperty, value); }
+            }
+
+            public static readonly DependencyProperty EasingFunctionProperty =
+                DependencyProperty.Register("EasingFunction", typeof(IEasingFunction), typeof(GridLengthAnimation));
+
+            public override object GetCurrentValue(object defaultOriginValue, object defaultDestinationValue, AnimationClock animationClock)
+            {
+                if (animationClock == null)
+                    throw new ArgumentNullException(nameof(animationClock));
+
+                double fromValue = From.Value;
+                double toValue = To.Value;
+
+                // アニメーションの進行度を取得
+                double progress = animationClock.CurrentProgress.Value;
+
+                // EasingFunction が設定されている場合は適用
+                if (EasingFunction != null)
+                {
+                    progress = EasingFunction.Ease(progress);
+                }
+
+                // 現在の値を計算
+                double currentValue = fromValue + (toValue - fromValue) * progress;
+
+                return new GridLength(currentValue);
             }
         }
     }
