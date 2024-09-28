@@ -4,11 +4,13 @@ using AimAssist.UI.Combos.Commands;
 using AimAssist.UI.Options;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.ApplicationLog;
+using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
+using CodeGenerator;
 using Common.UI;
 using Common.UI.ChatGPT;
 using Library.Options;
@@ -99,7 +101,8 @@ namespace AimAssist.UI.UnitContentsView
                     return new WebViewControl(url);
                 case AppLogUnit:
                     return new ApplicationLogControl();
-
+                case CodeGeneratorUnit:
+                    return new CodeGeneratorControl();
                 default:
                     break;
             }
