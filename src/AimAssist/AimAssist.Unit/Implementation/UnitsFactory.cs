@@ -27,7 +27,7 @@ namespace AimAssist.Units.Implementation
                 }
             }
 
-            //yield return new TranscriptionUnit();
+            yield return new TranscriptionUnit();
             yield return new RssSettingUnit();
 
             //yield return new AppLogUnit();
