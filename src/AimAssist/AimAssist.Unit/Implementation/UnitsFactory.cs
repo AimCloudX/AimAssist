@@ -6,6 +6,7 @@ using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
+using AimAssist.Units.Implementation.Web.MindMeister;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
 using Common.UI.Commands.Shortcus;
@@ -58,6 +59,8 @@ namespace AimAssist.Units.Implementation
                     yield return new SnippetModelUnit(snippet);
                 }
             }
+
+            yield return new MindMeisterUnit("最近開いたMap", "https://www.mindmeister.com/app/maps/recent");
 
             var cheatSheetDirectory = new DirectoryInfo("Resources/CheatSheet/");
             foreach (var file in cheatSheetDirectory.GetFiles())

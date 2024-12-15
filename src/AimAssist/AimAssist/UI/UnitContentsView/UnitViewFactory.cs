@@ -8,11 +8,13 @@ using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
+using AimAssist.Units.Implementation.Web.MindMeister;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
 using CodeGenerator;
 using Common.UI;
 using Common.UI.ChatGPT;
+using Common.UI.WebUI;
 using Library.Options;
 using System.IO;
 using System.Windows;
@@ -82,6 +84,10 @@ namespace AimAssist.UI.UnitContentsView
                         VerticalAlignment = VerticalAlignment.Stretch,
                         Margin = new Thickness(0)
                     };
+                case MindMeisterUnit model:
+                    return new MindMeisterViewControl(model);
+                case MindMeisterItemUnit model:
+                    return new WebViewControl(model.SearchUrl, model.Name);
                 case UrlUnit urlPath:
                     var url = urlPath.Url;
                     if (url.StartsWith("https://chatgpt"))

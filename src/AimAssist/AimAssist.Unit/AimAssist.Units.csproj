@@ -40,5 +40,8 @@
     <Compile Update="Implementation\Options\CustomizeKeyboardShortcutsSettings.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Implementation\Web\MindMeister\MindMeisterViewControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

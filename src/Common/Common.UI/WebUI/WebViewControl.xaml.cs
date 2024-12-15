@@ -13,6 +13,13 @@ namespace Common.UI
         private string readedURl;
         private string title;
 
+        public WebViewControl(string url, string title)
+        {
+            InitializeComponent();
+            this.title = title;
+            this.url = url;
+        }
+
         public WebViewControl(string url)
         {
             InitializeComponent();

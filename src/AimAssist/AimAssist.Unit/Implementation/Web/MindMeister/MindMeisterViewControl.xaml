@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="Common.UI.WebUI.MindMeisterViewControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Common.UI.WebUI"
+              xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             Loaded="UserControl_Loaded"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" x:Name="WebMenu">
+            <Menu  Grid.Row="0">
+                <MenuItem Header="設定">
+                    <MenuItem Header="APIキーの入力" Click="MenuItem_InputApiKey_Click"/>
+                </MenuItem>
+            </Menu>
+            <Button Content="mapのid取得" Margin="0,0,10,0" Click="Button_Click0" />
+            <Button Content="リンク作成" Margin="0,0,10,0" Click="Button_Click" />
+            <Button Content="ブラウザで開く" Margin="0,0,10,0" Click="Button_Click2" />
+        </StackPanel>
+        <wpf:WebView2 Grid.Row="1" x:Name="webView" 
+                      NavigationCompleted="webView_NavigationCompleted"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+        </wpf:WebView2>
+        <StackPanel Grid.Row="2">
+            <TextBlock x:Name="StatusTextBlock" />
+        </StackPanel>
+    </Grid>
+</UserControl>
