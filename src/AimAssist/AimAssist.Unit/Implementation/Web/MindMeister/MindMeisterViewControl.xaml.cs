@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -100,19 +101,25 @@ namespace Common.UI.WebUI
                 webView.CoreWebView2.Navigate(url);
             } }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             InitializeWebView();
             LoadApiKey();
             if (ApiKey != null)
             {
                 apiService = new ApiService(ApiKey);
-                SendUnits(apiService.Cash);
+                var maps = await apiService.LoadMap();
+                SendUnits(maps);
             }
         }
 
         private async void Button_Click0(object sender, RoutedEventArgs e)
         {
+            if(apiService == null)
+            {
+                return;
+            }
+
             var ids = await ExtractMapIdsFromWebViewAsync(this.webView.CoreWebView2);
 
             // Use Parallel.ForEachAsync to process map requests concurrently
@@ -125,6 +132,37 @@ namespace Common.UI.WebUI
             SendUnits(maps);
 
             apiService.AddMaps(maps);
+
+            // test
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
+                string apiUrl = "https://www.mindmeister.com/api/v2/mm.folders.getList";
+                //string apiUrl = "https://www.mindmeister.com/api/v2/maps/3236607029";
+
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine("Response:");
+                        Console.WriteLine(responseBody);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {response.StatusCode}");
+                        string errorBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Details: {errorBody}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception: {ex.Message}");
+                }
+            }
         }
 
         private void SendUnits(IEnumerable<MindMeisterMap> maps)

@@ -10,6 +10,8 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using RestSharp;
 using System.Text.Json;
 using System.IO;
+using CodeGenerator;
+using System.Collections;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
@@ -19,8 +21,6 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
 
         public string MapCashPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mindmeisterap.cash");
         public List<MindMeisterMap> Cash = new();
-
-
 
         public void AddMaps(IEnumerable<MindMeisterMap> maps)
         {
@@ -82,13 +82,29 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
         public ApiService(string apiKey)
         {
             ApiKey = apiKey;
+        }
 
+        public async Task<IEnumerable<MindMeisterMap>> LoadMap()
+        {
             if (File.Exists(MapCashPath))
             {
                 string json = File.ReadAllText(MapCashPath);
-                Cash.AddRange(System.Text.Json.JsonSerializer.Deserialize<List<MindMeisterMap>>(json));
+                var loadedMaps = System.Text.Json.JsonSerializer.Deserialize<List<MindMeisterMap>>(json);
+                if(loadedMaps != null)
+                {
+                    var validatedMaps = await Task.WhenAll(loadedMaps.Select(async map =>
+                    {
+                        return await this.GetMap(map.Id).ConfigureAwait(false);
+                    }));
 
+                    var maps = validatedMaps.Where(x => x != null).ToArray();
+                    Cash.AddRange(maps);
+
+                    return maps;
+                }
             }
+
+            return Array.Empty<MindMeisterMap>();
         }
     }
 }
