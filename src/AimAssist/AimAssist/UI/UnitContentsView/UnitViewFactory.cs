@@ -6,6 +6,7 @@ using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.ApplicationLog;
 using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Options;
+using AimAssist.Units.Implementation.Pdf;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
 using AimAssist.Units.Implementation.Web.MindMeister;
@@ -105,6 +106,8 @@ namespace AimAssist.UI.UnitContentsView
                     }
 
                     return new WebViewControl(url);
+                case PdfMergeUnit:
+                    return new PdfMergerControl();
                 case AppLogUnit:
                     return new ApplicationLogControl();
                 case CodeGeneratorUnit:

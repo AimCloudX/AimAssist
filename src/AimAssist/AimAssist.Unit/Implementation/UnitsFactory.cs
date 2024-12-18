@@ -5,6 +5,7 @@ using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
+using AimAssist.Units.Implementation.Pdf;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web.MindMeister;
 using AimAssist.Units.Implementation.Web.Rss;
@@ -31,6 +32,7 @@ namespace AimAssist.Units.Implementation
 
             yield return new CodeGeneratorUnit();
             yield return new TranscriptionUnit();
+            yield return new PdfMergeUnit();
             yield return new RssSettingUnit();
 
             //yield return new AppLogUnit();
