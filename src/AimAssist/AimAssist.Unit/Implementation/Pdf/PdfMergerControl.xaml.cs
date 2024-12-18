@@ -199,7 +199,21 @@ namespace AimAssist.Units.Implementation.Pdf
                 try
                 {
                     // PDFの結合処理
-                    // ...
+                    using (PdfDocument outputDocument = new PdfDocument())
+                    {
+                        foreach (var pdfPath in PdfFiles)
+                        {
+                            using (PdfDocument inputDocument = PdfReader.Open(pdfPath.FilePath, PdfDocumentOpenMode.Import))
+                            {
+                                for (int i = 0; i < inputDocument.PageCount; i++)
+                                {
+                                    outputDocument.AddPage(inputDocument.Pages[i]);
+                                }
+                            }
+                        }
+
+                        outputDocument.Save(saveFileDialog.FileName);
+                    }
 
 
                     // 結合したPDFを開く
