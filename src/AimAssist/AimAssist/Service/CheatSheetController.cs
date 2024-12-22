@@ -183,6 +183,10 @@ namespace CheatSheet.Services
 
                             _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName+" / "+ domainName);
                         }
+                        else
+                        {
+                            return;
+                        }
                     }
                     else
                     {
@@ -207,6 +211,10 @@ namespace CheatSheet.Services
             // アクティブウィンドウが表示されているスクリーンを特定
             System.Windows.Forms.Screen activeScreen = System.Windows.Forms.Screen.FromHandle(activeWindow);
 
+            if(_cheatsheetPopup == null)
+            {
+                return;
+            }
             // チートシートポップアップの位置とサイズを設定
             _cheatsheetPopup.Width = activeScreen.WorkingArea.Width;
             _cheatsheetPopup.Height = 220; // 必要に応じて調整
