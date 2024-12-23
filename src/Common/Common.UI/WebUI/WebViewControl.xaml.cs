@@ -146,5 +146,10 @@ namespace Common.UI
 
 
         }
+
+        private void Button_Click3(object sender, RoutedEventArgs e)
+        {
+            webView.CoreWebView2.Navigate(this.url);
+        }
     }
 }

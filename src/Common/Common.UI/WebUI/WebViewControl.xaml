@@ -16,6 +16,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" x:Name="WebMenu">
             <Button Content="リンク作成" Margin="0,0,10,0" Click="Button_Click" />
             <Button Content="ブラウザで開く" Margin="0,0,10,0" Click="Button_Click2" />
+            <Button Content="🔃" Margin="0,0,10,0" Click="Button_Click3" />
         </StackPanel>
         <wpf:WebView2 Grid.Row="1" x:Name="webView" 
                       NavigationCompleted="webView_NavigationCompleted"
