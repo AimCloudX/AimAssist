@@ -36,7 +36,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             }
 
             var options = new JsonSerializerOptions { WriteIndented = true };
-            string json = System.Text.Json.JsonSerializer.Serialize(Cash.OrderBy(x=>x.Title), options);
+            string json = System.Text.Json.JsonSerializer.Serialize(Cash.OrderByDescending(x=>x.UpdatedTime), options);
             File.WriteAllText(MapCashPath, json);
         }
 
@@ -47,7 +47,13 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             var json = await GetJsonObject(ApiKey, apiUrl, id);
             if (json.TryGetValue("title", out var value))
             {
-                return new MindMeisterMap(id, value.ToString());
+
+                if(json.TryGetValue("updated_at", out var updated))
+                {
+                    return new MindMeisterMap(id, value.ToString(), updated.ToString());
+                }
+
+
             }
 
             return null;

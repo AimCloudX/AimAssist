@@ -10,14 +10,16 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
 {
     public class MindMeisterMap
     {
-        public MindMeisterMap(string id, string title)
+        public MindMeisterMap(string id, string title, string updatedTime)
         {
             Id = id;
             Title = title;
+            UpdatedTime = updatedTime;
         }
 
         public string Id { get; set; }
         public string Title { get; set; }
+        public string UpdatedTime { get; }
 
         [JsonIgnore]
         public string Url => $"https://www.mindmeister.com/app/map/{Id}";
