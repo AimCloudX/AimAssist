@@ -522,6 +522,7 @@ namespace AimAssist.UI.MainWindows
             if (!isAnimating)
             {
                 itemListWidth = e.NewSize.Width;
+                isItemListVisible = itemListWidth > 0;
             }
         }
 
@@ -556,6 +557,11 @@ namespace AimAssist.UI.MainWindows
             }
             else
             {
+                if(itemListWidth == 0)
+                {
+                    itemListWidth = 220;
+                }
+
                 // 項目リストを表示するアニメーション
                 var animation = new GridLengthAnimation
                 {
