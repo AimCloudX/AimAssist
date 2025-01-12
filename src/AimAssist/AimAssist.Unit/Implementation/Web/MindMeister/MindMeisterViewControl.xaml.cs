@@ -167,9 +167,13 @@ namespace Common.UI.WebUI
 
         private void SendUnits(IEnumerable<MindMeisterMap> maps)
         {
+            if (!maps.Any())
+            {
+                return;
+            }
+
             var args = new UnitsArgs(MindMeisterMode.Instance, maps.Select(y => new UrlUnit(MindMeisterMode.Instance, y.Title, y.Url)).ToList(), true);
             AimAssistCommands.SendUnitCommand.Execute(args, this);
-
         }
 
         static async Task<List<string>> ExtractMapIdsFromWebViewAsync(CoreWebView2 webView)

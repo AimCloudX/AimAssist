@@ -224,6 +224,7 @@ namespace AimAssist.UI.MainWindows
                     if (this.mode != unitsArgs.Mode)
                     {
                         this.mode = unitsArgs.Mode;
+                        this.ModeList.SelectedItem = this.mode;
                     }
                 }
 
