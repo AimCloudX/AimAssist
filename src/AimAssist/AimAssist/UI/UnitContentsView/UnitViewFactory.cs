@@ -5,6 +5,7 @@ using AimAssist.UI.Options;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.ApplicationLog;
 using AimAssist.Units.Implementation.CodeGenarator;
+using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Pdf;
 using AimAssist.Units.Implementation.Snippets;
@@ -112,6 +113,8 @@ namespace AimAssist.UI.UnitContentsView
                     return new ApplicationLogControl();
                 case CodeGeneratorUnit:
                     return new CodeGeneratorControl();
+                case ComputerUnit:
+                    return new ComputerView();
                 default:
                     break;
             }

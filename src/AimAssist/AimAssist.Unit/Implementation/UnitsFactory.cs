@@ -2,6 +2,7 @@
 using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.CodeGenarator;
+using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
@@ -34,6 +35,7 @@ namespace AimAssist.Units.Implementation
             yield return new TranscriptionUnit();
             yield return new PdfMergeUnit();
             yield return new RssSettingUnit();
+            yield return new ComputerUnit();
 
             //yield return new AppLogUnit();
 
