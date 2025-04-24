@@ -19,6 +19,7 @@ namespace AimAssist.Service
         private DispatcherTimer _timer;
         private List<LogEntry> _logEntries = new List<LogEntry>();
         private string _logDirectoryPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimAssist", "ApplicationLog");
+        private string _applicationLogFilePath;
 
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
@@ -35,6 +36,7 @@ namespace AimAssist.Service
         public ApplicationLogService()
         {
             // DIでインスタンス化されるように、パブリックコンストラクタを提供
+            _applicationLogFilePath = System.IO.Path.Combine(_logDirectoryPath, "AppLog.txt");
         }
 
         /// <summary>
@@ -48,6 +50,41 @@ namespace AimAssist.Service
             _timer.Interval = TimeSpan.FromMinutes(1); // 1分ごとにチェック
             _timer.Tick += Timer_Tick;
             _timer.Start();
+            
+            Log("ApplicationLogService initialized");
+        }
+
+        /// <summary>
+        /// ログメッセージを記録します
+        /// </summary>
+        /// <param name="message">ログメッセージ</param>
+        public void Log(string message)
+        {
+            try
+            {
+                // ディレクトリが存在しない場合は作成
+                if (!Directory.Exists(_logDirectoryPath))
+                {
+                    Directory.CreateDirectory(_logDirectoryPath);
+                }
+                
+                // 現在時刻を含めてログを記録
+                string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}";
+                
+                // デバッグコンソールにも出力
+                Debug.WriteLine(logMessage);
+                
+                // ファイルに追記
+                using (StreamWriter writer = new StreamWriter(_applicationLogFilePath, true))
+                {
+                    writer.WriteLine(logMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                // ログ処理自体でエラーが発生した場合はデバッグ出力のみ
+                Debug.WriteLine($"Error logging message: {ex.Message}");
+            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)

@@ -1,5 +1,6 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Interfaces;
+using AimAssist.Plugins;
 using AimAssist.Service;
 using Library.Options;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,6 +68,7 @@ namespace AimAssist
             services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
             services.AddSingleton<ISnippetOptionService, SnippetOptionServce>();
             services.AddSingleton<IWorkItemOptionService, WorkItemOptionService>();
+            services.AddSingleton<IPluginsService, PluginsService>();
             services.AddSingleton<PickerService>(provider => new PickerService(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IUnitsService>(),
@@ -102,7 +104,8 @@ namespace AimAssist
                 provider.GetRequiredService<IAppCommands>(),
                 provider.GetRequiredService<IEditorOptionService>(),
                 provider.GetRequiredService<ISnippetOptionService>(),
-                provider.GetRequiredService<IWorkItemOptionService>()
+                provider.GetRequiredService<IWorkItemOptionService>(),
+                provider.GetRequiredService<IPluginsService>()
             ));
             
             _serviceProvider = services.BuildServiceProvider();

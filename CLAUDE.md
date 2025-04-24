@@ -171,6 +171,7 @@ AimAssist/
 | インターフェース抽出 | 完了 | - | 2025-04-25 |
 | 設定管理改善 | 完了 | - | 2025-04-25 |
 | テスト環境構築 | 未着手 | - | - |
+| PluginsServiceのDI対応 | 完了 | - | 2025-04-25 |
 
 ## 現在の課題とノート
 
@@ -221,6 +222,7 @@ AimAssist/
    - ✓ EditorOptionService
    - ✓ SnippetOptionService
    - ✓ WorkItemOptionService
+   - ✓ PluginsService
 2. ✓ AppCommandsクラスをDIに完全対応させる
 3. ✓ ユニットテストプロジェクトの追加
    - ✓ プロジェクト作成
@@ -228,8 +230,9 @@ AimAssist/
    - ✓ サービスの単体テスト
    - ✗ 統合テストの追加
 4. リファクタリングの詳細計画の策定
-   - ✗ SnippetOptionServiceとWorkItemOptionServiceのDI対応
-   - ✗ プラグインシステムの改善
+   - ✓ PluginsServiceをDIパターンに対応
+   - ✗ 命名の一貫性確保（例: GetConverters vs GetConterters）
+   - ✗ エラーハンドリングの改善
    - ✗ UI層の改善
    - ✗ 国際化対応
 5. クリーンアーキテクチャの適用

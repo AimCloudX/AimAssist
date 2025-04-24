@@ -1,6 +1,5 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Interfaces;
-using AimAssist.Plugins;
 using AimAssist.Service;
 using AimAssist.UI.SystemTray;
 using AimAssist.UI.Tools.HotKeys;
@@ -30,6 +29,7 @@ namespace AimAssist
         private readonly IEditorOptionService _editorOptionService;
         private readonly ISnippetOptionService _snippetOptionService;
         private readonly IWorkItemOptionService _workItemOptionService;
+        private readonly IPluginsService _pluginsService;
 
         /// <summary>
         /// コンストラクタ
@@ -44,6 +44,7 @@ namespace AimAssist
         /// <param name="editorOptionService">エディターオプションサービス</param>
         /// <param name="snippetOptionService">スニペットオプションサービス</param>
         /// <param name="workItemOptionService">作業項目オプションサービス</param>
+        /// <param name="pluginsService">プラグインサービス</param>
         public Initializer(
             IUnitsService unitsService,
             ICommandService commandService,
@@ -54,7 +55,8 @@ namespace AimAssist
             IAppCommands appCommands,
             IEditorOptionService editorOptionService,
             ISnippetOptionService snippetOptionService,
-            IWorkItemOptionService workItemOptionService)
+            IWorkItemOptionService workItemOptionService,
+            IPluginsService pluginsService)
         {
             _unitsService = unitsService;
             _commandService = commandService;
@@ -66,6 +68,7 @@ namespace AimAssist
             _editorOptionService = editorOptionService;
             _snippetOptionService = snippetOptionService;
             _workItemOptionService = workItemOptionService;
+            _pluginsService = pluginsService;
         }
 
         /// <summary>
@@ -132,15 +135,15 @@ namespace AimAssist
                 _workItemOptionService, 
                 _snippetOptionService));
 
-            var pluginService = new PluginsService();
-            pluginService.LoadCommandPlugins();
-            var factories = pluginService.GetFactories();
+            // DIから取得したIPluginsServiceを使用
+            _pluginsService.LoadCommandPlugins();
+            var factories = _pluginsService.GetFactories();
             foreach (var item in factories)
             {
                 _unitsService.RegisterUnits(item);
             }
 
-            var converters = pluginService.GetConterters();
+            var converters = _pluginsService.GetConverters();
             foreach (var item in converters)
             {
                 UnitViewFactory.UnitToUIElementDicotionary.TryAdd(item.Key, item.Value);
