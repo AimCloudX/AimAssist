@@ -28,6 +28,8 @@ namespace AimAssist
         private readonly PickerService _pickerService;
         private readonly IAppCommands _appCommands;
         private readonly IEditorOptionService _editorOptionService;
+        private readonly ISnippetOptionService _snippetOptionService;
+        private readonly IWorkItemOptionService _workItemOptionService;
 
         /// <summary>
         /// コンストラクタ
@@ -38,6 +40,10 @@ namespace AimAssist
         /// <param name="serviceProvider">サービスプロバイダー</param>
         /// <param name="windowHandleService">ウィンドウハンドルサービス</param>
         /// <param name="pickerService">ピッカーサービス</param>
+        /// <param name="appCommands">アプリケーションコマンド</param>
+        /// <param name="editorOptionService">エディターオプションサービス</param>
+        /// <param name="snippetOptionService">スニペットオプションサービス</param>
+        /// <param name="workItemOptionService">作業項目オプションサービス</param>
         public Initializer(
             IUnitsService unitsService,
             ICommandService commandService,
@@ -46,7 +52,9 @@ namespace AimAssist
             WindowHandleService windowHandleService,
             PickerService pickerService,
             IAppCommands appCommands,
-            IEditorOptionService editorOptionService)
+            IEditorOptionService editorOptionService,
+            ISnippetOptionService snippetOptionService,
+            IWorkItemOptionService workItemOptionService)
         {
             _unitsService = unitsService;
             _commandService = commandService;
@@ -56,6 +64,8 @@ namespace AimAssist
             _pickerService = pickerService;
             _appCommands = appCommands;
             _editorOptionService = editorOptionService;
+            _snippetOptionService = snippetOptionService;
+            _workItemOptionService = workItemOptionService;
         }
 
         /// <summary>
@@ -76,10 +86,10 @@ namespace AimAssist
             }
 
             string workItemOptionSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "WorkItems", "workitem.option.json");
-            if (!File.Exists(WorkItemOptionService.OptionPath))
+            if (!File.Exists(_workItemOptionService.OptionPath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(WorkItemOptionService.OptionPath));
-                File.Copy(workItemOptionSource, WorkItemOptionService.OptionPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(_workItemOptionService.OptionPath));
+                File.Copy(workItemOptionSource, _workItemOptionService.OptionPath);
             }
 
             string targetPath = Path.Combine(roamingPath, "AimAssist", "WorkItem.md");
@@ -90,13 +100,14 @@ namespace AimAssist
                 File.Copy(sourcePath, targetPath);
             }
 
-            WorkItemOptionService.LoadOption();
+            // DI経由で取得したWorkItemOptionServiceを使用
+            _workItemOptionService.LoadOption();
 
             string snippetoption = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "snippet.option.json");
-            if (!File.Exists(SnippetOptionServce.OptionPath))
+            if (!File.Exists(_snippetOptionService.OptionPath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(SnippetOptionServce.OptionPath));
-                File.Copy(snippetoption, SnippetOptionServce.OptionPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(_snippetOptionService.OptionPath));
+                File.Copy(snippetoption, _snippetOptionService.OptionPath);
             }
 
             string snippetDefault = Path.Combine(roamingPath, "AimAssist", "SnippetsStandard.md");
@@ -107,7 +118,8 @@ namespace AimAssist
                 File.Copy(snippetSource, snippetDefault);
             }
 
-            SnippetOptionServce.LoadOption();
+            // DI経由で取得したSnippetOptionServiceを使用
+            _snippetOptionService.LoadOption();
 
             // DIから取得したEditorOptionServiceを使用
             _editorOptionService.LoadOption();
@@ -115,7 +127,10 @@ namespace AimAssist
             SystemTrayRegister.Register();
 
             // DIで注入されたユニットサービスを使用
-            _unitsService.RegisterUnits(new UnitsFactory(_editorOptionService));
+            _unitsService.RegisterUnits(new UnitsFactory(
+                _editorOptionService, 
+                _workItemOptionService, 
+                _snippetOptionService));
 
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();

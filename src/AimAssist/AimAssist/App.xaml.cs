@@ -3,8 +3,10 @@ using AimAssist.Core.Interfaces;
 using AimAssist.Service;
 using Library.Options;
 using Microsoft.Extensions.DependencyInjection;
+using AimAssist.Units.Implementation.Snippets;
 using System.IO;
 using System.IO.Pipes;
+using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist
 {
@@ -63,6 +65,8 @@ namespace AimAssist
             services.AddSingleton<IApplicationLogService, ApplicationLogService>();
             services.AddSingleton<ISettingManager, SettingManager>();
             services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
+            services.AddSingleton<ISnippetOptionService, SnippetOptionServce>();
+            services.AddSingleton<IWorkItemOptionService, WorkItemOptionService>();
             services.AddSingleton<PickerService>(provider => new PickerService(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IUnitsService>(),
@@ -96,7 +100,9 @@ namespace AimAssist
                 provider.GetRequiredService<WindowHandleService>(),
                 provider.GetRequiredService<PickerService>(),
                 provider.GetRequiredService<IAppCommands>(),
-                provider.GetRequiredService<IEditorOptionService>()
+                provider.GetRequiredService<IEditorOptionService>(),
+                provider.GetRequiredService<ISnippetOptionService>(),
+                provider.GetRequiredService<IWorkItemOptionService>()
             ));
             
             _serviceProvider = services.BuildServiceProvider();
@@ -151,6 +157,8 @@ namespace AimAssist
 
             _serviceProvider.GetRequiredService<ISettingManager>().SaveSettings(settings);
             _serviceProvider.GetRequiredService<IEditorOptionService>().SaveOption();
+            _serviceProvider.GetRequiredService<ISnippetOptionService>().SaveOption();
+            _serviceProvider.GetRequiredService<IWorkItemOptionService>().SaveOption();
             mutex.ReleaseMutex();
         }
     }

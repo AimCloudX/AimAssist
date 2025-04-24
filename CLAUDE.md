@@ -207,6 +207,11 @@ AimAssist/
 - ユニットテストプロジェクト（AimAssist.Tests）を追加しました
 - DI設定のテストクラスを作成しました（DependencyInjectionTests）
 - サービスクラスのテストクラスを作成しました（SettingManagerTests、KeySequenceManagerTests）
+- SnippetOptionServiceのインターフェース（ISnippetOptionService）を作成し、DIパターンに対応させました
+- WorkItemOptionServiceのインターフェース（IWorkItemOptionService）を作成し、DIパターンに対応させました
+- AimAssist.CoreプロジェクトにAimAssist.Unitプロジェクトへの参照を追加しました
+- UnitsFactoryクラスにSnippetOptionServiceとWorkItemOptionServiceをコンストラクタで注入するように変更しました
+- Initializerクラスが新しい形式のUnitsFactoryを使用するように修正しました
 
 ## 次のステップ
 
@@ -214,8 +219,8 @@ AimAssist/
    - ✓ SettingManager
    - ✓ KeySequenceManager
    - ✓ EditorOptionService
-   - ✗ SnippetOptionService
-   - ✗ WorkItemOptionService
+   - ✓ SnippetOptionService
+   - ✓ WorkItemOptionService
 2. ✓ AppCommandsクラスをDIに完全対応させる
 3. ✓ ユニットテストプロジェクトの追加
    - ✓ プロジェクト作成

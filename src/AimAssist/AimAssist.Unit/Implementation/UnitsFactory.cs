@@ -23,14 +23,21 @@ namespace AimAssist.Units.Implementation
     public class UnitsFactory : IUnitsFacotry
     {
         private readonly IEditorOptionService _editorOptionService;
+        private readonly IWorkItemOptionService _workItemOptionService;
+        private readonly ISnippetOptionService _snippetOptionService;
 
-        public UnitsFactory(IEditorOptionService editorOptionService)
+        public UnitsFactory(
+            IEditorOptionService editorOptionService,
+            IWorkItemOptionService workItemOptionService,
+            ISnippetOptionService snippetOptionService)
         {
             _editorOptionService = editorOptionService;
+            _workItemOptionService = workItemOptionService;
+            _snippetOptionService = snippetOptionService;
         }
         public IEnumerable<IUnit> GetUnits()
         {
-            foreach (var workItemPath in WorkItemOptionService.Option.ItemPaths)
+            foreach (var workItemPath in _workItemOptionService.Option.ItemPaths)
             {
                 var links = new MarkdownService().GetLinks(workItemPath.GetActualPath());
 
@@ -64,7 +71,7 @@ namespace AimAssist.Units.Implementation
             }
 
             var parser = new SnippetParser();
-            foreach (var path in SnippetOptionServce.Option.ItemPaths)
+            foreach (var path in _snippetOptionService.Option.ItemPaths)
             {
                 var snippets = parser.ParseMarkdownFile(path.GetActualPath());
                 foreach (var snippet in snippets)
@@ -88,8 +95,8 @@ namespace AimAssist.Units.Implementation
             }
 
             var lists = new List<string>();
-            lists.Add(WorkItemOptionService.OptionPath);
-            lists.AddRange(WorkItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
+            lists.Add(_workItemOptionService.OptionPath);
+            lists.AddRange(_workItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
             if (File.Exists(_editorOptionService.Option.CustomVimKeybindingPath))
             {
                 lists.AddRange([_editorOptionService.OptionPath, _editorOptionService.Option.CustomVimKeybindingPath]);
@@ -99,8 +106,8 @@ namespace AimAssist.Units.Implementation
                 lists.AddRange([_editorOptionService.OptionPath]);
             }
 
-            lists.AddRange([SnippetOptionServce.OptionPath]);
-            lists.AddRange(SnippetOptionServce.Option.ItemPaths.Select(x => x.GetActualPath()));
+            lists.AddRange([_snippetOptionService.OptionPath]);
+            lists.AddRange(_snippetOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
             yield return new OptionUnit("Option", lists);
 
             yield return new ShortcutOptionUnit();

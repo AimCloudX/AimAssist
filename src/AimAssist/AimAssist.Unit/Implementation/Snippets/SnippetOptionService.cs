@@ -1,23 +1,19 @@
-﻿using AimAssist.Units.Implementation.WorkTools;
+﻿using AimAssist.Core.Interfaces;
+using AimAssist.Units.Implementation.WorkTools;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AimAssist.Units.Implementation.Snippets
 {
-    public class SnippetOptionServce
+    public class SnippetOptionServce : ISnippetOptionService
     {
-        public static ConfigModel Option;
+        public ConfigModel Option { get; private set; }
         private static FileSystemWatcher watcher;
 
-        public static string OptionPath =>
+        public string OptionPath =>
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimAssist", "snippet.option.json");
 
-        public static void LoadOption()
+        public void LoadOption()
         {
             if (File.Exists(OptionPath))
             {
@@ -62,10 +58,10 @@ namespace AimAssist.Units.Implementation.Snippets
             watcher.EnableRaisingEvents = true;
         }
 
-        private static void OnChanged(object source, FileSystemEventArgs e) =>
+        private void OnChanged(object source, FileSystemEventArgs e) =>
             LoadOption();
 
-        public static void SaveOption()
+        public void SaveOption()
         {
             var text = JsonConvert.SerializeObject(Option, Formatting.Indented);
             File.WriteAllText(OptionPath, text);
