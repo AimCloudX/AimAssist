@@ -1,6 +1,5 @@
-﻿using AimAssist.Units.Core.Mode;
-
-namespace AimAssist.Units.Core.Units
+﻿
+namespace AimAssist.Core.Units
 {
     public interface IUnit
     {

@@ -1,4 +1,6 @@
 ﻿using AimAssist.Core.Commands;
+using AimAssist.Core.Interfaces;
+using AimAssist.Core.Units;
 using AimAssist.Service;
 using AimAssist.UI.PickerWindows;
 using AimAssist.UI.UnitContentsView;
@@ -37,6 +39,7 @@ namespace AimAssist.UI.MainWindows
         public ObservableCollection<UnitViewModel> UnitLists { get; } = new ObservableCollection<UnitViewModel>();
         private IMode mode;
         private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
+        private readonly IUnitsService _unitsService;
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
@@ -57,8 +60,11 @@ namespace AimAssist.UI.MainWindows
 
             return IntPtr.Zero;
         }
-        public MainWindow()
+        
+        public MainWindow(IUnitsService unitsService)
         {
+            _unitsService = unitsService ?? throw new ArgumentNullException(nameof(unitsService));
+            
             InitializeComponent();
             SourceInitialized += MainWindow_SourceInitialized;
 
@@ -78,7 +84,7 @@ namespace AimAssist.UI.MainWindows
 
         private async void RegisterCommands()
         {
-            foreach (var mode in UnitsService.Instnace.GetAllModes())
+            foreach (var mode in _unitsService.GetAllModes())
             {
                 var modeChangeCommand = new RelayCommand(mode.GetModeChnageCommandName(), (window) =>
                 {
@@ -199,7 +205,7 @@ namespace AimAssist.UI.MainWindows
             CommandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
             CommandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
 
-            foreach (var unit in UnitsService.Instnace.CreateUnits(AllInclusiveMode.Instance))
+            foreach (var unit in _unitsService.CreateUnits(AllInclusiveMode.Instance))
             {
                 var unitChangeCommand = new RelayCommand(unit.Name, (Window window) =>
                 {
@@ -253,7 +259,7 @@ namespace AimAssist.UI.MainWindows
 
         private void LoadIcons()
         {
-            ModeList.ItemsSource = UnitsService.Instnace.GetAllModes();
+            ModeList.ItemsSource = _unitsService.GetAllModes();
         }
 
         private async void IconListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -351,7 +357,7 @@ namespace AimAssist.UI.MainWindows
 
             UnitLists.Clear();
 
-            var units = UnitsService.Instnace.CreateUnits(this.mode);
+            var units = _unitsService.CreateUnits(this.mode);
 
             foreach (var unit in units)
             {

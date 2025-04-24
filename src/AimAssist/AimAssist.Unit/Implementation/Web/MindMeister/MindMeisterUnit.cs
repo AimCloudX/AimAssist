@@ -1,4 +1,5 @@
-﻿using AimAssist.Units.Core.Mode;
+﻿using AimAssist.Core.Units;
+using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
-    public class MindMeisterUnit :IUnit
+    public class MindMeisterUnit : IUnit
     {
         public MindMeisterUnit(string name, string path)
         {

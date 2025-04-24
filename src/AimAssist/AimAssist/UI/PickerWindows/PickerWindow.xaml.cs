@@ -1,4 +1,7 @@
-﻿using AimAssist.Service;
+﻿using AimAssist.Core.Interfaces;
+using AimAssist.Core.Units;
+using AimAssist.Service;
+using AimAssist.UI.MainWindows;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
 
@@ -10,6 +13,7 @@ using Common.UI;
 using Common.UI.Editor;
 using Library.Options;
 using Mathos.Parser;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -99,7 +103,7 @@ namespace AimAssist.UI.PickerWindows
         public async void UpdateCandidate()
         {
             UnitLists.Clear();
-            var units = UnitsService.Instnace.CreateUnits(this.Mode);
+            var units = ((App)App.Current)._serviceProvider.GetRequiredService<IUnitsService>().CreateUnits(this.Mode);
 
             foreach (var unit in units)
             {
@@ -111,7 +115,8 @@ namespace AimAssist.UI.PickerWindows
                 UnitLists.Add(new UnitViewModel(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
             }
 
-            var keyUnits = UnitsService.Instnace.CreateUnits(KeyHelpMode.Instance);
+
+            var keyUnits = ((App)App.Current)._serviceProvider.GetRequiredService<IUnitsService>().CreateUnits(KeyHelpMode.Instance);
             foreach (var unit in keyUnits)
             {
                 if (unit is KeyHelpUnit keyHelpUnit)

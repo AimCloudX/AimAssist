@@ -1,12 +1,13 @@
 ﻿
 using AimAssist.UI.MainWindows;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace AimAssist.Service;
 internal static class WindowHandleService
 {
-    public static MainWindow Window { get; private set; } = new MainWindow();
+    public static MainWindow Window { get; private set; }
     private static bool isActivate;
 
     [DllImport("user32.dll")]
@@ -24,9 +25,10 @@ internal static class WindowHandleService
 
         isActivate = true;
 
-        if (Window.IsClosing)
+        if (Window == null || Window.IsClosing)
         {
-            Window = new MainWindow();
+            // DIコンテナからMainWindowを取得
+            Window = ((App)App.Current)._serviceProvider.GetRequiredService<MainWindow>();
         }
 
         Window.Visibility = System.Windows.Visibility.Visible;

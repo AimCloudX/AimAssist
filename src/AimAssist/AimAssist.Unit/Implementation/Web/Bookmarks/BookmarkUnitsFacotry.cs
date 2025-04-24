@@ -1,4 +1,5 @@
-﻿using AimAssist.Units.Core.Mode;
+﻿using AimAssist.Core.Units;
+using AimAssist.Units.Core.Mode;
 using Newtonsoft.Json;
 
 namespace AimAssist.Units.Implementation.Web.Bookmarks

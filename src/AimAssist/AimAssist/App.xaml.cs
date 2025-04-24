@@ -1,6 +1,8 @@
 ﻿using AimAssist.Core.Commands;
+using AimAssist.Core.Interfaces;
 using AimAssist.Service;
 using Library.Options;
+using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.IO.Pipes;
 
@@ -14,12 +16,23 @@ namespace AimAssist
         private static Mutex mutex;
         private const string appName = "AimAssist";
         private const string PipeName = "AimAssist";
+        public ServiceProvider _serviceProvider { get; private set; }
+
+        /// <summary>
+        /// アプリケーションの起動時に呼び出されるメソッド
+        /// </summary>
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
         {
+            // DI コンテナを設定
+            ConfigureServices();
+
             mutex = new Mutex(true, appName, out var createdNew);
             if (createdNew)
             {
-                new Initializer().Initialize();
+                // DIコンテナからInitializerを取得して使用
+                var initializer = _serviceProvider.GetRequiredService<Initializer>();
+                initializer.Initialize();
+                
                 var settings = new SettingManager().LoadSettings();
                 CommandService.SetKeymap(settings);
 
@@ -32,6 +45,23 @@ namespace AimAssist
                 ActivateAimAssistAnotherProcess();
                 Shutdown();
             }
+        }
+        
+        /// <summary>
+        /// DIコンテナの設定
+        /// </summary>
+        private void ConfigureServices()
+        {
+            var services = new ServiceCollection();
+            
+            // サービスを登録
+            services.AddSingleton<IUnitsService, UnitsService>();
+            services.AddSingleton<Initializer>();
+            services.AddTransient<UI.MainWindows.MainWindow>();
+            
+            // 他のサービスを登録
+            
+            _serviceProvider = services.BuildServiceProvider();
         }
 
         private static void ActivateAimAssistAnotherProcess()

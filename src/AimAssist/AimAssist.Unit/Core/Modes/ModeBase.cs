@@ -1,4 +1,5 @@
-﻿using Common.Commands.Shortcus;
+﻿using AimAssist.Core.Units;
+using Common.Commands.Shortcus;
 using MaterialDesignThemes.Wpf;
 using System.Windows;
 using System.Windows.Controls;

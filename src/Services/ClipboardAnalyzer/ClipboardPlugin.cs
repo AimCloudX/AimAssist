@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows;
+using AimAssist.Core.Units;
 using AimAssist.Plugins;
 using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;

@@ -1,4 +1,5 @@
 ﻿using AimAssist.Core.Commands;
+using AimAssist.Core.Interfaces;
 using AimAssist.Plugins;
 using AimAssist.Service;
 using AimAssist.UI.SystemTray;
@@ -13,8 +14,25 @@ using System.IO;
 
 namespace AimAssist
 {
+    /// <summary>
+    /// アプリケーションの初期化を行うクラス
+    /// </summary>
     internal class Initializer
     {
+        private readonly IUnitsService _unitsService;
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="unitsService">ユニットサービス</param>
+        public Initializer(IUnitsService unitsService)
+        {
+            _unitsService = unitsService;
+        }
+
+        /// <summary>
+        /// アプリケーションを初期化します
+        /// </summary>
         public void Initialize()
         {
             string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -64,15 +82,15 @@ namespace AimAssist
 
             SystemTrayRegister.Register();
 
-            var unitsService = UnitsService.Instnace;
-            unitsService.RegisterUnits(new UnitsFactory());
+            // DIで注入されたユニットサービスを使用
+            _unitsService.RegisterUnits(new UnitsFactory());
 
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();
-            var facotries = pluginService.GetFactories();
-            foreach (var item in facotries)
+            var factories = pluginService.GetFactories();
+            foreach (var item in factories)
             {
-                unitsService.RegisterUnits(item);
+                _unitsService.RegisterUnits(item);
             }
 
             var converters = pluginService.GetConterters();

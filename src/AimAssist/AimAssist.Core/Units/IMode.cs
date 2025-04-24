@@ -1,7 +1,7 @@
 ﻿using Common.Commands.Shortcus;
 using System.Windows.Controls;
 
-namespace AimAssist.Units.Core.Mode
+namespace AimAssist.Core.Units
 {
     public interface IMode
     {

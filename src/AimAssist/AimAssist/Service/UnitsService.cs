@@ -1,40 +1,45 @@
-﻿using AimAssist.Units.Core;
+﻿using AimAssist.Core.Interfaces;
+using AimAssist.Core.Units;
+using AimAssist.Units.Core;
 using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Service
 {
-    public class UnitsService
+    /// <summary>
+    /// ユニットサービスの実装
+    /// </summary>
+    public class UnitsService : IUnitsService
     {
-        private static UnitsService? instance;
-
         private Dictionary<IMode, IList<IUnit>> modeDic = new() {
             { AllInclusiveMode.Instance, new List<IUnit>() },
-             };
+        };
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public UnitsService()
+        {
+            // DIでインスタンス化されるように、パブリックコンストラクタを提供
+        }
+
+        /// <summary>
+        /// 利用可能なすべてのモードを取得します
+        /// </summary>
+        /// <returns>利用可能なモードのコレクション</returns>
         public IReadOnlyCollection<IMode> GetAllModes()
         {
             return modeDic.Keys.Where(x => x.IsIncludeAllInclusive).ToList();
         }
 
-        public static UnitsService Instnace
+        /// <summary>
+        /// ユニットファクトリからユニットを登録します
+        /// </summary>
+        /// <param name="factory">ユニットファクトリ</param>
+        public void RegisterUnits(IUnitsFacotry factory)
         {
-            get
-            {
-                if (instance == null)
-                {
-                    var factory = new UnitsService();
-                    instance = factory;
-                }
-
-                return instance;
-            }
-        }
-
-        public void RegisterUnits(IUnitsFacotry facotry)
-        {
-            var units = facotry.GetUnits();
+            var units = factory.GetUnits();
             foreach (var unit in units)
             {
                 if (modeDic.TryGetValue(AllInclusiveMode.Instance, out var allUnits))
@@ -56,6 +61,11 @@ namespace AimAssist.Service
             }
         }
 
+        /// <summary>
+        /// 指定したモードのユニットを作成します
+        /// </summary>
+        /// <param name="mode">モード</param>
+        /// <returns>作成されたユニットのコレクション</returns>
         public IEnumerable<IUnit> CreateUnits(IMode mode)
         {
             if(modeDic.TryGetValue(mode, out var units))

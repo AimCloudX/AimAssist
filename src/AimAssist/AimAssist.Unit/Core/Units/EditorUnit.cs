@@ -1,4 +1,4 @@
-﻿using AimAssist.Units.Core.Mode;
+﻿using AimAssist.Core.Units;
 using System.IO;
 
 namespace AimAssist.Units.Core.Units

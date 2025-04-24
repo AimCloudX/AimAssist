@@ -1,6 +1,4 @@
-﻿using AimAssist.Units.Core.Units;
-
-namespace AimAssist.Units.Core
+﻿namespace AimAssist.Core.Units
 {
     public interface IUnitsFacotry
     {

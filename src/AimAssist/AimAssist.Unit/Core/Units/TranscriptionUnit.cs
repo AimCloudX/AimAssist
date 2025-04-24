@@ -1,4 +1,5 @@
-﻿using AimAssist.Units.Core.Mode;
+﻿using AimAssist.Core.Units;
+using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Core.Units
