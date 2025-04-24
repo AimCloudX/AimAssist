@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AimAssist\AimAssist.Plugins\AimAssist.Plugins.csproj" />
+    <ProjectReference Include="..\..\AimAssist\AimAssist\AimAssist.csproj" />
   </ItemGroup>
 
   <ItemGroup>

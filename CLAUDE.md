@@ -133,19 +133,19 @@ AimAssist/
 ## リファクタリング実施計画
 
 1. **準備フェーズ** 
-   - [ ] コードベースの詳細分析
+   - [x] コードベースの詳細分析
    - [ ] テスト環境構築
    - [ ] 優先順位付け
 
 2. **基盤的リファクタリング**
-   - [ ] 依存性注入コンテナ導入
-   - [ ] インターフェース抽出
+   - [x] 依存性注入コンテナ導入
+   - [x] インターフェース抽出
    - [ ] ロギングフレームワーク導入
 
 3. **構造的リファクタリング**
    - [ ] アーキテクチャ再構築
    - [ ] MVVMパターン適用
-   - [ ] 設定管理改善
+   - [x] 設定管理改善
 
 4. **機能別リファクタリング**
    - [ ] プラグインシステム改善
@@ -167,8 +167,10 @@ AimAssist/
 | タスク | 状態 | 担当者 | 完了日 |
 |-------|------|-------|-------|
 | コードベース分析 | 完了 | - | 2025-04-24 |
+| 依存性注入導入 | 完了 | - | 2025-04-25 |
+| インターフェース抽出 | 完了 | - | 2025-04-25 |
+| 設定管理改善 | 完了 | - | 2025-04-25 |
 | テスト環境構築 | 未着手 | - | - |
-| 依存性注入導入 | 進行中 | - | - |
 
 ## 現在の課題とノート
 
@@ -189,15 +191,44 @@ AimAssist/
 - MainWindowがDIからUnitViewFactoryを取得するよう修正しました
 - PickerServiceを静的クラスからDIパターンに変更しました
 - WindowHandleServiceを静的クラスからDIパターンに変更しました
-- AppCommandsクラスのコマンド初期化をDIパターンに対応させました
+- AppCommandsクラスを静的クラスからDIパターンに対応したインスタンスクラスに変更しました
 - CheatSheetControllerをDIパターンに対応させ、WindowHandleServiceのインスタンスを使用するように修正しました
+- SettingManagerのインターフェース（ISettingManager）を作成し、DIパターンに対応させました
+- KeySequenceManagerのインターフェース（IKeySequenceManager）を作成し、DIパターンに対応させました
+- EditorOptionServiceのインターフェース（IEditorOptionService）を作成し、静的クラスからインスタンスベースのDIパターンに変更しました
+- EditorOptionServiceの変更に伴うエラーを修正しました（UnitsFactory、PickerWindow、FileModel、MainWindow）
+- SystemTrayRegisterでの静的AppCommandsの使用をDIパターンに変更しました
+- MainWindow.xaml.csにGetRequiredServiceメソッドを使用するためのMicrosoft.Extensions.DependencyInjection名前空間を追加しました
+- AimEditor.xaml.csをDIパターンに対応させ、IEditorOptionServiceをコンストラクタで注入するように変更しました
+- UnitViewFactoryにIEditorOptionServiceを注入し、AimEditorの生成時に渡すように修正しました
+- ClipboardAnalyzerプロジェクトにAimAssist.Coreへの参照を追加し、IEditorOptionServiceを使用できるようにしました
+- ClipboardListにIEditorOptionServiceを注入するように修正しました
+- ClipboardPluginをDIパターンに対応させ、GetUIElementConvertersメソッドでIEditorOptionServiceを取得して使用するように修正しました
+- ユニットテストプロジェクト（AimAssist.Tests）を追加しました
+- DI設定のテストクラスを作成しました（DependencyInjectionTests）
+- サービスクラスのテストクラスを作成しました（SettingManagerTests、KeySequenceManagerTests）
 
 ## 次のステップ
 
 1. 残りのサービスクラスに対してインターフェースを抽出し、DIに対応させる
-   - SettingManager
-   - EditJsonService
-   - KeySequenceManager
-2. AppCommandsクラスをDIに完全対応させる
-3. ユニットテストプロジェクトの追加
+   - ✓ SettingManager
+   - ✓ KeySequenceManager
+   - ✓ EditorOptionService
+   - ✗ SnippetOptionService
+   - ✗ WorkItemOptionService
+2. ✓ AppCommandsクラスをDIに完全対応させる
+3. ✓ ユニットテストプロジェクトの追加
+   - ✓ プロジェクト作成
+   - ✓ DIコンテナのテスト
+   - ✓ サービスの単体テスト
+   - ✗ 統合テストの追加
 4. リファクタリングの詳細計画の策定
+   - ✗ SnippetOptionServiceとWorkItemOptionServiceのDI対応
+   - ✗ プラグインシステムの改善
+   - ✗ UI層の改善
+   - ✗ 国際化対応
+5. クリーンアーキテクチャの適用
+   - ✗ ドメイン層の整理
+   - ✗ アプリケーション層の整理
+   - ✗ インフラストラクチャ層の整理
+   - ✗ プレゼンテーション層の整理

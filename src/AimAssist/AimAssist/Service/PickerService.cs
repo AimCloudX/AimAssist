@@ -14,6 +14,8 @@ public class PickerService
     private static IntPtr beforeWindow;
     private static bool isActive;
     private readonly ICommandService _commandService;
+    private readonly IUnitsService _unitsService;
+    private readonly IEditorOptionService _editorOptionService;
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -23,9 +25,11 @@ public class PickerService
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-    public PickerService(ICommandService commandService)
+    public PickerService(ICommandService commandService, IUnitsService unitsService, IEditorOptionService editorOptionService)
     {
         _commandService = commandService;
+        _unitsService = unitsService;
+        _editorOptionService = editorOptionService;
     }
 
     public void ShowPickerWindow()
@@ -42,7 +46,7 @@ public class PickerService
         GetWindowThreadProcessId(beforeWindow, out var processId);
         Process process = Process.GetProcessById((int)processId);
 
-        var window = new PickerWindow(process.ProcessName, _commandService);
+        var window = new PickerWindow(process.ProcessName, _commandService, _unitsService, _editorOptionService);
         window.Closed += DoAction;
         window.Show();
         window.Activate();

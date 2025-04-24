@@ -2,6 +2,7 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using AimAssist.Core.Interfaces;
 using ClipboardAnalyzer.DomainModels;
 using ClipboardAnalyzer.Services;
 using Library.Options;
@@ -14,11 +15,14 @@ namespace ClipboardAnalyzer
     public partial class ClipboardList : UserControl
     {
         public ObservableCollection<IClipboardData> Items { get; set; } = new ObservableCollection<IClipboardData>();
-        public ClipboardList()
+        private readonly IEditorOptionService _editorOptionService;
+
+        public ClipboardList(IEditorOptionService editorOptionService)
         {
+            _editorOptionService = editorOptionService;
             InitializeComponent();
             UpdateClipboard();
-            this.editor.SetOption(EditorOptionService.Option);
+            this.editor.SetOption(_editorOptionService.Option);
         }
 
         private void UpdateClipboard()

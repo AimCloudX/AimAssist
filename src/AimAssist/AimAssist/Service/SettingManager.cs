@@ -1,11 +1,12 @@
-﻿using Common;
+﻿using AimAssist.Core.Interfaces;
+using Common;
 using Common.Commands.Shortcus;
 using System.IO;
 using System.Text.Json;
 
 namespace AimAssist.Service
 {
-    public class SettingManager
+    public class SettingManager : ISettingManager
     {
         private string _settingsFilePath;
 

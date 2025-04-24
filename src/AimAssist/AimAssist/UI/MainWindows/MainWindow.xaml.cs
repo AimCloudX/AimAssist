@@ -14,6 +14,7 @@ using Common.Commands;
 using Common.Commands.Shortcus;
 using Common.UI;
 using Common.UI.WebUI;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -496,7 +497,8 @@ namespace AimAssist.UI.MainWindows
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            AppCommands.ShutdownAimAssist.Execute(this);
+            var appCommands = ((App)App.Current)._serviceProvider.GetRequiredService<IAppCommands>();
+            appCommands.ShutdownAimAssist.Execute(this);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)

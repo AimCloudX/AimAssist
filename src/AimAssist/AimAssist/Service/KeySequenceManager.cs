@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace AimAssist.Service
 {
-    public class KeySequenceManager
+    public class KeySequenceManager : IKeySequenceManager
     {
         private Key _lastKey;
         private ModifierKeys _lastModifiers;

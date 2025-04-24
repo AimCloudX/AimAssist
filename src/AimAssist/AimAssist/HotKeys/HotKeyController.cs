@@ -157,7 +157,7 @@ public class HotKeyController : IDisposable
 
     public void Dispose()
     {
-        cheatSheetController.Dispose();
+        cheatSheetController?.Dispose();
         Dispose(true);
         GC.SuppressFinalize(this);
     }

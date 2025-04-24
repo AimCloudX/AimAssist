@@ -33,13 +33,15 @@ namespace AimAssist
                 var initializer = _serviceProvider.GetRequiredService<Initializer>();
                 initializer.Initialize();
                 
-                var settings = new SettingManager().LoadSettings();
+                var settingManager = _serviceProvider.GetRequiredService<ISettingManager>();
+                var settings = settingManager.LoadSettings();
                 var commandService = _serviceProvider.GetRequiredService<ICommandService>();
                 commandService.SetKeymap(settings);
 
                 ThreadPool.QueueUserWorkItem(WaitCallActivate);// 名前付きパイプサーバーを起動 別プロセスからのActivate用
 
-                AppCommands.ToggleMainWindow.Execute(this);
+                var appCommands = _serviceProvider.GetRequiredService<IAppCommands>();
+                appCommands.ToggleMainWindow.Execute(this);
             }
             else
             {
@@ -59,18 +61,31 @@ namespace AimAssist
             services.AddSingleton<IUnitsService, UnitsService>();
             services.AddSingleton<ICommandService, CommandService>();
             services.AddSingleton<IApplicationLogService, ApplicationLogService>();
-            services.AddSingleton<PickerService>();
+            services.AddSingleton<ISettingManager, SettingManager>();
+            services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
+            services.AddSingleton<PickerService>(provider => new PickerService(
+                provider.GetRequiredService<ICommandService>(),
+                provider.GetRequiredService<IUnitsService>(),
+                provider.GetRequiredService<IEditorOptionService>()
+            ));
             services.AddSingleton<WindowHandleService>();
+            services.AddSingleton<IAppCommands, AppCommands>();
             //services.AddSingleton<CheatSheet.Services.CheatSheetController>(provider =>
             //    new CheatSheet.Services.CheatSheetController(
             //        Dispatcher.CurrentDispatcher, 
             //        provider.GetRequiredService<WindowHandleService>()
             //    ));
-            services.AddSingleton<UI.UnitContentsView.UnitViewFactory>();
+            services.AddSingleton<UI.UnitContentsView.UnitViewFactory>(provider => new UI.UnitContentsView.UnitViewFactory(
+                provider.GetRequiredService<ICommandService>(),
+                provider.GetRequiredService<IEditorOptionService>()
+            ));
             services.AddTransient<UI.MainWindows.MainWindow>();
-            services.AddTransient<UI.Tools.HotKeys.WaitHotKeysWindow>();
+            services.AddTransient<UI.Tools.HotKeys.WaitHotKeysWindow>(provider => new UI.Tools.HotKeys.WaitHotKeysWindow(
+                provider.GetRequiredService<ICommandService>(),
+                provider.GetRequiredService<IAppCommands>()
+            ));
             
-            // 他のサービスを登録
+            services.AddSingleton<IEditorOptionService, EditorOptionService>();
             
             // ファクトリーパターンでInitializerを登録
             services.AddSingleton<Initializer>(provider => new Initializer(
@@ -79,7 +94,9 @@ namespace AimAssist
                 provider.GetRequiredService<IApplicationLogService>(),
                 provider,
                 provider.GetRequiredService<WindowHandleService>(),
-                provider.GetRequiredService<PickerService>()
+                provider.GetRequiredService<PickerService>(),
+                provider.GetRequiredService<IAppCommands>(),
+                provider.GetRequiredService<IEditorOptionService>()
             ));
             
             _serviceProvider = services.BuildServiceProvider();
@@ -113,7 +130,11 @@ namespace AimAssist
                 using var reader = new StreamReader(server);
                 if (reader.ReadLine() == PipeName)
                 {
-                    Dispatcher.Invoke(() => AppCommands.ToggleMainWindow.Execute(this));
+                    Dispatcher.Invoke(() => 
+                    {
+                        var appCommands = _serviceProvider.GetRequiredService<IAppCommands>();
+                        appCommands.ToggleMainWindow.Execute(this);
+                    });
                 }
             }
         }
@@ -128,8 +149,8 @@ namespace AimAssist
                 settings.Remove(key);
             }
 
-            new SettingManager().SaveSettings(settings);
-            EditorOptionService.SaveOption();
+            _serviceProvider.GetRequiredService<ISettingManager>().SaveSettings(settings);
+            _serviceProvider.GetRequiredService<IEditorOptionService>().SaveOption();
             mutex.ReleaseMutex();
         }
     }

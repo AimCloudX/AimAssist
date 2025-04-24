@@ -26,6 +26,8 @@ namespace AimAssist
         private readonly IServiceProvider _serviceProvider;
         private readonly WindowHandleService _windowHandleService;
         private readonly PickerService _pickerService;
+        private readonly IAppCommands _appCommands;
+        private readonly IEditorOptionService _editorOptionService;
 
         /// <summary>
         /// コンストラクタ
@@ -42,7 +44,9 @@ namespace AimAssist
             IApplicationLogService applicationLogService,
             IServiceProvider serviceProvider,
             WindowHandleService windowHandleService,
-            PickerService pickerService)
+            PickerService pickerService,
+            IAppCommands appCommands,
+            IEditorOptionService editorOptionService)
         {
             _unitsService = unitsService;
             _commandService = commandService;
@@ -50,6 +54,8 @@ namespace AimAssist
             _serviceProvider = serviceProvider;
             _windowHandleService = windowHandleService;
             _pickerService = pickerService;
+            _appCommands = appCommands;
+            _editorOptionService = editorOptionService;
         }
 
         /// <summary>
@@ -58,7 +64,7 @@ namespace AimAssist
         public void Initialize()
         {
             // AppCommandsの初期化
-            AppCommands.Initialize(_windowHandleService, _pickerService);
+            _appCommands.Initialize();
             
             string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string editorOptionPath = Path.Combine(roamingPath, "AimAssist", "editor.option.json");
@@ -103,12 +109,13 @@ namespace AimAssist
 
             SnippetOptionServce.LoadOption();
 
-            EditorOptionService.LoadOption();
+            // DIから取得したEditorOptionServiceを使用
+            _editorOptionService.LoadOption();
 
             SystemTrayRegister.Register();
 
             // DIで注入されたユニットサービスを使用
-            _unitsService.RegisterUnits(new UnitsFactory());
+            _unitsService.RegisterUnits(new UnitsFactory(_editorOptionService));
 
             var pluginService = new PluginsService();
             pluginService.LoadCommandPlugins();
@@ -124,9 +131,9 @@ namespace AimAssist
                 UnitViewFactory.UnitToUIElementDicotionary.TryAdd(item.Key, item.Value);
             }
 
-            _commandService.Register(AppCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
-            _commandService.Register(AppCommands.ShowPickerWindow, new KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
-            _commandService.Register(AppCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
+            _commandService.Register(_appCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
+            _commandService.Register(_appCommands.ShowPickerWindow, new KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
+            _commandService.Register(_appCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
 
             // DIコンテナからWaitHotKeysWindowを取得
             var waitHotKeysWindow = _serviceProvider.GetRequiredService<UI.Tools.HotKeys.WaitHotKeysWindow>();

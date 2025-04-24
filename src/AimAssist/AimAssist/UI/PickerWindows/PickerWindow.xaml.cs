@@ -73,12 +73,14 @@ namespace AimAssist.UI.PickerWindows
         private readonly ICommandService _commandService;
         private readonly IUnitsService _unitsService;
         private readonly KeySequenceManager _keySequenceManager;
+        private readonly IEditorOptionService _editorOptionService;
 
-        public PickerWindow(string processName, ICommandService commandService)
+        public PickerWindow(string processName, ICommandService commandService, IUnitsService unitsService, IEditorOptionService editorOptionService)
         {
             this.processName = processName;
             _commandService = commandService;
-            _unitsService = ((App)App.Current)._serviceProvider.GetRequiredService<IUnitsService>();
+            _unitsService = unitsService;
+            _editorOptionService = editorOptionService;
             _keySequenceManager = new KeySequenceManager(commandService);
             
             this.InitializeComponent();
@@ -88,14 +90,14 @@ namespace AimAssist.UI.PickerWindows
             if(editor != null)
             {
                 this.MainContent.Content = editor;
-                editor.SetOption(EditorOptionService.Option);
+                editor.SetOption(_editorOptionService.Option);
             }
             else
             {
                 var monacoEditor = new MonacoEditor();
                 this.MainContent.Content = monacoEditor;
                 EditorCash.Editor = monacoEditor;
-                monacoEditor.SetOption(EditorOptionService.Option);
+                monacoEditor.SetOption(_editorOptionService.Option);
             }
 
             this.DataContext = this;

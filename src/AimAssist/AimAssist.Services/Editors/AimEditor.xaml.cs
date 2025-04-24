@@ -1,4 +1,5 @@
-﻿using Library.Editors;
+﻿using AimAssist.Core.Interfaces;
+using Library.Editors;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Controls;
@@ -12,16 +13,18 @@ namespace AimAssist.Core.Editors
     public partial class AimEditor : UserControl
     {
         public ObservableCollection<FileModel> Models { get; } = new ObservableCollection<FileModel>();
+        private readonly IEditorOptionService _editorOptionService;
 
-        public AimEditor()
+        public AimEditor(IEditorOptionService editorOptionService)
         {
+            _editorOptionService = editorOptionService;
             InitializeComponent();
             this.DataContext = this;
         }
 
         public void NewTab(string filePath)
         {
-            var model = new FileModel(filePath);
+            var model = new FileModel(filePath, _editorOptionService);
             Models.Add(model);
         }
 

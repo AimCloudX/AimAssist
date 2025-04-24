@@ -1,5 +1,7 @@
 ﻿
 using AimAssist.Core.Commands;
+using AimAssist.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.UI.SystemTray
 {
@@ -22,14 +24,16 @@ namespace AimAssist.UI.SystemTray
         }
         private static void Show_Click(object? sender, EventArgs e)
         {
-            AppCommands.ToggleMainWindow.Execute(null);
+            var appCommands = ((App)App.Current)._serviceProvider.GetRequiredService<IAppCommands>();
+            appCommands.ToggleMainWindow.Execute(null);
         }
 
         private static void NotifyIcon_Click(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                AppCommands.ToggleMainWindow.Execute(null);
+                var appCommands = ((App)App.Current)._serviceProvider.GetRequiredService<IAppCommands>();
+                appCommands.ToggleMainWindow.Execute(null);
             }
         }
 

@@ -36,14 +36,17 @@ namespace AimAssist.UI.UnitContentsView
 
         private static Dictionary<string, UIElement> cash = new();
         private readonly ICommandService _commandService;
+        private readonly IEditorOptionService _editorOptionService;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="commandService">コマンドサービス</param>
-        public UnitViewFactory(ICommandService commandService)
+        /// <param name="editorOptionService">エディタオプションサービス</param>
+        public UnitViewFactory(ICommandService commandService, IEditorOptionService editorOptionService)
         {
             _commandService = commandService;
+            _editorOptionService = editorOptionService;
         }
         
         /// <summary>
@@ -80,7 +83,7 @@ namespace AimAssist.UI.UnitContentsView
                 case RssSettingUnit:
                     return new RssControl();
                 case OptionUnit option:
-                    var optionEditor = new AimEditor();
+                    var optionEditor = new AimEditor(_editorOptionService);
                     foreach(var filePath in option.OptionFilePaths)
                     {
                         optionEditor.NewTab(filePath);
@@ -88,7 +91,7 @@ namespace AimAssist.UI.UnitContentsView
 
                     return optionEditor;
                 case EditorUnit editorUnit:
-                    var editor = new AimEditor();
+                    var editor = new AimEditor(_editorOptionService);
                     editor.NewTab(editorUnit.FullPath);
                     return editor;
                 case ShortcutOptionUnit:

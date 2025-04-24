@@ -1,4 +1,5 @@
-﻿using Common.UI.Editor;
+﻿using AimAssist.Core.Interfaces;
+using Common.UI.Editor;
 using Library.Options;
 using System.IO;
 using System.Windows.Controls;
@@ -11,13 +12,15 @@ namespace Library.Editors
         {{".md", "markdown" },
             { ".json","json"}
         };
+        private readonly IEditorOptionService _editorOptionService;
 
-        public FileModel(string filePath)
+        public FileModel(string filePath, IEditorOptionService editorOptionService)
         {
+            _editorOptionService = editorOptionService;
             FileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
             FilePath = filePath;
             monacoEditor = new MonacoEditor();
-            monacoEditor.SetOption(EditorOptionService.Option);
+            monacoEditor.SetOption(_editorOptionService.Option);
             var extension = Path.GetExtension(filePath);
             if(_extensions.TryGetValue(extension, out var language))
             {

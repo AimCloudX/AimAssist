@@ -1,4 +1,5 @@
-﻿using AimAssist.Core.Units;
+﻿using AimAssist.Core.Interfaces;
+using AimAssist.Core.Units;
 using AimAssist.Core.Units.Units;
 using AimAssist.Services.Markdown;
 using AimAssist.Units.Core;
@@ -21,6 +22,12 @@ namespace AimAssist.Units.Implementation
 {
     public class UnitsFactory : IUnitsFacotry
     {
+        private readonly IEditorOptionService _editorOptionService;
+
+        public UnitsFactory(IEditorOptionService editorOptionService)
+        {
+            _editorOptionService = editorOptionService;
+        }
         public IEnumerable<IUnit> GetUnits()
         {
             foreach (var workItemPath in WorkItemOptionService.Option.ItemPaths)
@@ -83,13 +90,13 @@ namespace AimAssist.Units.Implementation
             var lists = new List<string>();
             lists.Add(WorkItemOptionService.OptionPath);
             lists.AddRange(WorkItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
-            if (File.Exists(EditorOptionService.Option.CustomVimKeybindingPath))
+            if (File.Exists(_editorOptionService.Option.CustomVimKeybindingPath))
             {
-                lists.AddRange([EditorOptionService.OptionPath, EditorOptionService.Option.CustomVimKeybindingPath]);
+                lists.AddRange([_editorOptionService.OptionPath, _editorOptionService.Option.CustomVimKeybindingPath]);
             }
             else
             {
-                lists.AddRange([EditorOptionService.OptionPath]);
+                lists.AddRange([_editorOptionService.OptionPath]);
             }
 
             lists.AddRange([SnippetOptionServce.OptionPath]);

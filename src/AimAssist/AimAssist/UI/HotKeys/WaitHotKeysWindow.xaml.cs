@@ -11,18 +11,20 @@ namespace AimAssist.UI.Tools.HotKeys
     {
         private HotKeyController hotkeyController;
         private readonly ICommandService _commandService;
+        private readonly IAppCommands _appCommands;
 
-        public WaitHotKeysWindow(ICommandService commandService)
+        public WaitHotKeysWindow(ICommandService commandService, IAppCommands appCommands)
         {
             _commandService = commandService;
+            _appCommands = appCommands;
             this.InitializeComponent();
             this.Visibility = Visibility.Hidden;
             this.ShowInTaskbar = false;
 
             // HotKeyの登録
             this.hotkeyController = new HotKeyController(this);
-            RegisterHotKey(AppCommands.ToggleMainWindow.CommandName);
-            RegisterHotKey(AppCommands.ShowPickerWindow.CommandName);
+            RegisterHotKey(_appCommands.ToggleMainWindow.CommandName);
+            RegisterHotKey(_appCommands.ShowPickerWindow.CommandName);
 
             EventPublisher.KeyUpdateEventPublisher.UpdateKeyGestureEventHandler
                  += KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler; ;
