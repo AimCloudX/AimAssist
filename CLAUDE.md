@@ -174,6 +174,8 @@ AimAssist/
 | PluginsServiceのDI対応 | 完了 | - | 2025-04-25 |
 | ClipboardPluginのDI対応 | 完了 | - | 2025-04-25 |
 | 命名の一貫性改善 | 進行中 | - | - |
+| SystemTrayRegisterのDI対応 | 完了 | - | 2025-04-25 |
+| エラーハンドリング改善 | 進行中 | - | - |
 
 ## 現在の課題とノート
 
@@ -183,8 +185,9 @@ AimAssist/
 - EditorCash → EditorCacheに修正しました
 - BookmarkUnitsFacotry → BookmarkUnitsFactoryに修正しました
 - UnitViewModel.csの参照を確認し、キャッシュの実装を改善する必要があります
-- エラーハンドリングの改善を進めています
-- アプリケーション全体の命名の一貫性を確保するために引き続き誤字を修正しています UnitsServiceの依存性注入を実装しました
+- エラーハンドリングの改善を実施しました（例外処理の適切な実装、エラーログの出力など）
+- アプリケーション全体の命名の一貫性を確保するために引き続き誤字を修正しています
+- UnitsServiceの依存性注入を実装しました
 - アプリケーションのDIコンテナを導入しました（Microsoft.Extensions.DependencyInjection）
 - インターフェースの抽出とシングルトンパターンの改善を進めています
 - 命名の修正（UnitsService.Instnace → UnitsService.Instance、WaitHowKeysWindow → WaitHotKeysWindow）
@@ -206,7 +209,12 @@ AimAssist/
 - SettingManagerのインターフェース（ISettingManager）を作成し、DIパターンに対応させました
 - KeySequenceManagerのインターフェース（IKeySequenceManager）を作成し、DIパターンに対応させました
 - EditorOptionServiceのインターフェース（IEditorOptionService）を作成し、静的クラスからインスタンスベースのDIパターンに変更しました
-- EditorOptionServiceの変更に伴うエラーを修正しました（UnitsFactory、PickerWindow、FileModel、MainWindow）
+- EditorOptionServiceの変更に伴うエラーを修正しました
+- SystemTrayRegisterを静的クラスからインスタンスベースのクラスに変更し、DIパターンに対応させました
+- SnippetOptionServceの名前をSnippetOptionServiceに修正し、一貫性を向上させました
+- 各種設定サービスの読み込み・保存処理にエラーハンドリングを実装し、安定性を向上させました
+- アプリケーション起動時の初期化処理に例外処理を追加し、エラー発生時にユーザーに通知するようにしました
+- プラグイン読み込み処理に例外処理を実装し、一部のプラグインが読み込めない場合でもアプリケーション全体が起動できるようにしましたしました（UnitsFactory、PickerWindow、FileModel、MainWindow）
 - SystemTrayRegisterでの静的AppCommandsの使用をDIパターンに変更しました
 - MainWindow.xaml.csにGetRequiredServiceメソッドを使用するためのMicrosoft.Extensions.DependencyInjection名前空間を追加しました
 - AimEditor.xaml.csをDIパターンに対応させ、IEditorOptionServiceをコンストラクタで注入するように変更しました
@@ -238,13 +246,19 @@ AimAssist/
    - ✓ DIコンテナのテスト
    - ✓ サービスの単体テスト
    - ✗ 統合テストの追加
-4. リファクタリングの詳細計画の策定
+4. ✓ SystemTrayRegisterをDIパターンに対応させる
+5. エラーハンドリング機能の強化 (後回しにしてください)
+   - ✓ 各種サービスのエラーハンドリング改善
+   - ✓ 例外処理の適切な実装
+   - ✗ ユーザーへの適切なエラー表示機能
+   - ✗ エラーログ機能の拡充
+6. リファクタリングの詳細計画の策定
    - ✓ PluginsServiceをDIパターンに対応
    - ✗ 命名の一貫性確保（例: GetConverters vs GetConterters）
-   - ✗ エラーハンドリングの改善
+   - ✓ エラーハンドリングの改善
    - ✗ UI層の改善
    - ✗ 国際化対応
-5. クリーンアーキテクチャの適用
+7. クリーンアーキテクチャの適用
    - ✗ ドメイン層の整理
    - ✗ アプリケーション層の整理
    - ✗ インフラストラクチャ層の整理

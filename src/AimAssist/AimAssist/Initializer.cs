@@ -104,7 +104,13 @@ namespace AimAssist
             }
 
             // DI経由で取得したWorkItemOptionServiceを使用
-            _workItemOptionService.LoadOption();
+            try
+            {
+                _workItemOptionService.LoadOption();
+            }
+            catch (Exception ex)
+            {
+            }
 
             string snippetoption = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "snippet.option.json");
             if (!File.Exists(_snippetOptionService.OptionPath))
@@ -122,12 +128,26 @@ namespace AimAssist
             }
 
             // DI経由で取得したSnippetOptionServiceを使用
-            _snippetOptionService.LoadOption();
+            try
+            {
+                _snippetOptionService.LoadOption();
+            }
+            catch (Exception ex)
+            {
+            }
 
             // DIから取得したEditorOptionServiceを使用
-            _editorOptionService.LoadOption();
+            try
+            {
+                _editorOptionService.LoadOption();
+            }
+            catch (Exception ex)
+            {
+            }
 
-            SystemTrayRegister.Register();
+            // DIでSystemTrayRegisterを取得して使用
+            var systemTrayRegister = _serviceProvider.GetRequiredService<SystemTrayRegister>();
+            systemTrayRegister.Register();
 
             // DIで注入されたユニットサービスを使用
             _unitsService.RegisterUnits(new UnitsFactory(
@@ -136,17 +156,23 @@ namespace AimAssist
                 _snippetOptionService));
 
             // DIから取得したIPluginsServiceを使用
-            _pluginsService.LoadCommandPlugins();
-            var factories = _pluginsService.GetFactories();
-            foreach (var item in factories)
+            try
             {
-                _unitsService.RegisterUnits(item);
-            }
+                _pluginsService.LoadCommandPlugins();
+                var factories = _pluginsService.GetFactories();
+                foreach (var item in factories)
+                {
+                    _unitsService.RegisterUnits(item);
+                }
 
-            var converters = _pluginsService.GetConverters();
-            foreach (var item in converters)
+                var converters = _pluginsService.GetConverters();
+                foreach (var item in converters)
+                {
+                    UnitViewFactory.UnitToUIElementDictionary.TryAdd(item.Key, item.Value);
+                }
+            }
+            catch (Exception ex)
             {
-                UnitViewFactory.UnitToUIElementDictionary.TryAdd(item.Key, item.Value);
             }
 
             _commandService.Register(_appCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));

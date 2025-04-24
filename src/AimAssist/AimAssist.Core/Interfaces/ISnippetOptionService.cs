@@ -26,6 +26,7 @@ namespace AimAssist.Core.Interfaces
         /// <summary>
         /// 設定を保存する
         /// </summary>
-        void SaveOption();
+        /// <returns>保存が成功したかどうか</returns>
+        bool SaveOption();
     }
 }

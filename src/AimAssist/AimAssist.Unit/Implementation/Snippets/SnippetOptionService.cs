@@ -5,7 +5,7 @@ using System.IO;
 
 namespace AimAssist.Units.Implementation.Snippets
 {
-    public class SnippetOptionServce : ISnippetOptionService
+    public class SnippetOptionService : ISnippetOptionService
     {
         public ConfigModel Option { get; private set; }
         private static FileSystemWatcher watcher;
@@ -29,8 +29,11 @@ namespace AimAssist.Units.Implementation.Snippets
 
                     Option = option;
                 }
-                catch (Exception _)
+                catch (Exception ex)
                 {
+                    // エラーログを出力
+                    Console.WriteLine($"スニペットオプションの読み込みに失敗しました: {ex.Message}");
+                    // デフォルト設定を適用
                     Option = new ConfigModel();
                 }
             }
@@ -61,10 +64,32 @@ namespace AimAssist.Units.Implementation.Snippets
         private void OnChanged(object source, FileSystemEventArgs e) =>
             LoadOption();
 
-        public void SaveOption()
+        /// <summary>
+        /// オプションをファイルに保存します
+        /// </summary>
+        /// <returns>保存が成功したかどうか</returns>
+        public bool SaveOption()
         {
-            var text = JsonConvert.SerializeObject(Option, Formatting.Indented);
-            File.WriteAllText(OptionPath, text);
+            try
+            {
+                var text = JsonConvert.SerializeObject(Option, Formatting.Indented);
+                
+                // ディレクトリが存在しない場合は作成
+                var directory = Path.GetDirectoryName(OptionPath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                
+                File.WriteAllText(OptionPath, text);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // エラーログを出力
+                Console.WriteLine($"スニペットオプションの保存に失敗しました: {ex.Message}");
+                return false;
+            }
         }
     }
 }

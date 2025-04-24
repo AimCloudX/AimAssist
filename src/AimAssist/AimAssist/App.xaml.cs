@@ -8,6 +8,7 @@ using AimAssist.Units.Implementation.Snippets;
 using System.IO;
 using System.IO.Pipes;
 using AimAssist.Units.Implementation.WorkTools;
+using System.Windows.Forms;
 
 namespace AimAssist
 {
@@ -33,13 +34,20 @@ namespace AimAssist
             if (createdNew)
             {
                 // DIコンテナからInitializerを取得して使用
-                var initializer = _serviceProvider.GetRequiredService<Initializer>();
-                initializer.Initialize();
-                
-                var settingManager = _serviceProvider.GetRequiredService<ISettingManager>();
-                var settings = settingManager.LoadSettings();
-                var commandService = _serviceProvider.GetRequiredService<ICommandService>();
-                commandService.SetKeymap(settings);
+                try
+                {
+                    var initializer = _serviceProvider.GetRequiredService<Initializer>();
+                    initializer.Initialize();
+                    
+                    var settingManager = _serviceProvider.GetRequiredService<ISettingManager>();
+                    var settings = settingManager.LoadSettings();
+                    var commandService = _serviceProvider.GetRequiredService<ICommandService>();
+                    commandService.SetKeymap(settings);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"アプリケーションの初期化中にエラーが発生しました。\n{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
 
                 ThreadPool.QueueUserWorkItem(WaitCallActivate);// 名前付きパイプサーバーを起動 別プロセスからのActivate用
 
@@ -66,7 +74,7 @@ namespace AimAssist
             services.AddSingleton<IApplicationLogService, ApplicationLogService>();
             services.AddSingleton<ISettingManager, SettingManager>();
             services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
-            services.AddSingleton<ISnippetOptionService, SnippetOptionServce>();
+            services.AddSingleton<ISnippetOptionService, SnippetOptionService>();
             services.AddSingleton<IWorkItemOptionService, WorkItemOptionService>();
             services.AddSingleton<IPluginsService>(provider => new PluginsService(
                 provider.GetRequiredService<IApplicationLogService>(),
@@ -79,6 +87,9 @@ namespace AimAssist
             ));
             services.AddSingleton<WindowHandleService>();
             services.AddSingleton<IAppCommands, AppCommands>();
+            services.AddSingleton<UI.SystemTray.SystemTrayRegister>(provider => 
+                new UI.SystemTray.SystemTrayRegister(provider.GetRequiredService<IAppCommands>())
+            );
             //services.AddSingleton<CheatSheet.Services.CheatSheetController>(provider =>
             //    new CheatSheet.Services.CheatSheetController(
             //        Dispatcher.CurrentDispatcher, 
