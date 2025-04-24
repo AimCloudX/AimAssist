@@ -32,9 +32,9 @@ namespace AimAssist.UI.UnitContentsView
     /// </summary>
     public class UnitViewFactory
     {
-        public static Dictionary<Type, Func<IUnit, UIElement>> UnitToUIElementDicotionary = new();
+        public static Dictionary<Type, Func<IUnit, UIElement>> UnitToUIElementDictionary = new();
 
-        private static Dictionary<string, UIElement> cash = new();
+        private static Dictionary<string, UIElement> cache = new();
         private readonly ICommandService _commandService;
         private readonly IEditorOptionService _editorOptionService;
 
@@ -62,13 +62,13 @@ namespace AimAssist.UI.UnitContentsView
                 return CreateInner(unit);
             }
 
-            if (cash.TryGetValue(unit.Name, out var uiElement))
+            if (cache.TryGetValue(unit.Name, out var uiElement))
             {
                 return uiElement;
             }
 
             var element = CreateInner(unit);
-            cash.Add(unit.Name, element);
+            cache.Add(unit.Name, element);
             return element;
         }
 
@@ -145,7 +145,7 @@ namespace AimAssist.UI.UnitContentsView
                     break;
             }
 
-            if(UnitToUIElementDicotionary.TryGetValue(unit.Content.GetType(), out var value))
+            if(UnitToUIElementDictionary.TryGetValue(unit.Content.GetType(), out var value))
             {
                 return value.Invoke(unit.Content);
             }

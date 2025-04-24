@@ -11,22 +11,30 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ClipboardAnalyzer
 {
-    [Export(typeof(IUnitplugin))]
-    public class ClipboardPlugin : IUnitplugin
+    [Export(typeof(IUnitPlugin))]
+    public class ClipboardPlugin : IUnitPlugin
     {
+        private readonly IEditorOptionService _editorOptionService;
+
+        [ImportingConstructor]
+        public ClipboardPlugin(IEditorOptionService editorOptionService = null)
+        {
+            // MEFによるインポートでIEditorOptionServiceがnullの場合にのみサービスロケーターを使用
+            _editorOptionService = editorOptionService ?? ((App)App.Current)?._serviceProvider?.GetRequiredService<IEditorOptionService>();
+        }
+
         public Dictionary<Type, Func<IUnit, UIElement>> GetUIElementConverters()
         {
             return new Dictionary<Type, Func<IUnit, UIElement>> {
                 {typeof(ClipboardUnit), (unit)=> {
-                    var editorOptionService = ((App)App.Current)._serviceProvider.GetRequiredService<IEditorOptionService>();
-                    return new ClipboardList(editorOptionService);
+                    return new ClipboardList(_editorOptionService);
                 }}
             };
         }
 
-        public IEnumerable<IUnitsFacotry> GetUnitsFactory()
+        public IEnumerable<IUnitsFactory> GetUnitsFactory()
         {
-            yield return new ClipboardUnitsFacotry();
+            yield return new ClipboardUnitsFactory();
         }
     }
 }

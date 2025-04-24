@@ -17,7 +17,7 @@ namespace AimAssist.Core.Interfaces
         /// ユニットファクトリからユニットを登録します
         /// </summary>
         /// <param name="factory">ユニットファクトリ</param>
-        void RegisterUnits(IUnitsFacotry factory);
+        void RegisterUnits(IUnitsFactory factory);
 
         /// <summary>
         /// 指定したモードのユニットを作成します

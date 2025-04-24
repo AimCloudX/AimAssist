@@ -37,7 +37,7 @@ namespace AimAssist.Service
         /// ユニットファクトリからユニットを登録します
         /// </summary>
         /// <param name="factory">ユニットファクトリ</param>
-        public void RegisterUnits(IUnitsFacotry factory)
+        public void RegisterUnits(IUnitsFactory factory)
         {
             var units = factory.GetUnits();
             foreach (var unit in units)

@@ -20,7 +20,7 @@ using System.IO;
 
 namespace AimAssist.Units.Implementation
 {
-    public class UnitsFactory : IUnitsFacotry
+    public class UnitsFactory : IUnitsFactory
     {
         private readonly IEditorOptionService _editorOptionService;
         private readonly IWorkItemOptionService _workItemOptionService;

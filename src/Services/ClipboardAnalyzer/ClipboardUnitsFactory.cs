@@ -6,7 +6,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace ClipboardAnalyzer
 {
-    public class ClipboardUnitsFacotry : IUnitsFacotry
+    public class ClipboardUnitsFactory : IUnitsFactory
     {
         public IEnumerable<IUnit> GetUnits()
         {

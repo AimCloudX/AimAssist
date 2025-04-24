@@ -146,7 +146,7 @@ namespace AimAssist
             var converters = _pluginsService.GetConverters();
             foreach (var item in converters)
             {
-                UnitViewFactory.UnitToUIElementDicotionary.TryAdd(item.Key, item.Value);
+                UnitViewFactory.UnitToUIElementDictionary.TryAdd(item.Key, item.Value);
             }
 
             _commandService.Register(_appCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));

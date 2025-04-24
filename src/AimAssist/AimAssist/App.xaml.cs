@@ -68,7 +68,10 @@ namespace AimAssist
             services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
             services.AddSingleton<ISnippetOptionService, SnippetOptionServce>();
             services.AddSingleton<IWorkItemOptionService, WorkItemOptionService>();
-            services.AddSingleton<IPluginsService, PluginsService>();
+            services.AddSingleton<IPluginsService>(provider => new PluginsService(
+                provider.GetRequiredService<IApplicationLogService>(),
+                provider.GetRequiredService<IEditorOptionService>()
+            ));
             services.AddSingleton<PickerService>(provider => new PickerService(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IUnitsService>(),

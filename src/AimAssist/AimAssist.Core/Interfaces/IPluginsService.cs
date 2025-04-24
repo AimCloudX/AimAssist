@@ -17,12 +17,22 @@ namespace AimAssist.Core.Interfaces
         /// ユニットファクトリを取得します
         /// </summary>
         /// <returns>ユニットファクトリのコレクション</returns>
-        IEnumerable<IUnitsFacotry> GetFactories();
+        IEnumerable<IUnitsFactory> GetFactories();
 
         /// <summary>
         /// UIエレメントコンバーターを取得します
         /// </summary>
         /// <returns>UIエレメントコンバーターのコレクション</returns>
         Dictionary<Type, Func<IUnit, UIElement>> GetConverters();
+
+        /// <summary>
+        /// プラグインが読み込まれているかどうかを取得します
+        /// </summary>
+        bool IsPluginsLoaded { get; }
+
+        /// <summary>
+        /// 読み込まれたプラグインの数を取得します
+        /// </summary>
+        int PluginsCount { get; }
     }
 }

@@ -86,7 +86,7 @@ namespace AimAssist.UI.PickerWindows
             this.InitializeComponent();
             SourceInitialized += MainWindow_SourceInitialized;
 
-            var editor = EditorCash.Editor;
+            var editor = EditorCache.Editor;
             if(editor != null)
             {
                 this.MainContent.Content = editor;
@@ -96,7 +96,7 @@ namespace AimAssist.UI.PickerWindows
             {
                 var monacoEditor = new MonacoEditor();
                 this.MainContent.Content = monacoEditor;
-                EditorCash.Editor = monacoEditor;
+                EditorCache.Editor = monacoEditor;
                 monacoEditor.SetOption(_editorOptionService.Option);
             }
 
@@ -203,13 +203,13 @@ namespace AimAssist.UI.PickerWindows
                 {
                     if (unit.Content is SnippetUnit model)
                     {
-                        this.SnippetText = await EditorCash.Editor.GetText();
+                        this.SnippetText = await EditorCache.Editor.GetText();
                         this.CloseWindow();
                     }
 
                     if (unit.Content is SnippetModelUnit snippetModel)
                     {
-                        this.SnippetText = await EditorCash.Editor.GetText();
+                        this.SnippetText = await EditorCache.Editor.GetText();
                         this.CloseWindow();
                     }
 
@@ -272,7 +272,7 @@ namespace AimAssist.UI.PickerWindows
             }
 
             this.IsClosing = true;
-            EditorCash.Editor = (MonacoEditor)this.MainContent.Content;
+            EditorCache.Editor = (MonacoEditor)this.MainContent.Content;
             this.Close();
         }
 
@@ -299,13 +299,13 @@ namespace AimAssist.UI.PickerWindows
         {
             if (this.ComboListBox.SelectedItem is UnitViewModel unit && unit.Content is SnippetUnit model)
             {
-                EditorCash.Editor.SetTextAsync(model.Code);
+                EditorCache.Editor.SetTextAsync(model.Code);
             }
 
             if (this.ComboListBox.SelectedItem is UnitViewModel unitViewModel
                 && unitViewModel.Content is SnippetModelUnit snippetModel)
             {
-                EditorCash.Editor.SetTextAsync(snippetModel.Code);
+                EditorCache.Editor.SetTextAsync(snippetModel.Code);
             }
 
         }
@@ -377,7 +377,7 @@ namespace AimAssist.UI.PickerWindows
 
 };
 
-            //EditorCash.Editor.RegisterSnippets(snippetVariables);
+            //EditorCache.Editor.RegisterSnippets(snippetVariables);
         }
     }
 }

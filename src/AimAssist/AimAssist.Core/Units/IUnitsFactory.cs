@@ -1,6 +1,6 @@
 ﻿namespace AimAssist.Core.Units
 {
-    public interface IUnitsFacotry
+    public interface IUnitsFactory
     {
         IEnumerable<IUnit> GetUnits();
     }

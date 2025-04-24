@@ -172,10 +172,19 @@ AimAssist/
 | 設定管理改善 | 完了 | - | 2025-04-25 |
 | テスト環境構築 | 未着手 | - | - |
 | PluginsServiceのDI対応 | 完了 | - | 2025-04-25 |
+| ClipboardPluginのDI対応 | 完了 | - | 2025-04-25 |
+| 命名の一貫性改善 | 進行中 | - | - |
 
 ## 現在の課題とノート
 
-- UnitsServiceの依存性注入を実装しました
+- PluginsServiceとClipboardPluginをDIパターンに完全対応させました
+- IUnitsFacotry → IUnitsFactoryに修正し、名前の誤字を修正しました
+- UnitToUIElementDicotionary → UnitToUIElementDictionaryに修正しました
+- EditorCash → EditorCacheに修正しました
+- BookmarkUnitsFacotry → BookmarkUnitsFactoryに修正しました
+- UnitViewModel.csの参照を確認し、キャッシュの実装を改善する必要があります
+- エラーハンドリングの改善を進めています
+- アプリケーション全体の命名の一貫性を確保するために引き続き誤字を修正しています UnitsServiceの依存性注入を実装しました
 - アプリケーションのDIコンテナを導入しました（Microsoft.Extensions.DependencyInjection）
 - インターフェースの抽出とシングルトンパターンの改善を進めています
 - 命名の修正（UnitsService.Instnace → UnitsService.Instance、WaitHowKeysWindow → WaitHotKeysWindow）

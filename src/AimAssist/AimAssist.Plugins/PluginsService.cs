@@ -14,22 +14,34 @@ namespace AimAssist.Plugins
     /// </summary>
     public class PluginsService : IPluginsService
     {
-        [ImportMany(typeof(IUnitplugin))] private IEnumerable<IUnitplugin> _plugins;
+        [ImportMany(typeof(IUnitPlugin))] private IEnumerable<IUnitPlugin> _plugins;
         private readonly IApplicationLogService _applicationLogService;
+        private readonly IEditorOptionService _editorOptionService;
+        private bool _isPluginsLoaded = false;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="applicationLogService">アプリケーションログサービス</param>
-        public PluginsService(IApplicationLogService applicationLogService)
+        /// <param name="editorOptionService">エディターオプションサービス</param>
+        public PluginsService(
+            IApplicationLogService applicationLogService, 
+            IEditorOptionService editorOptionService)
         {
-            _applicationLogService = applicationLogService;
-            _plugins = new List<IUnitplugin>();
+            _applicationLogService = applicationLogService ?? throw new ArgumentNullException(nameof(applicationLogService));
+            _editorOptionService = editorOptionService ?? throw new ArgumentNullException(nameof(editorOptionService));
+            _plugins = new List<IUnitPlugin>();
         }
 
         /// <inheritdoc/>
         public void LoadCommandPlugins()
         {
+            if (_isPluginsLoaded)
+            {
+                _applicationLogService.Log("プラグインは既にロードされています。");
+                return;
+            }
+
             // MEFコンテナを作成してプラグインをロード
             var catalog = new AggregateCatalog();
             var pluginPath = Path.Combine(Environment.CurrentDirectory, "Plugins");
@@ -43,34 +55,95 @@ namespace AimAssist.Plugins
                 else
                 {
                     _applicationLogService.Log($"プラグインディレクトリが見つかりません: {pluginPath}");
+                    _applicationLogService.Log("プラグインディレクトリを作成します。");
+                    
+                    try
+                    {
+                        Directory.CreateDirectory(pluginPath);
+                        _applicationLogService.Log($"プラグインディレクトリを作成しました: {pluginPath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _applicationLogService.Log($"プラグインディレクトリの作成に失敗しました: {ex.Message}");
+                    }
+                    
                     return;
                 }
             }
             catch (Exception e)
             {
                 _applicationLogService.Log($"プラグインのロード中にエラーが発生しました: {e.Message}");
-                MessageBox.Show($"プラグインのロード中にエラーが発生しました: {e.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                _applicationLogService.Log($"詳細: {e.StackTrace}");
+                
+                MessageBox.Show(
+                    $"プラグインのロード中にエラーが発生しました: {e.Message}", 
+                    "エラー", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Error);
                 return;
             }
 
-            var container = new CompositionContainer(catalog);
-            container.ComposeParts(this);
-            _applicationLogService.Log($"プラグインのロードが完了しました。プラグイン数: {_plugins.Count()}");
+            try
+            {
+                var container = new CompositionContainer(catalog);
+                
+                // MEFコンテナに_editorOptionServiceを登録
+                var batch = new CompositionBatch();
+                batch.AddExportedValue(_editorOptionService);
+                container.Compose(batch);
+                
+                container.ComposeParts(this);
+                _isPluginsLoaded = true;
+                _applicationLogService.Log($"プラグインのロードが完了しました。プラグイン数: {_plugins.Count()}");
+            }
+            catch (CompositionException ce)
+            {
+                _applicationLogService.Log($"プラグインのコンポジション中にエラーが発生しました: {ce.Message}");
+                _applicationLogService.Log($"詳細: {ce.StackTrace}");
+                
+                MessageBox.Show(
+                    $"プラグインのコンポジション中にエラーが発生しました。詳細はログを確認してください。", 
+                    "エラー", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                _applicationLogService.Log($"プラグインのロード中に予期しないエラーが発生しました: {ex.Message}");
+                _applicationLogService.Log($"詳細: {ex.StackTrace}");
+                
+                MessageBox.Show(
+                    $"プラグインのロード中に予期しないエラーが発生しました。詳細はログを確認してください。", 
+                    "エラー", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Error);
+            }
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IUnitsFacotry> GetFactories()
+        public IEnumerable<IUnitsFactory> GetFactories()
         {
-            var factories = new List<IUnitsFacotry>();
+            if (!_isPluginsLoaded)
+            {
+                _applicationLogService.Log("プラグインがロードされていません。先にLoadCommandPluginsを呼び出してください。");
+                return Enumerable.Empty<IUnitsFactory>();
+            }
+            
+            var factories = new List<IUnitsFactory>();
             foreach (var plugin in _plugins)
             {
                 try
                 {
-                    factories.AddRange(plugin.GetUnitsFactory());
+                    var pluginFactories = plugin.GetUnitsFactory();
+                    if (pluginFactories != null)
+                    {
+                        factories.AddRange(pluginFactories);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _applicationLogService.Log($"プラグインからファクトリの取得中にエラーが発生しました: {ex.Message}");
+                    _applicationLogService.Log($"プラグイン {plugin.GetType().Name} からファクトリの取得中にエラーが発生しました: {ex.Message}");
+                    _applicationLogService.Log($"詳細: {ex.StackTrace}");
                 }
             }
 
@@ -80,23 +153,52 @@ namespace AimAssist.Plugins
         /// <inheritdoc/>
         public Dictionary<Type, Func<IUnit, UIElement>> GetConverters()
         {
+            if (!_isPluginsLoaded)
+            {
+                _applicationLogService.Log("プラグインがロードされていません。先にLoadCommandPluginsを呼び出してください。");
+                return new Dictionary<Type, Func<IUnit, UIElement>>();
+            }
+            
             var converters = new Dictionary<Type, Func<IUnit, UIElement>>();
             foreach (var plugin in _plugins)
             {
                 try
                 {
-                    foreach (var converter in plugin.GetUIElementConverters())
+                    var pluginConverters = plugin.GetUIElementConverters();
+                    if (pluginConverters != null)
                     {
-                        converters.TryAdd(converter.Key, converter.Value);
+                        foreach (var converter in pluginConverters)
+                        {
+                            if (!converters.ContainsKey(converter.Key))
+                            {
+                                converters.Add(converter.Key, converter.Value);
+                                _applicationLogService.Log($"コンバーター登録: {converter.Key.Name}");
+                            }
+                            else
+                            {
+                                _applicationLogService.Log($"警告: コンバーター {converter.Key.Name} は既に登録されています。スキップします。");
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    _applicationLogService.Log($"プラグインからコンバーターの取得中にエラーが発生しました: {ex.Message}");
+                    _applicationLogService.Log($"プラグイン {plugin.GetType().Name} からコンバーターの取得中にエラーが発生しました: {ex.Message}");
+                    _applicationLogService.Log($"詳細: {ex.StackTrace}");
                 }
             }
 
             return converters;
         }
+
+        /// <summary>
+        /// プラグインが読み込まれているかどうかを取得します
+        /// </summary>
+        public bool IsPluginsLoaded => _isPluginsLoaded;
+
+        /// <summary>
+        /// 読み込まれたプラグインの数を取得します
+        /// </summary>
+        public int PluginsCount => _plugins?.Count() ?? 0;
     }
 }
