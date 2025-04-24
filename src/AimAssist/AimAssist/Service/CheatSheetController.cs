@@ -31,8 +31,9 @@ namespace CheatSheet.Services
         private DispatcherTimer _timer;
 
         private readonly Dispatcher dispatcher;
+        private readonly WindowHandleService _windowHandleService;
 
-        public CheatSheetController(Dispatcher dispatcher)
+        public CheatSheetController(Dispatcher dispatcher, WindowHandleService windowHandleService)
         {
             _keyboardProc = KeyboardHookCallback;
             _mouseProc = MouseHookCallback;
@@ -44,6 +45,7 @@ namespace CheatSheet.Services
             _timer.Interval = TimeSpan.FromSeconds(0.5);
             _timer.Tick += Timer_Tick;
             this.dispatcher = dispatcher;
+            _windowHandleService = windowHandleService;
         }
 
         private void InitializeCheatsheets()
@@ -173,7 +175,7 @@ namespace CheatSheet.Services
             {
                 if(activeAppName == "AimAssist")
                 {
-                    var unit = WindowHandleService.Window.GetCurrentUnit; 
+                    var unit = _windowHandleService.Window?.GetCurrentUnit; 
                     if(unit is UrlUnit urlUnit)
                     {
                         var domainName = GetDomainFromUrl(urlUnit.Description);
@@ -181,7 +183,7 @@ namespace CheatSheet.Services
                         {
                             cheatsheetContent += webCheatSheet;
 
-                            _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName+" / "+ domainName);
+                            _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName+" / "+domainName);
                         }
                         else
                         {

@@ -1,4 +1,5 @@
 ﻿using AimAssist.Core.Commands;
+using AimAssist.Core.Interfaces;
 using Common.Commands.Shortcus;
 using System.Windows;
 using System.Windows.Input;
@@ -11,6 +12,12 @@ namespace AimAssist.Service
         private ModifierKeys _lastModifiers;
         private DateTime _lastKeyPressTime;
         private bool _isWaitingForSecondKey = false;
+        private readonly ICommandService _commandService;
+
+        public KeySequenceManager(ICommandService commandService)
+        {
+            _commandService = commandService;
+        }
 
         public bool HandleKeyPress(Key key, ModifierKeys modifiers, Window window)
         {
@@ -25,7 +32,7 @@ namespace AimAssist.Service
             {
                 // 2つ目のキーを処理
                 var keySequence = new KeySequence(_lastKey, _lastModifiers, key, modifiers);
-                if (CommandService.TryGetFirstSecontKeyCommand(keySequence, out var doubleKeyCommand))
+                if (_commandService.TryGetFirstSecontKeyCommand(keySequence, out var doubleKeyCommand))
                 {
                     doubleKeyCommand.Execute(window);
                     ResetKeySequence();
@@ -40,7 +47,7 @@ namespace AimAssist.Service
 
             // 1つのキーのシーケンスのチェック
             var singleKeySequence = new KeyGesture(key, modifiers);
-            if (CommandService.TryGetFirstOnlyKeyCommand(singleKeySequence, out var command))
+            if (_commandService.TryGetFirstOnlyKeyCommand(singleKeySequence, out var command))
             {
                 command.Execute(window);
                 ResetKeySequence();

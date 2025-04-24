@@ -26,7 +26,7 @@ public class HotKeyController : IDisposable
         this.window = window;
         var host = new WindowInteropHelper(window);
         _windowHandle = host.Handle;
-        cheatSheetController = new CheatSheetController(window.Dispatcher);
+        //cheatSheetController = new CheatSheetController(window.Dispatcher);
 
         ComponentDispatcher.ThreadPreprocessMessage += ComponentDispatcher_ThreadPreprocessMessage;
     }

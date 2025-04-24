@@ -1,15 +1,19 @@
 ﻿
+using AimAssist.Core.Interfaces;
 using AimAssist.UI.MainWindows;
 using AimAssist.UI.PickerWindows;
 using Common.Commands.Shortcus;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace AimAssist.Service;
-internal static class PickerService
+
+public class PickerService
 {
     private static IntPtr beforeWindow;
     private static bool isActive;
+    private readonly ICommandService _commandService;
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -19,7 +23,12 @@ internal static class PickerService
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-    public static void ShowPickerWindow()
+    public PickerService(ICommandService commandService)
+    {
+        _commandService = commandService;
+    }
+
+    public void ShowPickerWindow()
     {
         if(isActive) { return; }
         isActive = true;
@@ -33,7 +42,7 @@ internal static class PickerService
         GetWindowThreadProcessId(beforeWindow, out var processId);
         Process process = Process.GetProcessById((int)processId);
 
-        var window = new PickerWindow(process.ProcessName);
+        var window = new PickerWindow(process.ProcessName, _commandService);
         window.Closed += DoAction;
         window.Show();
         window.Activate();
@@ -66,7 +75,7 @@ internal static class PickerService
 
         // 元のプロセスをアクティブにする
         SetForegroundWindow(beforeWindow);
-        Thread.Sleep(100); // アクテイブになるまで少し待つ
+        Thread.Sleep(100); // アクティブになるまで少し待つ
 
         // SendKeysを使用してキーを送信するためにSystem.Windows.Formsを追加する必要がある
 

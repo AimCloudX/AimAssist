@@ -1,16 +1,20 @@
 ﻿
 using AimAssist.Core.Commands;
 using AimAssist.Core.Events;
+using AimAssist.Core.Interfaces;
 using AimAssist.HotKeys;
 using System.Windows;
 
 namespace AimAssist.UI.Tools.HotKeys
 {
-    public partial class WaitHowKeysWindow : Window
+    public partial class WaitHotKeysWindow : Window
     {
         private HotKeyController hotkeyController;
-        public WaitHowKeysWindow()
+        private readonly ICommandService _commandService;
+
+        public WaitHotKeysWindow(ICommandService commandService)
         {
+            _commandService = commandService;
             this.InitializeComponent();
             this.Visibility = Visibility.Hidden;
             this.ShowInTaskbar = false;
@@ -32,12 +36,12 @@ namespace AimAssist.UI.Tools.HotKeys
 
         private void RegisterHotKey(string commandName)
         {
-            if (CommandService.TryGetKeyGesutre(commandName, out var command, out var keyGesture))
+            if (_commandService.TryGetKeyGesutre(commandName, out var command, out var keyGesture))
             {
-                    this.hotkeyController.Register(keyGesture.FirstModifiers,
-                                          keyGesture.FirstKey,
-                                              command
-                                          );
+                this.hotkeyController.Register(keyGesture.FirstModifiers,
+                                      keyGesture.FirstKey,
+                                          command
+                                      );
             }
         }
 

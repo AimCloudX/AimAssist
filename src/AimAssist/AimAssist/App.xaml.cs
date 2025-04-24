@@ -34,7 +34,8 @@ namespace AimAssist
                 initializer.Initialize();
                 
                 var settings = new SettingManager().LoadSettings();
-                CommandService.SetKeymap(settings);
+                var commandService = _serviceProvider.GetRequiredService<ICommandService>();
+                commandService.SetKeymap(settings);
 
                 ThreadPool.QueueUserWorkItem(WaitCallActivate);// 名前付きパイプサーバーを起動 別プロセスからのActivate用
 
@@ -56,10 +57,30 @@ namespace AimAssist
             
             // サービスを登録
             services.AddSingleton<IUnitsService, UnitsService>();
-            services.AddSingleton<Initializer>();
+            services.AddSingleton<ICommandService, CommandService>();
+            services.AddSingleton<IApplicationLogService, ApplicationLogService>();
+            services.AddSingleton<PickerService>();
+            services.AddSingleton<WindowHandleService>();
+            //services.AddSingleton<CheatSheet.Services.CheatSheetController>(provider =>
+            //    new CheatSheet.Services.CheatSheetController(
+            //        Dispatcher.CurrentDispatcher, 
+            //        provider.GetRequiredService<WindowHandleService>()
+            //    ));
+            services.AddSingleton<UI.UnitContentsView.UnitViewFactory>();
             services.AddTransient<UI.MainWindows.MainWindow>();
+            services.AddTransient<UI.Tools.HotKeys.WaitHotKeysWindow>();
             
             // 他のサービスを登録
+            
+            // ファクトリーパターンでInitializerを登録
+            services.AddSingleton<Initializer>(provider => new Initializer(
+                provider.GetRequiredService<IUnitsService>(),
+                provider.GetRequiredService<ICommandService>(),
+                provider.GetRequiredService<IApplicationLogService>(),
+                provider,
+                provider.GetRequiredService<WindowHandleService>(),
+                provider.GetRequiredService<PickerService>()
+            ));
             
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -99,7 +120,8 @@ namespace AimAssist
 
         private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
         {
-            var settings = CommandService.GetKeymap();
+            var commandService = _serviceProvider.GetRequiredService<ICommandService>();
+            var settings = commandService.GetKeymap();
             var noneSettingsKeys = settings.Where(x => x.Value.FirstModifiers == 0).Select(y=>y.Key);
             foreach (var key in noneSettingsKeys)
             {
@@ -109,7 +131,6 @@ namespace AimAssist
             new SettingManager().SaveSettings(settings);
             EditorOptionService.SaveOption();
             mutex.ReleaseMutex();
-
         }
     }
 }

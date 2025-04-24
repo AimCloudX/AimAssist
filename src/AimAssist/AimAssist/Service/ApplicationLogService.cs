@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AimAssist.Core.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,23 +11,11 @@ using System.Windows.Threading;
 
 namespace AimAssist.Service
 {
-    internal class ApplicationLogService
+    /// <summary>
+    /// アプリケーションログサービスの実装クラス
+    /// </summary>
+    public class ApplicationLogService : IApplicationLogService
     {
-        private static ApplicationLogService instance;
-
-        public static ApplicationLogService Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new ApplicationLogService();
-                }
-
-                return instance;
-            }
-        }
-
         private DispatcherTimer _timer;
         private List<LogEntry> _logEntries = new List<LogEntry>();
         private string _logDirectoryPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimAssist", "ApplicationLog");
@@ -40,6 +29,17 @@ namespace AimAssist.Service
         [DllImport("user32.dll")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public ApplicationLogService()
+        {
+            // DIでインスタンス化されるように、パブリックコンストラクタを提供
+        }
+
+        /// <summary>
+        /// サービスを初期化します
+        /// </summary>
         public void Initialize()
         {
             Directory.CreateDirectory(_logDirectoryPath); // ログディレクトリを作成
@@ -131,6 +131,9 @@ namespace AimAssist.Service
         }
     }
 
+    /// <summary>
+    /// ログエントリクラス
+    /// </summary>
     public class LogEntry
     {
         public string Time { get; set; }
@@ -138,6 +141,9 @@ namespace AimAssist.Service
         public string App { get; set; }
     }
 
+    /// <summary>
+    /// アクティブウィンドウ情報クラス
+    /// </summary>
     public class ActiveWindowInfo
     {
         public string WindowTitle { get; set; }

@@ -69,12 +69,20 @@ namespace AimAssist.UI.PickerWindows
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public PickerWindow(string processName)
-        {
-            this.InitializeComponent();
-            this.processName = processName;
-            SourceInitialized += MainWindow_SourceInitialized;
+        private readonly string processName;
+        private readonly ICommandService _commandService;
+        private readonly IUnitsService _unitsService;
+        private readonly KeySequenceManager _keySequenceManager;
 
+        public PickerWindow(string processName, ICommandService commandService)
+        {
+            this.processName = processName;
+            _commandService = commandService;
+            _unitsService = ((App)App.Current)._serviceProvider.GetRequiredService<IUnitsService>();
+            _keySequenceManager = new KeySequenceManager(commandService);
+            
+            this.InitializeComponent();
+            SourceInitialized += MainWindow_SourceInitialized;
 
             var editor = EditorCash.Editor;
             if(editor != null)
@@ -103,7 +111,7 @@ namespace AimAssist.UI.PickerWindows
         public async void UpdateCandidate()
         {
             UnitLists.Clear();
-            var units = ((App)App.Current)._serviceProvider.GetRequiredService<IUnitsService>().CreateUnits(this.Mode);
+            var units = _unitsService.CreateUnits(this.Mode);
 
             foreach (var unit in units)
             {
@@ -115,8 +123,7 @@ namespace AimAssist.UI.PickerWindows
                 UnitLists.Add(new UnitViewModel(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
             }
 
-
-            var keyUnits = ((App)App.Current)._serviceProvider.GetRequiredService<IUnitsService>().CreateUnits(KeyHelpMode.Instance);
+            var keyUnits = _unitsService.CreateUnits(KeyHelpMode.Instance);
             foreach (var unit in keyUnits)
             {
                 if (unit is KeyHelpUnit keyHelpUnit)
@@ -129,7 +136,6 @@ namespace AimAssist.UI.PickerWindows
 
                 UnitLists.Add(new UnitViewModel(unit));
             }
-
         }
 
         private void HandleTypingTimerTimeout(object sender, EventArgs e)
@@ -322,10 +328,6 @@ namespace AimAssist.UI.PickerWindows
             return IntPtr.Zero;
         }
 
-
-        private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
-        private readonly string processName;
-
         private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
@@ -375,6 +377,5 @@ namespace AimAssist.UI.PickerWindows
 
             //EditorCash.Editor.RegisterSnippets(snippetVariables);
         }
-
     }
 }

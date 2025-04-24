@@ -1,4 +1,5 @@
 ﻿using AimAssist.Core.Commands;
+using AimAssist.Core.Interfaces;
 using Common;
 using Common.Commands.Shortcus;
 using Library.Options;
@@ -14,10 +15,13 @@ namespace AimAssist.UI.Options
     /// </summary>
     public partial class CustomizeKeyboardShortcutsSettings : System.Windows.Controls.UserControl
     {
-        public CustomizeKeyboardShortcutsSettings()
+        private readonly ICommandService _commandService;
+
+        public CustomizeKeyboardShortcutsSettings(ICommandService commandService)
         {
+            _commandService = commandService;
             InitializeComponent();
-            foreach (var shortcut in CommandService.GetKeymap())
+            foreach (var shortcut in _commandService.GetKeymap())
             {
                 this.ShortcutSettings.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
             }
@@ -113,7 +117,7 @@ namespace AimAssist.UI.Options
             {
                 foreach (var shortcut in modifiedShortcutes)
                 {
-                    CommandService.UpdateKeyGesture(shortcut.CommandName, shortcut.Gesture);
+                    _commandService.UpdateKeyGesture(shortcut.CommandName, shortcut.Gesture);
                 }
             }
         }

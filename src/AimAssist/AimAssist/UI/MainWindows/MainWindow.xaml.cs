@@ -38,8 +38,10 @@ namespace AimAssist.UI.MainWindows
         private bool isAnimating = false;
         public ObservableCollection<UnitViewModel> UnitLists { get; } = new ObservableCollection<UnitViewModel>();
         private IMode mode;
-        private readonly KeySequenceManager _keySequenceManager = new KeySequenceManager();
+        private readonly KeySequenceManager _keySequenceManager;
         private readonly IUnitsService _unitsService;
+        private readonly ICommandService _commandService;
+        private readonly UnitViewFactory _unitViewFactory;
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
@@ -61,9 +63,12 @@ namespace AimAssist.UI.MainWindows
             return IntPtr.Zero;
         }
         
-        public MainWindow(IUnitsService unitsService)
+        public MainWindow(IUnitsService unitsService, ICommandService commandService, UnitViewFactory unitViewFactory)
         {
             _unitsService = unitsService ?? throw new ArgumentNullException(nameof(unitsService));
+            _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+            _unitViewFactory = unitViewFactory ?? throw new ArgumentNullException(nameof(unitViewFactory));
+            _keySequenceManager = new KeySequenceManager(_commandService);
             
             InitializeComponent();
             SourceInitialized += MainWindow_SourceInitialized;
@@ -95,7 +100,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 }
  );
-                CommandService.Register(modeChangeCommand, mode.DefaultKeySequence);
+                _commandService.Register(modeChangeCommand, mode.DefaultKeySequence);
             }
 
             MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), (Window window) =>
@@ -197,13 +202,13 @@ namespace AimAssist.UI.MainWindows
                 }
             });
 
-            CommandService.Register(MainWindowCommands.NextMode, new KeySequence(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
-            CommandService.Register(MainWindowCommands.PreviousMode, new KeySequence(Key.P, ModifierKeys.Control | ModifierKeys.Shift));
-            CommandService.Register(MainWindowCommands.NextUnit, new KeySequence(Key.N, ModifierKeys.Control));
-            CommandService.Register(MainWindowCommands.PreviousUnit, new KeySequence(Key.P, ModifierKeys.Control));
+            _commandService.Register(MainWindowCommands.NextMode, new KeySequence(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
+            _commandService.Register(MainWindowCommands.PreviousMode, new KeySequence(Key.P, ModifierKeys.Control | ModifierKeys.Shift));
+            _commandService.Register(MainWindowCommands.NextUnit, new KeySequence(Key.N, ModifierKeys.Control));
+            _commandService.Register(MainWindowCommands.PreviousUnit, new KeySequence(Key.P, ModifierKeys.Control));
 
-            CommandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
-            CommandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
+            _commandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
+            _commandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
 
             foreach (var unit in _unitsService.CreateUnits(AllInclusiveMode.Instance))
             {
@@ -216,9 +221,8 @@ namespace AimAssist.UI.MainWindows
                     }
                 });
 
-                CommandService.Register(unitChangeCommand, KeySequence.None);
+                _commandService.Register(unitChangeCommand, KeySequence.None);
             }
-
         }
 
         private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
@@ -292,7 +296,7 @@ namespace AimAssist.UI.MainWindows
         {
             if (this.ComboListBox.SelectedItem is UnitViewModel unit)
             {
-                var view = new UnitViewFactory().Create(unit);
+                var view = _unitViewFactory.Create(unit);
                 this.MainContent.Content = view;
             }
         }

@@ -176,12 +176,28 @@ AimAssist/
 - アプリケーションのDIコンテナを導入しました（Microsoft.Extensions.DependencyInjection）
 - インターフェースの抽出とシングルトンパターンの改善を進めています
 - 命名の修正（UnitsService.Instnace → UnitsService.Instance、WaitHowKeysWindow → WaitHotKeysWindow）
-- TODO
+- CommandServiceを静的クラスからDIを使用したインスタンスクラスに変更しました
+- CommandServiceのインターフェース（ICommandService）を作成しました
+- ApplicationLogServiceをDIパターンに修正しました
+- ApplicationLogServiceのインターフェース（IApplicationLogService）を作成しました
+- App.xaml.csのDI設定を更新しました
+- Initializerクラスをインジェクションされたサービスを使用するように修正しました
+- WaitHotKeysWindowを修正してDIからCommandServiceを取得するようにしました
+- サービスロケーターパターン（((App)App.Current)._serviceProvider.GetRequiredService）を除去しました
+- CustomizeKeyboardShortcutsSettingsをDIパターンに対応させました
+- UnitViewFactoryをDIパターンに対応させました
+- MainWindowがDIからUnitViewFactoryを取得するよう修正しました
+- PickerServiceを静的クラスからDIパターンに変更しました
+- WindowHandleServiceを静的クラスからDIパターンに変更しました
+- AppCommandsクラスのコマンド初期化をDIパターンに対応させました
+- CheatSheetControllerをDIパターンに対応させ、WindowHandleServiceのインスタンスを使用するように修正しました
 
 ## 次のステップ
 
-1. CommandServiceを静的クラスからDIを使用したインスタンスクラスに変更する
-2. ApplicationLogServiceをDIパターンに修正する
-3. 残りのサービスクラスに対してインターフェースを抽出し、DIに対応させる
-4. ユニットテストプロジェクトの追加
-5. リファクタリングの詳細計画の策定
+1. 残りのサービスクラスに対してインターフェースを抽出し、DIに対応させる
+   - SettingManager
+   - EditJsonService
+   - KeySequenceManager
+2. AppCommandsクラスをDIに完全対応させる
+3. ユニットテストプロジェクトの追加
+4. リファクタリングの詳細計画の策定

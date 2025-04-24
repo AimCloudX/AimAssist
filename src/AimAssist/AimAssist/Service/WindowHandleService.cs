@@ -5,15 +5,22 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace AimAssist.Service;
-internal static class WindowHandleService
+
+public class WindowHandleService
 {
-    public static MainWindow Window { get; private set; }
-    private static bool isActivate;
+    public MainWindow Window { get; private set; }
+    private bool isActivate;
+    private readonly IServiceProvider _serviceProvider;
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-    public static void ToggleMainWindow()
+    public WindowHandleService(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    public void ToggleMainWindow()
     {
         if (isActivate)
         {
@@ -28,7 +35,7 @@ internal static class WindowHandleService
         if (Window == null || Window.IsClosing)
         {
             // DIコンテナからMainWindowを取得
-            Window = ((App)App.Current)._serviceProvider.GetRequiredService<MainWindow>();
+            Window = _serviceProvider.GetRequiredService<MainWindow>();
         }
 
         Window.Visibility = System.Windows.Visibility.Visible;
@@ -40,7 +47,7 @@ internal static class WindowHandleService
         SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
     }
 
-    private static void DoAction(object? sender, EventArgs e)
+    private void DoAction(object? sender, EventArgs e)
     {
         isActivate = false;
     }

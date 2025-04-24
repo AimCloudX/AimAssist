@@ -1,4 +1,5 @@
 ﻿using AimAssist.Core.Editors;
+using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Core.Units.Units;
 using AimAssist.UI.Combos;
@@ -20,17 +21,37 @@ using Common.UI;
 using Common.UI.ChatGPT;
 using Common.UI.WebUI;
 using Library.Options;
+using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Windows;
 
 namespace AimAssist.UI.UnitContentsView
 {
-    internal class UnitViewFactory
+    /// <summary>
+    /// ユニットからUIを作成するファクトリークラス
+    /// </summary>
+    public class UnitViewFactory
     {
         public static Dictionary<Type, Func<IUnit, UIElement>> UnitToUIElementDicotionary = new();
 
         private static Dictionary<string, UIElement> cash = new();
+        private readonly ICommandService _commandService;
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="commandService">コマンドサービス</param>
+        public UnitViewFactory(ICommandService commandService)
+        {
+            _commandService = commandService;
+        }
         
+        /// <summary>
+        /// ユニットからUIを作成します
+        /// </summary>
+        /// <param name="unit">ユニット</param>
+        /// <param name="createNew">新規作成するかどうか</param>
+        /// <returns>作成されたUI要素</returns>
         public UIElement Create(UnitViewModel unit, bool createNew = false)
         {
             if (createNew)
@@ -48,7 +69,7 @@ namespace AimAssist.UI.UnitContentsView
             return element;
         }
 
-        private static UIElement CreateInner(UnitViewModel unit)
+        private UIElement CreateInner(UnitViewModel unit)
         {
             switch (unit.Content)
             {
@@ -71,7 +92,7 @@ namespace AimAssist.UI.UnitContentsView
                     editor.NewTab(editorUnit.FullPath);
                     return editor;
                 case ShortcutOptionUnit:
-                    return new CustomizeKeyboardShortcutsSettings();
+                    return new CustomizeKeyboardShortcutsSettings(_commandService);
                 case SnippetUnit model:
                     return new System.Windows.Controls.TextBox()
                     {

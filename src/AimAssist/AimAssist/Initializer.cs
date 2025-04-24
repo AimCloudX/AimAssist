@@ -10,6 +10,7 @@ using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.WorkTools;
 using Common.Commands.Shortcus;
 using Library.Options;
+using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 
 namespace AimAssist
@@ -20,14 +21,35 @@ namespace AimAssist
     internal class Initializer
     {
         private readonly IUnitsService _unitsService;
+        private readonly ICommandService _commandService;
+        private readonly IApplicationLogService _applicationLogService;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly WindowHandleService _windowHandleService;
+        private readonly PickerService _pickerService;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="unitsService">ユニットサービス</param>
-        public Initializer(IUnitsService unitsService)
+        /// <param name="commandService">コマンドサービス</param>
+        /// <param name="applicationLogService">アプリケーションログサービス</param>
+        /// <param name="serviceProvider">サービスプロバイダー</param>
+        /// <param name="windowHandleService">ウィンドウハンドルサービス</param>
+        /// <param name="pickerService">ピッカーサービス</param>
+        public Initializer(
+            IUnitsService unitsService,
+            ICommandService commandService,
+            IApplicationLogService applicationLogService,
+            IServiceProvider serviceProvider,
+            WindowHandleService windowHandleService,
+            PickerService pickerService)
         {
             _unitsService = unitsService;
+            _commandService = commandService;
+            _applicationLogService = applicationLogService;
+            _serviceProvider = serviceProvider;
+            _windowHandleService = windowHandleService;
+            _pickerService = pickerService;
         }
 
         /// <summary>
@@ -35,6 +57,9 @@ namespace AimAssist
         /// </summary>
         public void Initialize()
         {
+            // AppCommandsの初期化
+            AppCommands.Initialize(_windowHandleService, _pickerService);
+            
             string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string editorOptionPath = Path.Combine(roamingPath, "AimAssist", "editor.option.json");
             string editorOptionSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Settings", "editor.option.json");
@@ -99,13 +124,15 @@ namespace AimAssist
                 UnitViewFactory.UnitToUIElementDicotionary.TryAdd(item.Key, item.Value);
             }
 
-            CommandService.Register(AppCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
-            CommandService.Register(AppCommands.ShowPickerWindow, new KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
-            CommandService.Register(AppCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
+            _commandService.Register(AppCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
+            _commandService.Register(AppCommands.ShowPickerWindow, new KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
+            _commandService.Register(AppCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
 
-            new WaitHowKeysWindow().Show();
+            // DIコンテナからWaitHotKeysWindowを取得
+            var waitHotKeysWindow = _serviceProvider.GetRequiredService<UI.Tools.HotKeys.WaitHotKeysWindow>();
+            waitHotKeysWindow.Show();
 
-            ApplicationLogService.Instance.Initialize();
+            _applicationLogService.Initialize();
         }
     }
 }
