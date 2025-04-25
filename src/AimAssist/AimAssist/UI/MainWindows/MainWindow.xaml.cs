@@ -4,18 +4,14 @@ using AimAssist.Core.Units;
 using AimAssist.Service;
 using AimAssist.UI.PickerWindows;
 using AimAssist.UI.UnitContentsView;
-using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web;
 using Common.Commands;
 using Common.Commands.Shortcus;
 using Common.UI;
-using Common.UI.WebUI;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -43,6 +39,8 @@ namespace AimAssist.UI.MainWindows
         private readonly IUnitsService _unitsService;
         private readonly ICommandService _commandService;
         private readonly UnitViewFactory _unitViewFactory;
+        private readonly IApplicationLogService _logService;
+        private readonly IServiceProvider _serviceProvider;
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
@@ -64,11 +62,18 @@ namespace AimAssist.UI.MainWindows
             return IntPtr.Zero;
         }
         
-        public MainWindow(IUnitsService unitsService, ICommandService commandService, UnitViewFactory unitViewFactory)
+        public MainWindow(
+            IUnitsService unitsService, 
+            ICommandService commandService, 
+            UnitViewFactory unitViewFactory,
+            IApplicationLogService logService,
+            IServiceProvider serviceProvider)
         {
             _unitsService = unitsService ?? throw new ArgumentNullException(nameof(unitsService));
             _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
             _unitViewFactory = unitViewFactory ?? throw new ArgumentNullException(nameof(unitViewFactory));
+            _logService = logService ?? throw new ArgumentNullException(nameof(logService));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _keySequenceManager = new KeySequenceManager(_commandService);
             
             InitializeComponent();

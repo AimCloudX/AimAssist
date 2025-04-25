@@ -1,4 +1,5 @@
 ﻿using AimAssist.Core.Interfaces;
+using AimAssist.Core.Services;
 using AimAssist.Service;
 using AimAssist.UI.SystemTray;
 using AimAssist.UI.UnitContentsView;
@@ -24,6 +25,7 @@ namespace AimAssist
         private readonly ISnippetOptionService _snippetOptionService;
         private readonly IWorkItemOptionService _workItemOptionService;
         private readonly IPluginsService _pluginsService;
+        private readonly IApplicationLogService _logService;
 
         /// <summary>
         /// コンストラクタ
@@ -38,6 +40,7 @@ namespace AimAssist
         /// <param name="snippetOptionService">スニペットオプションサービス</param>
         /// <param name="workItemOptionService">作業項目オプションサービス</param>
         /// <param name="pluginsService">プラグインサービス</param>
+        /// <param name="logService">アプリケーションログサービス</param>
         public Initializer(
             IUnitsService unitsService,
             ICommandService commandService,
@@ -48,7 +51,8 @@ namespace AimAssist
             IEditorOptionService editorOptionService,
             ISnippetOptionService snippetOptionService,
             IWorkItemOptionService workItemOptionService,
-            IPluginsService pluginsService)
+            IPluginsService pluginsService,
+            IApplicationLogService logService)
         {
             _unitsService = unitsService;
             _commandService = commandService;
@@ -60,6 +64,7 @@ namespace AimAssist
             _snippetOptionService = snippetOptionService;
             _workItemOptionService = workItemOptionService;
             _pluginsService = pluginsService;
+            _logService = logService;
         }
 
         /// <summary>
@@ -101,6 +106,7 @@ namespace AimAssist
             }
             catch (Exception ex)
             {
+                _logService.LogException(ex, "WorkItemOptionServiceの初期化中にエラーが発生しました");
             }
 
             string snippetoption = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "snippet.option.json");
@@ -125,6 +131,7 @@ namespace AimAssist
             }
             catch (Exception ex)
             {
+                _logService.LogException(ex, "SnippetOptionServiceの初期化中にエラーが発生しました");
             }
 
             // DIから取得したEditorOptionServiceを使用
@@ -134,6 +141,7 @@ namespace AimAssist
             }
             catch (Exception ex)
             {
+                _logService.LogException(ex, "EditorOptionServiceの初期化中にエラーが発生しました");
             }
 
             // DIでSystemTrayRegisterを取得して使用
@@ -149,6 +157,7 @@ namespace AimAssist
             // DIから取得したIPluginsServiceを使用
             try
             {
+                _logService.Info("プラグインの読み込みを開始します");
                 _pluginsService.LoadCommandPlugins();
                 var factories = _pluginsService.GetFactories();
                 foreach (var item in factories)
@@ -161,9 +170,11 @@ namespace AimAssist
                 {
                     UnitViewFactory.UnitToUIElementDictionary.TryAdd(item.Key, item.Value);
                 }
+                _logService.Info("プラグインの読み込みが完了しました");
             }
             catch (Exception ex)
             {
+                _logService.LogException(ex, "プラグインの読み込み中にエラーが発生しました");
             }
 
             _commandService.Register(_appCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));

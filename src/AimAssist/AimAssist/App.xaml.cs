@@ -1,5 +1,7 @@
 ﻿using AimAssist.Core.Commands;
+using AimAssist.Core.Helpers;
 using AimAssist.Core.Interfaces;
+using AimAssist.Core.Services;
 using AimAssist.Plugins;
 using AimAssist.Service;
 using Library.Options;
@@ -33,19 +35,27 @@ namespace AimAssist
             mutex = new Mutex(true, appName, out var createdNew);
             if (createdNew)
             {
+                // ApplicationLogServiceの初期化とエラーハンドリングヘルパーの設定
+                var logService = _serviceProvider.GetRequiredService<IApplicationLogService>();
+                ErrorHandlingHelper.SetLogService(logService);
+                
                 // DIコンテナからInitializerを取得して使用
                 try
                 {
+                    logService.Info("アプリケーションの初期化を開始します");
                     var initializer = _serviceProvider.GetRequiredService<Initializer>();
                     initializer.Initialize();
                     
+                    logService.Info("設定情報を読み込みます");
                     var settingManager = _serviceProvider.GetRequiredService<ISettingManager>();
                     var settings = settingManager.LoadSettings();
                     var commandService = _serviceProvider.GetRequiredService<ICommandService>();
                     commandService.SetKeymap(settings);
+                    logService.Info("アプリケーションの初期化が正常に完了しました");
                 }
                 catch (Exception ex)
                 {
+                    logService.LogException(ex, "アプリケーション初期化中に重大なエラーが発生しました");
                     MessageBox.Show($"アプリケーションの初期化中にエラーが発生しました。\n{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
@@ -75,6 +85,7 @@ namespace AimAssist
             services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
             services.AddSingleton<ISnippetOptionService, SnippetOptionService>();
             services.AddSingleton<IWorkItemOptionService, WorkItemOptionService>();
+            services.AddSingleton<IApplicationLogService, ApplicationLogService>();
             services.AddSingleton<IPluginsService>(provider => new PluginsService(
                 provider.GetRequiredService<IEditorOptionService>()
             ));
@@ -96,7 +107,13 @@ namespace AimAssist
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IEditorOptionService>()
             ));
-            services.AddTransient<UI.MainWindows.MainWindow>();
+            services.AddTransient<UI.MainWindows.MainWindow>(provider => new UI.MainWindows.MainWindow(
+                provider.GetRequiredService<IUnitsService>(),
+                provider.GetRequiredService<ICommandService>(),
+                provider.GetRequiredService<UI.UnitContentsView.UnitViewFactory>(),
+                provider.GetRequiredService<IApplicationLogService>(),
+                provider
+            ));
             services.AddTransient<UI.Tools.HotKeys.WaitHotKeysWindow>(provider => new UI.Tools.HotKeys.WaitHotKeysWindow(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IAppCommands>()
@@ -115,7 +132,8 @@ namespace AimAssist
                 provider.GetRequiredService<IEditorOptionService>(),
                 provider.GetRequiredService<ISnippetOptionService>(),
                 provider.GetRequiredService<IWorkItemOptionService>(),
-                provider.GetRequiredService<IPluginsService>()
+                provider.GetRequiredService<IPluginsService>(),
+                provider.GetRequiredService<IApplicationLogService>()
             ));
             
             _serviceProvider = services.BuildServiceProvider();
