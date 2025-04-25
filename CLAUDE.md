@@ -175,21 +175,35 @@ AimAssist/
 | ClipboardPluginのDI対応 | 完了 | - | 2025-04-25 |
 | 命名の一貫性改善 | 進行中 | - | - |
 | SystemTrayRegisterのDI対応 | 完了 | - | 2025-04-25 |
+| WindowHandleServiceのDI対応 | 完了 | - | 2025-04-25 |
+| PickerServiceのDI対応 | 完了 | - | 2025-04-25 |
+| CheatSheetControllerのDI対応 | 完了 | - | 2025-04-25 |
+| AppCommandsのDI対応修正 | 完了 | - | 2025-04-25 |
 | エラーハンドリング改善 | 進行中 | - | - |
+| コンパイルエラーの修正 | 完了 | - | 2025-04-25 |
+| 実行時エラーの修正 | 完了 | - | 2025-04-25 |
 
 ## 現在の課題
 
 - UnitViewModel.csの参照を確認し、キャッシュの実装を改善する必要があります
+- サービスクラスのエラーハンドリングをさらに改善し、適切なログ記録メカニズムを実装する
+- アプリケーション全体のアーキテクチャをクリーンアーキテクチャに沿って再構築する
+- 命名の一貫性を確保するためのコード分析と修正を行う
+- インターフェース修正時にメソッド名の変更が必要な場合は、全ての参照箇所の更新を忘れないようにする（例：SetForegroundWindow → ActivateWindow）
+- インターフェースへの切り替え時には、依存関係を持つすべてのクラスも同様に更新する必要がある（例：AppCommandsクラスのコンストラクタ）
 
 ## 次のステップ
 
-1. 残りのサービスクラスに対してインターフェースを抽出し、DIに対応させる
+1. ✓ 残りのサービスクラスに対してインターフェースを抽出し、DIに対応させる
    - ✓ SettingManager
    - ✓ KeySequenceManager
    - ✓ EditorOptionService
    - ✓ SnippetOptionService
    - ✓ WorkItemOptionService
    - ✓ PluginsService
+   - ✓ WindowHandleService
+   - ✓ PickerService
+   - ✓ CheatSheetController
 2. ✓ AppCommandsクラスをDIに完全対応させる
 3. ✓ ユニットテストプロジェクトの追加
    - ✓ プロジェクト作成

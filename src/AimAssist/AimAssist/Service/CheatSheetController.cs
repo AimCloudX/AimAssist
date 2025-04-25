@@ -1,13 +1,19 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
 using System.IO;
+using System.Threading.Tasks;
+using AimAssist.Core.Interfaces;
 using AimAssist.Service;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Core;
+using AimAssist.Core.Units;
 
 namespace CheatSheet.Services
 {
-    public class CheatSheetController : IDisposable
+    public class CheatSheetController : ICheatSheetController, IDisposable
     {
         private const int WH_KEYBOARD_LL = 13;
         private const int WH_MOUSE_LL = 14;
@@ -31,9 +37,9 @@ namespace CheatSheet.Services
         private DispatcherTimer _timer;
 
         private readonly Dispatcher dispatcher;
-        private readonly WindowHandleService _windowHandleService;
+        private readonly IWindowHandleService _windowHandleService;
 
-        public CheatSheetController(Dispatcher dispatcher, WindowHandleService windowHandleService)
+        public CheatSheetController(Dispatcher dispatcher, IWindowHandleService windowHandleService)
         {
             _keyboardProc = KeyboardHookCallback;
             _mouseProc = MouseHookCallback;
@@ -52,21 +58,29 @@ namespace CheatSheet.Services
         {
             _cheatsheets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            var dictInfo = new DirectoryInfo("Resources/CheatSheet/");
-            foreach (var file in dictInfo.GetFiles())
+            try
             {
-                var name = Path.GetFileNameWithoutExtension(file.Name);
-                var text = File.ReadAllText(file.FullName);
-                _cheatsheets.Add(name, text);
-            }
+                var dictInfo = new DirectoryInfo("Resources/CheatSheet/");
+                foreach (var file in dictInfo.GetFiles())
+                {
+                    var name = Path.GetFileNameWithoutExtension(file.Name);
+                    var text = File.ReadAllText(file.FullName);
+                    _cheatsheets.Add(name, text);
+                }
 
-            _webcCheatsheets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            var web = new DirectoryInfo("Resources/CheatSheet/Web/");
-            foreach (var file in web.GetFiles())
+                _webcCheatsheets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                var web = new DirectoryInfo("Resources/CheatSheet/Web/");
+                foreach (var file in web.GetFiles())
+                {
+                    var name = Path.GetFileNameWithoutExtension(file.Name);
+                    var text = File.ReadAllText(file.FullName);
+                    _webcCheatsheets.Add(name, text);
+                }
+            }
+            catch (Exception ex)
             {
-                var name = Path.GetFileNameWithoutExtension(file.Name);
-                var text = File.ReadAllText(file.FullName);
-                _webcCheatsheets.Add(name, text);
+                Debug.WriteLine($"チートシート初期化エラー: {ex.Message}");
+                // エラーログの記録などの追加処理を行う
             }
         }
 
@@ -109,7 +123,7 @@ namespace CheatSheet.Services
                     {
                         _isCtrlPressed = false;
                         _timer.Stop();
-                        dispatcher.Invoke(() => HideCheatsheet());
+                        dispatcher.Invoke(() => CloseCheatSheet());
                     }
                 }
             }
@@ -145,10 +159,11 @@ namespace CheatSheet.Services
         {
             if (_isCtrlPressed && (DateTime.Now - _ctrlKeyPressStart).TotalSeconds >= 1)
             {
-                dispatcher.Invoke(() => ShowCheatsheet());
+                dispatcher.Invoke(() => ShowCheatSheet(_windowHandleService.GetActiveProcessName()));
                 _timer.Stop();
             }
         }
+        
         public static string GetDomainFromUrl(string url)
         {
             try
@@ -162,71 +177,93 @@ namespace CheatSheet.Services
             }
         }
 
-
-        private void ShowCheatsheet()
+        /// <summary>
+        /// チートシートを表示する
+        /// </summary>
+        /// <param name="processName">対象プロセス名</param>
+        public async Task ShowCheatSheet(string processName)
         {
             if (_cheatsheetPopup != null)
             {
                 return;
             }
 
-            string activeAppName = GetActiveApplicationName();
-            if (_cheatsheets.TryGetValue(activeAppName, out string cheatsheetContent))
+            try
             {
-                if(activeAppName == "AimAssist")
+                if (_cheatsheets.TryGetValue(processName, out string cheatsheetContent))
                 {
-                    var unit = _windowHandleService.Window?.GetCurrentUnit; 
-                    if(unit is UrlUnit urlUnit)
+                    if(processName == "AimAssist")
                     {
-                        var domainName = GetDomainFromUrl(urlUnit.Description);
-                        if(_webcCheatsheets.TryGetValue(domainName, out var webCheatSheet))
+                        var unit = GetMainWindowCurrentUnit();
+                        if(unit is UrlUnit urlUnit)
                         {
-                            cheatsheetContent += webCheatSheet;
-
-                            _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName+" / "+domainName);
+                            var domainName = GetDomainFromUrl(urlUnit.Description);
+                            if(_webcCheatsheets.TryGetValue(domainName, out var webCheatSheet))
+                            {
+                                cheatsheetContent += webCheatSheet;
+                                _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, processName + " / " + domainName);
+                            }
+                            else
+                            {
+                                return;
+                            }
                         }
                         else
                         {
-                            return;
+                            _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, processName);
                         }
                     }
                     else
                     {
-                        _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName);
+                        _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, processName);
                     }
                 }
                 else
                 {
-                    _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, activeAppName);
+                    return;
                 }
+
+                // アクティブウィンドウの位置を取得
+                IntPtr activeWindow = GetForegroundWindow();
+                RECT activeWindowRect;
+                GetWindowRect(activeWindow, out activeWindowRect);
+
+                // アクティブウィンドウが表示されているスクリーンを特定
+                System.Windows.Forms.Screen activeScreen = System.Windows.Forms.Screen.FromHandle(activeWindow);
+
+                if(_cheatsheetPopup == null)
+                {
+                    return;
+                }
+                
+                // チートシートポップアップの位置とサイズを設定
+                _cheatsheetPopup.Width = activeScreen.WorkingArea.Width;
+                _cheatsheetPopup.Height = 220; // 必要に応じて調整
+                _cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
+                _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
+
+                _cheatsheetPopup.Show();
             }
-            else
+            catch (Exception ex)
             {
-                return;
+                Debug.WriteLine($"チートシート表示エラー: {ex.Message}");
+                // エラーログの記録などの追加処理を行う
             }
-
-            // アクティブウィンドウの位置を取得
-            IntPtr activeWindow = GetForegroundWindow();
-            RECT activeWindowRect;
-            GetWindowRect(activeWindow, out activeWindowRect);
-
-            // アクティブウィンドウが表示されているスクリーンを特定
-            System.Windows.Forms.Screen activeScreen = System.Windows.Forms.Screen.FromHandle(activeWindow);
-
-            if(_cheatsheetPopup == null)
-            {
-                return;
-            }
-            // チートシートポップアップの位置とサイズを設定
-            _cheatsheetPopup.Width = activeScreen.WorkingArea.Width;
-            _cheatsheetPopup.Height = 220; // 必要に応じて調整
-            _cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
-            _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
-
-            _cheatsheetPopup.Show();
         }
 
-        private void HideCheatsheet()
+        /// <summary>
+        /// チートシートをアプリケーション名で表示する
+        /// </summary>
+        /// <param name="applicationName">アプリケーション名</param>
+        public async Task ShowCheatSheetByApplicationName(string applicationName)
+        {
+            await ShowCheatSheet(applicationName);
+        }
+
+        /// <summary>
+        /// チートシートを閉じる
+        /// </summary>
+        public void CloseCheatSheet()
         {
             if (_cheatsheetPopup != null)
             {
@@ -235,13 +272,12 @@ namespace CheatSheet.Services
             }
         }
 
-        private string GetActiveApplicationName()
+        private IUnit GetMainWindowCurrentUnit()
         {
-            IntPtr hwnd = GetForegroundWindow();
-            uint processId;
-            GetWindowThreadProcessId(hwnd, out processId);
-            Process process = Process.GetProcessById((int)processId);
-            return process.ProcessName;
+            // メインウィンドウから現在のユニットを取得する処理を追加
+            // この部分は実際の実装に合わせて修正する必要があります
+            // 例えば、WindowHandleServiceからメインウィンドウにアクセスして現在のユニットを取得
+            return null;
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]

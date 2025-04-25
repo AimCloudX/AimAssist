@@ -17,8 +17,8 @@ namespace AimAssist
         private readonly IUnitsService _unitsService;
         private readonly ICommandService _commandService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly WindowHandleService _windowHandleService;
-        private readonly PickerService _pickerService;
+        private readonly IWindowHandleService _windowHandleService;
+        private readonly IPickerService _pickerService;
         private readonly IAppCommands _appCommands;
         private readonly IEditorOptionService _editorOptionService;
         private readonly ISnippetOptionService _snippetOptionService;
@@ -42,8 +42,8 @@ namespace AimAssist
             IUnitsService unitsService,
             ICommandService commandService,
             IServiceProvider serviceProvider,
-            WindowHandleService windowHandleService,
-            PickerService pickerService,
+            IWindowHandleService windowHandleService,
+            IPickerService pickerService,
             IAppCommands appCommands,
             IEditorOptionService editorOptionService,
             ISnippetOptionService snippetOptionService,

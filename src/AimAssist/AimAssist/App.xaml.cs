@@ -78,21 +78,20 @@ namespace AimAssist
             services.AddSingleton<IPluginsService>(provider => new PluginsService(
                 provider.GetRequiredService<IEditorOptionService>()
             ));
-            services.AddSingleton<PickerService>(provider => new PickerService(
-                provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<IUnitsService>(),
-                provider.GetRequiredService<IEditorOptionService>()
+            services.AddSingleton<IPickerService, PickerService>();
+            services.AddSingleton<IWindowHandleService, WindowHandleService>();
+            services.AddSingleton<IAppCommands>(provider => new AppCommands(
+                provider.GetRequiredService<IWindowHandleService>(),
+                provider.GetRequiredService<IPickerService>()
             ));
-            services.AddSingleton<WindowHandleService>();
-            services.AddSingleton<IAppCommands, AppCommands>();
             services.AddSingleton<UI.SystemTray.SystemTrayRegister>(provider => 
                 new UI.SystemTray.SystemTrayRegister(provider.GetRequiredService<IAppCommands>())
             );
-            //services.AddSingleton<CheatSheet.Services.CheatSheetController>(provider =>
-            //    new CheatSheet.Services.CheatSheetController(
-            //        Dispatcher.CurrentDispatcher, 
-            //        provider.GetRequiredService<WindowHandleService>()
-            //    ));
+            services.AddSingleton<ICheatSheetController>(provider =>
+                new CheatSheet.Services.CheatSheetController(
+                    System.Windows.Threading.Dispatcher.CurrentDispatcher, 
+                    provider.GetRequiredService<IWindowHandleService>()
+                ));
             services.AddSingleton<UI.UnitContentsView.UnitViewFactory>(provider => new UI.UnitContentsView.UnitViewFactory(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IEditorOptionService>()
@@ -110,8 +109,8 @@ namespace AimAssist
                 provider.GetRequiredService<IUnitsService>(),
                 provider.GetRequiredService<ICommandService>(),
                 provider,
-                provider.GetRequiredService<WindowHandleService>(),
-                provider.GetRequiredService<PickerService>(),
+                provider.GetRequiredService<IWindowHandleService>(),
+                provider.GetRequiredService<IPickerService>(),
                 provider.GetRequiredService<IAppCommands>(),
                 provider.GetRequiredService<IEditorOptionService>(),
                 provider.GetRequiredService<ISnippetOptionService>(),
