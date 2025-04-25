@@ -71,13 +71,11 @@ namespace AimAssist
             // サービスを登録
             services.AddSingleton<IUnitsService, UnitsService>();
             services.AddSingleton<ICommandService, CommandService>();
-            services.AddSingleton<IApplicationLogService, ApplicationLogService>();
             services.AddSingleton<ISettingManager, SettingManager>();
             services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
             services.AddSingleton<ISnippetOptionService, SnippetOptionService>();
             services.AddSingleton<IWorkItemOptionService, WorkItemOptionService>();
             services.AddSingleton<IPluginsService>(provider => new PluginsService(
-                provider.GetRequiredService<IApplicationLogService>(),
                 provider.GetRequiredService<IEditorOptionService>()
             ));
             services.AddSingleton<PickerService>(provider => new PickerService(
@@ -111,7 +109,6 @@ namespace AimAssist
             services.AddSingleton<Initializer>(provider => new Initializer(
                 provider.GetRequiredService<IUnitsService>(),
                 provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<IApplicationLogService>(),
                 provider,
                 provider.GetRequiredService<WindowHandleService>(),
                 provider.GetRequiredService<PickerService>(),

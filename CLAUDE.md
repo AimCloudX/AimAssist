@@ -177,59 +177,9 @@ AimAssist/
 | SystemTrayRegisterのDI対応 | 完了 | - | 2025-04-25 |
 | エラーハンドリング改善 | 進行中 | - | - |
 
-## 現在の課題とノート
+## 現在の課題
 
-- PluginsServiceとClipboardPluginをDIパターンに完全対応させました
-- IUnitsFacotry → IUnitsFactoryに修正し、名前の誤字を修正しました
-- UnitToUIElementDicotionary → UnitToUIElementDictionaryに修正しました
-- EditorCash → EditorCacheに修正しました
-- BookmarkUnitsFacotry → BookmarkUnitsFactoryに修正しました
 - UnitViewModel.csの参照を確認し、キャッシュの実装を改善する必要があります
-- エラーハンドリングの改善を実施しました（例外処理の適切な実装、エラーログの出力など）
-- アプリケーション全体の命名の一貫性を確保するために引き続き誤字を修正しています
-- UnitsServiceの依存性注入を実装しました
-- アプリケーションのDIコンテナを導入しました（Microsoft.Extensions.DependencyInjection）
-- インターフェースの抽出とシングルトンパターンの改善を進めています
-- 命名の修正（UnitsService.Instnace → UnitsService.Instance、WaitHowKeysWindow → WaitHotKeysWindow）
-- CommandServiceを静的クラスからDIを使用したインスタンスクラスに変更しました
-- CommandServiceのインターフェース（ICommandService）を作成しました
-- ApplicationLogServiceをDIパターンに修正しました
-- ApplicationLogServiceのインターフェース（IApplicationLogService）を作成しました
-- App.xaml.csのDI設定を更新しました
-- Initializerクラスをインジェクションされたサービスを使用するように修正しました
-- WaitHotKeysWindowを修正してDIからCommandServiceを取得するようにしました
-- サービスロケーターパターン（((App)App.Current)._serviceProvider.GetRequiredService）を除去しました
-- CustomizeKeyboardShortcutsSettingsをDIパターンに対応させました
-- UnitViewFactoryをDIパターンに対応させました
-- MainWindowがDIからUnitViewFactoryを取得するよう修正しました
-- PickerServiceを静的クラスからDIパターンに変更しました
-- WindowHandleServiceを静的クラスからDIパターンに変更しました
-- AppCommandsクラスを静的クラスからDIパターンに対応したインスタンスクラスに変更しました
-- CheatSheetControllerをDIパターンに対応させ、WindowHandleServiceのインスタンスを使用するように修正しました
-- SettingManagerのインターフェース（ISettingManager）を作成し、DIパターンに対応させました
-- KeySequenceManagerのインターフェース（IKeySequenceManager）を作成し、DIパターンに対応させました
-- EditorOptionServiceのインターフェース（IEditorOptionService）を作成し、静的クラスからインスタンスベースのDIパターンに変更しました
-- EditorOptionServiceの変更に伴うエラーを修正しました
-- SystemTrayRegisterを静的クラスからインスタンスベースのクラスに変更し、DIパターンに対応させました
-- SnippetOptionServceの名前をSnippetOptionServiceに修正し、一貫性を向上させました
-- 各種設定サービスの読み込み・保存処理にエラーハンドリングを実装し、安定性を向上させました
-- アプリケーション起動時の初期化処理に例外処理を追加し、エラー発生時にユーザーに通知するようにしました
-- プラグイン読み込み処理に例外処理を実装し、一部のプラグインが読み込めない場合でもアプリケーション全体が起動できるようにしましたしました（UnitsFactory、PickerWindow、FileModel、MainWindow）
-- SystemTrayRegisterでの静的AppCommandsの使用をDIパターンに変更しました
-- MainWindow.xaml.csにGetRequiredServiceメソッドを使用するためのMicrosoft.Extensions.DependencyInjection名前空間を追加しました
-- AimEditor.xaml.csをDIパターンに対応させ、IEditorOptionServiceをコンストラクタで注入するように変更しました
-- UnitViewFactoryにIEditorOptionServiceを注入し、AimEditorの生成時に渡すように修正しました
-- ClipboardAnalyzerプロジェクトにAimAssist.Coreへの参照を追加し、IEditorOptionServiceを使用できるようにしました
-- ClipboardListにIEditorOptionServiceを注入するように修正しました
-- ClipboardPluginをDIパターンに対応させ、GetUIElementConvertersメソッドでIEditorOptionServiceを取得して使用するように修正しました
-- ユニットテストプロジェクト（AimAssist.Tests）を追加しました
-- DI設定のテストクラスを作成しました（DependencyInjectionTests）
-- サービスクラスのテストクラスを作成しました（SettingManagerTests、KeySequenceManagerTests）
-- SnippetOptionServiceのインターフェース（ISnippetOptionService）を作成し、DIパターンに対応させました
-- WorkItemOptionServiceのインターフェース（IWorkItemOptionService）を作成し、DIパターンに対応させました
-- AimAssist.CoreプロジェクトにAimAssist.Unitプロジェクトへの参照を追加しました
-- UnitsFactoryクラスにSnippetOptionServiceとWorkItemOptionServiceをコンストラクタで注入するように変更しました
-- Initializerクラスが新しい形式のUnitsFactoryを使用するように修正しました
 
 ## 次のステップ
 
@@ -247,7 +197,7 @@ AimAssist/
    - ✓ サービスの単体テスト
    - ✗ 統合テストの追加
 4. ✓ SystemTrayRegisterをDIパターンに対応させる
-5. エラーハンドリング機能の強化 (後回しにしてください)
+5. エラーハンドリング機能の強化
    - ✓ 各種サービスのエラーハンドリング改善
    - ✓ 例外処理の適切な実装
    - ✗ ユーザーへの適切なエラー表示機能

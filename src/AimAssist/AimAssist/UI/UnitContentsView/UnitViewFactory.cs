@@ -6,7 +6,6 @@ using AimAssist.UI.Combos;
 using AimAssist.UI.Combos.Commands;
 using AimAssist.UI.Options;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.ApplicationLog;
 using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.Options;
@@ -15,14 +14,10 @@ using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
 using AimAssist.Units.Implementation.Web.MindMeister;
 using AimAssist.Units.Implementation.Web.Rss;
-using AimAssist.Units.Implementation.WorkTools;
 using CodeGenerator;
 using Common.UI;
 using Common.UI.ChatGPT;
 using Common.UI.WebUI;
-using Library.Options;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
 using System.Windows;
 
 namespace AimAssist.UI.UnitContentsView
@@ -135,8 +130,6 @@ namespace AimAssist.UI.UnitContentsView
                     return new WebViewControl(url);
                 case PdfMergeUnit:
                     return new PdfMergerControl();
-                case AppLogUnit:
-                    return new ApplicationLogControl();
                 case CodeGeneratorUnit:
                     return new CodeGeneratorControl();
                 case ComputerUnit:

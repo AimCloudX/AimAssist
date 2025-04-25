@@ -1,14 +1,9 @@
-﻿using AimAssist.Core.Commands;
-using AimAssist.Core.Interfaces;
+﻿using AimAssist.Core.Interfaces;
 using AimAssist.Service;
 using AimAssist.UI.SystemTray;
-using AimAssist.UI.Tools.HotKeys;
 using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Implementation;
-using AimAssist.Units.Implementation.Snippets;
-using AimAssist.Units.Implementation.WorkTools;
 using Common.Commands.Shortcus;
-using Library.Options;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 
@@ -21,7 +16,6 @@ namespace AimAssist
     {
         private readonly IUnitsService _unitsService;
         private readonly ICommandService _commandService;
-        private readonly IApplicationLogService _applicationLogService;
         private readonly IServiceProvider _serviceProvider;
         private readonly WindowHandleService _windowHandleService;
         private readonly PickerService _pickerService;
@@ -36,7 +30,6 @@ namespace AimAssist
         /// </summary>
         /// <param name="unitsService">ユニットサービス</param>
         /// <param name="commandService">コマンドサービス</param>
-        /// <param name="applicationLogService">アプリケーションログサービス</param>
         /// <param name="serviceProvider">サービスプロバイダー</param>
         /// <param name="windowHandleService">ウィンドウハンドルサービス</param>
         /// <param name="pickerService">ピッカーサービス</param>
@@ -48,7 +41,6 @@ namespace AimAssist
         public Initializer(
             IUnitsService unitsService,
             ICommandService commandService,
-            IApplicationLogService applicationLogService,
             IServiceProvider serviceProvider,
             WindowHandleService windowHandleService,
             PickerService pickerService,
@@ -60,7 +52,6 @@ namespace AimAssist
         {
             _unitsService = unitsService;
             _commandService = commandService;
-            _applicationLogService = applicationLogService;
             _serviceProvider = serviceProvider;
             _windowHandleService = windowHandleService;
             _pickerService = pickerService;
@@ -182,8 +173,6 @@ namespace AimAssist
             // DIコンテナからWaitHotKeysWindowを取得
             var waitHotKeysWindow = _serviceProvider.GetRequiredService<UI.Tools.HotKeys.WaitHotKeysWindow>();
             waitHotKeysWindow.Show();
-
-            _applicationLogService.Initialize();
         }
     }
 }
