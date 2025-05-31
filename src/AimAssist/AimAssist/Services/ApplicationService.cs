@@ -1,7 +1,7 @@
 ﻿using AimAssist.Core.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+using Common.UI.Commands.Shortcus;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AimAssist.Services
@@ -14,41 +14,46 @@ namespace AimAssist.Services
 
     public class ApplicationService : IApplicationService
     {
-        private readonly IApplicationLogService _logService;
-        private readonly ISettingManager _settingManager;
+        private readonly IApplicationLifecycleService _lifecycleService;
+        private readonly IModuleInitializationService _moduleInitializationService;
+        private readonly IConfigurationManagerService _configurationManager;
         private readonly ICommandService _commandService;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IApplicationLogService _logService;
 
         public ApplicationService(
-            IApplicationLogService logService,
-            ISettingManager settingManager,
+            IApplicationLifecycleService lifecycleService,
+            IModuleInitializationService moduleInitializationService,
+            IConfigurationManagerService configurationManager,
             ICommandService commandService,
-            IServiceProvider serviceProvider)
+            IApplicationLogService logService)
         {
-            _logService = logService;
-            _settingManager = settingManager;
+            _lifecycleService = lifecycleService;
+            _moduleInitializationService = moduleInitializationService;
+            _configurationManager = configurationManager;
             _commandService = commandService;
-            _serviceProvider = serviceProvider;
+            _logService = logService;
         }
 
         public async Task InitializeAsync()
         {
             try
             {
-                _logService.Info("アプリケーションの初期化を開始します");
-                
-                var initializer = _serviceProvider.GetRequiredService<Initializer>();
-                initializer.Initialize();
-                
-                _logService.Info("設定情報を読み込みます");
-                var settings = _settingManager.LoadSettings();
-                _commandService.SetKeymap(settings);
-                
-                _logService.Info("アプリケーションの初期化が正常に完了しました");
+                _logService.Info("アプリケーションサービスの初期化を開始します");
+
+                await _lifecycleService.StartupAsync();
+                await _moduleInitializationService.InitializeAllModulesAsync();
+
+                var settings = _configurationManager.GetConfiguration<Dictionary<string, KeySequence>>("Keymap", "AllSettings", new Dictionary<string, KeySequence>());
+                if (settings != null && settings.Count > 0)
+                {
+                    _commandService.SetKeymap(settings);
+                }
+
+                _logService.Info("アプリケーションサービスの初期化が正常に完了しました");
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "アプリケーション初期化中に重大なエラーが発生しました");
+                _logService.LogException(ex, "アプリケーションサービス初期化中に重大なエラーが発生しました");
                 throw;
             }
         }
@@ -57,25 +62,16 @@ namespace AimAssist.Services
         {
             try
             {
-                _logService.Info("アプリケーションのシャットダウンを開始します");
-                
-                var settings = _commandService.GetKeymap();
-                var noneSettingsKeys = settings.Where(x => x.Value.FirstModifiers == 0).Select(y => y.Key);
-                foreach (var key in noneSettingsKeys)
-                {
-                    settings.Remove(key);
-                }
+                _logService.Info("アプリケーションサービスのシャットダウンを開始します");
 
-                _settingManager.SaveSettings(settings);
-                _serviceProvider.GetRequiredService<IEditorOptionService>().SaveOption();
-                _serviceProvider.GetRequiredService<ISnippetOptionService>().SaveOption();
-                _serviceProvider.GetRequiredService<IWorkItemOptionService>().SaveOption();
-                
-                _logService.Info("アプリケーションのシャットダウンが完了しました");
+                await _moduleInitializationService.ShutdownAllModulesAsync();
+                await _lifecycleService.ShutdownAsync();
+
+                _logService.Info("アプリケーションサービスのシャットダウンが完了しました");
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "アプリケーションシャットダウン中にエラーが発生しました");
+                _logService.LogException(ex, "アプリケーションサービスシャットダウン中にエラーが発生しました");
             }
         }
     }

@@ -1,50 +1,54 @@
 ﻿using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Factories;
+using System;
 
 namespace AimAssist.Units.Implementation
 {
     public interface ICompositeUnitsFactory
     {
         IEnumerable<IUnit> GetUnits();
+        void RegisterSubFactory(AbstractUnitsFactory factory);
+        void UnregisterSubFactory(string factoryName);
     }
 
-    public class CompositeUnitsFactory : ICompositeUnitsFactory
+    public class CompositeUnitsFactory : AbstractUnitsFactory, ICompositeUnitsFactory
     {
-        private readonly IWorkToolsUnitsFactory workToolsFactory;
-        private readonly ISnippetUnitsFactory snippetFactory;
-        private readonly IKnowledgeUnitsFactory knowledgeFactory;
-        private readonly ICheatSheetUnitsFactory cheatSheetFactory;
-        private readonly IOptionUnitsFactory optionFactory;
-        private readonly ICoreUnitsFactory coreFactory;
+        private readonly IUnitsFactoryManager _factoryManager;
 
-        public CompositeUnitsFactory(
-            IWorkToolsUnitsFactory workToolsFactory,
-            ISnippetUnitsFactory snippetFactory,
-            IKnowledgeUnitsFactory knowledgeFactory,
-            ICheatSheetUnitsFactory cheatSheetFactory,
-            IOptionUnitsFactory optionFactory,
-            ICoreUnitsFactory coreFactory)
+        public CompositeUnitsFactory(IUnitsFactoryManager factoryManager) 
+            : base("Composite", priority: 100)
         {
-            this.workToolsFactory = workToolsFactory;
-            this.snippetFactory = snippetFactory;
-            this.knowledgeFactory = knowledgeFactory;
-            this.cheatSheetFactory = cheatSheetFactory;
-            this.optionFactory = optionFactory;
-            this.coreFactory = coreFactory;
+            _factoryManager = factoryManager ?? throw new ArgumentNullException(nameof(factoryManager));
+        }
+
+        public override IEnumerable<IUnit> CreateUnits()
+        {
+            return _factoryManager.GetAllUnits();
         }
 
         public IEnumerable<IUnit> GetUnits()
         {
-            var allUnits = new List<IUnit>();
+            return CreateUnits();
+        }
 
-            allUnits.AddRange(workToolsFactory.CreateUnits());
-            allUnits.AddRange(snippetFactory.CreateUnits());
-            allUnits.AddRange(knowledgeFactory.CreateUnits());
-            allUnits.AddRange(cheatSheetFactory.CreateUnits());
-            allUnits.AddRange(optionFactory.CreateUnits());
-            allUnits.AddRange(coreFactory.CreateUnits());
+        public void RegisterSubFactory(AbstractUnitsFactory factory)
+        {
+            _factoryManager.RegisterFactory(factory);
+        }
 
-            return allUnits;
+        public void UnregisterSubFactory(string factoryName)
+        {
+            _factoryManager.UnregisterFactory(factoryName);
+        }
+
+        public override void Initialize()
+        {
+            _factoryManager.InitializeAllFactories();
+        }
+
+        public override void Dispose()
+        {
+            _factoryManager.DisposeAllFactories();
         }
     }
 }
