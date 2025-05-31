@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using MessageBox = System.Windows.MessageBox;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
     public class FileTreeItem : TreeViewItem
     {

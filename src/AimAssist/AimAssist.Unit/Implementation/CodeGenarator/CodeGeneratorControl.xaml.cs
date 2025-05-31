@@ -1,19 +1,16 @@
 ﻿//using ICSharpCode.AvalonEdit.Highlighting;
-using Microsoft.Win32;
-using Newtonsoft.Json;
-using System;
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Microsoft.Win32;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
     public partial class CodeGeneratorControl : UserControl, INotifyPropertyChanged
     {

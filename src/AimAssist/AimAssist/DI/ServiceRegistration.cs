@@ -1,17 +1,18 @@
-﻿using AimAssist.Core.Commands;
+﻿using AimAssist.Commands;
+using AimAssist.Core.Commands;
 using AimAssist.Core.Interfaces;
 using AimAssist.Core.Services;
 using AimAssist.Middlewares;
 using AimAssist.Plugins;
 using AimAssist.Service;
 using AimAssist.Services;
-using AimAssist.UI.Tools.HotKeys;
+using AimAssist.Services.Options;
+using AimAssist.UI.HotKeys;
 using AimAssist.Units.Implementation;
 using AimAssist.Units.Implementation.Factories;
 using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.WorkTools;
 using AimAssist.ViewModels;
-using Library.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI
@@ -60,7 +61,7 @@ namespace AimAssist.DI
             ));
 
             services.AddSingleton<ICheatSheetController>(provider =>
-                new CheatSheet.Services.CheatSheetController(
+                new CheatSheetController(
                     System.Windows.Threading.Dispatcher.CurrentDispatcher,
                     provider.GetRequiredService<IWindowHandleService>()
                 ));

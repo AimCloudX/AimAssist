@@ -10,7 +10,6 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using RestSharp;
 using System.Text.Json;
 using System.IO;
-using CodeGenerator;
 using System.Collections;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister

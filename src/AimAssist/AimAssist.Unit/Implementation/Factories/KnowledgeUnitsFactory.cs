@@ -1,8 +1,7 @@
 ﻿using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Knowledge;
 using System.IO;
-using AimAssist.Core.Units.Units;
+using AimAssist.Units.Implementation.Knowledges;
 
 namespace AimAssist.Units.Implementation.Factories
 {

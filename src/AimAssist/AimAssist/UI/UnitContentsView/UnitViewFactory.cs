@@ -1,10 +1,5 @@
-﻿using AimAssist.Core.Editors;
-using AimAssist.Core.Interfaces;
+﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
-using AimAssist.Core.Units.Units;
-using AimAssist.UI.Combos;
-using AimAssist.UI.Combos.Commands;
-using AimAssist.UI.Options;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Computer;
@@ -14,11 +9,13 @@ using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Speech;
 using AimAssist.Units.Implementation.Web.MindMeister;
 using AimAssist.Units.Implementation.Web.Rss;
-using CodeGenerator;
 using Common.UI;
-using Common.UI.ChatGPT;
 using Common.UI.WebUI;
 using System.Windows;
+using AimAssist.Services.Editors;
+using Common.UI.Markdown;
+using Common.UI.WebUI.Amazon;
+using Common.UI.WebUI.LLM;
 
 namespace AimAssist.UI.UnitContentsView
 {

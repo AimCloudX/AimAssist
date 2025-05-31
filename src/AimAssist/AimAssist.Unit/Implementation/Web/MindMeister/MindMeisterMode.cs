@@ -1,11 +1,11 @@
-﻿using AimAssist.Units.Core.Mode;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
+using AimAssist.Units.Core.Modes;
 
 
 namespace AimAssist.Units.Implementation.Web.MindMeister

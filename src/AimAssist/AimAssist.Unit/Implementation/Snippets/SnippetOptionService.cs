@@ -2,6 +2,7 @@
 using AimAssist.Units.Implementation.WorkTools;
 using Newtonsoft.Json;
 using System.IO;
+using AimAssist.Core.Model;
 
 namespace AimAssist.Units.Implementation.Snippets
 {

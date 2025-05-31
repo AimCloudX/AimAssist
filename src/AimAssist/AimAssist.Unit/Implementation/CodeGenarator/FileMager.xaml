@@ -1,18 +1,18 @@
-﻿<Window x:Class="CodeGenerator.FileMager"
+﻿<Window x:Class="AimAssist.Units.Implementation.CodeGenarator.FileMager"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CodeGenerator" 
         xmlns:diffplex="clr-namespace:DiffPlex.Wpf.Controls;assembly=DiffPlex.Wpf" xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         mc:Ignorable="d"
         xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:codeGenarator="clr-namespace:AimAssist.Units.Implementation.CodeGenarator"
         ui:WindowHelper.UseModernWindowStyle="True"
 
         Title="FileMager" Height="800" Width="800"
         Loaded="Window_Loaded">
     <Window.Resources>
-        <local:ChangeTypeToBrushConverter x:Key="ChangeTypeToBrushConverter"/>
+        <codeGenarator:ChangeTypeToBrushConverter x:Key="ChangeTypeToBrushConverter"/>
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Windows;
+using AimAssist.UI.HotKeys;
 
 namespace AimAssist.Services
 {
@@ -92,7 +93,7 @@ namespace AimAssist.Services
         {
             try
             {
-                var hotKeysWindow = _serviceProvider.GetRequiredService<AimAssist.UI.Tools.HotKeys.WaitHotKeysWindow>();
+                var hotKeysWindow = _serviceProvider.GetRequiredService<WaitHotKeysWindow>();
                 if (!hotKeysWindow.IsVisible)
                 {
                     hotKeysWindow.Show();

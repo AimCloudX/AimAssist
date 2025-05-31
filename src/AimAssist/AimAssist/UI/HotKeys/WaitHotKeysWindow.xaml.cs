@@ -1,11 +1,9 @@
-﻿
-using AimAssist.Core.Commands;
+﻿using System.Windows;
 using AimAssist.Core.Events;
 using AimAssist.Core.Interfaces;
 using AimAssist.HotKeys;
-using System.Windows;
 
-namespace AimAssist.UI.Tools.HotKeys
+namespace AimAssist.UI.HotKeys
 {
     public partial class WaitHotKeysWindow : Window
     {

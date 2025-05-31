@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace AimAssist.Combos.Mode.Snippet
+namespace AimAssist.Units.Implementation.Snippets
 {
     public class SnippetPreviewFactory
     {

@@ -1,8 +1,7 @@
-﻿using ICSharpCode.AvalonEdit.Highlighting;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
     /// <summary>
     /// FileMager.xaml の相互作用ロジック

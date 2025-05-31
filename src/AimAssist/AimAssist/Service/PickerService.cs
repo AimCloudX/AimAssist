@@ -1,12 +1,12 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.UI.PickerWindows;
-using Common.Commands.Shortcus;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Service
 {

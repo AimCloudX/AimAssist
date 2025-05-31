@@ -5,14 +5,15 @@ using AimAssist.ViewModels;
 using AimAssist.Commands;
 using AimAssist.Core.Commands;
 using AimAssist.Units.Core.Modes;
-using Common.Commands.Shortcus;
 using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using Common.UI.Commands.Shortcus;
 using Microsoft.Extensions.DependencyInjection;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using RelayCommand = Common.UI.Commands.RelayCommand;
 
 namespace AimAssist.UI.MainWindows
 {
@@ -139,7 +140,7 @@ namespace AimAssist.UI.MainWindows
                 // モード変更コマンドの登録
                 foreach (var mode in _unitsService.GetAllModes())
                 {
-                    var modeChangeCommand = new Common.Commands.RelayCommand(mode.GetModeChnageCommandName(), (window) =>
+                    var modeChangeCommand = new RelayCommand(mode.GetModeChnageCommandName(), (window) =>
                     {
                         if (window is MainWindow mainWindow)
                         {
@@ -150,7 +151,7 @@ namespace AimAssist.UI.MainWindows
                 }
 
                 // メインウィンドウ用コマンドの登録
-                MainWindowCommands.NextMode = new Common.Commands.RelayCommand(nameof(MainWindowCommands.NextMode), (Window window) =>
+                MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), (Window window) =>
                 {
                     if (window is MainWindow mainWindow)
                     {
@@ -167,7 +168,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 });
 
-                MainWindowCommands.PreviousMode = new Common.Commands.RelayCommand(nameof(MainWindowCommands.PreviousMode), (Window window) =>
+                MainWindowCommands.PreviousMode = new RelayCommand(nameof(MainWindowCommands.PreviousMode), (Window window) =>
                 {
                     if (window is MainWindow mainWindow)
                     {
@@ -184,7 +185,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 });
 
-                MainWindowCommands.NextUnit = new Common.Commands.RelayCommand(nameof(MainWindowCommands.NextUnit), (Window window) =>
+                MainWindowCommands.NextUnit = new RelayCommand(nameof(MainWindowCommands.NextUnit), (Window window) =>
                 {
                     if (window is MainWindow mainWindow)
                     {
@@ -201,7 +202,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 });
 
-                MainWindowCommands.PreviousUnit = new Common.Commands.RelayCommand(nameof(MainWindowCommands.PreviousUnit), (Window window) =>
+                MainWindowCommands.PreviousUnit = new RelayCommand(nameof(MainWindowCommands.PreviousUnit), (Window window) =>
                 {
                     if (window is MainWindow mainWindow)
                     {
@@ -218,7 +219,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 });
 
-                MainWindowCommands.FocusContent = new Common.Commands.RelayCommand(nameof(MainWindowCommands.FocusContent), (Window window) =>
+                MainWindowCommands.FocusContent = new RelayCommand(nameof(MainWindowCommands.FocusContent), (Window window) =>
                 {
                     if (window is MainWindow mainWindow)
                     {
@@ -226,7 +227,7 @@ namespace AimAssist.UI.MainWindows
                     }
                 });
 
-                MainWindowCommands.FocusUnits = new Common.Commands.RelayCommand(nameof(MainWindowCommands.FocusUnits), (Window window) =>
+                MainWindowCommands.FocusUnits = new RelayCommand(nameof(MainWindowCommands.FocusUnits), (Window window) =>
                 {
                     if (window is MainWindow mainWindow)
                     {

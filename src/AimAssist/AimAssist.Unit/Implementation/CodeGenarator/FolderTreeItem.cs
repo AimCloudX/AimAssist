@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
     public class FolderTreeItem : TreeViewItem
     {

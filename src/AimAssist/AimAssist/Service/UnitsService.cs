@@ -1,7 +1,6 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core;
-using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
 

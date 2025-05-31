@@ -4,9 +4,10 @@ using AimAssist.Service;
 using AimAssist.UI.SystemTray;
 using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Implementation;
-using Common.Commands.Shortcus;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using AimAssist.UI.HotKeys;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist
 {
@@ -179,7 +180,7 @@ namespace AimAssist
             _commandService.Register(_appCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
 
             // DIコンテナからWaitHotKeysWindowを取得
-            var waitHotKeysWindow = _serviceProvider.GetRequiredService<UI.Tools.HotKeys.WaitHotKeysWindow>();
+            var waitHotKeysWindow = _serviceProvider.GetRequiredService<WaitHotKeysWindow>();
             waitHotKeysWindow.Show();
         }
     }

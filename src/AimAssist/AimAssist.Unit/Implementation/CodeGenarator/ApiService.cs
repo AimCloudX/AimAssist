@@ -1,14 +1,8 @@
 ﻿using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
     public class ApiService
     {

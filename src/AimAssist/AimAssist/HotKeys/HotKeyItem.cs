@@ -1,6 +1,6 @@
-﻿using Common.Commands;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Common.UI.Commands;
 
 namespace AimAssist.HotKeys;
 

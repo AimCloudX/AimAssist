@@ -1,4 +1,4 @@
-﻿using Common.Commands.Shortcus;
+﻿using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Core.Interfaces
 {

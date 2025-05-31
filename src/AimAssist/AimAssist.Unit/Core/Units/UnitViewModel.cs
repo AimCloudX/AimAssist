@@ -1,5 +1,4 @@
 ﻿using AimAssist.Core.Units;
-using AimAssist.Units.Core.Mode;
 using System.Windows.Media.Imaging;
 
 namespace AimAssist.Units.Core.Units

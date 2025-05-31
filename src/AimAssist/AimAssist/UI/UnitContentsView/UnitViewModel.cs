@@ -1,13 +1,11 @@
-﻿using AimAssist.Core.Units;
-using AimAssist.Units.Core.Mode;
-using Common.UI.WebUI;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
+using AimAssist.Core.Units;
+using AimAssist.Units.Core.Units;
+using Common.UI.WebUI;
 
-namespace AimAssist.Units.Core.Units
+namespace AimAssist.UI.UnitContentsView
 {
     public class UnitViewModel : INotifyPropertyChanged
     {

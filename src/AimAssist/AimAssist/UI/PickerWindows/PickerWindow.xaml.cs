@@ -3,11 +3,11 @@ using AimAssist.Service;
 using AimAssist.ViewModels;
 using Common.UI;
 using Common.UI.Editor;
-using Library.Options;
 using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Interop;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.UI.PickerWindows
 {
@@ -19,7 +19,7 @@ namespace AimAssist.UI.PickerWindows
         private readonly IEditorOptionService _editorOptionService;
 
         public string SnippetText => _viewModel.SnippetText;
-        public Common.Commands.Shortcus.KeySequence KeySequence => _viewModel.KeySequence;
+        public KeySequence KeySequence => _viewModel.KeySequence;
 
         public PickerWindow(
             string processName, 

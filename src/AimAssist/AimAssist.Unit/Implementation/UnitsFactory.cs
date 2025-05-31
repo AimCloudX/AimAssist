@@ -1,13 +1,11 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
-using AimAssist.Core.Units.Units;
 using AimAssist.Services.Markdown;
 using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.KeyHelp;
-using AimAssist.Units.Implementation.Knowledge;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Pdf;
 using AimAssist.Units.Implementation.Snippets;
@@ -15,8 +13,8 @@ using AimAssist.Units.Implementation.Web.MindMeister;
 using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
 using Common.UI.Commands.Shortcus;
-using Library.Options;
 using System.IO;
+using AimAssist.Units.Implementation.Knowledges;
 
 namespace AimAssist.Units.Implementation
 {

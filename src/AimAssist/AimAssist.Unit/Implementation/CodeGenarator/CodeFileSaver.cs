@@ -1,12 +1,10 @@
-﻿using DiffPlex.DiffBuilder.Model;
-using DiffPlex.DiffBuilder;
-using DiffPlex;
-using System;
-using System.IO;
+﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows;
+using DiffPlex;
+using DiffPlex.DiffBuilder;
+using DiffPlex.DiffBuilder.Model;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
     public class CodeFileSaver
     {

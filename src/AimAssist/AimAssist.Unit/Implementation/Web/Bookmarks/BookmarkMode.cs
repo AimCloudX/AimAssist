@@ -1,7 +1,7 @@
-﻿using AimAssist.Units.Core.Mode;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using AimAssist.Units.Core.Modes;
 
 namespace AimAssist.Units.Implementation.Web.Bookmarks
 {

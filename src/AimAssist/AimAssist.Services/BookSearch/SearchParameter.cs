@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
-namespace Library.BookSearch
+namespace AimAssist.Services.BookSearch
 {
     public class SearchParameter : INotifyPropertyChanged
     {

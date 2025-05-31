@@ -1,8 +1,8 @@
 ﻿using AimAssist.Core.Interfaces;
 using Common;
-using Common.Commands.Shortcus;
 using System.IO;
 using System.Text.Json;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Service
 {

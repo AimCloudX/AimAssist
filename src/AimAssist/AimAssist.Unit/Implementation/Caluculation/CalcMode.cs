@@ -1,11 +1,11 @@
-﻿using AimAssist.Units.Core.Mode;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using AimAssist.Units.Core.Modes;
 
 namespace AimAssist.Units.Implementation.Caluculation
 {

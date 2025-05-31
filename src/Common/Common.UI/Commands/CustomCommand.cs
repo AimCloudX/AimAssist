@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Common.Commands.Shortcus;
+﻿using System.Windows.Input;
+using Common.UI.Commands.Shortcus;
 
-namespace Common.Commands
+namespace Common.UI.Commands
 {
     public class CustomCommand : ICommand
     {

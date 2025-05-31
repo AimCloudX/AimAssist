@@ -1,12 +1,12 @@
-﻿using Microsoft.Web.WebView2.Core;
-using Newtonsoft.Json;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
+using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 
-namespace AimAssist.UI.Combos.Commands
+namespace Common.UI.WebUI.Amazon
 {
     public partial class AmazonWebViewControl : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {

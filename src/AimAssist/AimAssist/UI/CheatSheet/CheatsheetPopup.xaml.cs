@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 
-namespace CheatSheet
+namespace AimAssist.UI.CheatSheet
 {
     /// <summary>
     /// CheatSheetWindow.xaml の相互作用ロジック

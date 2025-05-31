@@ -1,14 +1,12 @@
-﻿using AimAssist.Core.Commands;
-using AimAssist.Core.Interfaces;
-using Common;
-using Common.Commands.Shortcus;
-using Library.Options;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AimAssist.Core.Interfaces;
+using AimAssist.Services.Options;
+using Common.UI.Commands.Shortcus;
 
-namespace AimAssist.UI.Options
+namespace AimAssist.Units.Implementation.Options
 {
     /// <summary>
     /// CustomizeKeyboardShortcutsSettings.xaml の相互作用ロジック

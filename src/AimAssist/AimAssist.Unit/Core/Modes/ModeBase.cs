@@ -1,11 +1,11 @@
-﻿using AimAssist.Core.Units;
-using Common.Commands.Shortcus;
-using MaterialDesignThemes.Wpf;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using AimAssist.Core.Units;
+using Common.UI.Commands.Shortcus;
+using MaterialDesignThemes.Wpf;
 
-namespace AimAssist.Units.Core.Mode
+namespace AimAssist.Units.Core.Modes
 {
     public abstract class ModeBase : IMode
     {

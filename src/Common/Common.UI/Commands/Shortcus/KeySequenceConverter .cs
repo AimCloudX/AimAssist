@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Common.Commands.Shortcus
+namespace Common.UI.Commands.Shortcus
 {
     public class KeySequenceConverter : JsonConverter<KeySequence>
     {

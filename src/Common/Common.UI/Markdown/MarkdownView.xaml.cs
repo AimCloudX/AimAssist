@@ -1,12 +1,11 @@
-﻿using Markdig;
-using Microsoft.Web.WebView2.Core;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using Microsoft.Web.WebView2.Core;
 
-namespace AimAssist.UI.Combos
+namespace Common.UI.Markdown
 {
     /// <summary>
     /// MarkdownView.xaml の相互作用ロジック
@@ -131,7 +130,7 @@ namespace AimAssist.UI.Combos
             }
 
             var modifiedMarkdown = string.Join(Environment.NewLine, modifiedLines);
-            return Markdown.ToHtml(modifiedMarkdown);
+            return Markdig.Markdown.ToHtml(modifiedMarkdown);
         }
 
         private List<TreeViewItem> CreateOutline(string markdownText)

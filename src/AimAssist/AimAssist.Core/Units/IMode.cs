@@ -1,5 +1,5 @@
-﻿using Common.Commands.Shortcus;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Core.Units
 {

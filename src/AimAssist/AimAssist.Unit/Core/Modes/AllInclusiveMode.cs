@@ -1,8 +1,7 @@
-﻿using AimAssist.Units.Core.Mode;
-using Common.Commands.Shortcus;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Units.Core.Modes
 {

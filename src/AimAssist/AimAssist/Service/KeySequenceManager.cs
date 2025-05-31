@@ -1,8 +1,8 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Interfaces;
-using Common.Commands.Shortcus;
 using System.Windows;
 using System.Windows.Input;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Service
 {

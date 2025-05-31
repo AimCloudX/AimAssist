@@ -1,10 +1,10 @@
 ﻿using AimAssist.Core.Events;
 using AimAssist.Core.Interfaces;
-using Common.Commands;
-using Common.Commands.Shortcus;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
+using Common.UI.Commands;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Core.Commands
 {

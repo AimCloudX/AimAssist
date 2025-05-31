@@ -1,7 +1,6 @@
 ﻿using AimAssist.Core.Commands;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
-using Library.Rss;
 using System.Collections.ObjectModel;
 using System.ServiceModel.Syndication;
 using System.Windows;

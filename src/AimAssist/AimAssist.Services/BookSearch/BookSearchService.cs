@@ -1,4 +1,4 @@
-﻿namespace Library.BookSearch
+﻿namespace AimAssist.Services.BookSearch
 {
     public static class BookSearchService
     {

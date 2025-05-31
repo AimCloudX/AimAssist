@@ -1,9 +1,9 @@
-﻿using AimAssist.Core.Interfaces;
+﻿using System.IO;
+using AimAssist.Core.Interfaces;
 using Common.UI.Editor;
 using Newtonsoft.Json;
-using System.IO;
 
-namespace Library.Options
+namespace AimAssist.Services.Options
 {
     public class EditorOptionService : IEditorOptionService
     {

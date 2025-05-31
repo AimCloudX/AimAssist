@@ -4,14 +4,11 @@ using AimAssist.Core.Units;
 using AimAssist.Service;
 using AimAssist.UI.PickerWindows;
 using AimAssist.UI.UnitContentsView;
-using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.Caluculation;
 using AimAssist.Units.Implementation.KeyHelp;
 using AimAssist.Units.Implementation.Snippets;
-using Common.Commands.Shortcus;
 using Common.UI.Editor;
-using Library.Options;
 using Mathos.Parser;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -19,6 +16,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Common.UI.Commands.Shortcus;
+using UnitViewModel = AimAssist.UI.UnitContentsView.UnitViewModel;
 
 namespace AimAssist.ViewModels
 {

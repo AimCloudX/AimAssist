@@ -1,8 +1,7 @@
 ﻿using AimAssist.Core.Interfaces;
-using AimAssist.Service;
-using Common.Commands;
+using Common.UI.Commands;
 
-namespace AimAssist.Core.Commands
+namespace AimAssist.Commands
 {
     /// <summary>
     /// アプリケーションのコマンドを定義するクラス
@@ -26,7 +25,7 @@ namespace AimAssist.Core.Commands
         /// <summary>
         /// アプリケーションをシャットダウンするコマンド
         /// </summary>
-        public RelayCommand ShutdownAimAssist => new RelayCommand(nameof(ShutdownAimAssist), (_) => App.Current.Shutdown());
+        public Common.UI.Commands.RelayCommand ShutdownAimAssist => new Common.UI.Commands.RelayCommand(nameof(ShutdownAimAssist), (_) => App.Current.Shutdown());
         
         /// <summary>
         /// メインウィンドウを切り替えるコマンド

@@ -1,6 +1,6 @@
-﻿using AimAssist.Units.Core.Mode;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
+using AimAssist.Units.Core.Modes;
 
 namespace AimAssist.Units.Implementation.Snippets
 {

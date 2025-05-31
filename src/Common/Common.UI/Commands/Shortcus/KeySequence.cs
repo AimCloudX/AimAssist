@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.Windows.Input;
 
-namespace Common.Commands.Shortcus
+namespace Common.UI.Commands.Shortcus
 {
     public class KeySequence
     {

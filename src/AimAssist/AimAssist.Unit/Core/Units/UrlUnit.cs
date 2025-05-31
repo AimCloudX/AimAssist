@@ -1,5 +1,4 @@
 ﻿using AimAssist.Core.Units;
-using AimAssist.Units.Core.Mode;
 
 namespace AimAssist.Units.Core.Units
 {

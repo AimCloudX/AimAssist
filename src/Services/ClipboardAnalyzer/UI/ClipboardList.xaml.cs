@@ -5,9 +5,8 @@ using System.Windows.Controls;
 using AimAssist.Core.Interfaces;
 using ClipboardAnalyzer.DomainModels;
 using ClipboardAnalyzer.Services;
-using Library.Options;
 
-namespace ClipboardAnalyzer
+namespace ClipboardAnalyzer.UI
 {
     /// <summary>
     /// ClipboardList.xaml の相互作用ロジック

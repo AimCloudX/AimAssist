@@ -1,16 +1,14 @@
-﻿using Common.Commands;
-
-namespace AimAssist.Core.Commands
+﻿namespace AimAssist.Commands
 {
     public class MainWindowCommands
     {
-        public static RelayCommand FocusPreview { get; set; }
-        public static RelayCommand FocusFilterTextBox { get; set; }
-        public static RelayCommand NextMode { get; set; }
-        public static RelayCommand PreviousMode { get; set; }
-        public static RelayCommand NextUnit { get; set; }
-        public static RelayCommand PreviousUnit { get; set; }
-        public static RelayCommand FocusContent { get; set; }
-        public static RelayCommand FocusUnits { get; set; }
+        public static Common.UI.Commands.RelayCommand FocusPreview { get; set; }
+        public static Common.UI.Commands.RelayCommand FocusFilterTextBox { get; set; }
+        public static Common.UI.Commands.RelayCommand NextMode { get; set; }
+        public static Common.UI.Commands.RelayCommand PreviousMode { get; set; }
+        public static Common.UI.Commands.RelayCommand NextUnit { get; set; }
+        public static Common.UI.Commands.RelayCommand PreviousUnit { get; set; }
+        public static Common.UI.Commands.RelayCommand FocusContent { get; set; }
+        public static Common.UI.Commands.RelayCommand FocusUnits { get; set; }
     }
 }

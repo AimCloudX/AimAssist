@@ -1,7 +1,6 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
     public partial class DiffWindow : Window
     {

@@ -1,7 +1,7 @@
-﻿using AimAssist.Core.Units;
-using System.IO;
+﻿using System.IO;
+using AimAssist.Core.Units;
 
-namespace AimAssist.Core.Units.Units
+namespace AimAssist.Units.Core.Units
 {
     public class MarkdownUnit: IUnit
     {

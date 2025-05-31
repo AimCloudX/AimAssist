@@ -1,4 +1,4 @@
-﻿using Common.Commands;
+﻿using Common.UI.Commands;
 
 namespace AimAssist.Core.Interfaces
 {

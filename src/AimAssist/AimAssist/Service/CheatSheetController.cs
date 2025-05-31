@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
-using System.IO;
-using System.Threading.Tasks;
 using AimAssist.Core.Interfaces;
-using AimAssist.Service;
-using AimAssist.Units.Core.Units;
-using AimAssist.Units.Core;
 using AimAssist.Core.Units;
+using AimAssist.UI.CheatSheet;
+using AimAssist.Units.Core.Units;
 
-namespace CheatSheet.Services
+namespace AimAssist.Service
 {
     public class CheatSheetController : ICheatSheetController, IDisposable
     {

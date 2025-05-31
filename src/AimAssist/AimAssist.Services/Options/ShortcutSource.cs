@@ -1,6 +1,6 @@
-﻿using Common.Commands.Shortcus;
+﻿using Common.UI.Commands.Shortcus;
 
-namespace Library.Options
+namespace AimAssist.Services.Options
 {
     public class ShortcutSource
     {

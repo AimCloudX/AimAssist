@@ -1,11 +1,10 @@
-﻿using AimAssist.Core.Interfaces;
-using Library.Editors;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AimAssist.Core.Interfaces;
 
-namespace AimAssist.Core.Editors
+namespace AimAssist.Services.Editors
 {
     /// <summary>
     /// AimEditor.xaml の相互作用ロジック

@@ -1,7 +1,6 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Snippets;
-using Library.Options;
 
 namespace AimAssist.Units.Implementation.Factories
 {

@@ -1,9 +1,6 @@
 ﻿using AimAssist.Core.Units;
-using AimAssist.Units.Core.Mode;
-using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Web.Rss;
 
-namespace Library.Rss
+namespace AimAssist.Units.Implementation.Web.Rss
 {
     public class RssItemUnit : IUnit
     {

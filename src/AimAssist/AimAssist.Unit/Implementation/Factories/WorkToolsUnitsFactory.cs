@@ -3,7 +3,6 @@ using AimAssist.Core.Units;
 using AimAssist.Services.Markdown;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.WorkTools;
-using Library.Options;
 
 namespace AimAssist.Units.Implementation.Factories
 {

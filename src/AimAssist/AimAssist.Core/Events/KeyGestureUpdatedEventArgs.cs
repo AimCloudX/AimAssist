@@ -1,5 +1,5 @@
-﻿using Common.Commands;
-using Common.Commands.Shortcus;
+﻿using Common.UI.Commands;
+using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Core.Events
 {

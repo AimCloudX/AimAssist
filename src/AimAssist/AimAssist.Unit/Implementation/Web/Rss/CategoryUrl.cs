@@ -1,4 +1,4 @@
-﻿namespace Library.Rss
+﻿namespace AimAssist.Units.Implementation.Web.Rss
 {
     public class CategoryUrl
     {

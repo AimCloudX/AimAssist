@@ -1,5 +1,5 @@
-﻿using AimAssist.Units.Implementation.WorkTools;
-using System;
+﻿using System;
+using AimAssist.Core.Model;
 
 namespace AimAssist.Core.Interfaces
 {

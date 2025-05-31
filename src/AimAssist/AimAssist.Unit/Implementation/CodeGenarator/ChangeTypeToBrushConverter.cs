@@ -1,14 +1,9 @@
-﻿using DiffPlex.DiffBuilder.Model;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
+using DiffPlex.DiffBuilder.Model;
 
-namespace CodeGenerator
+namespace AimAssist.Units.Implementation.CodeGenarator
 {
 public class ChangeTypeToBrushConverter : IValueConverter
     {

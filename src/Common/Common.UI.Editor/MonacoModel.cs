@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 
-namespace Common.UI.Editor
-{
+namespace Common.UI.Editor;
+
 [ComVisible(true)]
 public class MonacoModel
 {
@@ -36,7 +31,6 @@ public class MonacoModel
     }
 }
 
-}
 [ComVisible(true)]
 public class keyChange(string key, string command, string mode)
 {

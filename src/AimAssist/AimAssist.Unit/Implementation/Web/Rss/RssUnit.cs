@@ -1,6 +1,5 @@
 ﻿using AimAssist.Core.Units;
 using AimAssist.Units.Core;
-using AimAssist.Units.Core.Mode;
 using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Web.Rss

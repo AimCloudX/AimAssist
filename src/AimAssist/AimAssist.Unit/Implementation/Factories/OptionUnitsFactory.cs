@@ -1,6 +1,5 @@
 ﻿using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Options;
-using Library.Options;
 using System.IO;
 using AimAssist.Core.Interfaces;
 

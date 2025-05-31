@@ -1,9 +1,9 @@
-﻿using CheatSheet.Services;
-using Common.Commands;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using AimAssist.Service;
+using Common.UI.Commands;
 
 namespace AimAssist.HotKeys;
 

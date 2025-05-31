@@ -1,5 +1,4 @@
-﻿using Common.Commands.Shortcus;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace Common.UI.Commands.Shortcus
 {

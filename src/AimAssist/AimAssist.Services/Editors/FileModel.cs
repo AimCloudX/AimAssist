@@ -1,10 +1,9 @@
-﻿using AimAssist.Core.Interfaces;
-using Common.UI.Editor;
-using Library.Options;
-using System.IO;
+﻿using System.IO;
 using System.Windows.Controls;
+using AimAssist.Core.Interfaces;
+using Common.UI.Editor;
 
-namespace Library.Editors
+namespace AimAssist.Services.Editors
 {
     public class FileModel : TabItem
     {

@@ -1,8 +1,8 @@
-﻿using Microsoft.Web.WebView2.Core;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
+using Microsoft.Web.WebView2.Core;
 
-namespace Common.UI
+namespace Common.UI.WebUI
 {
     /// <summary>
     /// WebViewControl.xaml の相互作用ロジック

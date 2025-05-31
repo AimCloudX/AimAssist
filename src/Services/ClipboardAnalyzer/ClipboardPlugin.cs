@@ -6,6 +6,7 @@ using AimAssist.Core.Units;
 using AimAssist.Plugins;
 using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
+using ClipboardAnalyzer.UI;
 using Microsoft.Extensions.DependencyInjection;
 
 

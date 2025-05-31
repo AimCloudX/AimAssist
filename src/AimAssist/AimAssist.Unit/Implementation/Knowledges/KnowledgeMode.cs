@@ -1,8 +1,8 @@
-﻿using AimAssist.Units.Core.Mode;
+﻿using System.Windows.Controls;
+using AimAssist.Units.Core.Modes;
 using MaterialDesignThemes.Wpf;
-using System.Windows.Controls;
 
-namespace AimAssist.Units.Implementation.Knowledge
+namespace AimAssist.Units.Implementation.Knowledges
 {
     public class KnowledgeMode : ModeBase
     {
