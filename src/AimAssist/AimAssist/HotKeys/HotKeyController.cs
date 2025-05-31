@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using AimAssist.Core.Interfaces;
 using AimAssist.Service;
 using Common.UI.Commands;
 
@@ -9,11 +10,11 @@ namespace AimAssist.HotKeys;
 
 public class HotKeyController : IDisposable
 {
-    private nint _windowHandle;
-    private Dictionary<int, HotKeyItem> _hotkeyList = new Dictionary<int, HotKeyItem>();
-    private CheatSheetController cheatSheetController;
+    private readonly nint windowHandle;
+    private readonly Dictionary<int, HotKeyItem> hotkeyList = new Dictionary<int, HotKeyItem>();
+    private ICheatSheetController cheatSheetController;
 
-    private const int WM_HOTKEY = 0x0312;
+    private const int WmHotkey = 0x0312;
 
     [DllImport("user32.dll")]
     private static extern int RegisterHotKey(nint hWnd, int id, int modKey, int vKey);
@@ -21,11 +22,12 @@ public class HotKeyController : IDisposable
     [DllImport("user32.dll")]
     private static extern int UnregisterHotKey(nint hWnd, int id);
 
-    public HotKeyController(Window window)
+    public HotKeyController(Window window, ICheatSheetController cheatSheetController)
     {
         this.window = window;
+        this.cheatSheetController = cheatSheetController;
         var host = new WindowInteropHelper(window);
-        _windowHandle = host.Handle;
+        windowHandle = host.Handle;
         //cheatSheetController = new CheatSheetController(window.Dispatcher);
 
         ComponentDispatcher.ThreadPreprocessMessage += ComponentDispatcher_ThreadPreprocessMessage;
@@ -33,18 +35,18 @@ public class HotKeyController : IDisposable
 
     private void ComponentDispatcher_ThreadPreprocessMessage(ref MSG msg, ref bool handled)
     {
-        if (msg.message != WM_HOTKEY) { return; }
+        if (msg.message != WmHotkey) { return; }
 
         var id = msg.wParam.ToInt32();
-        if (_hotkeyList.TryGetValue(id, out var hotkey))
+        if (hotkeyList.TryGetValue(id, out var hotkey))
         {
             hotkey.Command.Execute(null);
         }
     }
 
-    private int _hotkeyID = 0x0000;
+    private int hotkeyId = 0x0000;
 
-    private const int MAX_HOTKEY_ID = 0xC000;
+    private const int MaxHotkeyId = 0xC000;
     private readonly Window window;
 
     /// <summary>
@@ -60,19 +62,19 @@ public class HotKeyController : IDisposable
         var vKey = KeyInterop.VirtualKeyFromKey(key);
 
         // HotKey登録
-        while (_hotkeyID < MAX_HOTKEY_ID)
+        while (hotkeyId < MaxHotkeyId)
         {
-            var ret = RegisterHotKey(_windowHandle, _hotkeyID, modKeyNum, vKey);
+            var ret = RegisterHotKey(windowHandle, hotkeyId, modKeyNum, vKey);
 
             if (ret != 0)
             {
                 // HotKeyのリストに追加
                 var hotkey = new HotKeyItem(modKey, key, command);
-                _hotkeyList.Add(_hotkeyID, hotkey);
-                _hotkeyID++;
+                hotkeyList.Add(hotkeyId, hotkey);
+                hotkeyId++;
                 return true;
             }
-            _hotkeyID++;
+            hotkeyId++;
         }
 
         return false;
@@ -85,7 +87,7 @@ public class HotKeyController : IDisposable
     /// <returns></returns>
     public bool Unregister(int id)
     {
-        var ret = UnregisterHotKey(_windowHandle, id);
+        var ret = UnregisterHotKey(windowHandle, id);
         return ret == 0;
     }
 
@@ -97,7 +99,7 @@ public class HotKeyController : IDisposable
     /// <returns></returns>
     public bool Unregister(ModifierKeys modKey, Key key)
     {
-        var item = _hotkeyList
+        var item = hotkeyList
             .FirstOrDefault(o => o.Value.ModifierKeys == modKey && o.Value.Key == key);
         var isFound = !item.Equals(default(KeyValuePair<int, HotKeyItem>));
 
@@ -106,7 +108,7 @@ public class HotKeyController : IDisposable
             var ret = Unregister(item.Key);
             if (ret)
             {
-                _hotkeyList.Remove(item.Key);
+                hotkeyList.Remove(item.Key);
             }
             return ret;
         }
@@ -123,7 +125,7 @@ public class HotKeyController : IDisposable
     public bool UnregisterAll()
     {
         var result = true;
-        foreach (var item in _hotkeyList)
+        foreach (var item in hotkeyList)
         {
             result &= Unregister(item.Key);
         }
@@ -132,7 +134,7 @@ public class HotKeyController : IDisposable
     }
 
     #region IDisposable Support
-    private bool disposedValue = false;
+    private bool disposedValue;
 
     protected virtual void Dispose(bool disposing)
     {

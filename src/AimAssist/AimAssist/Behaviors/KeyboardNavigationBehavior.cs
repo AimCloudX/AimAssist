@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Xaml.Behaviors;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -31,8 +30,6 @@ namespace AimAssist.Behaviors
 
         private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (TargetListBox == null) return;
-
             switch (e.Key)
             {
                 case Key.Up:

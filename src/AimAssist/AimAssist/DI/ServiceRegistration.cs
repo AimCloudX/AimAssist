@@ -14,7 +14,7 @@ namespace AimAssist.DI
                 new OptionServiceModule(),
                 new FactoryServiceModule(),
                 new PluginServiceModule(),
-                new UIServiceModule(),
+                new UiServiceModule(),
                 new InitializationServiceModule()
             };
 

@@ -5,7 +5,7 @@ namespace AimAssist.Core.Interfaces
     /// <summary>
     /// チートシート制御のためのインターフェース
     /// </summary>
-    public interface ICheatSheetController
+    public interface ICheatSheetController : IDisposable
     {
         /// <summary>
         /// チートシートを表示する

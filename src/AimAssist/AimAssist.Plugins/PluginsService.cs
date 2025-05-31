@@ -1,7 +1,5 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
-using AimAssist.Units.Core;
-using AimAssist.Units.Core.Units;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
@@ -14,9 +12,9 @@ namespace AimAssist.Plugins
     /// </summary>
     public class PluginsService : IPluginsService
     {
-        [ImportMany(typeof(IUnitPlugin))] private IEnumerable<IUnitPlugin> _plugins;
-        private readonly IEditorOptionService _editorOptionService;
-        private bool _isPluginsLoaded = false;
+        [ImportMany(typeof(IUnitPlugin))] private IEnumerable<IUnitPlugin> plugins;
+        private readonly IEditorOptionService editorOptionService;
+        private bool isPluginsLoaded;
 
         /// <summary>
         /// コンストラクタ
@@ -25,14 +23,14 @@ namespace AimAssist.Plugins
         public PluginsService(
             IEditorOptionService editorOptionService)
         {
-            _editorOptionService = editorOptionService ?? throw new ArgumentNullException(nameof(editorOptionService));
-            _plugins = new List<IUnitPlugin>();
+            this.editorOptionService = editorOptionService ?? throw new ArgumentNullException(nameof(editorOptionService));
+            plugins = new List<IUnitPlugin>();
         }
 
         /// <inheritdoc/>
         public void LoadCommandPlugins()
         {
-            if (_isPluginsLoaded)
+            if (isPluginsLoaded)
             {
                 return;
             }
@@ -53,7 +51,7 @@ namespace AimAssist.Plugins
                     {
                         Directory.CreateDirectory(pluginPath);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                     }
                     
@@ -77,24 +75,22 @@ namespace AimAssist.Plugins
                 
                 // MEFコンテナに_editorOptionServiceを登録
                 var batch = new CompositionBatch();
-                batch.AddExportedValue(_editorOptionService);
+                batch.AddExportedValue(editorOptionService);
                 container.Compose(batch);
                 
                 container.ComposeParts(this);
-                _isPluginsLoaded = true;
+                isPluginsLoaded = true;
             }
-            catch (CompositionException ce)
+            catch (CompositionException)
             {
-                
                 MessageBox.Show(
                     $"プラグインのコンポジション中にエラーが発生しました。詳細はログを確認してください。", 
                     "エラー", 
                     MessageBoxButton.OK, 
                     MessageBoxImage.Error);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                
                 MessageBox.Show(
                     $"プラグインのロード中に予期しないエラーが発生しました。詳細はログを確認してください。", 
                     "エラー", 
@@ -106,13 +102,13 @@ namespace AimAssist.Plugins
         /// <inheritdoc/>
         public IEnumerable<IUnitsFactory> GetFactories()
         {
-            if (!_isPluginsLoaded)
+            if (!isPluginsLoaded)
             {
                 return Enumerable.Empty<IUnitsFactory>();
             }
             
             var factories = new List<IUnitsFactory>();
-            foreach (var plugin in _plugins)
+            foreach (var plugin in plugins)
             {
                 try
                 {
@@ -133,13 +129,13 @@ namespace AimAssist.Plugins
         /// <inheritdoc/>
         public Dictionary<Type, Func<IUnit, UIElement>> GetConverters()
         {
-            if (!_isPluginsLoaded)
+            if (!isPluginsLoaded)
             {
                 return new Dictionary<Type, Func<IUnit, UIElement>>();
             }
             
             var converters = new Dictionary<Type, Func<IUnit, UIElement>>();
-            foreach (var plugin in _plugins)
+            foreach (var plugin in plugins)
             {
                 try
                 {
@@ -169,11 +165,11 @@ namespace AimAssist.Plugins
         /// <summary>
         /// プラグインが読み込まれているかどうかを取得します
         /// </summary>
-        public bool IsPluginsLoaded => _isPluginsLoaded;
+        public bool IsPluginsLoaded => isPluginsLoaded;
 
         /// <summary>
         /// 読み込まれたプラグインの数を取得します
         /// </summary>
-        public int PluginsCount => _plugins?.Count() ?? 0;
+        public int PluginsCount => plugins?.Count() ?? 0;
     }
 }

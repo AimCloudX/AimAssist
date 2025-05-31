@@ -1,5 +1,4 @@
 ﻿using AimAssist.Services;
-using AimAssist.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI.Modules

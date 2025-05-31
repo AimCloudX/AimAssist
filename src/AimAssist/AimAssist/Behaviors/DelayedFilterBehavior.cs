@@ -1,17 +1,16 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Microsoft.Xaml.Behaviors;
-using System.ComponentModel;
 using System.Windows.Data;
 
 namespace AimAssist.Behaviors
 {
     public class DelayedFilterBehavior : Behavior<System.Windows.Controls.TextBox>
     {
-        private DispatcherTimer _timer;
-        private string _previousText = string.Empty;
+        private DispatcherTimer timer;
+        private string previousText = string.Empty;
+
 
         public static readonly DependencyProperty DelayProperty =
             DependencyProperty.Register(nameof(Delay), typeof(TimeSpan), typeof(DelayedFilterBehavior),
@@ -52,47 +51,44 @@ namespace AimAssist.Behaviors
         {
             base.OnDetaching();
             AssociatedObject.TextChanged -= OnTextChanged;
-            _timer?.Stop();
-            _timer = null;
+            timer?.Stop();
+            timer = null;
         }
 
         private void InitializeTimer()
         {
-            _timer = new DispatcherTimer
+            timer = new DispatcherTimer
             {
                 Interval = Delay
             };
-            _timer.Tick += OnTimerTick;
+            timer.Tick += OnTimerTick;
         }
 
         private void OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            _timer?.Stop();
-            _timer?.Start();
+            timer?.Stop();
+            timer?.Start();
         }
 
         private void OnTimerTick(object sender, EventArgs e)
         {
-            _timer?.Stop();
+            timer?.Stop();
 
-            if (_previousText.Equals(AssociatedObject.Text))
+            if (previousText.Equals(AssociatedObject.Text))
                 return;
 
             ApplyFilter();
-            _previousText = AssociatedObject.Text;
+            previousText = AssociatedObject.Text;
 
-            if (FilterTarget != null)
-            {
-                FilterTarget.SelectedIndex = 0;
-            }
+            FilterTarget.SelectedIndex = 0;
         }
 
         private void ApplyFilter()
         {
-            if (FilterTarget?.ItemsSource == null) return;
+            if (FilterTarget.ItemsSource == null) return;
 
             var view = CollectionViewSource.GetDefaultView(FilterTarget.ItemsSource);
-            if (view != null && FilterMethod != null)
+            if (view != null)
             {
                 view.Filter = FilterMethod;
             }

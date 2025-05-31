@@ -1,8 +1,4 @@
 ﻿using AimAssist.Core.Interfaces;
-using System;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Threading;
 
 namespace AimAssist.Middlewares
@@ -16,11 +12,11 @@ namespace AimAssist.Middlewares
 
     public class ErrorHandlingMiddleware : IErrorHandlingMiddleware
     {
-        private readonly IApplicationLogService _logService;
+        private readonly IApplicationLogService logService;
 
         public ErrorHandlingMiddleware(IApplicationLogService logService)
         {
-            _logService = logService;
+            this.logService = logService;
         }
 
         public void RegisterGlobalHandlers()
@@ -42,7 +38,7 @@ namespace AimAssist.Middlewares
             try
             {
                 var fullContext = string.IsNullOrEmpty(context) ? "予期しないエラー" : context;
-                _logService?.LogException(exception, fullContext);
+                logService?.LogException(exception, fullContext);
 
                 var errorMessage = @$"{fullContext}
 
@@ -90,19 +86,19 @@ namespace AimAssist.Middlewares
                 {
                     if (current.Dispatcher.CheckAccess())
                     {
-                        System.Windows.Forms.MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     else
                     {
                         current.Dispatcher.Invoke(() =>
                         {
-                            System.Windows.Forms.MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         });
                     }
                 }
                 else
                 {
-                    System.Windows.Forms.MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch

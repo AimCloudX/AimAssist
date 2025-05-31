@@ -16,8 +16,8 @@ namespace AimAssist.Behaviors
             DependencyProperty.Register(nameof(FilterText), typeof(string), typeof(DelayedTextFilterBehavior),
                 new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        private DispatcherTimer? _timer;
-        private string _previousText = string.Empty;
+        private DispatcherTimer? timer;
+        private string previousText = string.Empty;
 
         public TimeSpan Delay
         {
@@ -41,34 +41,34 @@ namespace AimAssist.Behaviors
         {
             base.OnDetaching();
             AssociatedObject.TextChanged -= OnTextChanged;
-            _timer?.Stop();
-            _timer = null;
+            timer?.Stop();
+            timer = null;
         }
 
         private void OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (_timer == null)
+            if (timer == null)
             {
-                _timer = new DispatcherTimer
+                timer = new DispatcherTimer
                 {
                     Interval = Delay
                 };
-                _timer.Tick += OnTimerTick;
+                timer.Tick += OnTimerTick;
             }
 
-            _timer.Stop();
-            _timer.Start();
+            timer.Stop();
+            timer.Start();
         }
 
         private void OnTimerTick(object? sender, EventArgs e)
         {
-            _timer?.Stop();
+            timer?.Stop();
 
             var currentText = AssociatedObject.Text;
-            if (_previousText != currentText)
+            if (previousText != currentText)
             {
                 FilterText = currentText;
-                _previousText = currentText;
+                previousText = currentText;
             }
         }
     }

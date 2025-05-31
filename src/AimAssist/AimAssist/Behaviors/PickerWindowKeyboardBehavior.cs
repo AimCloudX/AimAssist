@@ -61,22 +61,22 @@ namespace AimAssist.Behaviors
             {
                 case Key.Enter:
                     e.Handled = true;
-                    ExecuteCommand?.Execute(null);
+                    ExecuteCommand.Execute(null);
                     break;
 
                 case Key.Escape:
                     e.Handled = true;
-                    CloseCommand?.Execute(null);
+                    CloseCommand.Execute(null);
                     break;
 
                 case Key.Up:
                     e.Handled = true;
-                    NavigateUpCommand?.Execute(null);
+                    NavigateUpCommand.Execute(null);
                     break;
 
                 case Key.Down:
                     e.Handled = true;
-                    NavigateDownCommand?.Execute(null);
+                    NavigateDownCommand.Execute(null);
                     break;
             }
         }

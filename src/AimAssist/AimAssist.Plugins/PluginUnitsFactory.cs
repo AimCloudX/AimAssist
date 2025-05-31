@@ -13,8 +13,8 @@ namespace AimAssist.Plugins
 
     public class PluginUnitsFactory : AbstractUnitsFactory, IPluginUnitsFactory
     {
-        private readonly Dictionary<string, IUnitPlugin> _plugins = new();
-        private readonly object _lock = new();
+        private readonly Dictionary<string, IUnitPlugin> plugins = new();
+        private readonly object @lock = new();
 
         public PluginUnitsFactory() : base("Plugin", priority: 50)
         {
@@ -29,9 +29,9 @@ namespace AimAssist.Plugins
         {
             var allUnits = new List<IUnit>();
 
-            lock (_lock)
+            lock (@lock)
             {
-                foreach (var plugin in _plugins.Values)
+                foreach (var plugin in plugins.Values)
                 {
                     try
                     {
@@ -60,14 +60,14 @@ namespace AimAssist.Plugins
 
             var pluginName = plugin.GetType().Name;
 
-            lock (_lock)
+            lock (@lock)
             {
-                if (_plugins.ContainsKey(pluginName))
+                if (plugins.ContainsKey(pluginName))
                 {
                     throw new InvalidOperationException($"Plugin '{pluginName}' is already registered");
                 }
 
-                _plugins[pluginName] = plugin;
+                plugins[pluginName] = plugin;
             }
         }
 
@@ -75,28 +75,28 @@ namespace AimAssist.Plugins
         {
             if (string.IsNullOrEmpty(pluginName)) throw new ArgumentNullException(nameof(pluginName));
 
-            lock (_lock)
+            lock (@lock)
             {
-                if (_plugins.ContainsKey(pluginName))
+                if (plugins.ContainsKey(pluginName))
                 {
-                    _plugins.Remove(pluginName);
+                    plugins.Remove(pluginName);
                 }
             }
         }
 
         public IEnumerable<string> GetRegisteredPluginNames()
         {
-            lock (_lock)
+            lock (@lock)
             {
-                return _plugins.Keys.ToList();
+                return plugins.Keys.ToList();
             }
         }
 
         public override void Initialize()
         {
-            lock (_lock)
+            lock (@lock)
             {
-                foreach (var plugin in _plugins.Values)
+                foreach (var plugin in plugins.Values)
                 {
                     try
                     {
@@ -112,9 +112,9 @@ namespace AimAssist.Plugins
 
         public override void Dispose()
         {
-            lock (_lock)
+            lock (@lock)
             {
-                foreach (var plugin in _plugins.Values)
+                foreach (var plugin in plugins.Values)
                 {
                     try
                     {
@@ -128,7 +128,7 @@ namespace AimAssist.Plugins
                         System.Diagnostics.Debug.WriteLine($"Error disposing plugin: {ex.Message}");
                     }
                 }
-                _plugins.Clear();
+                plugins.Clear();
             }
         }
     }

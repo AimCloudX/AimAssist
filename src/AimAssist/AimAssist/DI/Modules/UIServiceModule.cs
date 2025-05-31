@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI.Modules
 {
-    public class UIServiceModule : IServiceModule
+    public class UiServiceModule : IServiceModule
     {
         public IServiceCollection RegisterServices(IServiceCollection services)
         {
@@ -29,11 +29,11 @@ namespace AimAssist.DI.Modules
                 provider.GetRequiredService<IApplicationLogService>()
             ));
 
-            services.AddSingleton<AimAssist.UI.SystemTray.SystemTrayRegister>(provider =>
-                new AimAssist.UI.SystemTray.SystemTrayRegister(provider.GetRequiredService<IAppCommands>())
+            services.AddSingleton<UI.SystemTray.SystemTrayRegister>(provider =>
+                new UI.SystemTray.SystemTrayRegister(provider.GetRequiredService<IAppCommands>())
             );
 
-            services.AddSingleton<AimAssist.UI.UnitContentsView.UnitViewFactory>(provider => new AimAssist.UI.UnitContentsView.UnitViewFactory(
+            services.AddSingleton<UI.UnitContentsView.UnitViewFactory>(provider => new UI.UnitContentsView.UnitViewFactory(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IEditorOptionService>()
             ));
@@ -41,7 +41,7 @@ namespace AimAssist.DI.Modules
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<PickerWindowViewModel>();
 
-            services.AddTransient<AimAssist.UI.MainWindows.MainWindow>(provider => new AimAssist.UI.MainWindows.MainWindow(
+            services.AddTransient<UI.MainWindows.MainWindow>(provider => new UI.MainWindows.MainWindow(
                 provider.GetRequiredService<MainWindowViewModel>(),
                 provider.GetRequiredService<IApplicationLogService>(),
                 (KeySequenceManager)provider.GetRequiredService<IKeySequenceManager>(),
@@ -51,7 +51,8 @@ namespace AimAssist.DI.Modules
 
             services.AddTransient<WaitHotKeysWindow>(provider => new WaitHotKeysWindow(
                 provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<IAppCommands>()
+                provider.GetRequiredService<IAppCommands>(),
+                provider.GetRequiredService<ICheatSheetController>()
             ));
 
             return services;

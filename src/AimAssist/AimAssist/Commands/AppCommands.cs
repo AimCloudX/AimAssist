@@ -8,8 +8,8 @@ namespace AimAssist.Commands
     /// </summary>
     public class AppCommands : IAppCommands
     {
-        private readonly IWindowHandleService _windowHandleService;
-        private readonly IPickerService _pickerService;
+        private readonly IWindowHandleService windowHandleService;
+        private readonly IPickerService pickerService;
 
         /// <summary>
         /// AppCommandsのコンストラクタ
@@ -18,8 +18,8 @@ namespace AimAssist.Commands
         /// <param name="pickerService">ピッカーサービス</param>
         public AppCommands(IWindowHandleService windowHandleService, IPickerService pickerService)
         {
-            _windowHandleService = windowHandleService;
-            _pickerService = pickerService;
+            this.windowHandleService = windowHandleService;
+            this.pickerService = pickerService;
         }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace AimAssist.Commands
         /// </summary>
         public void Initialize()
         {
-            ToggleMainWindow = new HotkeyCommand(nameof(ToggleMainWindow), (_) => _windowHandleService.ToggleMainWindow());
-            ShowPickerWindow = new HotkeyCommand(nameof(ShowPickerWindow), async (_) => await _pickerService.ShowPicker());
+            ToggleMainWindow = new HotkeyCommand(nameof(ToggleMainWindow), (_) => windowHandleService.ToggleMainWindow());
+            ShowPickerWindow = new HotkeyCommand(nameof(ShowPickerWindow), async (_) => await pickerService.ShowPicker());
         }
     }
 }

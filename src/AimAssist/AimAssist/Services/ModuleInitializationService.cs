@@ -1,8 +1,4 @@
 ﻿using AimAssist.Services.Initialization;
-using AimAssist.Core.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace AimAssist.Services
 {
@@ -17,11 +13,11 @@ namespace AimAssist.Services
 
     public class ModuleInitializationService : IModuleInitializationService
     {
-        private readonly IApplicationInitializationService _applicationInitializer;
-        private readonly IFileInitializationService _fileInitializer;
-        private readonly IPluginInitializationService _pluginInitializer;
-        private readonly IConfigurationManagerService _configurationManager;
-        private readonly Core.Interfaces.IApplicationLogService _logService;
+        private readonly IApplicationInitializationService applicationInitializer;
+        private readonly IFileInitializationService fileInitializer;
+        private readonly IPluginInitializationService pluginInitializer;
+        private readonly IConfigurationManagerService configurationManager;
+        private readonly Core.Interfaces.IApplicationLogService logService;
 
         public ModuleInitializationService(
             IApplicationInitializationService applicationInitializer,
@@ -30,18 +26,18 @@ namespace AimAssist.Services
             IConfigurationManagerService configurationManager,
             Core.Interfaces.IApplicationLogService logService)
         {
-            _applicationInitializer = applicationInitializer;
-            _fileInitializer = fileInitializer;
-            _pluginInitializer = pluginInitializer;
-            _configurationManager = configurationManager;
-            _logService = logService;
+            this.applicationInitializer = applicationInitializer;
+            this.fileInitializer = fileInitializer;
+            this.pluginInitializer = pluginInitializer;
+            this.configurationManager = configurationManager;
+            this.logService = logService;
         }
 
         public async Task InitializeAllModulesAsync()
         {
             try
             {
-                _logService.Info("全モジュールの初期化を開始します");
+                logService.Info("全モジュールの初期化を開始します");
 
                 // await _applicationInitializer.InitializeAsync();
                 // _logService.Info("アプリケーション初期化が完了しました");
@@ -52,14 +48,14 @@ namespace AimAssist.Services
                 // await _pluginInitializer.InitializeAsync();
                 // _logService.Info("プラグイン初期化が完了しました");
 
-                _configurationManager.LoadAllSections();
-                _logService.Info("設定読み込みが完了しました");
+                configurationManager.LoadAllSections();
+                logService.Info("設定読み込みが完了しました");
 
-                _logService.Info("全モジュールの初期化が正常に完了しました");
+                logService.Info("全モジュールの初期化が正常に完了しました");
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "モジュール初期化中にエラーが発生しました");
+                logService.LogException(ex, "モジュール初期化中にエラーが発生しました");
                 throw;
             }
         }
@@ -68,7 +64,7 @@ namespace AimAssist.Services
         {
             try
             {
-                _logService.Info($"モジュール '{moduleName}' の初期化を開始します");
+                logService.Info($"モジュール '{moduleName}' の初期化を開始します");
 
                 switch (moduleName.ToLower())
                 {
@@ -82,18 +78,18 @@ namespace AimAssist.Services
                     //     await _pluginInitializer.InitializeAsync();
                     //     break;
                     case "configuration":
-                        _configurationManager.LoadAllSections();
+                        configurationManager.LoadAllSections();
                         break;
                     default:
-                        _logService.Warning($"不明なモジュール名: {moduleName}");
+                        logService.Warning($"不明なモジュール名: {moduleName}");
                         return;
                 }
 
-                _logService.Info($"モジュール '{moduleName}' の初期化が完了しました");
+                logService.Info($"モジュール '{moduleName}' の初期化が完了しました");
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, $"モジュール '{moduleName}' の初期化中にエラーが発生しました");
+                logService.LogException(ex, $"モジュール '{moduleName}' の初期化中にエラーが発生しました");
                 throw;
             }
         }
@@ -102,10 +98,10 @@ namespace AimAssist.Services
         {
             try
             {
-                _logService.Info("全モジュールのシャットダウンを開始します");
+                logService.Info("全モジュールのシャットダウンを開始します");
 
-                _configurationManager.SaveAllSections();
-                _logService.Info("設定保存が完了しました");
+                configurationManager.SaveAllSections();
+                logService.Info("設定保存が完了しました");
 
                 // await _pluginInitializer.ShutdownAsync();
                 // _logService.Info("プラグインシャットダウンが完了しました");
@@ -116,11 +112,11 @@ namespace AimAssist.Services
                 // await _applicationInitializer.ShutdownAsync();
                 // _logService.Info("アプリケーションシャットダウンが完了しました");
 
-                _logService.Info("全モジュールのシャットダウンが正常に完了しました");
+                logService.Info("全モジュールのシャットダウンが正常に完了しました");
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "モジュールシャットダウン中にエラーが発生しました");
+                logService.LogException(ex, "モジュールシャットダウン中にエラーが発生しました");
                 throw;
             }
         }
@@ -129,7 +125,7 @@ namespace AimAssist.Services
         {
             try
             {
-                _logService.Info($"モジュール '{moduleName}' のシャットダウンを開始します");
+                logService.Info($"モジュール '{moduleName}' のシャットダウンを開始します");
 
                 switch (moduleName.ToLower())
                 {
@@ -143,18 +139,18 @@ namespace AimAssist.Services
                     //     await _pluginInitializer.ShutdownAsync();
                     //     break;
                     case "configuration":
-                        _configurationManager.SaveAllSections();
+                        configurationManager.SaveAllSections();
                         break;
                     default:
-                        _logService.Warning($"不明なモジュール名: {moduleName}");
+                        logService.Warning($"不明なモジュール名: {moduleName}");
                         return;
                 }
 
-                _logService.Info($"モジュール '{moduleName}' のシャットダウンが完了しました");
+                logService.Info($"モジュール '{moduleName}' のシャットダウンが完了しました");
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, $"モジュール '{moduleName}' のシャットダウン中にエラーが発生しました");
+                logService.LogException(ex, $"モジュール '{moduleName}' のシャットダウン中にエラーが発生しました");
                 throw;
             }
         }

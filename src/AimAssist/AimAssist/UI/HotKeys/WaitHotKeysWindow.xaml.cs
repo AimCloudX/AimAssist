@@ -10,17 +10,19 @@ namespace AimAssist.UI.HotKeys
         private HotKeyController hotkeyController;
         private readonly ICommandService _commandService;
         private readonly IAppCommands _appCommands;
+        private readonly ICheatSheetController cheatSheetController;
 
-        public WaitHotKeysWindow(ICommandService commandService, IAppCommands appCommands)
+        public WaitHotKeysWindow(ICommandService commandService, IAppCommands appCommands, ICheatSheetController cheatSheetController)
         {
             _commandService = commandService;
             _appCommands = appCommands;
+            this.cheatSheetController = cheatSheetController;
             this.InitializeComponent();
             this.Visibility = Visibility.Hidden;
             this.ShowInTaskbar = false;
 
             // HotKeyの登録
-            this.hotkeyController = new HotKeyController(this);
+            this.hotkeyController = new HotKeyController(this, this.cheatSheetController);
             RegisterHotKey(_appCommands.ToggleMainWindow.CommandName);
             RegisterHotKey(_appCommands.ShowPickerWindow.CommandName);
 

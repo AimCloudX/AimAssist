@@ -1,5 +1,4 @@
-﻿using AimAssist.Core.Interfaces;
-using AimAssist.Plugins;
+﻿using AimAssist.Plugins;
 using AimAssist.Units.Implementation;
 using AimAssist.Units.Implementation.Factories;
 using Microsoft.Extensions.DependencyInjection;
