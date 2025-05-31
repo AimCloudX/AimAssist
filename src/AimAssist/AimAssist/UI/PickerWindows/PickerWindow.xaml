@@ -3,20 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:behaviors="clr-namespace:AimAssist.Behaviors"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="{Binding Mode.Name, Mode=OneWay}"
         Width="800"
         Height="500"
-        xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:monaco1="clr-namespace:Common.UI.Editor;assembly=Common.UI.Editor"
+        xmlns:ui="http://schemas.modernwpf.com/2019" 
+        xmlns:monaco1="clr-namespace:Common.UI.Editor;assembly=Common.UI.Editor"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Closing="Window_Closing"
         ShowInTaskbar="False"
-        Deactivated="Window_LostFocus"
-        KeyDown="OnKeyDown"
-        Topmost="True"
-        >
+        Topmost="True">
+    
+    <i:Interaction.Behaviors>
+        <behaviors:PickerWindowKeyboardBehavior 
+            NavigateUpCommand="{Binding NavigateUpCommand}"
+            NavigateDownCommand="{Binding NavigateDownCommand}"
+            ExecuteCommand="{Binding ExecuteCommand}"
+            CloseCommand="{Binding CloseCommand}" />
+    </i:Interaction.Behaviors>
+    
     <Grid>
         <Grid x:Name="Root" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
@@ -27,47 +35,59 @@
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
+            
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
+                
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" x:Name="PackgeTextBorder" BorderBrush="Gray" BorderThickness="2" Padding="5" Margin="2" Visibility="Collapsed">
-                        <TextBlock  Margin="0,0,5,0" x:Name="PackageText" Visibility="Collapsed"></TextBlock>
+                    
+                    <Border Grid.Column="0" x:Name="PackgeTextBorder" BorderBrush="Gray" BorderThickness="2" 
+                            Padding="5" Margin="2" Visibility="Collapsed">
+                        <TextBlock Margin="0,0,5,0" x:Name="PackageText" Visibility="Collapsed"></TextBlock>
                     </Border>
-                    <TextBox Grid.Column="1" x:Name="FilterTextBox"  PreviewKeyDown="TextBox_OnPreviewKeyDown" TextChanged="TextBox_OnTextChanged"
-                     InputMethod.PreferredImeConversionMode="FullShape"></TextBox>
-
+                    
+                    <TextBox Grid.Column="1" x:Name="FilterTextBox" 
+                             Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             InputMethod.PreferredImeConversionMode="FullShape">
+                    </TextBox>
                 </Grid>
                 <StackPanel x:Name="FilterContents"/>
             </Grid>
-            <ListBox  Grid.Row="1" x:Name="ComboListBox" 
-                          ItemsSource="{Binding UnitLists}" 
-                          VirtualizingPanel.IsVirtualizing="True" 
-                          VirtualizingPanel.VirtualizationMode="Standard"
-                          SelectionChanged="ComboListBox_SelectionChanged"
-                          HorizontalAlignment="Stretch"
-                          ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                          ScrollViewer.VerticalScrollBarVisibility="Visible">
+            
+            <ListBox Grid.Row="1" x:Name="ComboListBox" 
+                     ItemsSource="{Binding UnitLists}" 
+                     SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+                     SelectedItem="{Binding SelectedUnit, Mode=TwoWay}"
+                     VirtualizingPanel.IsVirtualizing="True" 
+                     VirtualizingPanel.VirtualizationMode="Standard"
+                     HorizontalAlignment="Stretch"
+                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                     ScrollViewer.VerticalScrollBarVisibility="Visible">
+                
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
+                
                 <ListBox.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"  Foreground="Gray" IsHitTestVisible="False"/>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" 
+                                           Foreground="Gray" IsHitTestVisible="False"/>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>
                 </ListBox.GroupStyle>
+                
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -81,37 +101,43 @@
                                     <RowDefinition Height="2"></RowDefinition>
                                     <RowDefinition Height="Auto"></RowDefinition>
                                 </Grid.RowDefinitions>
+                                
                                 <StackPanel Grid.Row="0" Grid.Column="0">
-                                    <TextBlock Text="{Binding Name}"  FontSize="18"/>
+                                    <TextBlock Text="{Binding Name}" FontSize="18"/>
                                 </StackPanel>
+                                
                                 <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
                                     <TextBlock FontSize="14" Text="{Binding Description}" 
-                                           Foreground="Gray"
-                                           TextTrimming="CharacterEllipsis"
-                                           TextWrapping="NoWrap"
-                                           HorizontalAlignment="Left" InputMethod.PreferredImeConversionMode="FullShape"/>
+                                               Foreground="Gray"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap"
+                                               HorizontalAlignment="Left" 
+                                               InputMethod.PreferredImeConversionMode="FullShape"/>
                                 </StackPanel>
+                                
                                 <StackPanel Grid.Row="0" Grid.Column="1">
                                     <TextBlock FontSize="14" Text="{Binding Category}" 
-                                           Foreground="Gray"
-                                           TextTrimming="CharacterEllipsis"
-                                           TextWrapping="NoWrap"
-                                           HorizontalAlignment="Right" InputMethod.PreferredImeConversionMode="FullShape"/>
+                                               Foreground="Gray"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap"
+                                               HorizontalAlignment="Right" 
+                                               InputMethod.PreferredImeConversionMode="FullShape"/>
                                 </StackPanel>
                             </Grid>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        Background="{TemplateBinding Background}"
-                                        Padding="{TemplateBinding Padding}" CornerRadius="10"
-                                        ClipToBounds="True">
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            Background="{TemplateBinding Background}"
+                                            Padding="{TemplateBinding Padding}" CornerRadius="10"
+                                            ClipToBounds="True">
                                         <ContentPresenter />
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -125,8 +151,8 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>
+            
             <ContentControl x:Name="MainContent" Grid.Column="1" Grid.RowSpan="2"></ContentControl>
-            <!--<monaco1:MonacoEditor Grid.Column="1" Grid.RowSpan="2" x:Name="Editor"></monaco1:MonacoEditor>-->
         </Grid>
     </Grid>
 </Window>

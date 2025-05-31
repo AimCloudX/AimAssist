@@ -127,7 +127,19 @@ WPFベースのコマンドランチャー・生産性向上ツール
 2. **テスタビリティ向上**: ViewModelが独立してテスト可能
 3. **保守性向上**: コードビハインドが最小限で変更影響が局所化
 4. **再利用性向上**: BehaviorとUserControlが他のウィンドウでも再利用可能
-5. **宣言的UI**: XAMLベースの宣言的プログラミングスタイル
+6. **統一された設計**: MainWindowとPickerWindowが同じMVVMパターンを採用
+7. **エラーハンドリング統一**: ErrorHandlingMiddlewareによる一貫した例外処理
+
+#### 7. PickerWindow リファクタリング完了 ✅
+- **PickerWindowViewModel.cs**: 完全なMVVMアーキテクチャ実装
+- **PickerWindow.xaml.cs**: 300行以上から100行程度に大幅簡素化
+- **MVVM分離**: UI ロジック、ビジネスロジック、プレゼンテーションロジックが明確に分離
+- **Behaviors統合**: キーボード操作とテキストフィルタリング処理を独立したBehaviorクラスに分離
+  - `PickerWindowKeyboardBehavior`: キーボードナビゲーション処理
+  - `DelayedTextFilterBehavior`: 遅延フィルタリング処理（オプション、直接バインディングでも動作）
+- **計算機能**: `=10*10` のような数式入力による計算機能が正常動作
+- **DI統合**: PickerWindowViewModelがサービス層と適切に統合
+- **エラーハンドリング**: 統一されたエラー処理とログ出力
 
 ### 今後の改善点
 - PickerWindowの同様なリファクタリング

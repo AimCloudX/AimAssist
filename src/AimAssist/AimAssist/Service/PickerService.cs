@@ -20,6 +20,8 @@ namespace AimAssist.Service
         private readonly ICommandService _commandService;
         private readonly IUnitsService _unitsService;
         private readonly IEditorOptionService _editorOptionService;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IApplicationLogService _logService;
         private TaskCompletionSource<string> _tcs;
 
         [DllImport("user32.dll")]
@@ -37,11 +39,12 @@ namespace AimAssist.Service
         /// <param name="commandService">コマンドサービス</param>
         /// <param name="unitsService">ユニットサービス</param>
         /// <param name="editorOptionService">エディタオプションサービス</param>
-        public PickerService(ICommandService commandService, IUnitsService unitsService, IEditorOptionService editorOptionService)
+        public PickerService(ICommandService commandService, IUnitsService unitsService, IEditorOptionService editorOptionService, IApplicationLogService logService)
         {
             _commandService = commandService;
             _unitsService = unitsService;
             _editorOptionService = editorOptionService;
+            _logService = logService;
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace AimAssist.Service
                 GetWindowThreadProcessId(beforeWindow, out var processId);
                 Process process = Process.GetProcessById((int)processId);
 
-                var window = new PickerWindow(process.ProcessName, _commandService, _unitsService, _editorOptionService);
+                var window = new PickerWindow(process.ProcessName, _commandService, _unitsService, _editorOptionService, _logService);
                 window.Closed += (sender, e) => 
                 {
                     if (sender is PickerWindow pickerWindow)

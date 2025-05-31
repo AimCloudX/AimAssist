@@ -1,325 +1,92 @@
 ﻿using AimAssist.Core.Interfaces;
-using AimAssist.Core.Units;
 using AimAssist.Service;
-using AimAssist.UI.MainWindows;
-using AimAssist.Units.Core.Mode;
-using AimAssist.Units.Core.Units;
-
-using AimAssist.Units.Implementation.Caluculation;
-using AimAssist.Units.Implementation.KeyHelp;
-using AimAssist.Units.Implementation.Snippets;
-using Common.Commands.Shortcus;
+using AimAssist.ViewModels;
 using Common.UI;
 using Common.UI.Editor;
 using Library.Options;
-using Mathos.Parser;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.ObjectModel;
+using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
 
 namespace AimAssist.UI.PickerWindows
 {
-    public partial class PickerWindow : Window, INotifyPropertyChanged
+    public partial class PickerWindow : Window
     {
-        public ObservableCollection<UnitViewModel> UnitLists { get; } = new ObservableCollection<UnitViewModel>();
-
-        public IMode Mode { get; set; }
-
-        public string SnippetText { get; set; } = string.Empty;
-
-        public KeySequence KeySequence { get; set; }
-
-        protected void OnPropertyChanged([CallerMemberName] string name = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        private bool Filter(object obj)
-        {
-            var filterText = this.FilterTextBox.Text;
-
-            if (string.IsNullOrEmpty(filterText))
-            {
-                return true;
-            }
-
-            var combo = obj as UnitViewModel;
-            if (combo != null)
-            {
-
-                if (!combo.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public bool IsClosing { get; set; }
-
-        DispatcherTimer? typingTimer;
-        private string beforeText = string.Empty;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private readonly string processName;
-        private readonly ICommandService _commandService;
-        private readonly IUnitsService _unitsService;
+        private readonly PickerWindowViewModel _viewModel;
+        private readonly IApplicationLogService _logService;
         private readonly KeySequenceManager _keySequenceManager;
         private readonly IEditorOptionService _editorOptionService;
 
-        public PickerWindow(string processName, ICommandService commandService, IUnitsService unitsService, IEditorOptionService editorOptionService)
+        public string SnippetText => _viewModel.SnippetText;
+        public Common.Commands.Shortcus.KeySequence KeySequence => _viewModel.KeySequence;
+
+        public PickerWindow(
+            string processName, 
+            ICommandService commandService, 
+            IUnitsService unitsService, 
+            IEditorOptionService editorOptionService,
+            IApplicationLogService logService)
         {
-            this.processName = processName;
-            _commandService = commandService;
-            _unitsService = unitsService;
-            _editorOptionService = editorOptionService;
+            _logService = logService ?? throw new ArgumentNullException(nameof(logService));
+            _editorOptionService = editorOptionService ?? throw new ArgumentNullException(nameof(editorOptionService));
             _keySequenceManager = new KeySequenceManager(commandService);
+
+            _viewModel = new PickerWindowViewModel(processName, unitsService, editorOptionService);
             
-            this.InitializeComponent();
-            SourceInitialized += MainWindow_SourceInitialized;
-
-            var editor = EditorCache.Editor;
-            if(editor != null)
-            {
-                this.MainContent.Content = editor;
-                editor.SetOption(_editorOptionService.Option);
-            }
-            else
-            {
-                var monacoEditor = new MonacoEditor();
-                this.MainContent.Content = monacoEditor;
-                EditorCache.Editor = monacoEditor;
-                monacoEditor.SetOption(_editorOptionService.Option);
-            }
-
-            this.DataContext = this;
-
-            this.Mode = SnippetMode.Instance;
-            this.UpdateCandidate();
-            this.FilterTextBox.Focus();
-
-            this.ComboListBox.SelectedIndex = 0;
-            RegisterSnippets();
+            InitializeComponent();
+            
+            DataContext = _viewModel;
+            
+            SourceInitialized += OnSourceInitialized;
+            Closing += OnClosing;
+            Deactivated += OnDeactivated;
+            
+            InitializeEditor();
+            FilterTextBox.Focus();
         }
 
-        public async void UpdateCandidate()
+        private void InitializeEditor()
         {
-            UnitLists.Clear();
-            var units = _unitsService.CreateUnits(this.Mode);
-
-            foreach (var unit in units)
+            try
             {
-                UnitLists.Add(new UnitViewModel(unit));
-            }
-
-            if (System.Windows.Clipboard.ContainsText())
-            {
-                UnitLists.Add(new UnitViewModel(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
-            }
-
-            var keyUnits = _unitsService.CreateUnits(KeyHelpMode.Instance);
-            foreach (var unit in keyUnits)
-            {
-                if (unit is KeyHelpUnit keyHelpUnit)
+                var editor = EditorCache.Editor;
+                if (editor != null)
                 {
-                    if(keyHelpUnit.Category != processName)
-                    {
-                        continue;
-                    }
+                    MainContent.Content = editor;
+                    editor.SetOption(_editorOptionService.Option);
                 }
-
-                UnitLists.Add(new UnitViewModel(unit));
-            }
-        }
-
-        private void HandleTypingTimerTimeout(object sender, EventArgs e)
-        {
-            if (this.typingTimer != null)
-            {
-                this.typingTimer.Tick -= this.HandleTypingTimerTimeout;
-            }
-
-            this.typingTimer = null;
-            if (this.beforeText.Equals(this.FilterTextBox.Text))
-            {
-                return;
-            }
-
-            if (this.FilterTextBox.Text.StartsWith('='))
-            {
-                this.Mode = CalcMode.Instance;
-                // ComboListの内容を更新する
-                
-                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
-                view.Filter = (obj) => true;
-
-                var parser = new MathParser();
-                try
+                else
                 {
-                    String expression = this.FilterTextBox.Text.Remove(0, 1);
-                    double result = parser.Parse(expression);
-                    var unitViewModel = new UnitViewModel(new SnippetUnit(result.ToString(), result.ToString()));
-
-                    this.UnitLists.Clear();
-                    this.UnitLists.Add(unitViewModel);
-                }
-                catch (Exception)
-                {
-
+                    var monacoEditor = new MonacoEditor();
+                    MainContent.Content = monacoEditor;
+                    EditorCache.Editor = monacoEditor;
+                    monacoEditor.SetOption(_editorOptionService.Option);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                if(this.Mode != SnippetMode.Instance)
-                {
-                    this.Mode = SnippetMode.Instance;
-                    UpdateCandidate();
-                }
-
-                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(this.ComboListBox.Items);
-                view.Filter = this.Filter;
-            }
-
-            this.typingTimer = null;
-            this.beforeText = this.FilterTextBox.Text;
-            this.OnPropertyChanged(nameof(this.UnitLists));
-            this.ComboListBox.SelectedIndex = 0;
-        }
-
-        private async void TextBox_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                e.Handled = true;
-                if (this.ComboListBox.SelectedItem is UnitViewModel unit)
-                {
-                    if (unit.Content is SnippetUnit model)
-                    {
-                        this.SnippetText = await EditorCache.Editor.GetText();
-                        this.CloseWindow();
-                    }
-
-                    if (unit.Content is SnippetModelUnit snippetModel)
-                    {
-                        this.SnippetText = await EditorCache.Editor.GetText();
-                        this.CloseWindow();
-                    }
-
-                    if (unit.Content is KeyHelpUnit keyHelpUnit)
-                    {
-                        this.KeySequence = keyHelpUnit.KeyItem.Sequence;
-                        this.CloseWindow();
-                    }
-                }
-
-            }
-
-            else if (e.Key == Key.Escape)
-            {
-                this.CloseWindow();
-            }
-
-            if (e.Key == Key.Up)
-            {
-                var index = this.ComboListBox.SelectedIndex;
-                if (index <= 0) return;
-                this.ComboListBox.SelectedIndex = index - 1;
-            }
-
-            if (e.Key == Key.Down)
-            {
-                var index = this.ComboListBox.SelectedIndex;
-                if (index >= this.ComboListBox.Items.Count) return;
-                this.ComboListBox.SelectedIndex = index + 1;
-            }
-
-            this.ComboListBox.ScrollIntoView(this.ComboListBox.SelectedItem);
-        }
-
-        private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (this.typingTimer == null)
-            {
-                this.typingTimer = new DispatcherTimer
-                {
-                    Interval = default,
-                    IsEnabled = false,
-                    Tag = null
-                };
-
-                this.typingTimer.Interval = TimeSpan.FromMilliseconds(100);
-
-                this.typingTimer.Tick += this.HandleTypingTimerTimeout;
-            }
-
-            this.typingTimer.Stop(); // Resets the timer
-            this.typingTimer.Start();
-        }
-
-        private void CloseWindow()
-        {
-            if (this.IsClosing)
-            {
-                return;
-            }
-
-            this.IsClosing = true;
-            EditorCache.Editor = (MonacoEditor)this.MainContent.Content;
-            this.Close();
-        }
-
-        public void FocusContent()
-        {
-            if (this.MainContent.Content is IFocasable focusable)
-            {
-                focusable.Focus();
+                _logService?.LogException(ex, "エディタ初期化中にエラーが発生しました");
             }
         }
 
-
-        private void Window_Closing(object sender, CancelEventArgs e)
+        private void OnSourceInitialized(object? sender, EventArgs e)
         {
-            this.IsClosing = true;
-        }
-
-        private void Window_LostFocus(object sender, EventArgs e)
-        {
-            //this.CloseWindow();
-        }
-
-        private void ComboListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (this.ComboListBox.SelectedItem is UnitViewModel unit && unit.Content is SnippetUnit model)
+            try
             {
-                EditorCache.Editor.SetTextAsync(model.Code);
+                var handle = new WindowInteropHelper(this).Handle;
+                HwndSource.FromHwnd(handle)?.AddHook(WndProc);
             }
-
-            if (this.ComboListBox.SelectedItem is UnitViewModel unitViewModel
-                && unitViewModel.Content is SnippetModelUnit snippetModel)
+            catch (Exception ex)
             {
-                EditorCache.Editor.SetTextAsync(snippetModel.Code);
+                _logService?.LogException(ex, "ウィンドウ初期化中にエラーが発生しました");
             }
-
-        }
-
-        private void MainWindow_SourceInitialized(object sender, EventArgs e)
-        {
-            var handle = new WindowInteropHelper(this).Handle;
-            HwndSource.FromHwnd(handle)?.AddHook(new HwndSourceHook(WndProc));
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             const int WM_SYSKEYDOWN = 0x0104;
-            const int VK_MENU = 0x12; // Alt key
+            const int VK_MENU = 0x12;
 
             if (msg == WM_SYSKEYDOWN && wParam.ToInt32() == VK_MENU)
             {
@@ -330,54 +97,33 @@ namespace AimAssist.UI.PickerWindows
             return IntPtr.Zero;
         }
 
-        private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void OnClosing(object? sender, CancelEventArgs e)
         {
-            if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
+            try
             {
-                e.Handled = true;
+                _viewModel.IsClosing = true;
+                if (MainContent.Content is MonacoEditor editor)
+                {
+                    EditorCache.Editor = editor;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logService?.LogException(ex, "ウィンドウ終了処理中にエラーが発生しました");
             }
         }
 
-        private void RegisterSnippets()
+        private void OnDeactivated(object? sender, EventArgs e)
         {
+            // フォーカス喪失時の処理（必要に応じて実装）
+        }
 
-            var snippetVariables = new List<EditorSnippet> { 
-
-    //new Snippet { Label = "TM_SELECTED_TEXT", InsertText = "${TM_SELECTED_TEXT}", Documentation = "The currently selected text or the empty string" },
-    //new Snippet { Label = "TM_CURRENT_LINE", InsertText = "${TM_CURRENT_LINE}", Documentation = "The contents of the current line" },
-    //new Snippet { Label = "TM_CURRENT_WORD", InsertText = "${TM_CURRENT_WORD}", Documentation = "The contents of the word under cursor or the empty string" },
-    //new Snippet { Label = "TM_LINE_INDEX", InsertText = "${TM_LINE_INDEX}", Documentation = "The zero-index based line number" },
-    //new Snippet { Label = "TM_LINE_NUMBER", InsertText = "${TM_LINE_NUMBER}", Documentation = "The one-index based line number" },
-    //new Snippet { Label = "TM_FILENAME", InsertText = "${TM_FILENAME}", Documentation = "The filename of the current document" },
-    //new Snippet { Label = "TM_FILENAME_BASE", InsertText = "${TM_FILENAME_BASE}", Documentation = "The filename of the current document without its extensions" },
-    //new Snippet { Label = "TM_DIRECTORY", InsertText = "${TM_DIRECTORY}", Documentation = "The directory of the current document" },
-    //new Snippet { Label = "TM_FILEPATH", InsertText = "${TM_FILEPATH}", Documentation = "The full file path of the current document" },
-    //new Snippet { Label = "WORKSPACE_NAME", InsertText = "${WORKSPACE_NAME}", Documentation = "The name of the opened workspace or folder" },
-    
-    // Date and Time variables
-    //new Snippet { Label = "CURRENT_YEAR", InsertText = "${CURRENT_YEAR}", Documentation = "The current year" },
-    //new Snippet { Label = "CURRENT_YEAR_SHORT", InsertText = "${CURRENT_YEAR_SHORT}", Documentation = "The current year's last two digits" },
-    //new Snippet { Label = "CURRENT_MONTH", InsertText = "${CURRENT_MONTH}", Documentation = "The month as two digits (example '02')" },
-    //new Snippet { Label = "CURRENT_MONTH_NAME", InsertText = "${CURRENT_MONTH_NAME}", Documentation = "The full name of the month (example 'July')" },
-    //new Snippet { Label = "CURRENT_MONTH_NAME_SHORT", InsertText = "${CURRENT_MONTH_NAME_SHORT}", Documentation = "The short name of the month (example 'Jul')" },
-    //new Snippet { Label = "CURRENT_DATE", InsertText = "${CURRENT_DATE}", Documentation = "The day of the month" },
-    //new Snippet { Label = "CURRENT_DAY_NAME", InsertText = "${CURRENT_DAY_NAME}", Documentation = "The name of day (example 'Monday')" },
-    //new Snippet { Label = "CURRENT_DAY_NAME_SHORT", InsertText = "${CURRENT_DAY_NAME_SHORT}", Documentation = "The short name of the day (example 'Mon')" },
-    //new Snippet { Label = "CURRENT_HOUR", InsertText = "${CURRENT_HOUR}", Documentation = "The current hour in 24-hour clock format" },
-    //new Snippet { Label = "CURRENT_MINUTE", InsertText = "${CURRENT_MINUTE}", Documentation = "The current minute" },
-    //new Snippet { Label = "CURRENT_SECOND", InsertText = "${CURRENT_SECOND}", Documentation = "The current second" },
-    //new Snippet { Label = "CURRENT_SECONDS_UNIX", InsertText = "${CURRENT_SECONDS_UNIX}", Documentation = "The number of seconds since the Unix epoch" }
-
-    new EditorSnippet { Label = "CURRENT_YEAR", InsertText = "\\\\${CURRENT_YEAR}", Documentation = "The current year" },
-    new EditorSnippet { Label = "CURRENT_MONTH", InsertText = "\\\\${CURRENT_MONTH}", Documentation = "The month as two digits (example '02')" },
-    new EditorSnippet { Label = "CURRENT_DATE", InsertText = "\\\\${CURRENT_DATE}", Documentation = "The day of the month" },
-    new EditorSnippet { Label = "CURRENT_HOUR", InsertText = "\\\\${CURRENT_HOUR}", Documentation = "The current hour in 24-hour clock format" },
-    new EditorSnippet { Label = "CURRENT_MINUTE", InsertText = "\\\\${CURRENT_MINUTE}", Documentation = "The current minute" },
-    new EditorSnippet { Label = "CURRENT_SECOND", InsertText = "\\\\${CURRENT_SECOND}", Documentation = "The current second" },
-
-};
-
-            //EditorCache.Editor.RegisterSnippets(snippetVariables);
+        public void FocusContent()
+        {
+            if (MainContent.Content is IFocasable focusable)
+            {
+                focusable.Focus();
+            }
         }
     }
 }

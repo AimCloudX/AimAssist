@@ -5,6 +5,7 @@ using AimAssist.Middlewares;
 using AimAssist.Plugins;
 using AimAssist.Service;
 using AimAssist.Services;
+using AimAssist.UI.Tools.HotKeys;
 using AimAssist.Units.Implementation;
 using AimAssist.Units.Implementation.Factories;
 using AimAssist.Units.Implementation.Snippets;
@@ -44,7 +45,12 @@ namespace AimAssist.DI
             services.AddSingleton<ISettingManager, SettingManager>();
             services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
             services.AddSingleton<IApplicationLogService, ApplicationLogService>();
-            services.AddSingleton<IPickerService, PickerService>();
+            services.AddSingleton<IPickerService>(provider => new PickerService(
+                provider.GetRequiredService<ICommandService>(),
+                provider.GetRequiredService<IUnitsService>(),
+                provider.GetRequiredService<IEditorOptionService>(),
+                provider.GetRequiredService<IApplicationLogService>()
+            ));
             services.AddSingleton<IWindowHandleService, WindowHandleService>();
             services.AddSingleton<IErrorHandlingMiddleware, ErrorHandlingMiddleware>();
 
@@ -74,6 +80,7 @@ namespace AimAssist.DI
             ));
 
             services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<PickerWindowViewModel>();
 
             services.AddTransient<AimAssist.UI.MainWindows.MainWindow>(provider => new AimAssist.UI.MainWindows.MainWindow(
                 provider.GetRequiredService<MainWindowViewModel>(),
@@ -83,7 +90,7 @@ namespace AimAssist.DI
                 provider.GetRequiredService<ICommandService>()
             ));
 
-            services.AddTransient<AimAssist.UI.Tools.HotKeys.WaitHotKeysWindow>(provider => new AimAssist.UI.Tools.HotKeys.WaitHotKeysWindow(
+            services.AddTransient<WaitHotKeysWindow>(provider => new WaitHotKeysWindow(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IAppCommands>()
             ));
