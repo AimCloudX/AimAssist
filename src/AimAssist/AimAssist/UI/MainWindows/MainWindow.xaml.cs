@@ -1,6 +1,5 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Service;
-using AimAssist.ViewModels;
 using AimAssist.Commands;
 using System.ComponentModel;
 using System.Windows;

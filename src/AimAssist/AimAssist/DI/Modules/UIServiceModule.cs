@@ -2,7 +2,8 @@
 using AimAssist.Core.Interfaces;
 using AimAssist.Service;
 using AimAssist.UI.HotKeys;
-using AimAssist.ViewModels;
+using AimAssist.UI.MainWindows;
+using AimAssist.UI.PickerWindows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI.Modules

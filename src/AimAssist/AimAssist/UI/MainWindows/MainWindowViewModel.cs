@@ -1,4 +1,9 @@
-﻿using AimAssist.Commands;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Input;
+using AimAssist.Commands;
+using AimAssist.Core.Commands;
 using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Services;
@@ -6,15 +11,10 @@ using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.Snippets;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Input;
-using AimAssist.Core.Commands;
 using AimAssist.Units.Implementation.Web;
 using UnitViewModel = AimAssist.UI.UnitContentsView.UnitViewModel;
 
-namespace AimAssist.ViewModels
+namespace AimAssist.UI.MainWindows
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {

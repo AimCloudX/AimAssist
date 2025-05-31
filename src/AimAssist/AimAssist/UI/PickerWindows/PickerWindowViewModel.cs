@@ -1,25 +1,20 @@
-﻿using AimAssist.Commands;
-using AimAssist.Core.Interfaces;
-using AimAssist.Core.Units;
-using AimAssist.Service;
-using AimAssist.UI.PickerWindows;
-using AimAssist.UI.UnitContentsView;
-using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Caluculation;
-using AimAssist.Units.Implementation.KeyHelp;
-using AimAssist.Units.Implementation.Snippets;
-using Common.UI.Editor;
-using Mathos.Parser;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using AimAssist.Commands;
+using AimAssist.Core.Interfaces;
+using AimAssist.Core.Units;
+using AimAssist.Units.Implementation.Caluculation;
+using AimAssist.Units.Implementation.KeyHelp;
+using AimAssist.Units.Implementation.Snippets;
 using Common.UI.Commands.Shortcus;
+using Mathos.Parser;
 using UnitViewModel = AimAssist.UI.UnitContentsView.UnitViewModel;
 
-namespace AimAssist.ViewModels
+namespace AimAssist.UI.PickerWindows
 {
     public class PickerWindowViewModel : INotifyPropertyChanged
     {
