@@ -52,6 +52,17 @@ namespace AimAssist.ViewModels
             {
                 _selectedIndex = value;
                 OnPropertyChanged();
+                
+                // SelectedIndexが変更されたときにSelectedUnitも更新
+                if (_selectedIndex >= 0 && _selectedIndex < UnitLists.Count)
+                {
+                    var view = CollectionViewSource.GetDefaultView(UnitLists);
+                    var filteredItems = view.Cast<UnitViewModel>().ToList();
+                    if (_selectedIndex < filteredItems.Count)
+                    {
+                        SelectedUnit = filteredItems[_selectedIndex];
+                    }
+                }
             }
         }
 
@@ -129,22 +140,43 @@ namespace AimAssist.ViewModels
 
         private void HandleCalculationMode()
         {
-            Mode = CalcMode.Instance;
+            // モード切り替え時にフィルタをクリア
+            if (Mode != CalcMode.Instance)
+            {
+                Mode = CalcMode.Instance;
+                var view = CollectionViewSource.GetDefaultView(UnitLists);
+                view.Filter = null; // フィルタをクリア
+            }
 
             try
             {
                 var expression = _filterText.Remove(0, 1);
+                if (string.IsNullOrWhiteSpace(expression))
+                {
+                    UnitLists.Clear();
+                    return;
+                }
+
                 var parser = new MathParser();
                 var result = parser.Parse(expression);
-                var unitViewModel = new UnitViewModel(new SnippetUnit(result.ToString(), result.ToString()));
+                var calcUnit = new CalcUnit(expression, result.ToString());
+                var unitViewModel = new UnitViewModel(calcUnit);
 
                 UnitLists.Clear();
                 UnitLists.Add(unitViewModel);
                 SelectedIndex = 0;
+                SelectedUnit = unitViewModel; // 明示的に選択状態を設定
             }
-            catch
+            catch (Exception ex)
             {
-                // 計算エラーは無視
+                // 計算エラーの場合、エラーメッセージを表示
+                var errorUnit = new CalcUnit(_filterText.Remove(0, 1), $"エラー: {ex.Message}");
+                var unitViewModel = new UnitViewModel(errorUnit);
+                
+                UnitLists.Clear();
+                UnitLists.Add(unitViewModel);
+                SelectedIndex = 0;
+                SelectedUnit = unitViewModel; // 明示的に選択状態を設定
             }
         }
 
@@ -158,7 +190,18 @@ namespace AimAssist.ViewModels
 
             var view = CollectionViewSource.GetDefaultView(UnitLists);
             view.Filter = FilterUnits;
-            SelectedIndex = 0;
+            view.Refresh(); // フィルタの再適用を強制
+            
+            // フィルタ適用後に最初の項目を選択
+            if (UnitLists.Count > 0)
+            {
+                SelectedIndex = 0;
+                var filteredItems = view.Cast<UnitViewModel>().ToList();
+                if (filteredItems.Count > 0)
+                {
+                    SelectedUnit = filteredItems[0];
+                }
+            }
         }
 
         private bool FilterUnits(object obj)
@@ -184,11 +227,20 @@ namespace AimAssist.ViewModels
             {
                 EditorCache.Editor?.SetTextAsync(snippetModelUnit.Code);
             }
+            else if (_selectedUnit?.Content is CalcUnit calcUnit)
+            {
+                EditorCache.Editor?.SetTextAsync(calcUnit.Result);
+            }
         }
 
         public void UpdateCandidate()
         {
             UnitLists.Clear();
+            
+            // フィルタをクリア
+            var view = CollectionViewSource.GetDefaultView(UnitLists);
+            view.Filter = null;
+            
             var units = _unitsService.CreateUnits(Mode);
 
             foreach (var unit in units)
@@ -209,11 +261,21 @@ namespace AimAssist.ViewModels
                     UnitLists.Add(new UnitViewModel(unit));
                 }
             }
+            
+            // 最初の項目を選択
+            if (UnitLists.Count > 0)
+            {
+                SelectedIndex = 0;
+                SelectedUnit = UnitLists[0];
+            }
         }
 
         private void NavigateUp()
         {
-            if (SelectedIndex > 0)
+            var view = CollectionViewSource.GetDefaultView(UnitLists);
+            var filteredItems = view.Cast<UnitViewModel>().ToList();
+            
+            if (SelectedIndex > 0 && filteredItems.Count > 0)
             {
                 SelectedIndex--;
             }
@@ -221,7 +283,10 @@ namespace AimAssist.ViewModels
 
         private void NavigateDown()
         {
-            if (SelectedIndex < UnitLists.Count - 1)
+            var view = CollectionViewSource.GetDefaultView(UnitLists);
+            var filteredItems = view.Cast<UnitViewModel>().ToList();
+            
+            if (SelectedIndex < filteredItems.Count - 1)
             {
                 SelectedIndex++;
             }
@@ -237,6 +302,11 @@ namespace AimAssist.ViewModels
             else if (SelectedUnit?.Content is SnippetModelUnit)
             {
                 SnippetText = await EditorCache.Editor?.GetText() ?? string.Empty;
+                IsClosing = true;
+            }
+            else if (SelectedUnit?.Content is CalcUnit calcUnit)
+            {
+                SnippetText = calcUnit.Result;
                 IsClosing = true;
             }
             else if (SelectedUnit?.Content is KeyHelpUnit keyHelpUnit)

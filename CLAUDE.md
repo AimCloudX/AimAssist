@@ -29,6 +29,7 @@ WPFベースのコマンドランチャー・生産性向上ツール
 - **Common**: 共通UI・コンポーネント
 
 #### 1.2 依存関係の整理
+
 **問題点:**
 - Initializerクラスが多数の依存関係を持ちすぎている（11個のパラメータ）
 - ServiceRegistrationが複雑になっている
@@ -135,3 +136,46 @@ WPFベースのコマンドランチャー・生産性向上ツール
 2. 十分なテスト実施
 3. ロールバック計画の準備
 4. プラグインAPIの段階的移行
+
+## Phase 1 進捗状況
+
+### 完了項目
+1. **ServiceRegistrationのモジュール化**: ✅ 完了
+   - IServiceModuleインターフェースの作成
+   - 機能別モジュール分離（Core, Application, UI, Option, Factory, Plugin, Initialization）
+   - モジュールベースの登録システム
+
+2. **Initializerの責務分離**: ✅ 完了
+   - IApplicationInitializationServiceの作成
+   - FileInitializationServiceによるファイル初期化の分離
+   - PluginInitializationServiceによるプラグイン初期化の分離
+   - ApplicationInitializationServiceによる統合初期化
+
+3. **依存関係の簡素化**: ✅ 完了
+   - Initializerが単一のIApplicationInitializationServiceに依存
+   - 11個のパラメータから1個に削減
+
+### バグ修正
+4. **計算機能の修正**: ✅ 完了
+   - CalcUnitの新規実装
+   - PickerWindowViewModelでのCalc機能の復旧
+   - Calc→Snippet→Calcモード切り替え時の表示問題を修正
+   - フィルタリング状態の適切な管理
+   - SelectedUnitの同期問題の解決
+
+### 技術的改善点
+- **責務の明確化**: 各サービスが単一責任を持つように分離
+- **モジュール性の向上**: DIコンテナの登録がモジュール単位で管理
+- **テスタビリティの向上**: 各初期化サービスが独立してテスト可能
+- **保守性の向上**: 新機能追加時にモジュールとして追加可能
+- **UI状態管理の改善**: モード切り替え時の状態の一貫性を確保
+
+### 修正内容詳細
+- **CalcUnit**: 計算専用のUnitクラスを新規作成
+- **HandleCalculationMode**: モード切り替え時のフィルタクリアとSelectedUnit同期
+- **HandleSnippetMode**: フィルタ再適用とビューの強制更新
+- **SelectedIndex**: インデックス変更時のSelectedUnit自動同期
+- **NavigateUp/Down**: フィルタされたアイテムを考慮したナビゲーション
+
+### 次のステップ
+Phase 2のサービス層再設計に進む予定

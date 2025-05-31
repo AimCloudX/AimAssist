@@ -1,0 +1,23 @@
+﻿using AimAssist.Core.Interfaces;
+using AimAssist.Units.Implementation;
+using AimAssist.Units.Implementation.Factories;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace AimAssist.DI.Modules
+{
+    public class FactoryServiceModule : IServiceModule
+    {
+        public IServiceCollection RegisterServices(IServiceCollection services)
+        {
+            services.AddSingleton<IWorkToolsUnitsFactory, WorkToolsUnitsFactory>();
+            services.AddSingleton<ISnippetUnitsFactory, SnippetUnitsFactory>();
+            services.AddSingleton<IKnowledgeUnitsFactory, KnowledgeUnitsFactory>();
+            services.AddSingleton<ICheatSheetUnitsFactory, CheatSheetUnitsFactory>();
+            services.AddSingleton<IOptionUnitsFactory, OptionUnitsFactory>();
+            services.AddSingleton<ICoreUnitsFactory, CoreUnitsFactory>();
+            services.AddSingleton<ICompositeUnitsFactory, CompositeUnitsFactory>();
+            
+            return services;
+        }
+    }
+}

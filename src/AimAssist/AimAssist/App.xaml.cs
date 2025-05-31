@@ -35,8 +35,8 @@ namespace AimAssist
                 
                 try
                 {
-                    var applicationService = _serviceProvider.GetRequiredService<IApplicationService>();
-                    applicationService.InitializeAsync().Wait();
+                    var initializer = _serviceProvider.GetRequiredService<Initializer>();
+                    initializer.Initialize();
                 }
                 catch (Exception ex)
                 {
@@ -61,7 +61,7 @@ namespace AimAssist
             var services = new ServiceCollection();
             
             services.RegisterServices();
-            services.RegisterInitializer();
+            services.AddSingleton<Initializer>();
             
             _serviceProvider = services.BuildServiceProvider();
         }
