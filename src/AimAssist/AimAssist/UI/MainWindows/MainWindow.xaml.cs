@@ -1,11 +1,7 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Service;
-using AimAssist.Services;
 using AimAssist.ViewModels;
 using AimAssist.Commands;
-using AimAssist.Core.Commands;
-using AimAssist.Units.Core.Modes;
-using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -19,11 +15,11 @@ namespace AimAssist.UI.MainWindows
 {
     public partial class MainWindow : Window
     {
-        private readonly MainWindowViewModel _viewModel;
-        private readonly IApplicationLogService _logService;
-        private readonly KeySequenceManager _keySequenceManager;
-        private readonly IUnitsService _unitsService;
-        private readonly ICommandService _commandService;
+        private readonly MainWindowViewModel viewModel;
+        private readonly IApplicationLogService logService;
+        private readonly KeySequenceManager keySequenceManager;
+        private readonly IUnitsService unitsService;
+        private readonly ICommandService commandService;
 
         public MainWindow(
             MainWindowViewModel viewModel,
@@ -32,15 +28,15 @@ namespace AimAssist.UI.MainWindows
             IUnitsService unitsService,
             ICommandService commandService)
         {
-            _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
-            _logService = logService ?? throw new ArgumentNullException(nameof(logService));
-            _keySequenceManager = keySequenceManager ?? throw new ArgumentNullException(nameof(keySequenceManager));
-            _unitsService = unitsService ?? throw new ArgumentNullException(nameof(unitsService));
-            _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+            this.viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+            this.logService = logService ?? throw new ArgumentNullException(nameof(logService));
+            this.keySequenceManager = keySequenceManager ?? throw new ArgumentNullException(nameof(keySequenceManager));
+            this.unitsService = unitsService ?? throw new ArgumentNullException(nameof(unitsService));
+            this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
             
             InitializeComponent();
             
-            DataContext = _viewModel;
+            DataContext = this.viewModel;
             
             SourceInitialized += MainWindow_SourceInitialized;
             Loaded += MainWindow_Loaded;
@@ -52,7 +48,7 @@ namespace AimAssist.UI.MainWindows
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (_keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
+            if (keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
             {
                 e.Handled = true;
             }
@@ -67,7 +63,7 @@ namespace AimAssist.UI.MainWindows
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "ウィンドウ初期化中にエラーが発生しました");
+                logService.LogException(ex, "ウィンドウ初期化中にエラーが発生しました");
             }
         }
 
@@ -94,7 +90,7 @@ namespace AimAssist.UI.MainWindows
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "ウィンドウ読み込み中にエラーが発生しました");
+                logService.LogException(ex, "ウィンドウ読み込み中にエラーが発生しました");
             }
         }
 
@@ -108,7 +104,7 @@ namespace AimAssist.UI.MainWindows
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "ウィンドウ終了処理中にエラーが発生しました");
+                logService.LogException(ex, "ウィンドウ終了処理中にエラーが発生しました");
             }
         }
 
@@ -116,9 +112,9 @@ namespace AimAssist.UI.MainWindows
         {
             try
             {
-                _viewModel.IsItemListVisible = !_viewModel.IsItemListVisible;
+                viewModel.IsItemListVisible = !viewModel.IsItemListVisible;
                 
-                if (_viewModel.IsItemListVisible)
+                if (viewModel.IsItemListVisible)
                 {
                     ItemListColumn.Width = new GridLength(220);
                 }
@@ -129,7 +125,7 @@ namespace AimAssist.UI.MainWindows
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "ハンバーガーメニュー操作中にエラーが発生しました");
+                logService.LogException(ex, "ハンバーガーメニュー操作中にエラーが発生しました");
             }
         }
 
@@ -138,16 +134,16 @@ namespace AimAssist.UI.MainWindows
             try
             {
                 // モード変更コマンドの登録
-                foreach (var mode in _unitsService.GetAllModes())
+                foreach (var mode in unitsService.GetAllModes())
                 {
                     var modeChangeCommand = new RelayCommand(mode.GetModeChnageCommandName(), (window) =>
                     {
                         if (window is MainWindow mainWindow)
                         {
-                            mainWindow._viewModel.SelectedMode = mode;
+                            mainWindow.viewModel.SelectedMode = mode;
                         }
                     });
-                    _commandService.Register(modeChangeCommand, mode.DefaultKeySequence);
+                    commandService.Register(modeChangeCommand, mode.DefaultKeySequence);
                 }
 
                 // メインウィンドウ用コマンドの登録
@@ -155,15 +151,15 @@ namespace AimAssist.UI.MainWindows
                 {
                     if (window is MainWindow mainWindow)
                     {
-                        var modes = mainWindow._viewModel.Modes;
-                        var currentIndex = modes.IndexOf(mainWindow._viewModel.SelectedMode);
+                        var modes = mainWindow.viewModel.Modes;
+                        var currentIndex = modes.IndexOf(mainWindow.viewModel.SelectedMode);
                         if (currentIndex == modes.Count - 1)
                         {
-                            mainWindow._viewModel.SelectedMode = modes[0];
+                            mainWindow.viewModel.SelectedMode = modes[0];
                         }
                         else
                         {
-                            mainWindow._viewModel.SelectedMode = modes[currentIndex + 1];
+                            mainWindow.viewModel.SelectedMode = modes[currentIndex + 1];
                         }
                     }
                 });
@@ -172,15 +168,15 @@ namespace AimAssist.UI.MainWindows
                 {
                     if (window is MainWindow mainWindow)
                     {
-                        var modes = mainWindow._viewModel.Modes;
-                        var currentIndex = modes.IndexOf(mainWindow._viewModel.SelectedMode);
+                        var modes = mainWindow.viewModel.Modes;
+                        var currentIndex = modes.IndexOf(mainWindow.viewModel.SelectedMode);
                         if (currentIndex == 0)
                         {
-                            mainWindow._viewModel.SelectedMode = modes[modes.Count - 1];
+                            mainWindow.viewModel.SelectedMode = modes[modes.Count - 1];
                         }
                         else
                         {
-                            mainWindow._viewModel.SelectedMode = modes[currentIndex - 1];
+                            mainWindow.viewModel.SelectedMode = modes[currentIndex - 1];
                         }
                     }
                 });
@@ -189,15 +185,15 @@ namespace AimAssist.UI.MainWindows
                 {
                     if (window is MainWindow mainWindow)
                     {
-                        var units = mainWindow._viewModel.Units;
-                        var currentIndex = units.IndexOf(mainWindow._viewModel.SelectedUnit);
+                        var units = mainWindow.viewModel.Units;
+                        var currentIndex = units.IndexOf(mainWindow.viewModel.SelectedUnit);
                         if (currentIndex == units.Count - 1)
                         {
-                            mainWindow._viewModel.SelectedUnit = units[0];
+                            mainWindow.viewModel.SelectedUnit = units[0];
                         }
                         else
                         {
-                            mainWindow._viewModel.SelectedUnit = units[currentIndex + 1];
+                            mainWindow.viewModel.SelectedUnit = units[currentIndex + 1];
                         }
                     }
                 });
@@ -206,15 +202,15 @@ namespace AimAssist.UI.MainWindows
                 {
                     if (window is MainWindow mainWindow)
                     {
-                        var units = mainWindow._viewModel.Units;
-                        var currentIndex = units.IndexOf(mainWindow._viewModel.SelectedUnit);
+                        var units = mainWindow.viewModel.Units;
+                        var currentIndex = units.IndexOf(mainWindow.viewModel.SelectedUnit);
                         if (currentIndex == 0)
                         {
-                            mainWindow._viewModel.SelectedUnit = units[units.Count - 1];
+                            mainWindow.viewModel.SelectedUnit = units[units.Count - 1];
                         }
                         else
                         {
-                            mainWindow._viewModel.SelectedUnit = units[currentIndex - 1];
+                            mainWindow.viewModel.SelectedUnit = units[currentIndex - 1];
                         }
                     }
                 });
@@ -236,22 +232,22 @@ namespace AimAssist.UI.MainWindows
                 });
 
                 // キーバインディングの登録
-                _commandService.Register(MainWindowCommands.NextMode, new KeySequence(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
-                _commandService.Register(MainWindowCommands.PreviousMode, new KeySequence(Key.P, ModifierKeys.Control | ModifierKeys.Shift));
-                _commandService.Register(MainWindowCommands.NextUnit, new KeySequence(Key.N, ModifierKeys.Control));
-                _commandService.Register(MainWindowCommands.PreviousUnit, new KeySequence(Key.P, ModifierKeys.Control));
-                _commandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
-                _commandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
+                commandService.Register(MainWindowCommands.NextMode, new KeySequence(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
+                commandService.Register(MainWindowCommands.PreviousMode, new KeySequence(Key.P, ModifierKeys.Control | ModifierKeys.Shift));
+                commandService.Register(MainWindowCommands.NextUnit, new KeySequence(Key.N, ModifierKeys.Control));
+                commandService.Register(MainWindowCommands.PreviousUnit, new KeySequence(Key.P, ModifierKeys.Control));
+                commandService.Register(MainWindowCommands.FocusContent, new KeySequence(Key.K, ModifierKeys.Control, Key.L, ModifierKeys.Control));
+                commandService.Register(MainWindowCommands.FocusUnits, new KeySequence(Key.K, ModifierKeys.Control, Key.J, ModifierKeys.Control));
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "コマンド登録中にエラーが発生しました");
+                logService.LogException(ex, "コマンド登録中にエラーが発生しました");
             }
         }
 
         public void FocusContent()
         {
-            if (_viewModel.CurrentContent is Common.UI.IFocasable focusable)
+            if (viewModel.CurrentContent is Common.UI.IFocasable focusable)
             {
                 focusable.Focus();
             }

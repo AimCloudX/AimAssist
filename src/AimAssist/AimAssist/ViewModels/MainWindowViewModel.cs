@@ -6,32 +6,29 @@ using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.Snippets;
-using AimAssist.Units.Implementation.Web;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using AimAssist.Core.Commands;
+using AimAssist.Units.Implementation.Web;
 using UnitViewModel = AimAssist.UI.UnitContentsView.UnitViewModel;
 
 namespace AimAssist.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private readonly IUnitManagementService _unitManagementService;
-        private readonly INavigationService _navigationService;
-        private readonly IApplicationLogService _logService;
-        private readonly IUnitsService _unitsService;
-        private readonly UnitViewFactory _unitViewFactory;
+        private readonly IUnitManagementService unitManagementService;
+        private readonly IApplicationLogService logService;
+        private readonly IUnitsService unitsService;
+        private readonly UnitViewFactory unitViewFactory;
         
-        private string _filterText = string.Empty;
-        private UnitViewModel _selectedUnit;
-        private IMode _selectedMode;
-        private bool _isLoading;
-        private bool _isItemListVisible = true;
-        private UIElement _currentContent;
+        private string filterText = string.Empty;
+        private UnitViewModel selectedUnit;
+        private IMode selectedMode;
+        private bool isLoading;
+        private bool isItemListVisible = true;
+        private UIElement currentContent;
 
         public MainWindowViewModel(
             IUnitManagementService unitManagementService,
@@ -40,14 +37,17 @@ namespace AimAssist.ViewModels
             IUnitsService unitsService,
             UnitViewFactory unitViewFactory)
         {
-            _unitManagementService = unitManagementService;
-            _navigationService = navigationService;
-            _logService = logService;
-            _unitsService = unitsService;
-            _unitViewFactory = unitViewFactory;
+            this.unitManagementService = unitManagementService;
+            var service = navigationService;
+            this.logService = logService;
+            this.unitsService = unitsService;
+            this.unitViewFactory = unitViewFactory;
             
             Units = new ObservableCollection<UnitViewModel>();
             Modes = new ObservableCollection<IMode>();
+            
+            var binding = new CommandBinding(AimAssistCommands.SendUnitCommand, ExecuteReceiveData);
+            CommandManager.RegisterClassCommandBinding(typeof(Window), binding);
             
             RefreshUnitsCommand = new RelayCommand(async () => await RefreshUnitsAsync());
             ExecuteUnitCommand = new RelayCommand<UnitViewModel>(ExecuteUnit, unit => unit != null);
@@ -56,11 +56,11 @@ namespace AimAssist.ViewModels
             {
                 try
                 {
-                    _navigationService.HideMainWindow();
+                    service.HideMainWindow();
                 }
                 catch (Exception ex)
                 {
-                    _logService.LogException(ex, "ウィンドウクローズ中にエラーが発生しました");
+                    this.logService.LogException(ex, "ウィンドウクローズ中にエラーが発生しました");
                 }
             });
             
@@ -72,12 +72,12 @@ namespace AimAssist.ViewModels
 
         public string FilterText
         {
-            get => _filterText;
+            get => filterText;
             set
             {
-                if (_filterText != value)
+                if (filterText != value)
                 {
-                    _filterText = value;
+                    filterText = value;
                     OnPropertyChanged(nameof(FilterText));
                 }
             }
@@ -85,12 +85,12 @@ namespace AimAssist.ViewModels
 
         public UnitViewModel SelectedUnit
         {
-            get => _selectedUnit;
+            get => selectedUnit;
             set
             {
-                if (_selectedUnit != value)
+                if (selectedUnit != value)
                 {
-                    _selectedUnit = value;
+                    selectedUnit = value;
                     OnPropertyChanged(nameof(SelectedUnit));
                     UpdateCurrentContent();
                 }
@@ -99,12 +99,12 @@ namespace AimAssist.ViewModels
 
         public IMode SelectedMode
         {
-            get => _selectedMode;
+            get => selectedMode;
             set
             {
-                if (_selectedMode != value)
+                if (selectedMode != value)
                 {
-                    _selectedMode = value;
+                    selectedMode = value;
                     OnPropertyChanged(nameof(SelectedMode));
                     LoadUnitsForMode(value);
                 }
@@ -113,12 +113,12 @@ namespace AimAssist.ViewModels
 
         public bool IsLoading
         {
-            get => _isLoading;
+            get => isLoading;
             set
             {
-                if (_isLoading != value)
+                if (isLoading != value)
                 {
-                    _isLoading = value;
+                    isLoading = value;
                     OnPropertyChanged(nameof(IsLoading));
                 }
             }
@@ -126,12 +126,12 @@ namespace AimAssist.ViewModels
 
         public bool IsItemListVisible
         {
-            get => _isItemListVisible;
+            get => isItemListVisible;
             set
             {
-                if (_isItemListVisible != value)
+                if (isItemListVisible != value)
                 {
-                    _isItemListVisible = value;
+                    isItemListVisible = value;
                     OnPropertyChanged(nameof(IsItemListVisible));
                 }
             }
@@ -139,12 +139,12 @@ namespace AimAssist.ViewModels
 
         public UIElement CurrentContent
         {
-            get => _currentContent;
+            get => currentContent;
             set
             {
-                if (_currentContent != value)
+                if (currentContent != value)
                 {
-                    _currentContent = value;
+                    currentContent = value;
                     OnPropertyChanged(nameof(CurrentContent));
                 }
             }
@@ -162,7 +162,7 @@ namespace AimAssist.ViewModels
             try
             {
                 Modes.Clear();
-                foreach (var mode in _unitsService.GetAllModes())
+                foreach (var mode in unitsService.GetAllModes())
                 {
                     Modes.Add(mode);
                 }
@@ -174,7 +174,7 @@ namespace AimAssist.ViewModels
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "モード読み込み中にエラーが発生しました");
+                logService.LogException(ex, "モード読み込み中にエラーが発生しました");
             }
         }
 
@@ -185,7 +185,7 @@ namespace AimAssist.ViewModels
             try
             {
                 Units.Clear();
-                var units = _unitsService.CreateUnits(mode);
+                var units = unitsService.CreateUnits(mode);
 
                 foreach (var unit in units)
                 {
@@ -210,7 +210,7 @@ namespace AimAssist.ViewModels
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, $"モード '{mode.Name}' のユニット読み込み中にエラーが発生しました");
+                logService.LogException(ex, $"モード '{mode.Name}' のユニット読み込み中にエラーが発生しました");
             }
         }
 
@@ -220,11 +220,11 @@ namespace AimAssist.ViewModels
             {
                 try
                 {
-                    CurrentContent = _unitViewFactory.Create(SelectedUnit);
+                    CurrentContent = unitViewFactory.Create(SelectedUnit);
                 }
                 catch (Exception ex)
                 {
-                    _logService.LogException(ex, $"ユニット '{SelectedUnit.Name}' のコンテンツ作成中にエラーが発生しました");
+                    logService.LogException(ex, $"ユニット '{SelectedUnit.Name}' のコンテンツ作成中にエラーが発生しました");
                 }
             }
         }
@@ -234,17 +234,39 @@ namespace AimAssist.ViewModels
             try
             {
                 IsLoading = true;
-                _unitManagementService.RefreshUnits();
+                unitManagementService.RefreshUnits();
                 LoadUnitsForMode(SelectedMode);
-                _logService.Info("ユニットが更新されました");
+                logService.Info("ユニットが更新されました");
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, "ユニット更新中にエラーが発生しました");
+                logService.LogException(ex, "ユニット更新中にエラーが発生しました");
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+        
+        private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Parameter is UnitsArgs unitsArgs)
+            {
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                if (unitsArgs.NeedSetMode)
+                {
+                    if (SelectedMode != unitsArgs.Mode)
+                    {
+                        SelectedMode = unitsArgs.Mode;
+                    }
+                }
+
+                foreach (var unit in unitsArgs.Units)
+                {
+                        Units.Add(new UnitViewModel(unit));
+                }
+
+                Mouse.OverrideCursor = null;
             }
         }
 
@@ -269,12 +291,12 @@ namespace AimAssist.ViewModels
             {
                 if (unitViewModel?.Content != null)
                 {
-                    _logService.Info($"ユニットを実行しました: {unitViewModel.Name}");
+                    logService.Info($"ユニットを実行しました: {unitViewModel.Name}");
                 }
             }
             catch (Exception ex)
             {
-                _logService.LogException(ex, $"ユニット実行中にエラーが発生しました: {unitViewModel?.Name}");
+                logService.LogException(ex, $"ユニット実行中にエラーが発生しました: {unitViewModel?.Name}");
             }
         }
 
