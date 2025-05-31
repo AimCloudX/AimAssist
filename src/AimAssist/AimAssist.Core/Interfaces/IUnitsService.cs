@@ -25,5 +25,16 @@ namespace AimAssist.Core.Interfaces
         /// <param name="mode">モード</param>
         /// <returns>作成されたユニットのコレクション</returns>
         IEnumerable<IUnit> CreateUnits(IMode mode);
+
+        /// <summary>
+        /// すべてのユニットを取得します
+        /// </summary>
+        /// <returns>すべてのユニット</returns>
+        IEnumerable<IUnit> GetAllUnits();
+
+        /// <summary>
+        /// ユニットを再読み込みします
+        /// </summary>
+        void RefreshUnits();
     }
 }

@@ -69,4 +69,41 @@ WPFベースのコマンドランチャー・生産性向上ツール
 6. エラーハンドリング統一
 
 ## TODO
-リファクタリング実装開始
+
+リファクタリング実施状況
+
+### 完了したタスク
+
+#### 1. DI設定分離とモジュール化 ✅
+- ServiceRegistration.cs作成
+- モジュール別にサービス登録を分割
+- App.xaml.csのConfigureServicesを簡素化
+
+#### 2. アプリケーション層サービス作成 ✅
+- ApplicationService.cs: アプリ全体制御
+- UnitManagementService.cs: ユニット管理統合
+- ConfigurationService.cs: 設定管理統合
+- NavigationService.cs: 画面遷移管理
+
+#### 3. ViewModel分離とMVVM強化 ✅
+- MainWindowViewModel.cs作成
+- プレゼンテーション層のロジック分離
+
+#### 4. ユニットファクトリ分割 ✅
+- WorkToolsUnitsFactory.cs: ワークツール用ユニット
+- SnippetUnitsFactory.cs: スニペット用ユニット
+- KnowledgeUnitsFactory.cs: ナレッジ用ユニット
+- CheatSheetUnitsFactory.cs: チートシート用ユニット
+- OptionUnitsFactory.cs: オプション用ユニット
+- CoreUnitsFactory.cs: 基本機能用ユニット
+- CompositeUnitsFactory.cs: 統合ファクトリ
+
+#### 5. エラーハンドリング統一 ✅
+- ErrorHandlingMiddleware.cs作成
+- 統一例外ハンドラ実装
+- App.xaml.csでグローバル例外処理統合
+
+### 次のステップ
+- MainWindow.xaml.csのコードビハインド簡素化
+- UI Behaviorsの分離
+- UnitsServiceとの統合テスト

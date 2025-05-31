@@ -1,22 +1,18 @@
-﻿using AimAssist.Core.Commands;
-using AimAssist.Core.Helpers;
+﻿using AimAssist.Core.Helpers;
 using AimAssist.Core.Interfaces;
-using AimAssist.Core.Services;
-using AimAssist.Plugins;
-using AimAssist.Service;
-using Library.Options;
+using AimAssist.DI;
+using AimAssist.Middlewares;
+using AimAssist.Services;
 using Microsoft.Extensions.DependencyInjection;
-using AimAssist.Units.Implementation.Snippets;
+using System;
 using System.IO;
 using System.IO.Pipes;
-using AimAssist.Units.Implementation.WorkTools;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AimAssist
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : System.Windows.Application
     {
         private static Mutex mutex;
@@ -24,42 +20,31 @@ namespace AimAssist
         private const string PipeName = "AimAssist";
         public ServiceProvider _serviceProvider { get; private set; }
 
-        /// <summary>
-        /// アプリケーションの起動時に呼び出されるメソッド
-        /// </summary>
         private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
         {
-            // DI コンテナを設定
             ConfigureServices();
+
+            var errorHandler = _serviceProvider.GetRequiredService<IErrorHandlingMiddleware>();
+            errorHandler.RegisterGlobalHandlers();
 
             mutex = new Mutex(true, appName, out var createdNew);
             if (createdNew)
             {
-                // ApplicationLogServiceの初期化とエラーハンドリングヘルパーの設定
                 var logService = _serviceProvider.GetRequiredService<IApplicationLogService>();
                 ErrorHandlingHelper.SetLogService(logService);
                 
-                // DIコンテナからInitializerを取得して使用
                 try
                 {
-                    logService.Info("アプリケーションの初期化を開始します");
-                    var initializer = _serviceProvider.GetRequiredService<Initializer>();
-                    initializer.Initialize();
-                    
-                    logService.Info("設定情報を読み込みます");
-                    var settingManager = _serviceProvider.GetRequiredService<ISettingManager>();
-                    var settings = settingManager.LoadSettings();
-                    var commandService = _serviceProvider.GetRequiredService<ICommandService>();
-                    commandService.SetKeymap(settings);
-                    logService.Info("アプリケーションの初期化が正常に完了しました");
+                    var applicationService = _serviceProvider.GetRequiredService<IApplicationService>();
+                    applicationService.InitializeAsync().Wait();
                 }
                 catch (Exception ex)
                 {
-                    logService.LogException(ex, "アプリケーション初期化中に重大なエラーが発生しました");
-                    MessageBox.Show($"アプリケーションの初期化中にエラーが発生しました。\n{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    errorHandler.HandleException(ex, "アプリケーション初期化エラー");
+                    return;
                 }
 
-                ThreadPool.QueueUserWorkItem(WaitCallActivate);// 名前付きパイプサーバーを起動 別プロセスからのActivate用
+                ThreadPool.QueueUserWorkItem(WaitCallActivate);
 
                 var appCommands = _serviceProvider.GetRequiredService<IAppCommands>();
                 appCommands.ToggleMainWindow.Execute(this);
@@ -71,70 +56,12 @@ namespace AimAssist
             }
         }
         
-        /// <summary>
-        /// DIコンテナの設定
-        /// </summary>
         private void ConfigureServices()
         {
             var services = new ServiceCollection();
             
-            // サービスを登録
-            services.AddSingleton<IUnitsService, UnitsService>();
-            services.AddSingleton<ICommandService, CommandService>();
-            services.AddSingleton<ISettingManager, SettingManager>();
-            services.AddSingleton<IKeySequenceManager, KeySequenceManager>();
-            services.AddSingleton<ISnippetOptionService, SnippetOptionService>();
-            services.AddSingleton<IWorkItemOptionService, WorkItemOptionService>();
-            services.AddSingleton<IApplicationLogService, ApplicationLogService>();
-            services.AddSingleton<IPluginsService>(provider => new PluginsService(
-                provider.GetRequiredService<IEditorOptionService>()
-            ));
-            services.AddSingleton<IPickerService, PickerService>();
-            services.AddSingleton<IWindowHandleService, WindowHandleService>();
-            services.AddSingleton<IAppCommands>(provider => new AppCommands(
-                provider.GetRequiredService<IWindowHandleService>(),
-                provider.GetRequiredService<IPickerService>()
-            ));
-            services.AddSingleton<UI.SystemTray.SystemTrayRegister>(provider => 
-                new UI.SystemTray.SystemTrayRegister(provider.GetRequiredService<IAppCommands>())
-            );
-            services.AddSingleton<ICheatSheetController>(provider =>
-                new CheatSheet.Services.CheatSheetController(
-                    System.Windows.Threading.Dispatcher.CurrentDispatcher, 
-                    provider.GetRequiredService<IWindowHandleService>()
-                ));
-            services.AddSingleton<UI.UnitContentsView.UnitViewFactory>(provider => new UI.UnitContentsView.UnitViewFactory(
-                provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<IEditorOptionService>()
-            ));
-            services.AddTransient<UI.MainWindows.MainWindow>(provider => new UI.MainWindows.MainWindow(
-                provider.GetRequiredService<IUnitsService>(),
-                provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<UI.UnitContentsView.UnitViewFactory>(),
-                provider.GetRequiredService<IApplicationLogService>(),
-                provider
-            ));
-            services.AddTransient<UI.Tools.HotKeys.WaitHotKeysWindow>(provider => new UI.Tools.HotKeys.WaitHotKeysWindow(
-                provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<IAppCommands>()
-            ));
-            
-            services.AddSingleton<IEditorOptionService, EditorOptionService>();
-            
-            // ファクトリーパターンでInitializerを登録
-            services.AddSingleton<Initializer>(provider => new Initializer(
-                provider.GetRequiredService<IUnitsService>(),
-                provider.GetRequiredService<ICommandService>(),
-                provider,
-                provider.GetRequiredService<IWindowHandleService>(),
-                provider.GetRequiredService<IPickerService>(),
-                provider.GetRequiredService<IAppCommands>(),
-                provider.GetRequiredService<IEditorOptionService>(),
-                provider.GetRequiredService<ISnippetOptionService>(),
-                provider.GetRequiredService<IWorkItemOptionService>(),
-                provider.GetRequiredService<IPluginsService>(),
-                provider.GetRequiredService<IApplicationLogService>()
-            ));
+            services.RegisterServices();
+            services.RegisterInitializer();
             
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -145,18 +72,16 @@ namespace AimAssist
             {
                 try
                 {
-                    client.Connect(1000); // 1秒待機
+                    client.Connect(1000);
                     using var writer = new StreamWriter(client);
                     writer.WriteLine(PipeName);
                     writer.Flush();
                 }
                 catch (TimeoutException)
                 {
-                    // クライアントが接続できなかった場合の処理
                 }
             }
         }
-
 
         private void WaitCallActivate(object state)
         {
@@ -178,19 +103,17 @@ namespace AimAssist
 
         private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
         {
-            var commandService = _serviceProvider.GetRequiredService<ICommandService>();
-            var settings = commandService.GetKeymap();
-            var noneSettingsKeys = settings.Where(x => x.Value.FirstModifiers == 0).Select(y=>y.Key);
-            foreach (var key in noneSettingsKeys)
+            try
             {
-                settings.Remove(key);
+                var applicationService = _serviceProvider.GetRequiredService<IApplicationService>();
+                applicationService.ShutdownAsync().Wait();
+                mutex.ReleaseMutex();
             }
-
-            _serviceProvider.GetRequiredService<ISettingManager>().SaveSettings(settings);
-            _serviceProvider.GetRequiredService<IEditorOptionService>().SaveOption();
-            _serviceProvider.GetRequiredService<ISnippetOptionService>().SaveOption();
-            _serviceProvider.GetRequiredService<IWorkItemOptionService>().SaveOption();
-            mutex.ReleaseMutex();
+            catch (Exception ex)
+            {
+                var errorHandler = _serviceProvider.GetRequiredService<IErrorHandlingMiddleware>();
+                errorHandler.HandleException(ex, "アプリケーション終了エラー");
+            }
         }
     }
 }

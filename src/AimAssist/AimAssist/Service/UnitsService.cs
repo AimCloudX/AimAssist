@@ -75,5 +75,23 @@ namespace AimAssist.Service
 
             return Enumerable.Empty<IUnit>();
         }
+
+        /// <summary>
+        /// すべてのユニットを取得します
+        /// </summary>
+        /// <returns>すべてのユニット</returns>
+        public IEnumerable<IUnit> GetAllUnits()
+        {
+            return modeDic.Values.SelectMany(units => units);
+        }
+
+        /// <summary>
+        /// ユニットを再読み込みします
+        /// </summary>
+        public void RefreshUnits()
+        {
+            modeDic.Clear();
+            modeDic.Add(AllInclusiveMode.Instance, new List<IUnit>());
+        }
     }
 }

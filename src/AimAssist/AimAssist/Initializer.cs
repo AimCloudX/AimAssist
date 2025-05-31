@@ -144,17 +144,14 @@ namespace AimAssist
                 _logService.LogException(ex, "EditorOptionServiceの初期化中にエラーが発生しました");
             }
 
-            // DIでSystemTrayRegisterを取得して使用
             var systemTrayRegister = _serviceProvider.GetRequiredService<SystemTrayRegister>();
             systemTrayRegister.Register();
 
-            // DIで注入されたユニットサービスを使用
             _unitsService.RegisterUnits(new UnitsFactory(
                 _editorOptionService, 
                 _workItemOptionService, 
                 _snippetOptionService));
 
-            // DIから取得したIPluginsServiceを使用
             try
             {
                 _logService.Info("プラグインの読み込みを開始します");
