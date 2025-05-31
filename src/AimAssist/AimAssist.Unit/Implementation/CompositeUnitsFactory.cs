@@ -10,12 +10,12 @@ namespace AimAssist.Units.Implementation
 
     public class CompositeUnitsFactory : ICompositeUnitsFactory
     {
-        private readonly IWorkToolsUnitsFactory _workToolsFactory;
-        private readonly ISnippetUnitsFactory _snippetFactory;
-        private readonly IKnowledgeUnitsFactory _knowledgeFactory;
-        private readonly ICheatSheetUnitsFactory _cheatSheetFactory;
-        private readonly IOptionUnitsFactory _optionFactory;
-        private readonly ICoreUnitsFactory _coreFactory;
+        private readonly IWorkToolsUnitsFactory workToolsFactory;
+        private readonly ISnippetUnitsFactory snippetFactory;
+        private readonly IKnowledgeUnitsFactory knowledgeFactory;
+        private readonly ICheatSheetUnitsFactory cheatSheetFactory;
+        private readonly IOptionUnitsFactory optionFactory;
+        private readonly ICoreUnitsFactory coreFactory;
 
         public CompositeUnitsFactory(
             IWorkToolsUnitsFactory workToolsFactory,
@@ -25,24 +25,24 @@ namespace AimAssist.Units.Implementation
             IOptionUnitsFactory optionFactory,
             ICoreUnitsFactory coreFactory)
         {
-            _workToolsFactory = workToolsFactory;
-            _snippetFactory = snippetFactory;
-            _knowledgeFactory = knowledgeFactory;
-            _cheatSheetFactory = cheatSheetFactory;
-            _optionFactory = optionFactory;
-            _coreFactory = coreFactory;
+            this.workToolsFactory = workToolsFactory;
+            this.snippetFactory = snippetFactory;
+            this.knowledgeFactory = knowledgeFactory;
+            this.cheatSheetFactory = cheatSheetFactory;
+            this.optionFactory = optionFactory;
+            this.coreFactory = coreFactory;
         }
 
         public IEnumerable<IUnit> GetUnits()
         {
             var allUnits = new List<IUnit>();
 
-            allUnits.AddRange(_workToolsFactory.CreateUnits());
-            allUnits.AddRange(_snippetFactory.CreateUnits());
-            allUnits.AddRange(_knowledgeFactory.CreateUnits());
-            allUnits.AddRange(_cheatSheetFactory.CreateUnits());
-            allUnits.AddRange(_optionFactory.CreateUnits());
-            allUnits.AddRange(_coreFactory.CreateUnits());
+            allUnits.AddRange(workToolsFactory.CreateUnits());
+            allUnits.AddRange(snippetFactory.CreateUnits());
+            allUnits.AddRange(knowledgeFactory.CreateUnits());
+            allUnits.AddRange(cheatSheetFactory.CreateUnits());
+            allUnits.AddRange(optionFactory.CreateUnits());
+            allUnits.AddRange(coreFactory.CreateUnits());
 
             return allUnits;
         }
