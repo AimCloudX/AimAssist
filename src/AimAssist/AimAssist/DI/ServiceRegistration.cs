@@ -73,20 +73,20 @@ namespace AimAssist.DI
                 provider.GetRequiredService<IEditorOptionService>()
             ));
 
+            services.AddTransient<MainWindowViewModel>();
+
             services.AddTransient<AimAssist.UI.MainWindows.MainWindow>(provider => new AimAssist.UI.MainWindows.MainWindow(
-                provider.GetRequiredService<IUnitsService>(),
-                provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<AimAssist.UI.UnitContentsView.UnitViewFactory>(),
+                provider.GetRequiredService<MainWindowViewModel>(),
                 provider.GetRequiredService<IApplicationLogService>(),
-                provider
+                (KeySequenceManager)provider.GetRequiredService<IKeySequenceManager>(),
+                provider.GetRequiredService<IUnitsService>(),
+                provider.GetRequiredService<ICommandService>()
             ));
 
             services.AddTransient<AimAssist.UI.Tools.HotKeys.WaitHotKeysWindow>(provider => new AimAssist.UI.Tools.HotKeys.WaitHotKeysWindow(
                 provider.GetRequiredService<ICommandService>(),
                 provider.GetRequiredService<IAppCommands>()
             ));
-
-            services.AddTransient<MainWindowViewModel>();
 
             return services;
         }

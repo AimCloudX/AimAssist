@@ -8,9 +8,6 @@ using System.Runtime.InteropServices;
 
 namespace AimAssist.Service
 {
-    /// <summary>
-    /// ウィンドウハンドル操作サービスの実装クラス
-    /// </summary>
     public class WindowHandleService : IWindowHandleService
     {
         public MainWindow Window { get; private set; }
@@ -34,33 +31,28 @@ namespace AimAssist.Service
 
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="serviceProvider">サービスプロバイダ</param>
         public WindowHandleService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        /// <summary>
-        /// メインウィンドウの表示・非表示を切り替える
-        /// </summary>
         public void ToggleMainWindow()
         {
             if (isActivate)
             {
                 isActivate = false;
-                Window.Closed -= DoAction;
-                Window.Visibility = System.Windows.Visibility.Collapsed;
+                if (Window != null)
+                {
+                    Window.Closed -= DoAction;
+                    Window.Visibility = System.Windows.Visibility.Collapsed;
+                }
                 return;
             }
 
             isActivate = true;
 
-            if (Window == null || Window.IsClosing)
+            if (Window == null)
             {
-                // DIコンテナからMainWindowを取得
                 Window = _serviceProvider.GetRequiredService<MainWindow>();
             }
 
@@ -69,14 +61,9 @@ namespace AimAssist.Service
             Window.Focus();
             Window.Show();
              
-            // 自身のウィンドウハンドルをアクティブにする
             SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
         }
 
-        /// <summary>
-        /// アクティブウィンドウのプロセスIDを取得
-        /// </summary>
-        /// <returns>プロセスID</returns>
         public int GetActiveProcessId()
         {
             IntPtr hwnd = GetForegroundWindow();
@@ -84,10 +71,6 @@ namespace AimAssist.Service
             return (int)processId;
         }
 
-        /// <summary>
-        /// アクティブウィンドウのプロセス名を取得
-        /// </summary>
-        /// <returns>プロセス名</returns>
         public string GetActiveProcessName()
         {
             try
@@ -104,10 +87,6 @@ namespace AimAssist.Service
             }
         }
 
-        /// <summary>
-        /// アクティブウィンドウのタイトルを取得
-        /// </summary>
-        /// <returns>ウィンドウタイトル</returns>
         public string GetActiveWindowTitle()
         {
             const int nChars = 256;
@@ -121,11 +100,6 @@ namespace AimAssist.Service
             return string.Empty;
         }
 
-        /// <summary>
-        /// 指定したプロセス名のウィンドウを取得
-        /// </summary>
-        /// <param name="processName">プロセス名</param>
-        /// <returns>ウィンドウハンドル一覧</returns>
         public IEnumerable<IntPtr> GetProcessWindows(string processName)
         {
             var windows = new List<IntPtr>();
@@ -148,10 +122,6 @@ namespace AimAssist.Service
             return windows;
         }
 
-        /// <summary>
-        /// ウィンドウをアクティブにする
-        /// </summary>
-        /// <param name="hwnd">ウィンドウハンドル</param>
         public void ActivateWindow(IntPtr hwnd)
         {
             SetForegroundWindow(hwnd);

@@ -3,34 +3,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:AimAssist.Behaviors"
         mc:Ignorable="d"
-        Title="{Binding Mode.Name, Mode=OneWay}"
+        Title="{Binding SelectedMode.Name, Mode=OneWay}"
         Width="1200"
         Height="800"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         WindowStartupLocation="CenterScreen"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Closing="Window_Closing"
-        Loaded="Window_Loaded"
-        BorderThickness="5,0,5,5"
-        >
+        BorderThickness="5,0,5,5">
+    
     <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="15,1,15,15"  />
+        <WindowChrome ResizeBorderThickness="15,1,15,15" />
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <CollectionViewSource x:Key="GroupedItems" Source="{Binding UnitLists}">
+        <CollectionViewSource x:Key="GroupedItems" Source="{Binding Units}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Category"/>
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
+        
         <Style TargetType="GroupItem">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="GroupItem">
                         <Expander IsExpanded="True" BorderThickness="0">
                             <Expander.Header>
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="LightSlateGray" Height="15" IsHitTestVisible="False"/>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" 
+                                         Foreground="LightSlateGray" Height="15" IsHitTestVisible="False"/>
                             </Expander.Header>
                             <ItemsPresenter />
                         </Expander>
@@ -39,7 +41,8 @@
             </Setter>
         </Style>
     </Window.Resources>
- <Grid>
+
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition x:Name="ItemListColumn" Width="220" MinWidth="0"/>
@@ -50,8 +53,8 @@
         <!-- アイコンカラム -->
         <StackPanel Grid.Column="0">
             <!-- ハンバーガーメニューアイコン -->
-            <Button x:Name="HamburgerButton" Content="☰" 
-                    Click="HamburgerButton_Click" 
+            <Button Content="☰" 
+                    Click="HamburgerButton_Click"
                     FontSize="24" 
                     Width="50" 
                     Height="50" 
@@ -60,8 +63,9 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"/>
             
-            <!-- 既存のModeList -->
-            <ListBox x:Name="ModeList" SelectionChanged="IconListBox_SelectionChanged">
+            <!-- モードリスト -->
+            <ListBox ItemsSource="{Binding Modes}" 
+                     SelectedItem="{Binding SelectedMode}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <ContentControl Content="{Binding Icon, UpdateSourceTrigger=PropertyChanged}"/>
@@ -71,29 +75,37 @@
         </StackPanel>
 
         <!-- 項目リスト -->
-        <Grid Grid.Column="1" SizeChanged="ItemListGrid_SizeChanged">
+        <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBox Grid.Row="0" x:Name="FilterTextBox"  
-                     PreviewKeyDown="TextBox_OnPreviewKeyDown" 
-                     KeyDown="FilterTextBox_KeyDown" 
-                     TextChanged="TextBox_OnTextChanged"/>
+            
+            <TextBox Grid.Row="0" 
+                     x:Name="FilterTextBox"
+                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}">
+                <behaviors:Interaction.Behaviors>
+                    <local:KeyboardNavigationBehavior TargetListBox="{Binding ElementName=UnitListBox}"/>
+                    <local:DelayedFilterBehavior FilterTarget="{Binding ElementName=UnitListBox}" 
+                                               FilterMethod="{Binding FilterPredicate}"/>
+                </behaviors:Interaction.Behaviors>
+            </TextBox>
         
-            <ListBox x:Name="ComboListBox" Grid.Row="1"
+            <ListBox x:Name="UnitListBox" Grid.Row="1"
                      ItemsSource="{Binding Source={StaticResource GroupedItems}}" 
-                     SelectionChanged="ComboListBox_SelectionChanged"
+                     SelectedItem="{Binding SelectedUnit}"
                      VirtualizingPanel.IsVirtualizing="True" 
                      VirtualizingPanel.VirtualizationMode="Standard"
                      HorizontalAlignment="Stretch"
                      ScrollViewer.HorizontalScrollBarVisibility="Visible"
                      ScrollViewer.VerticalScrollBarVisibility="Visible">
+                
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
+                
                 <ListBox.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
@@ -105,6 +117,7 @@
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>
                 </ListBox.GroupStyle>
+                
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -129,6 +142,7 @@
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="Template">
@@ -155,8 +169,8 @@
             </ListBox>
         </Grid>
 
-        <!-- GridSplitter の修正 -->
-        <GridSplitter Grid.Column="2" x:Name="ItemListGridSplitter"
+        <!-- GridSplitter -->
+        <GridSplitter Grid.Column="2"
                       Width="5"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
@@ -168,6 +182,6 @@
                       Panel.ZIndex="1"/>
 
         <!-- メインコンテンツエリア -->
-        <ContentControl Grid.Column="3" x:Name="MainContent"/>
+        <ContentControl Grid.Column="3" Content="{Binding CurrentContent}"/>
     </Grid>
- </Window>
+</Window>

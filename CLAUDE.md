@@ -103,7 +103,34 @@ WPFベースのコマンドランチャー・生産性向上ツール
 - 統一例外ハンドラ実装
 - App.xaml.csでグローバル例外処理統合
 
-### 次のステップ
-- MainWindow.xaml.csのコードビハインド簡素化
-- UI Behaviorsの分離
-- UnitsServiceとの統合テスト
+#### 6. MainWindow リファクタリング完了 ✅
+- **MainWindow.xaml.cs**: 600行から130行程度に大幅簡素化
+- **MainWindowViewModel.cs**: 完全なMVVMアーキテクチャ実装  
+- **Behaviors分離**: キーボード操作とフィルタリング処理を独立したBehaviorクラスに分離
+  - `KeyboardNavigationBehavior`: キーボードナビゲーション処理
+  - `DelayedFilterBehavior`: 遅延フィルタリング処理
+- **型安全性向上**: WPF固有の型参照を明確化してコンパイルエラーを解決
+- **XAML現代化**: Microsoft.Xaml.Behaviors使用による宣言的プログラミング
+- **DI統合**: MainWindowViewModelがサービス層と適切に統合
+
+### エラー修正と安定性向上
+- WPFとWinFormsの型競合問題を解決
+- 存在しないプロパティ参照エラーを修正  
+- Microsoft.Xaml.Behaviors.Wpfパッケージを正しく統合
+- ServiceRegistrationの型参照エラーを解決
+- MainWindow.xamlの宣言的バインディングを最適化
+- RelayCommandの型不一致エラーを解決（専用RelayCommandクラス作成）
+- WindowHandleServiceの存在しないIsClosingプロパティ参照を修正
+
+### アーキテクチャ改善の成果
+1. **責任の分離**: UIロジック、ビジネスロジック、プレゼンテーションロジックが明確に分離
+2. **テスタビリティ向上**: ViewModelが独立してテスト可能
+3. **保守性向上**: コードビハインドが最小限で変更影響が局所化
+4. **再利用性向上**: BehaviorとUserControlが他のウィンドウでも再利用可能
+5. **宣言的UI**: XAMLベースの宣言的プログラミングスタイル
+
+### 今後の改善点
+- PickerWindowの同様なリファクタリング
+- 統合テストの実装
+- パフォーマンス最適化
+- ユーザビリティ向上
