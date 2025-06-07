@@ -1,9 +1,11 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using AimAssist.Core.Attributes;
+using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
 using AimAssist.Units.Core.Modes;
 
 namespace AimAssist.Units.Implementation.Options
 {
+    [ModeDisplayOrder(1000)]
     public class OptionMode : ModeBase
     {
         private OptionMode() : base(ModeName)

@@ -93,6 +93,18 @@ switch (unit.Content)
    - LoadUnitsForModeメソッドでソート後の最初のアイテムを選択
    - System.Linq using文追加でOrderBy機能を有効化
    - 並び替え後の正しいUnit選択を保証
+6. ✅ モード表示順序の改善（Attribute方式に変更）
+   - ModeDisplayOrderAttribute作成でMode表示順序を宣言的に管理
+   - UnitsService.GetAllModes()でAttribute値によるソート実装
+   - AllInclusiveMode: Order=0（最上位）、OptionMode: Order=1000（最下位）
+   - MainWindowViewModelからソートロジックを削除し、責任を分離
+   - UIでOptionアイコン（歯車）が一番下に表示される
+
+**Attribute方式の利点:**
+- 各Modeクラスで表示順序を宣言的に指定
+- 新しいModeの追加時も簡単に順序指定可能
+- UnitsServiceで一元的にソート処理
+- 拡張性とメンテナンス性が向上
 
 **ソート優先順位:**
 1. WorkItem.mdファイルでのHeader定義順序（最優先）
@@ -102,6 +114,7 @@ switch (unit.Content)
 **修正内容:**
 - アプリ起動時にTranscriptionViewが表示される問題を解決
 - ソート後の論理的な最初のアイテムが選択されるように修正
+- Optionモードを左サイドバーの最下位に移動
 
 #### ✅ Phase 3追加改善 - Unitの並び順改善
 1. ✅ グループ表示の並び順を修正

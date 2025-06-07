@@ -1,4 +1,5 @@
-﻿using AimAssist.Core.Interfaces;
+﻿using AimAssist.Core.Attributes;
+using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core;
 using AimAssist.Units.Core.Modes;
@@ -29,7 +30,20 @@ namespace AimAssist.Service
         /// <returns>利用可能なモードのコレクション</returns>
         public IReadOnlyCollection<IMode> GetAllModes()
         {
-            return modeDic.Keys.Where(x => x.IsIncludeAllInclusive).ToList();
+            var modes = modeDic.Keys.Where(x => x.IsIncludeAllInclusive);
+            
+            return modes
+                .OrderBy(mode => GetModeDisplayOrder(mode))
+                .ThenBy(mode => mode.Name)
+                .ToList();
+        }
+
+        private int GetModeDisplayOrder(IMode mode)
+        {
+            var attribute = mode.GetType().GetCustomAttributes(typeof(ModeDisplayOrderAttribute), false)
+                .FirstOrDefault() as ModeDisplayOrderAttribute;
+            
+            return attribute?.Order ?? 500;
         }
 
         /// <summary>

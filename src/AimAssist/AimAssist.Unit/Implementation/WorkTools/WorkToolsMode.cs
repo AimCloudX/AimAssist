@@ -1,9 +1,11 @@
 ﻿using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
+using AimAssist.Core.Attributes;
 using AimAssist.Units.Core.Modes;
 
 namespace AimAssist.Units.Implementation.WorkTools
 {
+    [ModeDisplayOrder(10)]
     public class WorkToolsMode : ModeBase
     {
         private WorkToolsMode() : base(ModeName) { }
