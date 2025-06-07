@@ -1,6 +1,5 @@
 ﻿using AimAssist.Core.Attributes;
 using AimAssist.Core.Units;
-using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Computer

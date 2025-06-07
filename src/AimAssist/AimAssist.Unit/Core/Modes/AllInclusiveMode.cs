@@ -17,6 +17,6 @@ namespace AimAssist.Units.Core.Modes
         public static AllInclusiveMode Instance { get; } = new AllInclusiveMode();
 
         public override string Description => "";
-        public override KeySequence? DefaultKeySequence => new KeySequence(Key.K, ModifierKeys.Control, Key.I, ModifierKeys.Control);
+        public override KeySequence DefaultKeySequence => new KeySequence(Key.K, ModifierKeys.Control, Key.I, ModifierKeys.Control);
     }
 }
