@@ -1,0 +1,158 @@
+﻿name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  BUILD_CONFIGURATION: 'Release'
+  TARGET_FRAMEWORK: 'net8.0-windows'
+  RUNTIME: 'win-x64'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      should-release: ${{ steps.check-release.outputs.should-release }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+    
+    - name: Restore dependencies
+      run: dotnet restore AimAssist.sln
+    
+    - name: Build
+      run: dotnet build AimAssist.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+    
+    - name: Test
+      run: dotnet test AimAssist.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
+    
+    - name: Generate version
+      id: version
+      run: |
+        if ("${{ github.ref }}" -match "refs/tags/v(.+)") {
+          $version = $matches[1]
+        } else {
+          $version = (Get-Date -Format "yyyy.MM.dd") + "-build." + "${{ github.run_number }}"
+        }
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        echo "Generated version: $version"
+      shell: powershell
+    
+    - name: Check if should release
+      id: check-release
+      run: |
+        $shouldRelease = "${{ github.ref }}" -eq "refs/heads/main" -or "${{ github.ref }}" -match "refs/tags/v"
+        echo "should-release=$shouldRelease" >> $env:GITHUB_OUTPUT
+        echo "Should release: $shouldRelease"
+      shell: powershell
+    
+    - name: Publish application
+      if: steps.check-release.outputs.should-release == 'true'
+      run: |
+        dotnet publish src/AimAssist/AimAssist/AimAssist.csproj `
+          --configuration ${{ env.BUILD_CONFIGURATION }} `
+          --framework ${{ env.TARGET_FRAMEWORK }} `
+          --runtime ${{ env.RUNTIME }} `
+          --self-contained true `
+          --output ./publish `
+          -p:PublishSingleFile=true `
+          -p:PublishTrimmed=false `
+          -p:IncludeNativeLibrariesForSelfExtract=true
+    
+    - name: Upload build artifacts
+      if: steps.check-release.outputs.should-release == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: AimAssist-${{ steps.version.outputs.version }}
+        path: publish/
+        retention-days: 7
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: needs.build.outputs.should-release == 'true'
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: AimAssist-${{ needs.build.outputs.version }}
+        path: ./publish
+    
+    - name: Create release archive
+      run: |
+        $version = "${{ needs.build.outputs.version }}"
+        $archiveName = "AimAssist-v$version-win-x64.zip"
+        Compress-Archive -Path ./publish/* -DestinationPath $archiveName
+        echo "ARCHIVE_NAME=$archiveName" >> $env:GITHUB_ENV
+        
+        $size = (Get-Item $archiveName).Length
+        $sizeInMB = [math]::Round($size / 1MB, 2)
+        echo "Archive created: $archiveName ($sizeInMB MB)"
+      shell: powershell
+    
+    - name: Generate release notes
+      id: release-notes
+      run: |
+        $version = "${{ needs.build.outputs.version }}"
+        $notes = @"
+        ## AimAssist v$version
+        
+        ### 📦 Release Information
+        - **Version**: $version
+        - **Build Date**: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
+        - **Platform**: Windows x64
+        - **Runtime**: Self-contained .NET 8
+        
+        ### 🚀 Installation
+        1. Download the \`AimAssist-v$version-win-x64.zip\` file
+        2. Extract to your desired location
+        3. Run \`AimAssist.exe\`
+        
+        ### 📋 System Requirements
+        - Windows 10/11 (x64)
+        - No additional .NET runtime required (self-contained)
+        
+        ### 🔄 Changes
+        This is an automated release from the main branch.
+        "@
+        
+        $notes | Out-File -FilePath release-notes.md -Encoding utf8
+        echo "notes-file=release-notes.md" >> $env:GITHUB_OUTPUT
+      shell: powershell
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ needs.build.outputs.version }}
+        name: AimAssist v${{ needs.build.outputs.version }}
+        body_path: ${{ steps.release-notes.outputs.notes-file }}
+        files: ${{ env.ARCHIVE_NAME }}
+        draft: false
+        prerelease: ${{ contains(needs.build.outputs.version, 'build') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
