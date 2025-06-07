@@ -72,8 +72,6 @@ namespace AimAssist.Services
                 ChangeState(ApplicationState.Stopping);
                 _logService.Info("アプリケーションの停止を開始します");
 
-                await Task.Delay(10);
-
                 ChangeState(ApplicationState.Stopped);
                 _logService.Info("アプリケーションが正常に停止しました");
             }
