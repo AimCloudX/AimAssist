@@ -14,7 +14,6 @@ namespace AimAssist.Plugins
     {
         [ImportMany(typeof(IUnitPlugin))] private IEnumerable<IUnitPlugin> plugins;
         private readonly IEditorOptionService editorOptionService;
-        private bool isPluginsLoaded;
 
         /// <summary>
         /// コンストラクタ
@@ -30,7 +29,7 @@ namespace AimAssist.Plugins
         /// <inheritdoc/>
         public void LoadCommandPlugins()
         {
-            if (isPluginsLoaded)
+            if (IsPluginsLoaded)
             {
                 return;
             }
@@ -46,15 +45,15 @@ namespace AimAssist.Plugins
                 }
                 else
                 {
-                    
                     try
                     {
                         Directory.CreateDirectory(pluginPath);
                     }
                     catch (Exception)
                     {
+                        // ignored
                     }
-                    
+
                     return;
                 }
             }
@@ -79,7 +78,7 @@ namespace AimAssist.Plugins
                 container.Compose(batch);
                 
                 container.ComposeParts(this);
-                isPluginsLoaded = true;
+                IsPluginsLoaded = true;
             }
             catch (CompositionException)
             {
@@ -102,9 +101,9 @@ namespace AimAssist.Plugins
         /// <inheritdoc/>
         public IEnumerable<IUnitsFactory> GetFactories()
         {
-            if (!isPluginsLoaded)
+            if (!IsPluginsLoaded)
             {
-                return Enumerable.Empty<IUnitsFactory>();
+                return [];
             }
             
             var factories = new List<IUnitsFactory>();
@@ -113,13 +112,11 @@ namespace AimAssist.Plugins
                 try
                 {
                     var pluginFactories = plugin.GetUnitsFactory();
-                    if (pluginFactories != null)
-                    {
-                        factories.AddRange(pluginFactories);
-                    }
+                    factories.AddRange(pluginFactories);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
+                    // ignored
                 }
             }
 
@@ -129,7 +126,7 @@ namespace AimAssist.Plugins
         /// <inheritdoc/>
         public Dictionary<Type, Func<IUnit, UIElement>> GetConverters()
         {
-            if (!isPluginsLoaded)
+            if (!IsPluginsLoaded)
             {
                 return new Dictionary<Type, Func<IUnit, UIElement>>();
             }
@@ -140,36 +137,22 @@ namespace AimAssist.Plugins
                 try
                 {
                     var pluginConverters = plugin.GetUIElementConverters();
-                    if (pluginConverters != null)
+                    foreach (var converter in pluginConverters.Where(converter => !converters.ContainsKey(converter.Key)))
                     {
-                        foreach (var converter in pluginConverters)
-                        {
-                            if (!converters.ContainsKey(converter.Key))
-                            {
-                                converters.Add(converter.Key, converter.Value);
-                            }
-                            else
-                            {
-                            }
-                        }
+                        converters.Add(converter.Key, converter.Value);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
+                    // ignored
                 }
             }
 
             return converters;
         }
 
-        /// <summary>
-        /// プラグインが読み込まれているかどうかを取得します
-        /// </summary>
-        public bool IsPluginsLoaded => isPluginsLoaded;
+        public bool IsPluginsLoaded { get; private set; }
 
-        /// <summary>
-        /// 読み込まれたプラグインの数を取得します
-        /// </summary>
-        public int PluginsCount => plugins?.Count() ?? 0;
+        public int PluginsCount => plugins.Count();
     }
 }

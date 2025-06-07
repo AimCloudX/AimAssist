@@ -1,6 +1,4 @@
 ﻿using AimAssist.Core.Units;
-using AimAssist.Units.Core;
-using AimAssist.Units.Core.Units;
 using System.Windows;
 
 namespace AimAssist.Plugins
