@@ -2,17 +2,11 @@
 
 namespace AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
-public class ClipboardImage : IClipboardData
+public class ClipboardImage(string format, BitmapSource bitmapsource) : IClipboardData
 {
-    public ClipboardImage(string format, BitmapSource bitmapsource)
-    {
-        Format = format;
-        BitmapSource = bitmapsource;
-    }
+    public string Format { get; } = format;
 
-    public string Format { get; }
-
-    public BitmapSource BitmapSource { get; }
+    public BitmapSource BitmapSource { get; } = bitmapsource;
 
     public bool IsDisabled => false;
 

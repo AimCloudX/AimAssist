@@ -75,7 +75,7 @@ namespace AimAssist.Services.Options
                 watcher.Dispose();
             }
 
-            watcher = new FileSystemWatcher(Path.GetDirectoryName(OptionPath));
+            watcher = new FileSystemWatcher(Path.GetDirectoryName(OptionPath) ?? string.Empty);
             // 監視する変更タイプを設定
             watcher.NotifyFilter = NotifyFilters.FileName
                                  | NotifyFilters.LastWrite

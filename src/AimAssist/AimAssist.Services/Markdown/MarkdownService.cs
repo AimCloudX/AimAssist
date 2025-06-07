@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Shapes;
+﻿using System.IO;
 
 namespace AimAssist.Services.Markdown
 {
@@ -12,8 +6,8 @@ namespace AimAssist.Services.Markdown
     {
         public IEnumerable<MarkdownLink> GetLinks(string filePath)
         {
-            string currentHeader = null;
-            bool inComment = false;
+            var currentHeader = string.Empty;
+            var inComment = false;
             foreach (var line in File.ReadAllLines(filePath))
             {
                 if (line.Trim().StartsWith("<!--"))
@@ -41,13 +35,13 @@ namespace AimAssist.Services.Markdown
                 }
                 else if (line.Contains("[") && line.Contains("]("))
                 {
-                    int startText = line.IndexOf("[") + 1;
-                    int endText = line.IndexOf("]", startText);
-                    int startUrl = line.IndexOf("(", endText) + 1;
-                    int endUrl = line.IndexOf(")", startUrl);
+                    var startText = line.IndexOf('[') + 1;
+                    var endText = line.IndexOf(']', startText);
+                    var startUrl = line.IndexOf('(', endText) + 1;
+                    var endUrl = line.IndexOf(')', startUrl);
 
-                    string text = line.Substring(startText, endText - startText);
-                    string url = line.Substring(startUrl, endUrl - startUrl);
+                    var text = line.Substring(startText, endText - startText);
+                    var url = line.Substring(startUrl, endUrl - startUrl);
 
                     yield return new MarkdownLink(text, url, currentHeader);
                 }
