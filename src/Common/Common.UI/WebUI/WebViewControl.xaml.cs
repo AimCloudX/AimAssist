@@ -4,11 +4,10 @@ using Microsoft.Web.WebView2.Core;
 
 namespace Common.UI.WebUI
 {
-    public partial class WebViewControl : System.Windows.Controls.UserControl, IFocasable
+    public partial class WebViewControl : IFocasable
     {
         private string url;
-        private string readedUrl;
-        private string title;
+        private string title = string.Empty;
 
         public WebViewControl(string url, string title)
         {
@@ -23,7 +22,7 @@ namespace Common.UI.WebUI
             this.url = url;
         }
         
-        public async void Focus()
+        public new async void Focus()
         {
             this.webView.Focus();
             if (webView.CoreWebView2 != null)
@@ -51,13 +50,17 @@ namespace Common.UI.WebUI
             try
             {
                 await webView.EnsureCoreWebView2Async(null);
-                webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-                webView.CoreWebView2.Settings.IsBuiltInErrorPageEnabled = false;
-                webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-                webView.CoreWebView2.Navigate(url);
+                if (webView.CoreWebView2 != null)
+                {
+                    webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                    webView.CoreWebView2.Settings.IsBuiltInErrorPageEnabled = false;
+                    webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
+                    webView.CoreWebView2.Navigate(url);
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // ignored
             }
         }
 
@@ -89,7 +92,7 @@ namespace Common.UI.WebUI
             dataObject.SetData(DataFormats.Text, titleUrl);
             Clipboard.SetDataObject(dataObject);
 
-            string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
+            var bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
             webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
         }
 
@@ -97,8 +100,6 @@ namespace Common.UI.WebUI
         {
             if (e.IsSuccess)
             {
-                readedUrl = webView.Source.ToString();
-
                 webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
                 {
                     title = task.Result;

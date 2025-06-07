@@ -30,22 +30,22 @@ namespace Common.UI.Commands.Shortcus
                     throw new JsonException();
                 }
 
-                string propertyName = reader.GetString();
+                var propertyName = reader.GetString();
                 reader.Read();
 
                 switch (propertyName)
                 {
                     case nameof(KeySequence.FirstKey):
-                        firstKey = (Key)reader.GetInt32();
+                        firstKey = (Key) reader.GetInt32();
                         break;
                     case nameof(KeySequence.FirstModifiers):
-                        firstModifiers = (ModifierKeys)reader.GetInt32();
+                        firstModifiers = (ModifierKeys) reader.GetInt32();
                         break;
                     case nameof(KeySequence.SecondKey):
-                        secondKey = (Key)reader.GetInt32();
+                        secondKey = (Key) reader.GetInt32();
                         break;
                     case nameof(KeySequence.SecondModifiers):
-                        secondModifiers = (ModifierKeys)reader.GetInt32();
+                        secondModifiers = (ModifierKeys) reader.GetInt32();
                         break;
                 }
             }
@@ -56,16 +56,18 @@ namespace Common.UI.Commands.Shortcus
         public override void Write(Utf8JsonWriter writer, KeySequence value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WriteNumber(nameof(KeySequence.FirstKey), (int)value.FirstKey);
-            writer.WriteNumber(nameof(KeySequence.FirstModifiers), (int)value.FirstModifiers);
+            writer.WriteNumber(nameof(KeySequence.FirstKey), (int) value.FirstKey);
+            writer.WriteNumber(nameof(KeySequence.FirstModifiers), (int) value.FirstModifiers);
             if (value.SecondKey.HasValue)
             {
-                writer.WriteNumber(nameof(KeySequence.SecondKey), (int)value.SecondKey.Value);
+                writer.WriteNumber(nameof(KeySequence.SecondKey), (int) value.SecondKey.Value);
             }
+
             if (value.SecondModifiers.HasValue)
             {
-                writer.WriteNumber(nameof(KeySequence.SecondModifiers), (int)value.SecondModifiers.Value);
+                writer.WriteNumber(nameof(KeySequence.SecondModifiers), (int) value.SecondModifiers.Value);
             }
+
             writer.WriteEndObject();
         }
     }

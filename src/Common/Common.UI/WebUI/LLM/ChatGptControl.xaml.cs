@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Web.WebView2.Core;
 
 namespace Common.UI.WebUI.LLM
@@ -8,14 +7,12 @@ namespace Common.UI.WebUI.LLM
     /// <summary>
     /// ChatGptControl.xaml の相互作用ロジック
     /// </summary>
-    public partial class ChatGptControl : UserControl, IFocasable
+    public partial class ChatGptControl : IFocasable
     {
-
         public event EventHandler<string> ResponseGenerated;
 
         private string url;
-        private string readedURl;
-        private string title;
+        private string title = string.Empty;
 
         public ChatGptControl(string url)
         {
@@ -28,7 +25,7 @@ namespace Common.UI.WebUI.LLM
         {
         }
 
-        public async void Focus()
+        public new async void Focus()
         {
             this.webView.Focus();
             if (webView.CoreWebView2 != null)
@@ -58,22 +55,30 @@ namespace Common.UI.WebUI.LLM
             {
                 // WebView2を初期化
                 await webView.EnsureCoreWebView2Async(null);
-                webView.CoreWebView2.NavigationCompleted += webView_NavigationCompleted;
-                webView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+                if (webView.CoreWebView2 != null)
+                {
+                    webView.CoreWebView2.NavigationCompleted += webView_NavigationCompleted;
+                    webView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
 
-                // ナビゲートするURLを設定
-                webView.CoreWebView2.Navigate(url);
+                    // ナビゲートするURLを設定
+                    webView.CoreWebView2.Navigate(url);
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // ignored
             }
         }
 
-        public string Url { get => this.url; set
+        public string Url
+        {
+            get => this.url;
+            set
             {
                 this.url = value;
                 webView.CoreWebView2.Navigate(url);
-            } }
+            }
+        }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -84,7 +89,6 @@ namespace Common.UI.WebUI.LLM
         {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(title))
             {
-
                 var bookmarklet1 = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet1);
                 return;
@@ -104,14 +108,11 @@ namespace Common.UI.WebUI.LLM
             webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
         }
 
-        private async void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        private void webView_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             // ナビゲーションが成功したか確認
             if (e.IsSuccess)
             {
-                // 現在のURLを取得
-                readedURl = webView.Source.ToString();
-
                 // 現在のページのタイトルを取得するためにJavaScriptを実行
                 webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
                 {
@@ -120,56 +121,23 @@ namespace Common.UI.WebUI.LLM
 
                     // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
                     title = title.Trim('"');
-
                 });
             }
-
-        //    await webView.CoreWebView2.ExecuteScriptAsync(@"
-        //    function observeResponseGeneration() {
-        //        const targetNode = document.querySelector('main');
-        //        if (!targetNode) {
-        //            console.error('Target node not found');
-        //            return;
-        //        }
-
-        //        const config = { childList: true, subtree: true };
-        //        const callback = function(mutationsList, observer) {
-        //            for(let mutation of mutationsList) {
-        //                if (mutation.type === 'childList') {
-        //                    const addedNodes = mutation.addedNodes;
-        //                    for (let node of addedNodes) {
-        //                        if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('markdown')) {
-        //                            // Response generation seems to be completed
-        //                            chrome.webview.postMessage({type: 'responseGenerated', content: node.innerText});
-        //                            observer.disconnect(); // Stop observing once we detect the response
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        };
-
-        //        const observer = new MutationObserver(callback);
-        //        observer.observe(targetNode, config);
-        //    }
-
-        //    observeResponseGeneration();
-        //");
         }
 
-        private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        private void CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
             var messageJson = e.WebMessageAsJson;
             var message = System.Text.Json.JsonSerializer.Deserialize<WebViewMessage>(messageJson);
 
-            if (message.type == "responseGenerated")
+            if (message is {Type: "responseGenerated"})
             {
-                ResponseGenerated?.Invoke(this, message.content);
+                ResponseGenerated(this, message.Content);
             }
         }
 
         private void Button_Click2(object sender, RoutedEventArgs e)
         {
-            // デフォルトのブラウザでURLを開く
             Process.Start(new ProcessStartInfo
             {
                 FileName = url,
@@ -178,10 +146,9 @@ namespace Common.UI.WebUI.LLM
         }
     }
 
-    public class WebViewMessage
+    public class WebViewMessage(string type, string content)
     {
-        public string type { get; set; }
-        public string content { get; set; }
+        public string Type { get; init; } = type;
+        public string Content { get; init; } = content;
     }
-
 }

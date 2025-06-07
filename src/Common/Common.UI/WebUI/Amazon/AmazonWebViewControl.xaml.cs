@@ -8,31 +8,40 @@ using Newtonsoft.Json;
 
 namespace Common.UI.WebUI.Amazon
 {
-    public partial class AmazonWebViewControl : System.Windows.Controls.UserControl, INotifyPropertyChanged
+    public partial class AmazonWebViewControl : INotifyPropertyChanged
     {
         private string url;
         private string title;
 
         private string productTitle;
         private string asin;
-        private BookInfo book;
+        private BookInfo? book;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public bool CanExectuteCommand { get; set; }
 
-        public string Url { get => this.url;
-                set { 
+        public string Url
+        {
+            get => this.url;
+            set
+            {
                 this.url = value;
                 webView.CoreWebView2.Navigate(url);
-            } }
+            }
+        }
 
         public AmazonWebViewControl(string url)
         {
             InitializeComponent();
             this.url = url;
+            this.productTitle = string.Empty;
+            this.asin = string.Empty;
+            this.book = null;
+            this.title  = string.Empty;
             this.DataContext = this;
         }
+
         private async void InitializeWebView()
         {
             if (this.webView.CoreWebView2 != null)
@@ -46,10 +55,11 @@ namespace Common.UI.WebUI.Amazon
                 await webView.EnsureCoreWebView2Async(null);
 
                 // ナビゲートするURLを設定
-                webView.CoreWebView2.Navigate(this.url);
+                webView.CoreWebView2?.Navigate(this.url);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // ignored
             }
         }
 
@@ -58,29 +68,28 @@ namespace Common.UI.WebUI.Amazon
             InitializeWebView();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if(string.IsNullOrEmpty(this.url)|| string.IsNullOrEmpty(this.title))
-            {
-
-                var bookmarklet1 = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet1);
-                return;
-            }
-
-            // HTMLリンクとMarkdownリンクを生成
-            var htmlLink = $"<a href=\"{url}\">{title}</a>";
-            var titleUrl = $"[{title}]({url})";
-
-            // クリップボードに書き込む
-            var dataObject = new DataObject();
-            dataObject.SetData(DataFormats.Html, htmlLink);
-            dataObject.SetData(DataFormats.Text, titleUrl);
-            Clipboard.SetDataObject(dataObject);
-
-            string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
-            webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
-        }
+        // private void Button_Click(object sender)
+        // {
+        //     if (string.IsNullOrEmpty(this.url) || string.IsNullOrEmpty(this.title))
+        //     {
+        //         const string bookmarklet1 = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
+        //         webView.CoreWebView2.ExecuteScriptAsync(bookmarklet1);
+        //         return;
+        //     }
+        //
+        //     // HTMLリンクとMarkdownリンクを生成
+        //     var htmlLink = $"<a href=\"{url}\">{title}</a>";
+        //     var titleUrl = $"[{title}]({url})";
+        //
+        //     // クリップボードに書き込む
+        //     var dataObject = new DataObject();
+        //     dataObject.SetData(DataFormats.Html, htmlLink);
+        //     dataObject.SetData(DataFormats.Text, titleUrl);
+        //     Clipboard.SetDataObject(dataObject);
+        //
+        //     string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
+        //     webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+        // }
 
         private async void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
@@ -88,24 +97,23 @@ namespace Common.UI.WebUI.Amazon
             if (e.IsSuccess)
             {
                 // 現在のページのタイトルを取得するためにJavaScriptを実行
-                webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
+                await webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
                 {
                     // JavaScriptの結果を取得
                     title = task.Result;
 
                     // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
                     title = title.Trim('"');
-
                 });
 
 
                 // productTitle
-            var productTitelScript = @"
+                var productTitelScript = @"
                 var productTitleElement = document.getElementById('productTitle');
                 var productTitle = productTitleElement ? productTitleElement.innerText.trim() : '';
                 productTitle;
             ";
-                webView.CoreWebView2.ExecuteScriptAsync(productTitelScript).ContinueWith(task =>
+                await webView.CoreWebView2.ExecuteScriptAsync(productTitelScript).ContinueWith(task =>
                 {
                     productTitle = task.Result;
                     productTitle = productTitle.Trim('"');
@@ -117,7 +125,7 @@ var ASIN = ASINElement ? ASINElement.value : '';
 ASIN;
 ";
 
-                webView.CoreWebView2.ExecuteScriptAsync(asinScript).ContinueWith(task =>
+                await webView.CoreWebView2.ExecuteScriptAsync(asinScript).ContinueWith(task =>
                 {
                     asin = task.Result;
                     asin = asin.Trim('"');
@@ -127,66 +135,67 @@ ASIN;
 
                 this.CanExectuteCommand = true;
                 OnPropertyChanged(nameof(CanExectuteCommand));
-
             }
         }
 
         private void Button_Click1(object sender, RoutedEventArgs e)
         {
-            if(book == null)
+            if (book == null)
             {
                 string bookmarklet = "javascript:(function(){alert('書籍情報の取得に失敗しました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
                 return;
             }
 
-            var price = ConvertStringToInt(book.price);
+            var price = ConvertStringToInt(book.Price);
 
             var errorList = new List<string>();
-            if(price== 0)
+            if (price == 0)
             {
                 errorList.Add("価格");
             }
 
-            if (string.IsNullOrEmpty(book.productTitle))
+            if (string.IsNullOrEmpty(book.ProductTitle))
             {
                 errorList.Add("本のタイトル");
             }
 
-            if (string.IsNullOrEmpty(book.publisher))
+            if (string.IsNullOrEmpty(book.Publisher))
             {
                 errorList.Add("出版社");
             }
 
-            if (string.IsNullOrEmpty(book.author))
+            if (string.IsNullOrEmpty(book.Author))
             {
                 errorList.Add("著者");
             }
-            if (string.IsNullOrEmpty(book.isbn13))
+
+            if (string.IsNullOrEmpty(book.Isbn13))
             {
                 errorList.Add("ISBN");
             }
 
-            var text = book.productTitle + "\t"+ book.publisher + "\t"+book.author+ "\t"+ price +"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+book.isbn13;
+            var text = book.ProductTitle + "\t" + book.Publisher + "\t" + book.Author + "\t" + price + "\t" + "\t" +
+                       "\t" + "\t" + "\t" + "\t" + book.Isbn13;
             Clipboard.SetText(text);
             if (errorList.Any())
             {
                 var sb = new StringBuilder();
                 sb.Append("次ののデータの取得に失敗しました ");
                 sb.Append(string.Join(" ", errorList));
-                string bookmarklet = $"javascript:(function(){{alert('{sb.ToString()}');}})();";
+                string bookmarklet = $"javascript:(function(){{alert('{sb}');}})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
             }
         }
 
         private void Button_Click2(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(url)) 
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(url))
             {
                 string bookmarklet = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
             }
-            else if(string.IsNullOrEmpty(productTitle)|| string.IsNullOrEmpty(asin))
+            else if (string.IsNullOrEmpty(productTitle) || string.IsNullOrEmpty(asin))
             {
                 var htmlLink = $"<a href=\"{url}\">{title}</a>";
                 var titleUrl = $"[{title}]({url})";
@@ -197,13 +206,12 @@ ASIN;
                 Clipboard.SetDataObject(dataObject);
                 string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
-
             }
-            else 
+            else
             {
-                var shortURL = $"https://www.amazon.co.jp/dp/{asin}";
-                var htmlLink = $"<a href=\"{shortURL}\">{productTitle}</a>";
-                var titleUrl = $"[{productTitle}]({shortURL})";
+                var shortUrl = $"https://www.amazon.co.jp/dp/{asin}";
+                var htmlLink = $"<a href=\"{shortUrl}\">{productTitle}</a>";
+                var titleUrl = $"[{productTitle}]({shortUrl})";
 
                 // クリップボードに書き込む
                 var dataObject = new DataObject();
@@ -213,7 +221,6 @@ ASIN;
                 string bookmarklet = "javascript:(function(){alert('短縮形のリンクをコピーしました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
             }
-
         }
 
         private void webView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
@@ -222,10 +229,11 @@ ASIN;
             OnPropertyChanged(nameof(CanExectuteCommand));
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
         private void Button_Click3(object sender, RoutedEventArgs e)
         {
             // デフォルトのブラウザでURLを開く
@@ -252,9 +260,9 @@ ASIN;
             }
         }
 
-        private async Task<BookInfo> FetchBookInfoAsync()
+        private async Task<BookInfo?> FetchBookInfoAsync()
         {
-string script = @"
+            string script = @"
 var productTitleElement = document.getElementById('productTitle');
 if(!productTitleElement)var productTitleElement = document.getElementById('ebooksProductTitle');
 var productTitle = productTitleElement ? productTitleElement.innerText.trim() : '';
@@ -292,22 +300,22 @@ JSON.stringify({ productTitle:productTitle, isbn13: ISBN, price: price, publishe
             }
         }
 
-        public class BookInfo
+        public class BookInfo(
+            string productTitle,
+            string isbn13,
+            string price,
+            string asin,
+            string author,
+            string publisher)
         {
-            [JsonProperty("productTitle")]
-            public string productTitle { get; set; }
-            [JsonProperty("isbn13")]
-            public string isbn13 { get; set; }
+            [JsonProperty("productTitle")] public string ProductTitle { get; set; } = productTitle;
+            [JsonProperty("isbn13")] public string Isbn13 { get; set; } = isbn13;
 
-            [JsonProperty("asin")]
-            public string ASIN { get; set; }
-            [JsonProperty("author")]
-            public string author { get; set; }
+            [JsonProperty("asin")] public string Asin { get; set; } = asin;
+            [JsonProperty("author")] public string Author { get; set; } = author;
 
-            [JsonProperty("price")]
-            public string price { get; set; }
-            [JsonProperty("publisher")]
-            public string publisher { get; set; }
+            [JsonProperty("price")] public string Price { get; set; } = price;
+            [JsonProperty("publisher")] public string Publisher { get; set; } = publisher;
         }
     }
 }

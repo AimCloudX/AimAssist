@@ -5,31 +5,30 @@ namespace Common.UI.Commands
 {
     public class RelayCommand : ICommand
     {
-        private readonly Action<Window> _execute;
+        private readonly Action<Window> execute;
 
         public RelayCommand(string commandName, Action<Window> execute)
         {
             CommandName = commandName;
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
         }
 
         public string CommandName { get; }
 
         public void Execute(Window window)
         {
-            _execute(window);
+            execute(window);
         }
 
         public void Execute(object? parameter)
         {
-            if(parameter is Window window)
+            if (parameter is Window window)
             {
-
-                _execute(window);
+                execute(window);
             }
             else
             {
-                _execute(null);
+                execute(null!);
             }
         }
 
@@ -38,7 +37,7 @@ namespace Common.UI.Commands
             return true;
         }
 
-        public event EventHandler CanExecuteChanged
+        public event EventHandler? CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
@@ -52,6 +51,11 @@ namespace Common.UI.Commands
             }
 
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(execute, CommandName);
         }
 
         public bool Equals(RelayCommand command)

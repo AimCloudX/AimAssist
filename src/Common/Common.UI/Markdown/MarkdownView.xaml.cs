@@ -1,14 +1,12 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 using System.Windows.Controls;
 using Microsoft.Web.WebView2.Core;
 
 namespace Common.UI.Markdown
 {
-    public partial class MarkdownView : System.Windows.Controls.UserControl
+    public partial class MarkdownView
     {
-        private string markdownText;
+        private readonly string markdownText = string.Empty;
 
         public MarkdownView(string filePath)
         {
@@ -17,21 +15,6 @@ namespace Common.UI.Markdown
             {
                 markdownText = File.ReadAllText(filePath);
             }
-
-            WebView.NavigationCompleted += OnNavigationCompleted;
-            InitializeAsync();
-        }
-        
-        public MarkdownView(IEnumerable<string> filePaths)
-        {
-            InitializeComponent();
-            var sb = new StringBuilder();
-            foreach (string filePath in filePaths)
-            {
-                sb.AppendLine(File.ReadAllText(filePath));
-            }
-
-            markdownText = sb.ToString() ;
 
             WebView.NavigationCompleted += OnNavigationCompleted;
             InitializeAsync();
@@ -45,36 +28,38 @@ namespace Common.UI.Markdown
         {
             await WebView.EnsureCoreWebView2Async(null);
 
-            string htmlText = MarkdownToHtmlWithAnchors(markdownText);
+            var htmlText = MarkdownToHtmlWithAnchors(markdownText);
 
-            string css = GetNordThemeCss();
+            var css = GetNordThemeCss();
 
-            string fullHtml = $@"
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset=""UTF-8"">
-    <style>
-        {css}
-    </style>
-</head>
-<body>
-    {htmlText}
-    <script>
-        function scrollToElement(id) {{
-            var element = document.getElementById(id);
-            if (element) {{
-                element.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
-            }}
-        }}
-    </script>
-</body>
-</html>";
+            var fullHtml = $$"""
+
+                             <!DOCTYPE html>
+                             <html>
+                             <head>
+                                 <meta charset="UTF-8">
+                                 <style>
+                                     {{css}}
+                                 </style>
+                             </head>
+                             <body>
+                                 {{htmlText}}
+                                 <script>
+                                     function scrollToElement(id) {
+                                         var element = document.getElementById(id);
+                                         if (element) {
+                                             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                         }
+                                     }
+                                 </script>
+                             </body>
+                             </html>
+                             """;
 
             WebView.NavigateToString(fullHtml);
         }
 
-        private void OnNavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        private void OnNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             var outline = CreateOutline(markdownText);
             foreach (var item in outline)
@@ -84,10 +69,10 @@ namespace Common.UI.Markdown
 
             SetTreeViewItemClickEvent(OutlineTreeView.Items);
         }
-        
-        private string MarkdownToHtmlWithAnchors(string markdownText)
+
+        private static string MarkdownToHtmlWithAnchors(string markdownText)
         {
-            var lines = markdownText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var lines = markdownText.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
             int headingCounter = 0;
             var modifiedLines = new List<string>();
 
@@ -111,11 +96,11 @@ namespace Common.UI.Markdown
             return Markdig.Markdown.ToHtml(modifiedMarkdown);
         }
 
-        private List<TreeViewItem> CreateOutline(string markdownText)
+        private List<TreeViewItem> CreateOutline(string markdown)
         {
             var outline = new List<TreeViewItem>();
-            var lines = markdownText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            int headingCounter = 0;
+            var lines = markdown.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
+            var headingCounter = 0;
 
             foreach (var line in lines)
             {
@@ -124,8 +109,8 @@ namespace Common.UI.Markdown
                     headingCounter++;
                     var level = line.TakeWhile(c => c == '#').Count();
                     var text = line.Substring(level).Trim();
-                    var item = new TreeViewItem { Header = text, Tag = $"heading{headingCounter}" };
-                    if(level < 2)
+                    var item = new TreeViewItem {Header = text, Tag = $"heading{headingCounter}"};
+                    if (level < 2)
                     {
                         item.IsExpanded = true;
                     }
@@ -145,9 +130,9 @@ namespace Common.UI.Markdown
             return outline;
         }
 
-        private TreeViewItem FindParent(List<TreeViewItem> items, int level)
+        private static TreeViewItem? FindParent(List<TreeViewItem> items, int level)
         {
-            TreeViewItem parent = null;
+            TreeViewItem? parent = null;
             foreach (var item in items)
             {
                 if (level == 1)
@@ -159,6 +144,7 @@ namespace Common.UI.Markdown
                     parent = FindParent(item.Items.OfType<TreeViewItem>().ToList(), level - 1);
                 }
             }
+
             return parent;
         }
 
@@ -166,14 +152,11 @@ namespace Common.UI.Markdown
         {
             foreach (var item in items.OfType<TreeViewItem>())
             {
-                item.MouseDoubleClick += (s, e) =>
+                item.MouseDoubleClick += (s, _) =>
                 {
-                    var treeViewItem = s as TreeViewItem;
-                    if (treeViewItem != null)
-                    {
-                        var id = treeViewItem.Tag.ToString();
-                        WebView.CoreWebView2.ExecuteScriptAsync($"scrollToElement('{id}')");
-                    }
+                    if (s is not TreeViewItem treeViewItem) return;
+                    var id = treeViewItem.Tag.ToString();
+                    WebView.CoreWebView2.ExecuteScriptAsync($"scrollToElement('{id}')");
                 };
 
                 if (item.Items.Count > 0)

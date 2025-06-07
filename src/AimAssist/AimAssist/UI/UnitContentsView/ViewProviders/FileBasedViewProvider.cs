@@ -45,15 +45,13 @@ namespace AimAssist.UI.UnitContentsView.ViewProviders
         {
             var editorOptionService = serviceProvider.GetService<IEditorOptionService>();
             var editor = new AimEditor(editorOptionService);
-            
+
             foreach (var filePath in filePaths)
             {
                 editor.NewTab(filePath);
             }
-            
+
             return editor;
         }
     }
 }
-
-
