@@ -1,6 +1,5 @@
 ﻿using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.Pdf;
 using AimAssist.Units.Implementation.Web.MindMeister;
@@ -17,7 +16,6 @@ namespace AimAssist.Units.Implementation.Factories
     {
         public IEnumerable<IUnit> CreateUnits()
         {
-            yield return new CodeGeneratorUnit();
             yield return new TranscriptionUnit();
             yield return new PdfMergeUnit();
             yield return new RssSettingUnit();

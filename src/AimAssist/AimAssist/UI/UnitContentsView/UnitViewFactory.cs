@@ -1,7 +1,6 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.CodeGenarator;
 using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Pdf;
@@ -127,8 +126,6 @@ namespace AimAssist.UI.UnitContentsView
                     return new WebViewControl(url);
                 case PdfMergeUnit:
                     return new PdfMergerControl();
-                case CodeGeneratorUnit:
-                    return new CodeGeneratorControl();
                 case ComputerUnit:
                     return new ComputerView();
                 default:
