@@ -12,9 +12,12 @@ using Common.UI;
 using Common.UI.WebUI;
 using System.Windows;
 using AimAssist.Services.Editors;
+using AimAssist.Units.Implementation.ClipboardAnalyzer;
+using AimAssist.Units.Implementation.ClipboardAnalyzer.UI;
 using Common.UI.Markdown;
 using Common.UI.WebUI.Amazon;
 using Common.UI.WebUI.LLM;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.UI.UnitContentsView
 {
@@ -128,6 +131,8 @@ namespace AimAssist.UI.UnitContentsView
                     return new PdfMergerControl();
                 case ComputerUnit:
                     return new ComputerView();
+                case ClipboardUnit:
+                    return new ClipboardList(_editorOptionService);
                 default:
                     break;
             }

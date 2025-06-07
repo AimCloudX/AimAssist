@@ -3,10 +3,10 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using AimAssist.Core.Interfaces;
-using ClipboardAnalyzer.DomainModels;
-using ClipboardAnalyzer.Services;
+using AimAssist.Services.ClipboardAnalyzer;
+using AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
-namespace ClipboardAnalyzer.UI
+namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 {
     /// <summary>
     /// ClipboardList.xaml の相互作用ロジック

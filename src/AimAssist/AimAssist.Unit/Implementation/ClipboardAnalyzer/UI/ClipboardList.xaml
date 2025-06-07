@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="ClipboardAnalyzer.UI.ClipboardList"
+﻿<UserControl x:Class="AimAssist.Units.Implementation.ClipboardAnalyzer.UI.ClipboardList"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                         
-             xmlns:clipboardanalyzer1="clr-namespace:ClipboardAnalyzer.UI"
-             xmlns:monaco1="clr-namespace:Common.UI.Editor;assembly=Common.UI.Editor">
+
+             xmlns:monaco1="clr-namespace:Common.UI.Editor;assembly=Common.UI.Editor"
+             xmlns:ui="clr-namespace:AimAssist.Units.Implementation.ClipboardAnalyzer.UI">
     <UserControl.Resources>
         <DataTemplate x:Key="StringTemplate">
             <TextBox Text="{Binding Data, Mode=OneWay}" TextWrapping="Wrap" IsReadOnly="True" 
@@ -35,7 +35,7 @@
                     <GridViewColumn Width="200" Header="Format" DisplayMemberBinding="{Binding Format}"/>
                     <GridViewColumn Width="400" Header="Data">
                         <GridViewColumn.CellTemplateSelector>
-                            <clipboardanalyzer1:CustomDataTemplateSelector
+                            <ui:CustomDataTemplateSelector
                                 StringTemplate="{StaticResource StringTemplate}"
                                 ImageTemplate="{StaticResource ImageTemplate}"/>
                         </GridViewColumn.CellTemplateSelector>

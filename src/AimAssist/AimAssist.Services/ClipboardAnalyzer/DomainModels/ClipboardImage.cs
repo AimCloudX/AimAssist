@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media.Imaging;
 
-namespace ClipboardAnalyzer.DomainModels;
+namespace AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
 public class ClipboardImage : IClipboardData
 {

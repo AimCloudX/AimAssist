@@ -1,4 +1,4 @@
-﻿namespace ClipboardAnalyzer.DomainModels;
+﻿namespace AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
 public interface IClipboardData
 {

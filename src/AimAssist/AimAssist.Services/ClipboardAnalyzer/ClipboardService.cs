@@ -1,6 +1,6 @@
-﻿using ClipboardAnalyzer.DomainModels;
+﻿using AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
-namespace ClipboardAnalyzer.Services;
+namespace AimAssist.Services.ClipboardAnalyzer;
 
 public partial class ClipboardService
 {

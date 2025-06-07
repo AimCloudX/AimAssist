@@ -1,7 +1,6 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Services.Markdown;
-using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.KeyHelp;
@@ -13,6 +12,7 @@ using AimAssist.Units.Implementation.Web.Rss;
 using AimAssist.Units.Implementation.WorkTools;
 using Common.UI.Commands.Shortcus;
 using System.IO;
+using AimAssist.Units.Implementation.ClipboardAnalyzer;
 using AimAssist.Units.Implementation.Knowledges;
 
 namespace AimAssist.Units.Implementation
@@ -48,6 +48,7 @@ namespace AimAssist.Units.Implementation
             yield return new PdfMergeUnit();
             yield return new RssSettingUnit();
             yield return new ComputerUnit();
+            yield return new ClipboardUnit();
 
             //yield return new AppLogUnit();
 

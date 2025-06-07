@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using ClipboardAnalyzer.DomainModels;
+using AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
-namespace ClipboardAnalyzer.UI
+namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 {
     public class CustomDataTemplateSelector : DataTemplateSelector
     {
