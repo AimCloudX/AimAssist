@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using AimAssist.Core.Attributes;
+using AimAssist.Core.Units;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace AimAssist.UI.UnitContentsView
@@ -55,14 +52,18 @@ namespace AimAssist.UI.UnitContentsView
                 var attribute = viewType.GetCustomAttribute<AutoDataTemplateAttribute>();
                 if (attribute != null)
                 {
-                    registeredTemplates[attribute.UnitType] = new TemplateInfo(viewType, attribute.UseDependencyInjection);
-                    System.Diagnostics.Debug.WriteLine($"Registered DataTemplate: {attribute.UnitType.Name} -> {viewType.Name} (UseDI: {attribute.UseDependencyInjection})");
+                    foreach (var unitType in attribute.UnitTypes)
+                    {
+                        registeredTemplates[unitType] = new TemplateInfo(viewType, attribute.UseDependencyInjection);
+                        System.Diagnostics.Debug.WriteLine($"Registered DataTemplate: {unitType.Name} -> {viewType.Name} (UseDI: {attribute.UseDependencyInjection})");
+                    }
                 }
             }
         }
 
-        public static UIElement CreateView(Type unitType, IServiceProvider serviceProvider = null)
+        public static UIElement CreateView(IUnit unit, IServiceProvider serviceProvider = null)
         {
+            var unitType = unit.GetType();
             if (registeredTemplates.TryGetValue(unitType, out var templateInfo))
             {
                 try
@@ -71,7 +72,7 @@ namespace AimAssist.UI.UnitContentsView
                     
                     if (templateInfo.UseDependencyInjection && serviceProvider != null)
                     {
-                        view = CreateInstanceWithDI(templateInfo.ViewType, serviceProvider);
+                        view = CreateInstanceWithDI(unit,templateInfo.ViewType, serviceProvider);
                     }
                     else
                     {
@@ -89,7 +90,7 @@ namespace AimAssist.UI.UnitContentsView
             return null;
         }
 
-        private static UIElement CreateInstanceWithDI(Type viewType, IServiceProvider serviceProvider)
+        private static UIElement CreateInstanceWithDI(IUnit unit, Type viewType, IServiceProvider serviceProvider)
         {
             var constructors = viewType.GetConstructors()
                 .OrderByDescending(c => c.GetParameters().Length);
@@ -109,6 +110,11 @@ namespace AimAssist.UI.UnitContentsView
                         if (parameterType == typeof(IServiceProvider))
                         {
                             service = serviceProvider;
+                        }
+                        else if (parameterType == unit.GetType())
+                        {
+                            args[i] = unit;
+                            continue;
                         }
                         else
                         {

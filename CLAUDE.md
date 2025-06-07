@@ -75,10 +75,16 @@ switch (unit.Content)
    - 従来のUnitsFactoryを無効化し、AutoDiscoveryUnitsFactoryのみでテスト
    - デバッグログ追加で動作確認予定
 
+#### 🔄 UnitViewFactory改善 - unit引数対応
+- CreateInstanceWithDIメソッドでunitパラメータの引数渡し機能を追加
+- IUnit型およびunit継承型のコンストラクタ引数に対応
+- ViewProviderで複雑なDI依存関係を持つケースでの利用を想定
+- Viewのコンストラクタでunitインスタンスを直接受け取り可能
+
 #### ✅ Phase 3追加改善 - WorkItemのファイル定義順序優先ソート機能
 1. ✅ CategoryOrderManagerサービス実装
    - MarkdownファイルのHeader出現順序を記録・管理
-   - Category名によるファイル内定義順序の優先度設定
+   - Category名による ファイル内定義順序の優先度設定
 2. ✅ MarkdownService拡張
    - GetHeaderOrder()メソッド追加でHeader順序取得機能
    - コメント行を除外した正確な順序解析
@@ -95,7 +101,7 @@ switch (unit.Content)
    - 並び替え後の正しいUnit選択を保証
 6. ✅ モード表示順序の改善（Attribute方式に変更）
    - ModeDisplayOrderAttribute作成でMode表示順序を宣言的に管理
-   - UnitsService.GetAllModes()でAttribute値によるソート実装
+   - UnitsService.GetAllModes()でAttribute値による ソート実装
    - AllInclusiveMode: Order=0（最上位）、OptionMode: Order=1000（最下位）
    - MainWindowViewModelからソートロジックを削除し、責任を分離
    - UIでOptionアイコン（歯車）が一番下に表示される
@@ -126,7 +132,21 @@ switch (unit.Content)
    - 名前による昇順ソート
    - XAMLでのソート定義とNamespace追加
 
-### 次のタスク（Phase 3完了に向けて）
+### ## ViewProvider vs AutoDataTemplate 移行検討
+
+### 検討対象: MindMeisterViewProvider
+- **現状**: 複雑な初期化処理、API通信、2つのUnit型対応
+- **移行可能性**: 技術的には可能だが以下の課題あり
+  - コンストラクタ引数問題（DataTemplateは引数なしのみ）
+  - 複雑な非同期初期化処理の対応
+  - 2つのUnit型（MindMeisterUnit、MindMeisterItemUnit）への対応
+
+### 結論: ハイブリッドシステム維持
+- **ViewProvider継続**: 複雑なDI依存・初期化が必要なケース
+- **DataTemplate活用**: 単純な1:1対応のケース
+- **理由**: 既存の安定性維持、適材適所の技術選択
+
+次のタスク（Phase 3完了に向けて）
 - ビルド成功確認
 - AutoDiscoveryUnitsFactoryの動作確認
 - 従来のUnitsFactoryとの機能比較・検証

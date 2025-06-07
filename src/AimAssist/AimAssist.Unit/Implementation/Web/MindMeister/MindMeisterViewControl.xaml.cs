@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
+using AimAssist.Core.Attributes;
 using AimAssist.Core.Commands;
 using AimAssist.Units.Core.Units;
 using Common.UI;
@@ -12,6 +13,7 @@ using Microsoft.Web.WebView2.Core;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
+    [AutoDataTemplate(typeof(MindMeisterUnit), true)]
     public partial class MindMeisterViewControl : IFocasable
     {
         private string? apiKey;

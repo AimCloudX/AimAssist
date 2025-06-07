@@ -70,7 +70,6 @@ namespace AimAssist.DI.Modules
             services.AddTransient<IViewProvider, UrlViewProvider>();
             services.AddTransient<IViewProvider, FileBasedViewProvider>();
             services.AddTransient<IViewProvider, DynamicContentViewProvider>();
-            services.AddTransient<IViewProvider, MindMeisterViewProvider>();
         }
     }
 }

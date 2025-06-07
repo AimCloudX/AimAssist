@@ -66,7 +66,7 @@ namespace AimAssist.UI.UnitContentsView
             }
 
             // 2. 自動登録されたDataTemplateをチェック
-            var autoTemplate = DataTemplateRegistry.CreateView(unit.Content.GetType(), serviceProvider);
+            var autoTemplate = DataTemplateRegistry.CreateView(unit.Content, serviceProvider);
             if (autoTemplate != null)
             {
                 if (autoTemplate is FrameworkElement element)
