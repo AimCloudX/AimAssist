@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Legacy\" />
     <Folder Include="Monaco\dist\" />
   </ItemGroup>
 </Project>

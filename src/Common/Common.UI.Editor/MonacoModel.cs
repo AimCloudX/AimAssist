@@ -9,15 +9,16 @@ public class MonacoModel
 
     public event Action<MonacoModel>? RequestSave;
 
-    private string _Text = string.Empty;
+    private string text = string.Empty;
+
     public string Text
     {
-        get => _Text;
+        get => text;
         set
         {
-            if (_Text != value)
+            if (text != value)
             {
-                _Text = value;
+                text = value;
                 TextChanged?.Invoke(this);
             }
         }
@@ -32,19 +33,19 @@ public class MonacoModel
 }
 
 [ComVisible(true)]
-public class keyChange(string key, string command, string mode)
+public class KeyChange(string key, string command, string mode)
 {
-    public string key { get; set; } = key;
+    public string Key { get; set; } = key;
 
-    public string command { get; set; }
-    public string mode { get; set; } = mode;
+    public string Command { get; set; } = command;
+    public string Mode { get; set; } = mode;
 }
 
-public class KeyEventMessage
+public class KeyEventMessage(string type, string key, bool ctrlKey, bool shiftKey, bool altKey)
 {
-    public string type { get; set; }
-    public string key { get; set; }
-    public bool ctrlKey { get; set; }
-    public bool shiftKey { get; set; }
-    public bool altKey { get; set; }
+    public string Type { get; set; } = type;
+    public string Key { get; set; } = key;
+    public bool CtrlKey { get; set; } = ctrlKey;
+    public bool ShiftKey { get; set; } = shiftKey;
+    public bool AltKey { get; set; } = altKey;
 }

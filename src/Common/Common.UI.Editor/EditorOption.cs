@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.UI.Editor
+﻿namespace Common.UI.Editor
 {
-    public class EditorOption
+    public class EditorOption(string customVimKeybindingPath, EditorMode mode)
     {
-        public EditorMode Mode { get; set; }
-        public string CustomVimKeybindingPath { get; set; }
+        public EditorMode Mode { get; } = mode;
+        public string CustomVimKeybindingPath { get; } = customVimKeybindingPath;
+
+        public static EditorOption Default()
+        {
+            return new EditorOption(string.Empty, EditorMode.Standard);
+        }
     }
 }

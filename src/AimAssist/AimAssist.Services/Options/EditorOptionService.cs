@@ -7,13 +7,12 @@ namespace AimAssist.Services.Options
 {
     public class EditorOptionService : IEditorOptionService
     {
-        private EditorOption _option;
-        private FileSystemWatcher _watcher;
+        private FileSystemWatcher? watcher;
 
         /// <summary>
         /// エディター設定
         /// </summary>
-        public EditorOption Option => _option;
+        public EditorOption Option { get; private set; } = EditorOption.Default();
 
         /// <summary>
         /// 設定ファイルのパス
@@ -43,20 +42,20 @@ namespace AimAssist.Services.Options
                     var option = JsonConvert.DeserializeObject<EditorOption>(text);
                     if (option == null)
                     {
-                        option = new EditorOption();
+                        option = EditorOption.Default();
                     }
 
-                    _option = option;
+                    this.Option = option;
                 }
-                catch(Exception _)
+                catch(Exception)
                 {
-                    _option = new EditorOption();
+                    Option = EditorOption.Default();
                 }
             }
             else
             {
-                var option = new EditorOption();
-                _option = option;
+                var option = EditorOption.Default();
+                this.Option = option;
                 SaveOption();
             }
 
@@ -69,28 +68,28 @@ namespace AimAssist.Services.Options
         private void SetupFileWatcher()
         {
             // 既に監視している場合は解除
-            if (_watcher != null)
+            if (watcher != null)
             {
-                _watcher.EnableRaisingEvents = false;
-                _watcher.Changed -= OnChanged;
-                _watcher.Dispose();
+                watcher.EnableRaisingEvents = false;
+                watcher.Changed -= OnChanged;
+                watcher.Dispose();
             }
 
-            _watcher = new FileSystemWatcher(Path.GetDirectoryName(OptionPath));
+            watcher = new FileSystemWatcher(Path.GetDirectoryName(OptionPath));
             // 監視する変更タイプを設定
-            _watcher.NotifyFilter = NotifyFilters.FileName
+            watcher.NotifyFilter = NotifyFilters.FileName
                                  | NotifyFilters.LastWrite
                                  | NotifyFilters.LastAccess
                                  | NotifyFilters.CreationTime;
 
             // 監視するファイルの種類を指定
-            _watcher.Filter = Path.GetFileName(OptionPath);
+            watcher.Filter = Path.GetFileName(OptionPath);
 
             // イベントハンドラを追加
-            _watcher.Changed += OnChanged;
+            watcher.Changed += OnChanged;
 
             // 監視を開始
-            _watcher.EnableRaisingEvents = true;
+            watcher.EnableRaisingEvents = true;
         }
 
         /// <summary>
@@ -106,7 +105,7 @@ namespace AimAssist.Services.Options
         /// </summary>
         public void SaveOption()
         {
-            var text = JsonConvert.SerializeObject(_option, Formatting.Indented);
+            var text = JsonConvert.SerializeObject(Option, Formatting.Indented);
             File.WriteAllText(OptionPath, text);
         }
     }
