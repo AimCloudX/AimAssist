@@ -16,7 +16,6 @@ namespace AimAssist.Services.Markdown
             bool inComment = false;
             foreach (var line in File.ReadAllLines(filePath))
             {
-                // HTMLコメントの開始をチェック
                 if (line.Trim().StartsWith("<!--"))
                 {
                     inComment = true;
@@ -27,7 +26,6 @@ namespace AimAssist.Services.Markdown
                     continue;
                 }
 
-                // HTMLコメントの終了をチェック
                 if (inComment)
                 {
                     if (line.Trim().EndsWith("-->"))
@@ -43,7 +41,6 @@ namespace AimAssist.Services.Markdown
                 }
                 else if (line.Contains("[") && line.Contains("]("))
                 {
-                    // 簡易的なリンク抽出（より堅牢な実装には正規表現を使用）
                     int startText = line.IndexOf("[") + 1;
                     int endText = line.IndexOf("]", startText);
                     int startUrl = line.IndexOf("(", endText) + 1;
@@ -55,6 +52,46 @@ namespace AimAssist.Services.Markdown
                     yield return new MarkdownLink(text, url, currentHeader);
                 }
             }
+        }
+
+        public Dictionary<string, int> GetHeaderOrder(string filePath)
+        {
+            var headerOrder = new Dictionary<string, int>();
+            bool inComment = false;
+            int order = 0;
+            
+            foreach (var line in File.ReadAllLines(filePath))
+            {
+                if (line.Trim().StartsWith("<!--"))
+                {
+                    inComment = true;
+                    if (line.Trim().EndsWith("-->"))
+                    {
+                        inComment = false;
+                    }
+                    continue;
+                }
+
+                if (inComment)
+                {
+                    if (line.Trim().EndsWith("-->"))
+                    {
+                        inComment = false;
+                    }
+                    continue;
+                }
+
+                if (line.StartsWith("# "))
+                {
+                    string header = line.Substring(2).Trim();
+                    if (!headerOrder.ContainsKey(header))
+                    {
+                        headerOrder[header] = order++;
+                    }
+                }
+            }
+            
+            return headerOrder;
         }
     }
 }

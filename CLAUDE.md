@@ -75,6 +75,44 @@ switch (unit.Content)
    - 従来のUnitsFactoryを無効化し、AutoDiscoveryUnitsFactoryのみでテスト
    - デバッグログ追加で動作確認予定
 
+#### ✅ Phase 3追加改善 - WorkItemのファイル定義順序優先ソート機能
+1. ✅ CategoryOrderManagerサービス実装
+   - MarkdownファイルのHeader出現順序を記録・管理
+   - Category名によるファイル内定義順序の優先度設定
+2. ✅ MarkdownService拡張
+   - GetHeaderOrder()メソッド追加でHeader順序取得機能
+   - コメント行を除外した正確な順序解析
+3. ✅ WorkToolsUnitsFactory更新
+   - ファイル読み込み時にHeader順序をCategoryOrderManagerに登録
+   - Units生成前にCategory順序情報を初期化
+4. ✅ UnitViewModel改善
+   - CategorySortKey算出ロジック更新
+   - ファイル定義順（3桁ゼロパディング）→ 50音順 → 未分類の優先順位
+   - CategoryOrderManagerとの統合で跨プロジェクト依存解決
+5. ✅ MainWindowViewModel修正
+   - LoadUnitsForModeメソッドでソート後の最初のアイテムを選択
+   - System.Linq using文追加でOrderBy機能を有効化
+   - 並び替え後の正しいUnit選択を保証
+
+**ソート優先順位:**
+1. WorkItem.mdファイルでのHeader定義順序（最優先）
+2. Categoryの50音順（ファイル未定義項目）
+3. 未分類項目（Category空文字、最下位）
+
+**修正内容:**
+- アプリ起動時にTranscriptionViewが表示される問題を解決
+- ソート後の論理的な最初のアイテムが選択されるように修正
+
+#### ✅ Phase 3追加改善 - Unitの並び順改善
+1. ✅ グループ表示の並び順を修正
+   - UnitViewModelにCategorySortKeyプロパティを追加
+   - 空のCategoryを持つUnitが末尾に表示されるように変更
+   - グループを持つUnitsが先頭に表示される
+2. ✅ CollectionViewSourceのソート機能実装
+   - CategorySortKeyによる昇順ソート
+   - 名前による昇順ソート
+   - XAMLでのソート定義とNamespace追加
+
 ### 次のタスク（Phase 3完了に向けて）
 - ビルド成功確認
 - AutoDiscoveryUnitsFactoryの動作確認

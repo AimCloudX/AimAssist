@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using AimAssist.Commands;
@@ -199,7 +200,7 @@ namespace AimAssist.UI.MainWindows
 
                 if (Units.Any())
                 {
-                    SelectedUnit = Units.First();
+                    SelectedUnit = Units.OrderBy(u => u.CategorySortKey).ThenBy(u => u.Name).First();
                 }
             }
             catch (Exception ex)

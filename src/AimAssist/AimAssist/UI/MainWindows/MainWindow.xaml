@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:AimAssist.Behaviors"
+        xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
         Title="{Binding SelectedMode.Name, Mode=OneWay}"
         Width="1200"
@@ -23,6 +24,10 @@
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Category"/>
             </CollectionViewSource.GroupDescriptions>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription PropertyName="CategorySortKey" Direction="Ascending"/>
+                <ComponentModel:SortDescription PropertyName="Name" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
         
         <Style TargetType="GroupItem">

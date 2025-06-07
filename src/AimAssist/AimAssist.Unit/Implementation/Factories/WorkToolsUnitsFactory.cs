@@ -22,9 +22,20 @@ namespace AimAssist.Units.Implementation.Factories
 
         public IEnumerable<IUnit> CreateUnits()
         {
+            var markdownService = new MarkdownService();
+            CategoryOrderManager.ClearCategoryOrder();
+            
             foreach (var workItemPath in _workItemOptionService.Option.ItemPaths)
             {
-                var links = new MarkdownService().GetLinks(workItemPath.GetActualPath());
+                var actualPath = workItemPath.GetActualPath();
+                
+                var headerOrder = markdownService.GetHeaderOrder(actualPath);
+                foreach (var kvp in headerOrder)
+                {
+                    CategoryOrderManager.SetCategoryOrder(kvp.Key, kvp.Value);
+                }
+                
+                var links = markdownService.GetLinks(actualPath);
 
                 foreach (var link in links)
                 {

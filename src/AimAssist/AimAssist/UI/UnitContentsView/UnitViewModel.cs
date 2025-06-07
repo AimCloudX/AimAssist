@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
+using AimAssist.Services.Markdown;
 using Common.UI.WebUI;
 
 namespace AimAssist.UI.UnitContentsView
@@ -48,6 +49,24 @@ namespace AimAssist.UI.UnitContentsView
         public string Name => Content.Name;
         public string Description => Content.Description;
         public string Category => Content.Category;
+        public string CategorySortKey => GetCategorySortKey();
+        
+        private string GetCategorySortKey()
+        {
+            if (string.IsNullOrEmpty(Content.Category))
+            {
+                return "zzz";
+            }
+            
+            var order = CategoryOrderManager.GetCategoryOrder(Content.Category);
+            if (order != int.MaxValue - 1)
+            {
+                return order.ToString("D3");
+            }
+            
+            return Content.Category;
+        }
+        
         public DependencyObject Icon
         {
             get { return this.icon; }
