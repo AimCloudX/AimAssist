@@ -145,8 +145,6 @@ public class UrlViewProvider : IViewProvider
 [ViewProvider(Priority = 90)]
 public class FileBasedViewProvider : IViewProvider
 {
-    private readonly IEditorOptionService editorOptionService;
-    
     public bool CanProvideView(Type unitType) => 
         unitType == typeof(MarkdownUnit) || 
         unitType == typeof(EditorUnit) || 
@@ -165,6 +163,160 @@ public class FileBasedViewProvider : IViewProvider
 }
 
 // 動的コンテンツ用Provider
+[ViewProvider(Priority = 80)]
+public class DynamicContentViewProvider : IViewProvider
+{
+    public bool CanProvideView(Type unitType) => unitType == typeof(SnippetUnit);
+    
+    public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
+    {
+        var code = unit switch
+        {
+            SnippetUnit snippet => snippet.Code,
+            _ => string.Empty
+        };
+        
+        return new TextBox
+        {
+            Text = code,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Margin = new Thickness(0),
+            IsReadOnly = true,
+            TextWrapping = TextWrapping.Wrap,
+            FontFamily = new FontFamily("Consolas"),
+            Background = Brushes.LightGray
+        };
+    }
+}
+```
+
+#### 4. 新しいUnitViewFactory（超シンプル）
+```csharp
+public class UnitViewFactory
+{
+    private readonly IEnumerable<IViewProvider> viewProviders;
+    private readonly IServiceProvider serviceProvider;
+    private readonly Dictionary<string, UIElement> cache = new();
+    
+    public UnitViewFactory(IEnumerable<IViewProvider> viewProviders, IServiceProvider serviceProvider)
+    {
+        this.viewProviders = viewProviders.OrderByDescending(p => p.Priority);
+        this.serviceProvider = serviceProvider;
+    }
+    
+    public UIElement Create(UnitViewModel unit, bool createNew = false)
+    {
+        if (!createNew && cache.TryGetValue(unit.Name, out var cached))
+            return cached;
+            
+        var element = CreateViewForUnit(unit.Content);
+        
+        if (!createNew && element != null)
+            cache[unit.Name] = element;
+            
+        return element;
+    }
+    
+    private UIElement CreateViewForUnit(IUnit unit)
+    {
+        // 1. 専用ViewProviderをチェック
+        var provider = viewProviders.FirstOrDefault(p => p.CanProvideView(unit.GetType()));
+        if (provider != null)
+        {
+            return provider.CreateView(unit, serviceProvider);
+        }
+        
+        // 2. WPFのDataTemplateに委譲（標準機能）
+        var contentPresenter = new ContentPresenter 
+        { 
+            Content = unit,
+            DataContext = serviceProvider // DIコンテナを提供
+        };
+        
+        return contentPresenter;
+    }
+}
+```
+
+### 移行戦略
+
+#### ✅ Phase 1: ViewProvider システム導入（完了）
+1. ✅ IViewProvider インターフェース作成
+2. ✅ 既存のswitch文ロジックをViewProviderに移行
+   - ✅ UrlViewProvider（URL条件分岐専用）
+   - ✅ FileBasedViewProvider（MarkdownUnit、EditorUnit、OptionUnit）
+   - ✅ DynamicContentViewProvider（SnippetUnit）
+3. ✅ DI登録とUnitViewFactoryの部分修正
+4. ✅ 既存機能との並行動作確認
+5. ✅ ビルド成功・動作確認完了
+
+#### Phase 2: DataTemplate 移行（1週間）
+1. App.xaml にDataTemplate追加
+2. 簡単な1:1対応Unitから順次移行
+3. ViewProviderから対応するケースを削除
+4. 動作確認とテスト
+
+#### Phase 3: Unit自動登録システム（1週間）
+1. AutoDiscoveryUnitsFactory 実装
+2. 既存UnitsFactory.csから段階的に移行
+3. CompositeUnitsFactory との統合
+4. 既存FactoryManagerシステムとの統合
+
+#### Phase 4: 完全移行とクリーンアップ（1週間）
+1. 全Unit-View対応の新システム移行完了
+2. UnitViewFactory.csのswitch文完全削除
+3. UnitsFactory.csの削除
+4. テストと最適化
+
+### 期待効果
+
+#### 新Unit追加の簡素化
+**従来（2箇所修正必要）:**
+```csharp
+// 1. UnitsFactory.cs に追加
+yield return new MyNewUnit();
+
+// 2. UnitViewFactory.cs に追加
+case MyNewUnit:
+    return new MyNewView();
+```
+
+**新方式（1箇所のみ）:**
+```xml
+<!-- App.xaml に1行追加するだけ -->
+<DataTemplate DataType="{x:Type units:MyNewUnit}">
+    <views:MyNewView />
+</DataTemplate>
+```
+
+#### コード削減効果
+- **UnitViewFactory.cs**: 100行 → 30行（70%削減）
+- **UnitsFactory.cs**: 80行 → 削除（100%削減）
+- **新Unit追加工数**: 95%削減
+- **修正漏れリスク**: ほぼゼロ
+
+#### 保守性向上
+- Unit-View対応が宣言的で視覚的に分かりやすい
+- WPF標準のDataTemplate活用でデバッグ容易
+- 複雑なケースもViewProviderで分離
+- プラグイン対応が自然に可能
+
+#### テスタビリティ向上
+- UnitからUIの依存を完全排除
+- Unit単体テストが容易
+- ViewProvider単体テストも可能
+
+### 実装完了状況
+✅ **Phase 1完了** - ViewProviderシステム導入
+- IViewProvider インターフェース
+- 3つのViewProvider実装（Url、FileBased、DynamicContent）
+- UnitViewFactoryの更新
+- DI統合
+- ビルド成功・動作確認完了
+
+次のPhase 2（DataTemplate移行）の準備が整いました。既存機能への影響を最小限に抑えつつ、段階的に新しいアーキテクチャに移行する基盤が完成しています。
+Provider
 [ViewProvider(Priority = 80)]
 public class DynamicContentViewProvider : IViewProvider
 {

@@ -18,37 +18,37 @@ using Common.UI.Markdown;
 using Common.UI.WebUI.Amazon;
 using Common.UI.WebUI.LLM;
 using Microsoft.Extensions.DependencyInjection;
+using System.Windows.Controls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace AimAssist.UI.UnitContentsView
 {
-    /// <summary>
-    /// ユニットからUIを作成するファクトリークラス
-    /// </summary>
     public class UnitViewFactory
     {
         public static Dictionary<Type, Func<IUnit, UIElement>> UnitToUIElementDictionary = new();
 
         private static Dictionary<string, UIElement> cache = new();
-        private readonly ICommandService _commandService;
-        private readonly IEditorOptionService _editorOptionService;
+        private readonly ICommandService commandService;
+        private readonly IEditorOptionService editorOptionService;
+        private readonly IServiceProvider serviceProvider;
+        private readonly IEnumerable<IViewProvider> viewProviders;
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="commandService">コマンドサービス</param>
-        /// <param name="editorOptionService">エディタオプションサービス</param>
-        public UnitViewFactory(ICommandService commandService, IEditorOptionService editorOptionService)
+        public UnitViewFactory(
+            ICommandService commandService, 
+            IEditorOptionService editorOptionService,
+            IServiceProvider serviceProvider,
+            IEnumerable<IViewProvider> viewProviders)
         {
-            _commandService = commandService;
-            _editorOptionService = editorOptionService;
+            this.commandService = commandService;
+            this.editorOptionService = editorOptionService;
+            this.serviceProvider = serviceProvider;
+            this.viewProviders = viewProviders.OrderByDescending(p => p.Priority);
         }
-        
-        /// <summary>
-        /// ユニットからUIを作成します
-        /// </summary>
-        /// <param name="unit">ユニット</param>
-        /// <param name="createNew">新規作成するかどうか</param>
-        /// <returns>作成されたUI要素</returns>
+
         public UIElement Create(UnitViewModel unit, bool createNew = false)
         {
             if (createNew)
@@ -62,47 +62,34 @@ namespace AimAssist.UI.UnitContentsView
             }
 
             var element = CreateInner(unit);
-            cache.Add(unit.Name, element);
+            if (element != null)
+            {
+                cache.Add(unit.Name, element);
+            }
             return element;
         }
 
         private UIElement CreateInner(UnitViewModel unit)
         {
+            var provider = viewProviders.FirstOrDefault(p => p.CanProvideView(unit.Content.GetType()));
+            if (provider != null)
+            {
+                return provider.CreateView(unit.Content, serviceProvider);
+            }
+
             switch (unit.Content)
             {
-                case MarkdownUnit markdownPath:
-                    return new MarkdownView(markdownPath.FullPath);
                 case TranscriptionUnit speechModel:
                     return new SpeechControl();
                 case RssSettingUnit:
                     return new RssControl();
-                case OptionUnit option:
-                    var optionEditor = new AimEditor(_editorOptionService);
-                    foreach(var filePath in option.OptionFilePaths)
-                    {
-                        optionEditor.NewTab(filePath);
-                    }
-
-                    return optionEditor;
-                case EditorUnit editorUnit:
-                    var editor = new AimEditor(_editorOptionService);
-                    editor.NewTab(editorUnit.FullPath);
-                    return editor;
                 case ShortcutOptionUnit:
-                    return new CustomizeKeyboardShortcutsSettings(_commandService);
-                case SnippetUnit model:
-                    return new System.Windows.Controls.TextBox()
-                    {
-                        Text = model.Code,
-                        HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
-                        VerticalAlignment = VerticalAlignment.Stretch,
-                        Margin = new Thickness(0)
-                    };
+                    return new CustomizeKeyboardShortcutsSettings(commandService);
                 case SnippetModelUnit model:
-                    return new System.Windows.Controls.TextBox()
+                    return new TextBox()
                     {
                         Text = model.Code,
-                        HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
                         VerticalAlignment = VerticalAlignment.Stretch,
                         Margin = new Thickness(0)
                     };
@@ -110,39 +97,28 @@ namespace AimAssist.UI.UnitContentsView
                     return new MindMeisterViewControl(model);
                 case MindMeisterItemUnit model:
                     return new WebViewControl(model.SearchUrl, model.Name);
-                case UrlUnit urlPath:
-                    var url = urlPath.Url;
-                    if (url.StartsWith("https://chatgpt"))
-                    {
-                        return new ChatGptControl(url);
-                    }
-                    if (url.StartsWith("https://claude.ai/"))
-                    {
-                        return new ClaudeControl(url);
-                    }
-
-                    if (url.StartsWith("https://www.amazon"))
-                    {
-                        return new AmazonWebViewControl(url);
-                    }
-
-                    return new WebViewControl(url);
                 case PdfMergeUnit:
                     return new PdfMergerControl();
                 case ComputerUnit:
                     return new ComputerView();
                 case ClipboardUnit:
-                    return new ClipboardList(_editorOptionService);
+                    return new ClipboardList(editorOptionService);
                 default:
                     break;
             }
 
-            if(UnitToUIElementDictionary.TryGetValue(unit.Content.GetType(), out var value))
+            if (UnitToUIElementDictionary.TryGetValue(unit.Content.GetType(), out var value))
             {
                 return value.Invoke(unit.Content);
             }
 
-            return null;
+            var contentPresenter = new ContentPresenter
+            {
+                Content = unit.Content,
+                DataContext = serviceProvider
+            };
+
+            return contentPresenter;
         }
     }
 }

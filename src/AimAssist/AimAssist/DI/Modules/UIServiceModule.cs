@@ -4,6 +4,8 @@ using AimAssist.Service;
 using AimAssist.UI.HotKeys;
 using AimAssist.UI.MainWindows;
 using AimAssist.UI.PickerWindows;
+using AimAssist.UI.UnitContentsView;
+using AimAssist.UI.UnitContentsView.ViewProviders;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI.Modules
@@ -34,9 +36,13 @@ namespace AimAssist.DI.Modules
                 new UI.SystemTray.SystemTrayRegister(provider.GetRequiredService<IAppCommands>())
             );
 
+            RegisterViewProviders(services);
+
             services.AddSingleton<UI.UnitContentsView.UnitViewFactory>(provider => new UI.UnitContentsView.UnitViewFactory(
                 provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<IEditorOptionService>()
+                provider.GetRequiredService<IEditorOptionService>(),
+                provider,
+                provider.GetServices<IViewProvider>()
             ));
 
             services.AddTransient<MainWindowViewModel>();
@@ -57,6 +63,13 @@ namespace AimAssist.DI.Modules
             ));
 
             return services;
+        }
+
+        private void RegisterViewProviders(IServiceCollection services)
+        {
+            services.AddTransient<IViewProvider, UrlViewProvider>();
+            services.AddTransient<IViewProvider, FileBasedViewProvider>();
+            services.AddTransient<IViewProvider, DynamicContentViewProvider>();
         }
     }
 }
