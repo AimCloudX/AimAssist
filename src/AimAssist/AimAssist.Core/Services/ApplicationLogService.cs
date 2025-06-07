@@ -1,8 +1,6 @@
-﻿using AimAssist.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
+using AimAssist.Core.Interfaces;
 
 namespace AimAssist.Core.Services
 {
@@ -11,17 +9,17 @@ namespace AimAssist.Core.Services
     /// </summary>
     public class ApplicationLogService : IApplicationLogService
     {
-        private readonly string _logFilePath;
-        private readonly int _maxLogFileSize;
-        private readonly List<string> _recentLogs;
-        private readonly object _lockObject = new object();
-        private readonly bool _isDebugMode;
+        private readonly string logFilePath;
+        private readonly int maxLogFileSize;
+        private readonly List<string> recentLogs;
+        private readonly object lockObject = new();
+        private readonly bool isDebugMode;
 
-        public ApplicationLogService(string logDirectory = null, int maxLogFileSize = 10485760, bool isDebugMode = false)
+        public ApplicationLogService(string? logDirectory = null, int maxLogFileSize = 10485760, bool isDebugMode = false)
         {
-            _isDebugMode = isDebugMode;
-            _maxLogFileSize = maxLogFileSize; // デフォルト10MB
-            _recentLogs = new List<string>();
+            this.isDebugMode = isDebugMode;
+            this.maxLogFileSize = maxLogFileSize; // デフォルト10MB
+            recentLogs = [];
 
             // ログディレクトリの設定
             string baseDir = logDirectory ?? Path.Combine(
@@ -36,29 +34,26 @@ namespace AimAssist.Core.Services
 
             // 日付でログファイル名を作成
             string date = DateTime.Now.ToString("yyyyMMdd");
-            _logFilePath = Path.Combine(baseDir, $"AimAssist_{date}.log");
+            logFilePath = Path.Combine(baseDir, $"AimAssist_{date}.log");
 
             // 起動時のログ
             Log(LogLevel.Info, "ApplicationLogService initialized");
         }
 
-        /// <summary>
-        /// ログを記録します
-        /// </summary>
         public void Log(LogLevel level, string message)
         {
-            if (level == LogLevel.Debug && !_isDebugMode)
+            if (level == LogLevel.Debug && !isDebugMode)
                 return;
 
             string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{level}] {message}";
 
-            lock (_lockObject)
+            lock (lockObject)
             {
                 // メモリ内のログバッファに追加
-                _recentLogs.Add(logEntry);
-                if (_recentLogs.Count > 1000) // 最大1000件保持
+                recentLogs.Add(logEntry);
+                if (recentLogs.Count > 1000) // 最大1000件保持
                 {
-                    _recentLogs.RemoveAt(0);
+                    recentLogs.RemoveAt(0);
                 }
 
                 try
@@ -78,7 +73,7 @@ namespace AimAssist.Core.Services
         /// <summary>
         /// 例外をログに記録します
         /// </summary>
-        public void LogException(Exception ex, string additionalInfo = null)
+        public void LogException(Exception ex, string? additionalInfo = null)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(additionalInfo != null ? $"Exception: {additionalInfo}" : "Exception:");
@@ -127,12 +122,12 @@ namespace AimAssist.Core.Services
         /// </summary>
         public IEnumerable<string> GetRecentLogs(int count = 100)
         {
-            lock (_lockObject)
+            lock (lockObject)
             {
-                int startIndex = Math.Max(0, _recentLogs.Count - count);
-                for (int i = startIndex; i < _recentLogs.Count; i++)
+                var startIndex = Math.Max(0, recentLogs.Count - count);
+                for (var i = startIndex; i < recentLogs.Count; i++)
                 {
-                    yield return _recentLogs[i];
+                    yield return recentLogs[i];
                 }
             }
         }
@@ -145,13 +140,13 @@ namespace AimAssist.Core.Services
             try
             {
                 // ファイルが存在し、サイズ制限を超えている場合はローテーション
-                if (File.Exists(_logFilePath) && new FileInfo(_logFilePath).Length > _maxLogFileSize)
+                if (File.Exists(logFilePath) && new FileInfo(logFilePath).Length > maxLogFileSize)
                 {
                     RotateLogFile();
                 }
 
                 // ログをファイルに追記
-                File.AppendAllText(_logFilePath, logEntry + Environment.NewLine);
+                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
             }
             catch (Exception ex)
             {
@@ -166,17 +161,21 @@ namespace AimAssist.Core.Services
         {
             try
             {
-                string directory = Path.GetDirectoryName(_logFilePath);
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(_logFilePath);
-                string extension = Path.GetExtension(_logFilePath);
-                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                string newPath = Path.Combine(directory, $"{fileNameWithoutExt}_{timestamp}{extension}");
+                var directory = Path.GetDirectoryName(logFilePath);
+                var fileNameWithoutExt = Path.GetFileNameWithoutExtension(logFilePath);
+                var extension = Path.GetExtension(logFilePath);
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                if (directory != null)
+                {
+                    var newPath = Path.Combine(directory, $"{fileNameWithoutExt}_{timestamp}{extension}");
 
-                // 古いログファイルを名前変更
-                File.Move(_logFilePath, newPath);
+                    // 古いログファイルを名前変更
+                    File.Move(logFilePath, newPath);
+                    
+                    // ログフォルダのクリーンアップ（14日以上前のログを削除）
+                    CleanupOldLogFiles(directory, 14);
+                }
 
-                // ログフォルダのクリーンアップ（14日以上前のログを削除）
-                CleanupOldLogFiles(directory, 14);
             }
             catch (Exception ex)
             {
@@ -189,10 +188,10 @@ namespace AimAssist.Core.Services
         /// </summary>
         private void CleanupOldLogFiles(string directory, int daysToKeep)
         {
+            var cutoffDate = DateTime.Now.AddDays(-daysToKeep);
             try
             {
-                DateTime cutoffDate = DateTime.Now.AddDays(-daysToKeep);
-                foreach (string file in Directory.GetFiles(directory, "AimAssist_*.log"))
+                foreach (var file in Directory.GetFiles(directory, "AimAssist_*.log"))
                 {
                     if (File.GetLastWriteTime(file) < cutoffDate)
                     {

@@ -6,7 +6,7 @@ namespace Common.UI.WebUI
 {
     public partial class WebViewControl : IFocasable
     {
-        private string url;
+        private string url = string.Empty;
         private string title = string.Empty;
 
         public WebViewControl(string url, string title)
@@ -67,7 +67,7 @@ namespace Common.UI.WebUI
         public string Url { get => this.url; set
             {
                 this.url = value;
-                webView.CoreWebView2.Navigate(url);
+                webView.CoreWebView2?.Navigate(url);
             } }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -80,7 +80,7 @@ namespace Common.UI.WebUI
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(title))
             {
                 var bookmarklet1 = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet1);
+                webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet1);
                 return;
             }
 
@@ -93,17 +93,20 @@ namespace Common.UI.WebUI
             Clipboard.SetDataObject(dataObject);
 
             var bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
-            webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+            webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
         }
 
         private void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             if (e.IsSuccess)
             {
-                webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
+                webView.CoreWebView2?.ExecuteScriptAsync("document.title").ContinueWith(task =>
                 {
-                    title = task.Result;
-                    title = title.Trim('"');
+                    if (task.Result != null)
+                    {
+                        title = task.Result;
+                        title = title.Trim('"');
+                    }
                 });
             }
         }
@@ -119,7 +122,7 @@ namespace Common.UI.WebUI
 
         private void Button_Click3(object sender, RoutedEventArgs e)
         {
-            webView.CoreWebView2.Navigate(this.url);
+            webView.CoreWebView2?.Navigate(this.url);
         }
     }
 }

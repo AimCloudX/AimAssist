@@ -2,16 +2,21 @@
 
 namespace AimAssist.Core.Model
 {
-    public class ConfigModel
+    public class ConfigModel(List<WorkItemPath> itemPaths)
     {
         [JsonProperty("workItemPaths")]
-        public List<WorkItemPath> ItemPaths { get; set; }
+        public List<WorkItemPath> ItemPaths { get; set; } = itemPaths;
+
+        public static ConfigModel Default()
+        {
+            return new ConfigModel([]);
+        }
     }
 
-    public class WorkItemPath
+    public class WorkItemPath(string path)
     {
         [JsonProperty("path")]
-        public string Path { get; set; }
+        public string Path { get; set; } = path;
 
         public string GetActualPath()
         {

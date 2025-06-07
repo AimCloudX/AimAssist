@@ -56,7 +56,7 @@ public class HotKeyController : IDisposable
     /// <param name="key"></param>
     /// <param name="command"></param>
     /// <returns></returns>
-    public bool Register(ModifierKeys modKey, Key key, RelayCommand command)
+    public bool Register(ModifierKeys modKey, Key key, RelayCommand? command)
     {
         var modKeyNum = (int)modKey;
         var vKey = KeyInterop.VirtualKeyFromKey(key);

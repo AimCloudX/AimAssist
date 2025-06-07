@@ -118,8 +118,8 @@ namespace Common.UI.Editor
             if (e.Key == Key.P && (Keyboard.Modifiers & ModifierKeys.Control) != 0 &&
                 (Keyboard.Modifiers & ModifierKeys.Shift) != 0)
             {
-                e.Handled = true; // イベントが処理されたことを示す
-                WebView.CoreWebView2.ExecuteScriptAsync("openMonacoCommandPalette();");
+                e.Handled = true;
+                WebView.CoreWebView2?.ExecuteScriptAsync("openMonacoCommandPalette();");
             }
         }
 
@@ -131,8 +131,7 @@ namespace Common.UI.Editor
                 jsonMessage.CtrlKey &&
                 jsonMessage.ShiftKey)
             {
-                // WebView2内でCtrl+Shift+Pが押されたときの処理
-                WebView.CoreWebView2.ExecuteScriptAsync("openMonacoCommandPalette();");
+                WebView.CoreWebView2?.ExecuteScriptAsync("openMonacoCommandPalette();");
             }
         }
 
@@ -140,9 +139,8 @@ namespace Common.UI.Editor
         {
             WebView.Focus();
 
-            // Monaco EditorのTextにフォーカスを設定するJavaScriptを実行
             var script = @"window.editor.focus();";
-            WebView.CoreWebView2.ExecuteScriptAsync(script);
+            WebView.CoreWebView2?.ExecuteScriptAsync(script);
         }
     }
 }

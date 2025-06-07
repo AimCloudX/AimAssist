@@ -10,11 +10,11 @@ namespace Common.UI.WebUI.Amazon
 {
     public partial class AmazonWebViewControl : INotifyPropertyChanged
     {
-        private string url;
-        private string title;
+        private string url = string.Empty;
+        private string title = string.Empty;
 
-        private string productTitle;
-        private string asin;
+        private string productTitle = string.Empty;
+        private string asin = string.Empty;
         private BookInfo? book;
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -27,7 +27,7 @@ namespace Common.UI.WebUI.Amazon
             set
             {
                 this.url = value;
-                webView.CoreWebView2.Navigate(url);
+                webView.CoreWebView2?.Navigate(url);
             }
         }
 
@@ -35,10 +35,7 @@ namespace Common.UI.WebUI.Amazon
         {
             InitializeComponent();
             this.url = url;
-            this.productTitle = string.Empty;
-            this.asin = string.Empty;
             this.book = null;
-            this.title  = string.Empty;
             this.DataContext = this;
         }
 
@@ -93,21 +90,17 @@ namespace Common.UI.WebUI.Amazon
 
         private async void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            // ナビゲーションが成功したか確認
             if (e.IsSuccess)
             {
-                // 現在のページのタイトルを取得するためにJavaScriptを実行
                 await webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
                 {
-                    // JavaScriptの結果を取得
-                    title = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    title = title.Trim('"');
+                    if (task.Result != null)
+                    {
+                        title = task.Result;
+                        title = title.Trim('"');
+                    }
                 });
 
-
-                // productTitle
                 var productTitelScript = @"
                 var productTitleElement = document.getElementById('productTitle');
                 var productTitle = productTitleElement ? productTitleElement.innerText.trim() : '';
@@ -115,8 +108,11 @@ namespace Common.UI.WebUI.Amazon
             ";
                 await webView.CoreWebView2.ExecuteScriptAsync(productTitelScript).ContinueWith(task =>
                 {
-                    productTitle = task.Result;
-                    productTitle = productTitle.Trim('"');
+                    if (task.Result != null)
+                    {
+                        productTitle = task.Result;
+                        productTitle = productTitle.Trim('"');
+                    }
                 });
 
                 string asinScript = @"
@@ -127,8 +123,11 @@ ASIN;
 
                 await webView.CoreWebView2.ExecuteScriptAsync(asinScript).ContinueWith(task =>
                 {
-                    asin = task.Result;
-                    asin = asin.Trim('"');
+                    if (task.Result != null)
+                    {
+                        asin = task.Result;
+                        asin = asin.Trim('"');
+                    }
                 });
 
                 book = await FetchBookInfoAsync();
@@ -143,7 +142,7 @@ ASIN;
             if (book == null)
             {
                 string bookmarklet = "javascript:(function(){alert('書籍情報の取得に失敗しました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+                webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
                 return;
             }
 
@@ -184,7 +183,7 @@ ASIN;
                 sb.Append("次ののデータの取得に失敗しました ");
                 sb.Append(string.Join(" ", errorList));
                 string bookmarklet = $"javascript:(function(){{alert('{sb}');}})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+                webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
             }
         }
 
@@ -193,7 +192,7 @@ ASIN;
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(url))
             {
                 string bookmarklet = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+                webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
             }
             else if (string.IsNullOrEmpty(productTitle) || string.IsNullOrEmpty(asin))
             {
@@ -205,7 +204,7 @@ ASIN;
                 dataObject.SetData(DataFormats.Text, titleUrl);
                 Clipboard.SetDataObject(dataObject);
                 string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+                webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
             }
             else
             {
@@ -219,7 +218,7 @@ ASIN;
                 dataObject.SetData(DataFormats.Text, titleUrl);
                 Clipboard.SetDataObject(dataObject);
                 string bookmarklet = "javascript:(function(){alert('短縮形のリンクをコピーしました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+                webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
             }
         }
 

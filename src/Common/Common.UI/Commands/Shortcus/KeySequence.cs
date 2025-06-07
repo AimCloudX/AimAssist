@@ -22,7 +22,7 @@ namespace Common.UI.Commands.Shortcus
 
         public bool IsSingleKeySequence => SecondKey == null;
 
-        public static KeySequence None => new KeySequence(Key.None, ModifierKeys.None);
+        public static KeySequence? None => new KeySequence(Key.None, ModifierKeys.None);
 
         public override string ToString()
         {
@@ -39,9 +39,10 @@ namespace Common.UI.Commands.Shortcus
             return $"{FirstModifiers}+{FirstKey}, {SecondModifiers}+{SecondKey}";
         }
 
-        private bool Equals(KeySequence obj)
+        private bool Equals(KeySequence? obj)
         {
-            return obj.FirstKey == FirstKey && obj.FirstModifiers == FirstModifiers && obj.SecondKey == SecondKey &&
+            return obj != null &&
+                   obj.FirstKey == FirstKey && obj.FirstModifiers == FirstModifiers && obj.SecondKey == SecondKey &&
                    obj.SecondModifiers == SecondModifiers;
         }
 

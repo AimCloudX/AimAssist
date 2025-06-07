@@ -49,19 +49,19 @@ namespace AimAssist.Units.Implementation.WorkTools
                     var option = JsonConvert.DeserializeObject<ConfigModel>(text);
                     if (option == null)
                     {
-                        option = new ConfigModel();
+                        option = ConfigModel.Default();
                     }
 
                     _option = option;
                 }
                 catch(Exception _)
                 {
-                    _option = new ConfigModel();
+                    _option = ConfigModel.Default();
                 }
             }
             else
             {
-                var option = new ConfigModel();
+                var option = ConfigModel.Default();
                 _option = option;
                 SaveOption();
             }

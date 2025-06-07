@@ -8,7 +8,7 @@ namespace Common.UI.WebUI.LLM
     {
         public event EventHandler<string> ResponseGenerated;
 
-        private string url;
+        private string url = string.Empty;
         private string title = string.Empty;
 
         public ClaudeControl(string url)
@@ -71,7 +71,7 @@ namespace Common.UI.WebUI.LLM
             set
             {
                 this.url = value;
-                webView.CoreWebView2.Navigate(url);
+                webView.CoreWebView2?.Navigate(url);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Common.UI.WebUI.LLM
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(title))
             {
                 var bookmarklet1 = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet1);
+                webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet1);
                 return;
             }
 
@@ -100,22 +100,20 @@ namespace Common.UI.WebUI.LLM
             Clipboard.SetDataObject(dataObject);
 
             string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
-            webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+            webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
         }
 
         private async void webView_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            // ナビゲーションが成功したか確認
             if (e.IsSuccess)
             {
-                // 現在のページのタイトルを取得するためにJavaScriptを実行
                 await webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
                 {
-                    // JavaScriptの結果を取得
-                    title = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    title = title.Trim('"');
+                    if (task.Result != null)
+                    {
+                        title = task.Result;
+                        title = title.Trim('"');
+                    }
                 });
             }
         }
@@ -127,7 +125,7 @@ namespace Common.UI.WebUI.LLM
 
             if (message?.Type == "responseGenerated")
             {
-                ResponseGenerated(this, message.Content);
+                ResponseGenerated?.Invoke(this, message.Content);
             }
         }
 

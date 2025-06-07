@@ -25,7 +25,7 @@ namespace AimAssist.Units.Implementation.Snippets
                     var option = JsonConvert.DeserializeObject<ConfigModel>(text);
                     if (option == null)
                     {
-                        option = new ConfigModel();
+                        option = ConfigModel.Default();
                     }
 
                     Option = option;
@@ -35,12 +35,12 @@ namespace AimAssist.Units.Implementation.Snippets
                     // エラーログを出力
                     Console.WriteLine($"スニペットオプションの読み込みに失敗しました: {ex.Message}");
                     // デフォルト設定を適用
-                    Option = new ConfigModel();
+                    Option = ConfigModel.Default();
                 }
             }
             else
             {
-                var option = new ConfigModel();
+                var option = ConfigModel.Default();
                 Option = option;
                 SaveOption();
             }

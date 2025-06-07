@@ -10,7 +10,7 @@ namespace AimAssist.Core.Helpers
     /// </summary>
     public static class ErrorHandlingHelper
     {
-        private static IApplicationLogService _logService;
+        private static IApplicationLogService? logService;
 
         /// <summary>
         /// ログサービスを設定します
@@ -18,7 +18,7 @@ namespace AimAssist.Core.Helpers
         /// <param name="logService">ログサービス</param>
         public static void SetLogService(IApplicationLogService logService)
         {
-            _logService = logService;
+            ErrorHandlingHelper.logService = logService;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace AimAssist.Core.Helpers
         /// <param name="errorMessage">エラーメッセージ</param>
         /// <param name="showMessageBox">エラーメッセージボックスを表示するかどうか</param>
         /// <returns>処理が成功したかどうか</returns>
-        public static bool SafeExecute(Action action, string errorMessage = null, bool showMessageBox = false)
+        public static bool SafeExecute(Action action, string? errorMessage = null, bool showMessageBox = false)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace AimAssist.Core.Helpers
         /// <param name="errorMessage">エラーメッセージ</param>
         /// <param name="showMessageBox">エラーメッセージボックスを表示するかどうか</param>
         /// <returns>処理が成功したかどうかを示すTask</returns>
-        public static async Task<bool> SafeExecuteAsync(Func<Task> asyncAction, string errorMessage = null, bool showMessageBox = false)
+        public static async Task<bool> SafeExecuteAsync(Func<Task> asyncAction, string? errorMessage = null, bool showMessageBox = false)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace AimAssist.Core.Helpers
         /// <param name="errorMessage">エラーメッセージ</param>
         /// <param name="showMessageBox">エラーメッセージボックスを表示するかどうか</param>
         /// <returns>関数の戻り値、または例外発生時のデフォルト値</returns>
-        public static T SafeExecute<T>(Func<T> func, T defaultValue = default, string errorMessage = null, bool showMessageBox = false)
+        public static T SafeExecute<T>(Func<T> func, T defaultValue = default!, string? errorMessage = null, bool showMessageBox = false)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace AimAssist.Core.Helpers
         /// <param name="errorMessage">エラーメッセージ</param>
         /// <param name="showMessageBox">エラーメッセージボックスを表示するかどうか</param>
         /// <returns>関数の戻り値、または例外発生時のデフォルト値を含むTask</returns>
-        public static async Task<T> SafeExecuteAsync<T>(Func<Task<T>> asyncFunc, T defaultValue = default, string errorMessage = null, bool showMessageBox = false)
+        public static async Task<T> SafeExecuteAsync<T>(Func<Task<T>> asyncFunc, T defaultValue = default!, string? errorMessage = null, bool showMessageBox = false)
         {
             try
             {
@@ -113,16 +113,14 @@ namespace AimAssist.Core.Helpers
         /// <param name="ex">発生した例外</param>
         /// <param name="message">エラーメッセージ</param>
         /// <param name="showMessageBox">エラーメッセージボックスを表示するかどうか</param>
-        private static void HandleException(Exception ex, string message = null, bool showMessageBox = false)
+        private static void HandleException(Exception ex, string? message = null, bool showMessageBox = false)
         {
             string errorMessage = string.IsNullOrEmpty(message)
                 ? $"エラーが発生しました: {ex.Message}"
                 : $"{message}: {ex.Message}";
 
-            // ログに記録
-            _logService?.LogException(ex, message);
+            logService?.LogException(ex, message);
 
-            // UIスレッドでメッセージボックスを表示
             if (showMessageBox)
             {
                 Application.Current?.Dispatcher?.Invoke(() =>

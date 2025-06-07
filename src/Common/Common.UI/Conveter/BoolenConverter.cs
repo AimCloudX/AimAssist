@@ -4,17 +4,17 @@ namespace Common.UI.Conveter
 {
     public class BoolenConverter : System.Windows.Data.IValueConverter
     {
-        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is bool boolValue)
             {
                 return !boolValue;
             }
 
-            throw new InvalidOperationException();
+            return null;
         }
 
-        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is bool)
             {

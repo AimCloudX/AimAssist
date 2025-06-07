@@ -30,7 +30,7 @@ namespace Common.UI.Commands.Shortcus
                     throw new JsonException();
                 }
 
-                var propertyName = reader.GetString();
+                var propertyName = reader.GetString()!;
                 reader.Read();
 
                 switch (propertyName)

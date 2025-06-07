@@ -16,7 +16,7 @@ namespace AimAssist.Units.Core.Modes
 
         public string Name { get; }
 
-        public virtual KeySequence DefaultKeySequence => KeySequence.None;
+        public virtual KeySequence? DefaultKeySequence => KeySequence.None;
 
         public virtual string Description => string.Empty;
 

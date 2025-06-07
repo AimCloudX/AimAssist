@@ -11,6 +11,6 @@ namespace AimAssist.Core.Units
 
         bool IsIncludeAllInclusive { get; }
 
-        KeySequence DefaultKeySequence { get; }
+        KeySequence? DefaultKeySequence { get; }
     }
 }

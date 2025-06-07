@@ -155,8 +155,11 @@ namespace Common.UI.Markdown
                 item.MouseDoubleClick += (s, _) =>
                 {
                     if (s is not TreeViewItem treeViewItem) return;
-                    var id = treeViewItem.Tag.ToString();
-                    WebView.CoreWebView2.ExecuteScriptAsync($"scrollToElement('{id}')");
+                    var id = treeViewItem.Tag?.ToString();
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        WebView.CoreWebView2?.ExecuteScriptAsync($"scrollToElement('{id}')");
+                    }
                 };
 
                 if (item.Items.Count > 0)

@@ -6,7 +6,7 @@ namespace AimAssist.Middlewares
     public interface IErrorHandlingMiddleware
     {
         void RegisterGlobalHandlers();
-        void HandleException(Exception exception, string context = "");
+        void HandleException(Exception exception, string? context = "");
         void HandleUnhandledException(Exception exception);
     }
 
@@ -31,7 +31,7 @@ namespace AimAssist.Middlewares
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         }
 
-        public void HandleException(Exception exception, string context = "")
+        public void HandleException(Exception exception, string? context = "")
         {
             if (exception == null) return;
 

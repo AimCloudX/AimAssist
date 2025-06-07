@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AimAssist.Core.Interfaces
+﻿namespace AimAssist.Core.Interfaces
 {
     /// <summary>
     /// アプリケーションログの重要度レベル
@@ -32,7 +29,7 @@ namespace AimAssist.Core.Interfaces
         /// </summary>
         /// <param name="ex">例外</param>
         /// <param name="additionalInfo">追加情報</param>
-        void LogException(Exception ex, string additionalInfo = null);
+        void LogException(Exception ex, string? additionalInfo = null);
 
         /// <summary>
         /// デバッグレベルのログを記録します

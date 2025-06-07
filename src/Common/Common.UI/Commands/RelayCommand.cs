@@ -58,9 +58,9 @@ namespace Common.UI.Commands
             return HashCode.Combine(execute, CommandName);
         }
 
-        public bool Equals(RelayCommand command)
+        public bool Equals(RelayCommand? command)
         {
-            return CommandName == command.CommandName;
+            return command != null && CommandName == command.CommandName;
         }
     }
 
