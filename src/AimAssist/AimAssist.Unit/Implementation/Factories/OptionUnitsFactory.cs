@@ -12,40 +12,40 @@ namespace AimAssist.Units.Implementation.Factories
 
     public class OptionUnitsFactory : IOptionUnitsFactory
     {
-        private readonly IWorkItemOptionService _workItemOptionService;
-        private readonly IEditorOptionService _editorOptionService;
-        private readonly ISnippetOptionService _snippetOptionService;
+        private readonly IWorkItemOptionService workItemOptionService;
+        private readonly IEditorOptionService editorOptionService;
+        private readonly ISnippetOptionService snippetOptionService;
 
         public OptionUnitsFactory(
             IWorkItemOptionService workItemOptionService,
             IEditorOptionService editorOptionService,
             ISnippetOptionService snippetOptionService)
         {
-            _workItemOptionService = workItemOptionService;
-            _editorOptionService = editorOptionService;
-            _snippetOptionService = snippetOptionService;
+            this.workItemOptionService = workItemOptionService;
+            this.editorOptionService = editorOptionService;
+            this.snippetOptionService = snippetOptionService;
         }
 
         public IEnumerable<IUnit> CreateUnits()
         {
             var lists = new List<string>();
-            lists.Add(_workItemOptionService.OptionPath);
-            lists.AddRange(_workItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
+            lists.Add(workItemOptionService.OptionPath);
+            lists.AddRange(workItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
             
-            if (File.Exists(_editorOptionService.Option.CustomVimKeybindingPath))
+            if (File.Exists(editorOptionService.Option.CustomVimKeybindingPath))
             {
-                lists.AddRange([_editorOptionService.OptionPath, _editorOptionService.Option.CustomVimKeybindingPath]);
+                lists.AddRange([editorOptionService.OptionPath, editorOptionService.Option.CustomVimKeybindingPath]);
             }
             else
             {
-                lists.AddRange([_editorOptionService.OptionPath]);
+                lists.AddRange([editorOptionService.OptionPath]);
             }
 
-            lists.AddRange([_snippetOptionService.OptionPath]);
-            lists.AddRange(_snippetOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
+            lists.AddRange([snippetOptionService.OptionPath]);
+            lists.AddRange(snippetOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
             
+            // 依存関係があるOptionUnitのみ生成（ShortcutOptionUnitは属性で自動登録）
             yield return new OptionUnit("Option", lists);
-            yield return new ShortcutOptionUnit();
         }
     }
 }

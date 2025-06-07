@@ -7,7 +7,6 @@ namespace AimAssist.Units.Implementation.Factories
 {
     public class AutoDiscoveryUnitsFactory : AbstractUnitsFactory
     {
-        private readonly ICoreUnitsFactory coreUnitsFactory;
         private readonly IKnowledgeUnitsFactory knowledgeUnitsFactory;
         private readonly IWorkToolsUnitsFactory workToolsUnitsFactory;
         private readonly ISnippetUnitsFactory snippetUnitsFactory;
@@ -15,7 +14,6 @@ namespace AimAssist.Units.Implementation.Factories
         private readonly IOptionUnitsFactory optionUnitsFactory;
 
         public AutoDiscoveryUnitsFactory(
-            ICoreUnitsFactory coreUnitsFactory,
             IKnowledgeUnitsFactory knowledgeUnitsFactory,
             IWorkToolsUnitsFactory workToolsUnitsFactory,
             ISnippetUnitsFactory snippetUnitsFactory,
@@ -23,7 +21,6 @@ namespace AimAssist.Units.Implementation.Factories
             IOptionUnitsFactory optionUnitsFactory)
             : base("AutoDiscovery", priority: 1000)
         {
-            this.coreUnitsFactory = coreUnitsFactory;
             this.knowledgeUnitsFactory = knowledgeUnitsFactory;
             this.workToolsUnitsFactory = workToolsUnitsFactory;
             this.snippetUnitsFactory = snippetUnitsFactory;
@@ -33,16 +30,10 @@ namespace AimAssist.Units.Implementation.Factories
 
         public override IEnumerable<IUnit> CreateUnits()
         {
-            System.Diagnostics.Debug.WriteLine("AutoDiscoveryUnitsFactory.CreateUnits() started");
+            System.Diagnostics.Debug.WriteLine("AutoDiscoveryUnitsFactory.CreateUnits() - 動的生成系のみ");
             var count = 0;
-            
-            foreach (var unit in coreUnitsFactory.CreateUnits())
-            {
-                count++;
-                System.Diagnostics.Debug.WriteLine($"  Core unit #{count}: {unit.GetType().Name} - {unit.Name}");
-                yield return unit;
-            }
 
+            // 動的ファイル読み込み系のみ残す
             foreach (var unit in knowledgeUnitsFactory.CreateUnits())
             {
                 count++;
@@ -71,10 +62,7 @@ namespace AimAssist.Units.Implementation.Factories
                 yield return unit;
             }
 
-            count++;
-            System.Diagnostics.Debug.WriteLine($"  Direct unit #{count}: ClipboardUnit");
-            yield return new ClipboardUnit();
-
+            // OptionUnitsFactoryには依存関係があるOptionUnitがある
             foreach (var unit in optionUnitsFactory.CreateUnits())
             {
                 count++;

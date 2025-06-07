@@ -18,7 +18,7 @@ namespace AimAssist.DI.Modules
             services.AddSingleton<IKnowledgeUnitsFactory, KnowledgeUnitsFactory>();
             services.AddSingleton<ICheatSheetUnitsFactory, CheatSheetUnitsFactory>();
             services.AddSingleton<IOptionUnitsFactory, OptionUnitsFactory>();
-            services.AddSingleton<ICoreUnitsFactory, CoreUnitsFactory>();
+            // CoreUnitsFactory削除 - 属性ベース自動登録に移行
             services.AddSingleton<AutoDiscoveryUnitsFactory>();
             services.AddSingleton<ReflectionBasedUnitsFactory>();
             
