@@ -68,10 +68,6 @@ namespace AimAssist.UI.UnitContentsView
             var autoTemplate = DataTemplateRegistry.CreateView(unit.Content, serviceProvider);
             if (autoTemplate != null)
             {
-                if (autoTemplate is FrameworkElement element)
-                {
-                    element.DataContext = unit.Content;
-                }
                 return autoTemplate;
             }
 

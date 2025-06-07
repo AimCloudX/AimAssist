@@ -29,8 +29,8 @@ namespace AimAssist.Units.Implementation.Web.Rss
             SearchParams.Add(new RssItemUnit("ビジネスジャーナル", "ビジネスジャーナル", "https://biz-journal.jp/index.xml") { IsEnabled = true });
             SearchParams.Add(new RssItemUnit("ビジネス+IT", "ビジネス+IT", "https://www.sbbit.jp/rss/HotTopics.rss") { IsEnabled = true });
             SearchParams.Add(new RssItemUnit("企業テックブログRSS", "企業テックブログRSS", "https://yamadashy.github.io/tech-blog-rss-feed/feeds/rss.xml") { IsEnabled = false });
-            SearchParams.Add(new RssItemUnit("現代ビジネス", "現代ビジネス", "https://gendai.media/list/feed/rss"));
-            SearchParams.Add(new RssItemUnit("GIGAZINE", "GIGAZINE", "https://gigazine.net/news/rss_2.0/"));
+            SearchParams.Add(new RssItemUnit("現代ビジネス", "現代ビジネス", "https://gendai.media/list/feed/rss"){ IsEnabled = false });
+            SearchParams.Add(new RssItemUnit("GIGAZINE", "GIGAZINE", "https://gigazine.net/news/rss_2.0/"){ IsEnabled = false });
             for (int i = 0; i < 5; i++)
             {
                 SearchParams.Add(new RssItemUnit("","", ""));
