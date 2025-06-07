@@ -9,40 +9,43 @@ namespace AimAssist.UI.UnitContentsView
 {
     public class UnitViewModel : INotifyPropertyChanged
     {
-        public UnitViewModel(IUnit content) : this(content.Mode.Icon, content)
+        public static UnitViewModel Instance(IUnit unit)
         {
+            if (unit is UrlUnit urlUnit)
+            {
+                return new UnitViewModel(urlUnit);
+            }
+            
+            return new UnitViewModel(unit.Mode.Icon,unit);
         }
 
-        public UnitViewModel(UrlUnit urlUnit, System.Windows.Controls.Control control)
+        private UnitViewModel(UrlUnit urlUnit)
         {
-            Task.Run(async () =>
-                {
-                    try
-                    {
-                        var icon = await FaviconFetcher.GetUrlIconAsync(urlUnit.Description);
-                        control.Dispatcher.Invoke(() =>
-                        {
-                            var image = new System.Windows.Controls.Image { Source = icon };
-                            this.Icon = image;
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        // エラーハンドリング
-                    }
-                });
-
             Content = urlUnit;
+            InitializeIconAsync(urlUnit);
         }
 
-        public UnitViewModel(DependencyObject icon, IUnit content)
+        private async void InitializeIconAsync(UrlUnit urlUnit)
+        {
+            try
+            {
+                var icon = await FaviconFetcher.GetUrlIconAsync(urlUnit.Description).ConfigureAwait(true);
+                var image = new System.Windows.Controls.Image { Source = icon };
+                this.Icon = image;
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private UnitViewModel(DependencyObject icon, IUnit content)
         {
             Icon = icon;
             Content = content;
         }
 
-        public IMode Mode =>Content.Mode;
-        public string Name =>Content.Name;
+        public IMode Mode => Content.Mode;
+        public string Name => Content.Name;
         public string Description => Content.Description;
         public string Category => Content.Category;
         public DependencyObject Icon

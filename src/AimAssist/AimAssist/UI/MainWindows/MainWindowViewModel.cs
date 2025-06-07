@@ -189,18 +189,12 @@ namespace AimAssist.UI.MainWindows
 
                 foreach (var unit in units)
                 {
-                    if (unit is UrlUnit urlUnit)
-                    {
-                        Units.Add(new UnitViewModel(urlUnit));
-                    }
-                    else if (unit is SnippetModelUnit && mode != SnippetMode.Instance)
+                    if (unit is SnippetModelUnit && mode != SnippetMode.Instance)
                     {
                         continue;
                     }
-                    else
-                    {
-                        Units.Add(new UnitViewModel(unit));
-                    }
+
+                    Units.Add(UnitViewModel.Instance(unit));
                 }
 
                 if (Units.Any())
@@ -263,7 +257,7 @@ namespace AimAssist.UI.MainWindows
 
                 foreach (var unit in unitsArgs.Units)
                 {
-                        Units.Add(new UnitViewModel(unit));
+                        Units.Add(UnitViewModel.Instance(unit));
                 }
 
                 Mouse.OverrideCursor = null;

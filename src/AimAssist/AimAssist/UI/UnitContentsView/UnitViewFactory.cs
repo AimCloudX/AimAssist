@@ -1,27 +1,11 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
-using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Computer;
 using AimAssist.Units.Implementation.Options;
-using AimAssist.Units.Implementation.Pdf;
 using AimAssist.Units.Implementation.Snippets;
-using AimAssist.Units.Implementation.Speech;
-using AimAssist.Units.Implementation.Web.MindMeister;
-using AimAssist.Units.Implementation.Web.Rss;
-using Common.UI;
-using Common.UI.WebUI;
 using System.Windows;
-using AimAssist.Services.Editors;
 using AimAssist.Units.Implementation.ClipboardAnalyzer;
 using AimAssist.Units.Implementation.ClipboardAnalyzer.UI;
-using Common.UI.Markdown;
-using Common.UI.WebUI.Amazon;
-using Common.UI.WebUI.LLM;
-using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using TextBox = System.Windows.Controls.TextBox;
 

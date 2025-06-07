@@ -155,7 +155,7 @@ namespace AimAssist.UI.PickerWindows
                 var parser = new MathParser();
                 var result = parser.Parse(expression);
                 var calcUnit = new CalcUnit(expression, result.ToString());
-                var unitViewModel = new UnitViewModel(calcUnit);
+                var unitViewModel = UnitViewModel.Instance(calcUnit);
 
                 UnitLists.Clear();
                 UnitLists.Add(unitViewModel);
@@ -166,7 +166,7 @@ namespace AimAssist.UI.PickerWindows
             {
                 // 計算エラーの場合、エラーメッセージを表示
                 var errorUnit = new CalcUnit(_filterText.Remove(0, 1), $"エラー: {ex.Message}");
-                var unitViewModel = new UnitViewModel(errorUnit);
+                var unitViewModel = UnitViewModel.Instance(errorUnit);
                 
                 UnitLists.Clear();
                 UnitLists.Add(unitViewModel);
@@ -240,12 +240,12 @@ namespace AimAssist.UI.PickerWindows
 
             foreach (var unit in units)
             {
-                UnitLists.Add(new UnitViewModel(unit));
+                UnitLists.Add(UnitViewModel.Instance(unit));
             }
 
             if (System.Windows.Clipboard.ContainsText())
             {
-                UnitLists.Add(new UnitViewModel(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
+                UnitLists.Add(UnitViewModel.Instance(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
             }
 
             var keyUnits = _unitsService.CreateUnits(KeyHelpMode.Instance);
@@ -253,7 +253,7 @@ namespace AimAssist.UI.PickerWindows
             {
                 if (unit is KeyHelpUnit keyHelpUnit && keyHelpUnit.Category == _processName)
                 {
-                    UnitLists.Add(new UnitViewModel(unit));
+                    UnitLists.Add(UnitViewModel.Instance(unit));
                 }
             }
             
