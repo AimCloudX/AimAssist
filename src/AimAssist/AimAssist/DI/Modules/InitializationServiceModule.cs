@@ -10,6 +10,7 @@ namespace AimAssist.DI.Modules
             services.AddSingleton<IFileInitializationService, FileInitializationService>();
             services.AddSingleton<IPluginInitializationService, PluginInitializationService>();
             services.AddSingleton<IApplicationInitializationService, ApplicationInitializationService>();
+            services.AddSingleton<IFactoryInitializationService, FactoryInitializationService>();
             
             return services;
         }

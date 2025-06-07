@@ -9,15 +9,16 @@ namespace AimAssist.Services.Initialization
 {
     public class ApplicationInitializationService : IApplicationInitializationService
     {
-        private readonly IAppCommands _appCommands;
-        private readonly ICommandService _commandService;
-        private readonly IUnitsService _unitsService;
-        private readonly ISnippetOptionService _snippetOptionService;
-        private readonly IWorkItemOptionService _workItemOptionService;
-        private readonly IEditorOptionService _editorOptionService;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IFileInitializationService _fileInitializationService;
-        private readonly IPluginInitializationService _pluginInitializationService;
+        private readonly IAppCommands appCommands;
+        private readonly ICommandService commandService;
+        private readonly IUnitsService unitsService;
+        private readonly ISnippetOptionService snippetOptionService;
+        private readonly IWorkItemOptionService workItemOptionService;
+        private readonly IEditorOptionService editorOptionService;
+        private readonly IServiceProvider serviceProvider;
+        private readonly IFileInitializationService fileInitializationService;
+        private readonly IPluginInitializationService pluginInitializationService;
+        private readonly IFactoryInitializationService factoryInitializationService;
 
         public ApplicationInitializationService(
             IAppCommands appCommands,
@@ -28,59 +29,77 @@ namespace AimAssist.Services.Initialization
             IEditorOptionService editorOptionService,
             IServiceProvider serviceProvider,
             IFileInitializationService fileInitializationService,
-            IPluginInitializationService pluginInitializationService)
+            IPluginInitializationService pluginInitializationService,
+            IFactoryInitializationService factoryInitializationService)
         {
-            _appCommands = appCommands;
-            _commandService = commandService;
-            _unitsService = unitsService;
-            _snippetOptionService = snippetOptionService;
-            _workItemOptionService = workItemOptionService;
-            _editorOptionService = editorOptionService;
-            _serviceProvider = serviceProvider;
-            _fileInitializationService = fileInitializationService;
-            _pluginInitializationService = pluginInitializationService;
+            this.appCommands = appCommands;
+            this.commandService = commandService;
+            this.unitsService = unitsService;
+            this.snippetOptionService = snippetOptionService;
+            this.workItemOptionService = workItemOptionService;
+            this.editorOptionService = editorOptionService;
+            this.serviceProvider = serviceProvider;
+            this.fileInitializationService = fileInitializationService;
+            this.pluginInitializationService = pluginInitializationService;
+            this.factoryInitializationService = factoryInitializationService;
         }
 
         public void Initialize()
         {
             InitializeCommands();
-            _fileInitializationService.InitializeFiles();
+            fileInitializationService.InitializeFiles();
             InitializeSystemTray();
-            InitializeUnits();
-            _pluginInitializationService.InitializePlugins();
+            InitializeFactoriesAndUnits();
+            pluginInitializationService.InitializePlugins();
             RegisterHotKeys();
             ShowMainWindow();
         }
 
         private void InitializeCommands()
         {
-            _appCommands.Initialize();
+            appCommands.Initialize();
         }
 
         private void InitializeSystemTray()
         {
-            var systemTrayRegister = _serviceProvider.GetRequiredService<SystemTrayRegister>();
+            var systemTrayRegister = serviceProvider.GetRequiredService<SystemTrayRegister>();
             systemTrayRegister.Register();
         }
 
-        private void InitializeUnits()
+        private void InitializeFactoriesAndUnits()
         {
-            _unitsService.RegisterUnits(new UnitsFactory(
-                _editorOptionService,
-                _workItemOptionService,
-                _snippetOptionService));
+            // Phase 3: 新しいFactoryManagerシステムのテスト
+            factoryInitializationService.InitializeFactories();
+            
+            // テスト用：新システムのみで動作確認
+            // 問題がなければ、従来のUnitsFactoryを完全に削除予定
+            
+            // var legacyFactory = new UnitsFactory(
+            //     editorOptionService,
+            //     workItemOptionService,
+            //     snippetOptionService);
+            // unitsService.RegisterUnits(legacyFactory);
+            
+            // デバッグ用：Unit数の確認
+            var allUnits = unitsService.GetAllUnits().ToList();
+            System.Diagnostics.Debug.WriteLine($"新システム合計Unit数: {allUnits.Count}");
+            foreach (var mode in unitsService.GetAllModes())
+            {
+                var modeUnits = unitsService.CreateUnits(mode).ToList();
+                System.Diagnostics.Debug.WriteLine($"Mode '{mode.GetType().Name}': {modeUnits.Count} units");
+            }
         }
 
         private void RegisterHotKeys()
         {
-            _commandService.Register(_appCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
-            _commandService.Register(_appCommands.ShowPickerWindow, new KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
-            _commandService.Register(_appCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
+            commandService.Register(appCommands.ToggleMainWindow, new KeySequence(System.Windows.Input.Key.A, System.Windows.Input.ModifierKeys.Alt));
+            commandService.Register(appCommands.ShowPickerWindow, new KeySequence(System.Windows.Input.Key.P, System.Windows.Input.ModifierKeys.Alt));
+            commandService.Register(appCommands.ShutdownAimAssist, new KeySequence(System.Windows.Input.Key.D, System.Windows.Input.ModifierKeys.Control));
         }
 
         private void ShowMainWindow()
         {
-            var waitHotKeysWindow = _serviceProvider.GetRequiredService<WaitHotKeysWindow>();
+            var waitHotKeysWindow = serviceProvider.GetRequiredService<WaitHotKeysWindow>();
             waitHotKeysWindow.Show();
         }
     }

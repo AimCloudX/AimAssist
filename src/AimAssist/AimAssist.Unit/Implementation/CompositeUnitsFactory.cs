@@ -4,9 +4,8 @@ using System;
 
 namespace AimAssist.Units.Implementation
 {
-    public interface ICompositeUnitsFactory
+    public interface ICompositeUnitsFactory : IUnitsFactory
     {
-        IEnumerable<IUnit> GetUnits();
         void RegisterSubFactory(AbstractUnitsFactory factory);
         void UnregisterSubFactory(string factoryName);
     }

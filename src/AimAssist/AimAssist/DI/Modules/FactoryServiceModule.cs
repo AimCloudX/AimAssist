@@ -19,6 +19,7 @@ namespace AimAssist.DI.Modules
             services.AddSingleton<ICheatSheetUnitsFactory, CheatSheetUnitsFactory>();
             services.AddSingleton<IOptionUnitsFactory, OptionUnitsFactory>();
             services.AddSingleton<ICoreUnitsFactory, CoreUnitsFactory>();
+            services.AddSingleton<AutoDiscoveryUnitsFactory>();
             
             return services;
         }
