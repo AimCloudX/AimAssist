@@ -35,7 +35,7 @@ namespace AimAssist.Units.Implementation.Web.Bookmarks
     public class ChromeBookmarks
     {
         [JsonProperty("roots")]
-        public ChromeRoots Roots { get; set; }
+        public ChromeRoots? Roots { get; set; }
     }
 
     /// <summary>
@@ -44,13 +44,13 @@ namespace AimAssist.Units.Implementation.Web.Bookmarks
     public class ChromeRoots
     {
         [JsonProperty("bookmark_bar")]
-        public ChromeBookmarkNode BookmarkBar { get; set; }
+        public ChromeBookmarkNode? BookmarkBar { get; set; }
 
         [JsonProperty("other")]
-        public ChromeBookmarkNode Other { get; set; }
+        public ChromeBookmarkNode? Other { get; set; }
 
         [JsonProperty("synced")]
-        public ChromeBookmarkNode Synced { get; set; }
+        public ChromeBookmarkNode? Synced { get; set; }
     }
 
     /// <summary>
@@ -59,16 +59,16 @@ namespace AimAssist.Units.Implementation.Web.Bookmarks
     public class ChromeBookmarkNode
     {
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         [JsonProperty("children")]
-        public List<ChromeBookmarkNode> Children { get; set; }
+        public List<ChromeBookmarkNode>? Children { get; set; }
     }
 
     /// <summary>
@@ -91,14 +91,18 @@ namespace AimAssist.Units.Implementation.Web.Bookmarks
     /// </summary>
     public class BookmarkItemConverter
     {
-        public static List<BookmarkItem> Convert(List<ChromeBookmarkNode> bookmarkNodes, string parentPath = "")
+        public static List<BookmarkItem> Convert(List<ChromeBookmarkNode>? bookmarkNodes, string parentPath = "")
         {
             var bookmarkItems = new List<BookmarkItem>();
 
+            if (bookmarkNodes == null) return bookmarkItems;
+
             foreach (var node in bookmarkNodes)
             {
+                if (node.Name == null) continue;
+                
                 var fullPath = CombinePath(parentPath, node.Name);
-                if (node.Type == "url")
+                if (node.Type == "url" && node.Url != null)
                 {
                     bookmarkItems.Add(new BookmarkItem(fullPath, node.Url));
                 }

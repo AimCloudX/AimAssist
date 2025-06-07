@@ -1,5 +1,4 @@
 ﻿using AimAssist.Core.Interfaces;
-using AimAssist.Units.Implementation.WorkTools;
 using Newtonsoft.Json;
 using System.IO;
 using AimAssist.Core.Model;
@@ -8,8 +7,8 @@ namespace AimAssist.Units.Implementation.Snippets
 {
     public class SnippetOptionService : ISnippetOptionService
     {
-        public ConfigModel Option { get; private set; }
-        private static FileSystemWatcher watcher;
+        public ConfigModel Option { get; private set; } = ConfigModel.Default();
+        private static FileSystemWatcher? watcher;
 
         public string OptionPath =>
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimAssist", "snippet.option.json");
@@ -45,7 +44,7 @@ namespace AimAssist.Units.Implementation.Snippets
                 SaveOption();
             }
 
-            watcher = new FileSystemWatcher(Path.GetDirectoryName(OptionPath));
+            watcher = new FileSystemWatcher(Path.GetDirectoryName(OptionPath) ?? throw new InvalidOperationException("OptionPath directory is null"));
             // 監視する変更タイプを設定
             watcher.NotifyFilter = NotifyFilters.FileName
                                  | NotifyFilters.LastWrite
@@ -77,7 +76,7 @@ namespace AimAssist.Units.Implementation.Snippets
                 
                 // ディレクトリが存在しない場合は作成
                 var directory = Path.GetDirectoryName(OptionPath);
-                if (!Directory.Exists(directory))
+                if (directory != null && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }

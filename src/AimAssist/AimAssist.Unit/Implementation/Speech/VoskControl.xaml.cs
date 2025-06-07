@@ -1,6 +1,5 @@
 ﻿using NAudio.Wave;
 using Newtonsoft.Json.Linq;
-using System.Windows.Controls;
 using Vosk;
 
 namespace AimAssist.Units.Implementation.Speech
@@ -8,10 +7,11 @@ namespace AimAssist.Units.Implementation.Speech
     /// <summary>
     /// VoskControl.xaml の相互作用ロジック
     /// </summary>
-    public partial class VoskControl : UserControl
+    public partial class VoskControl
     {
-        public VoskControl()
+        public VoskControl(Model? model)
         {
+            this.model = model;
             InitializeComponent();
             Task.Run(() => {
                 InitializeVosk();
@@ -19,30 +19,30 @@ namespace AimAssist.Units.Implementation.Speech
             });
         }
 
-        private WaveInEvent waveIn;
-        private Model model;
-        private VoskRecognizer recognizer;
+        private WaveInEvent? waveIn;
+        private Model? model;
+        private VoskRecognizer? recognizer;
 
-        private void OnDataAvailable(object sender, WaveInEventArgs e)
+        private void OnDataAvailable(object? sender, WaveInEventArgs e)
         {
-            if (recognizer.AcceptWaveform(e.Buffer, e.BytesRecorded))
+            if (recognizer != null && recognizer.AcceptWaveform(e.Buffer, e.BytesRecorded))
             {
                 var result = recognizer.Result();
                 Dispatcher.Invoke(() => TextBox.Text += ExtractTextFromJson(result) + "\n");
             }
         }
 
-        private string ExtractTextFromJson(string json)
+        private static string ExtractTextFromJson(string json)
         {
             var jObject = JObject.Parse(json);
-            return jObject["text"].ToString();
+            return jObject["text"]?.ToString()?? string.Empty;
         }
 
         private void InitializeVosk()
         {
             Vosk.Vosk.SetLogLevel(0);
-            string modelPath = "Resources/vosk-model-small-ja-0.22"; // モデルのパスを指定
-            model = new Vosk.Model(modelPath);
+            const string modelPath = "Resources/vosk-model-small-ja-0.22"; // モデルのパスを指定
+            model = new Model(modelPath);
             recognizer = new VoskRecognizer(model, 16000.0f);
         }
 
@@ -53,18 +53,6 @@ namespace AimAssist.Units.Implementation.Speech
             waveIn.DataAvailable += OnDataAvailable;
             //waveIn.RecordingStopped += OnRecordingStopped;
             waveIn.StartRecording();
-        }
-
-        private void OnRecordingStopped(object sender, StoppedEventArgs e)
-        {
-            waveIn.Dispose();
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            waveIn.StopRecording();
-            model.Dispose();
-            recognizer.Dispose();
         }
 
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)

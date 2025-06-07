@@ -1,28 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
     /// <summary>
     /// ApiKeyInputWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class ApiKeyInputWindow : Window
+    public partial class ApiKeyInputWindow
     {
-        public string ApiKey { get; private set; }
+        public string ApiKey { get; private set; } = string.Empty;
 
         public ApiKeyInputWindow()
         {
@@ -46,9 +33,9 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
                 // デフォルトのブラウザでリンクを開く
                 Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"リンクを開く際にエラーが発生しました: {ex.Message}");
+                MessageBox.Show($"リンクを開く際にエラーが発生しました: {ex.Message}");
             }
             e.Handled = true;
         }

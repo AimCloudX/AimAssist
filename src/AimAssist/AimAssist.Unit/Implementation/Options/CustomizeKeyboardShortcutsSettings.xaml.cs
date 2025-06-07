@@ -8,7 +8,7 @@ using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Units.Implementation.Options
 {
-    public partial class CustomizeKeyboardShortcutsSettings : System.Windows.Controls.UserControl
+    public partial class CustomizeKeyboardShortcutsSettings
     {
         private readonly ICommandService commandService;
 
@@ -16,12 +16,9 @@ namespace AimAssist.Units.Implementation.Options
         {
             this.commandService = commandService;
             InitializeComponent();
-            if (this.commandService != null)
+            foreach (var shortcut in this.commandService.GetKeymap())
             {
-                foreach (var shortcut in this.commandService.GetKeymap())
-                {
-                    this.ShortcutSettings.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
-                }
+                this.ShortcutSettings.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
             }
 
             this.DataContext = this;
@@ -31,15 +28,15 @@ namespace AimAssist.Units.Implementation.Options
         {
         }
 
-        private bool isFirstKeyEntered = false;
+        private bool isFirstKeyEntered;
         private void ShortcutTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox textBox && textBox.DataContext is ShortcutSource setting)
+            if (sender is TextBox textBox && textBox.DataContext is ShortcutSource)
             {
                 isFirstKeyEntered = false;
             }
         }
-        private void ShortcutTextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void ShortcutTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
             if(e.Key == Key.Enter)
@@ -72,8 +69,13 @@ namespace AimAssist.Units.Implementation.Options
                 }
                 else
                 {
-                    setting.Gesture = new KeySequence(setting.Gesture.FirstKey, setting.Gesture.FirstModifiers, key, modifiers);
-                    textBox.Text = setting.Gesture.ToString();
+                    if (setting.Gesture != null)
+                    {
+                        setting.Gesture = new KeySequence(setting.Gesture.FirstKey, setting.Gesture.FirstModifiers, key,
+                            modifiers);
+                        textBox.Text = setting.Gesture.ToString();
+                    }
+
                     isFirstKeyEntered = false;
                 }
             }
@@ -93,6 +95,10 @@ namespace AimAssist.Units.Implementation.Options
 
             var modifierKeysConverter = new ModifierKeysConverter();
             var convertToString = modifierKeysConverter.ConvertToString(modifierKeys);
+            if (convertToString == null)
+            {
+                return key.ToString();
+            }
 
             if (key == Key.LeftCtrl || key == Key.LeftShift || key == Key.RightCtrl || key == Key.LeftAlt
                 || key == Key.RightShift || key == Key.RightAlt)
@@ -110,21 +116,18 @@ namespace AimAssist.Units.Implementation.Options
 
         private void ApplyKey()
         {
-            if (commandService == null) return;
-
             var modifiedShortcutes = ShortcutSettings.Where(x => x.IsModified);
-            if (modifiedShortcutes.Any())
+            var shortcutSources = modifiedShortcutes as ShortcutSource[] ?? modifiedShortcutes.ToArray();
+            if (shortcutSources.Length == 0) return;
+            foreach (var shortcut in shortcutSources)
             {
-                foreach (var shortcut in modifiedShortcutes)
-                {
-                    commandService.UpdateKeyGesture(shortcut.CommandName, shortcut.Gesture);
-                }
+                commandService.UpdateKeyGesture(shortcut.CommandName, shortcut.Gesture);
             }
         }
 
-        private void UIElement_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void UIElement_OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (sender is System.Windows.Controls.TextBox textBox == false)
+            if (sender is TextBox textBox == false)
             {
                 return;
             }

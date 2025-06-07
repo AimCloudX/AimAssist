@@ -11,17 +11,17 @@ namespace AimAssist.Units.Implementation.Factories
 
     public class SnippetUnitsFactory : ISnippetUnitsFactory
     {
-        private readonly ISnippetOptionService _snippetOptionService;
+        private readonly ISnippetOptionService snippetOptionService;
 
         public SnippetUnitsFactory(ISnippetOptionService snippetOptionService)
         {
-            _snippetOptionService = snippetOptionService;
+            this.snippetOptionService = snippetOptionService;
         }
 
         public IEnumerable<IUnit> CreateUnits()
         {
             var parser = new SnippetParser();
-            foreach (var path in _snippetOptionService.Option.ItemPaths)
+            foreach (var path in snippetOptionService.Option.ItemPaths)
             {
                 var snippets = parser.ParseMarkdownFile(path.GetActualPath());
                 foreach (var snippet in snippets)

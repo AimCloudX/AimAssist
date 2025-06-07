@@ -1,17 +1,16 @@
-﻿using AimAssist.Core.Commands;
-using AimAssist.Core.Units;
-using AimAssist.Units.Core.Units;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ServiceModel.Syndication;
 using System.Windows;
-using System.Windows.Controls;
 using System.Xml;
 using AimAssist.Core.Attributes;
+using AimAssist.Core.Commands;
+using AimAssist.Core.Units;
+using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Web.Rss
 {
     [AutoDataTemplate(typeof(RssSettingUnit))]
-    public partial class RssControl : UserControl
+    public partial class RssControl
     {
         public RssControl()
         {
@@ -70,16 +69,18 @@ namespace AimAssist.Units.Implementation.Web.Rss
 
             iswebloading = false;
         }
-        static async IAsyncEnumerable<IUnit> GetUrlsFromRss(CategoryUrl rssUrl)
+
+        private static async IAsyncEnumerable<IUnit> GetUrlsFromRss(CategoryUrl rssUrl)
         {
             if (TryGetFeed(rssUrl, out var feed))
             {
+                if (feed?.Items == null) yield break;
                 foreach (var item in feed.Items)
                 {
-                    string title = item.Title.Text;
-                    string url = item.Links.FirstOrDefault()?.Uri.ToString();
+                    var title = item.Title.Text;
+                    var url = item.Links.FirstOrDefault()?.Uri.ToString();
 
-                    if(rssUrl.Category == "企業テックブログRSS")
+                    if (rssUrl.Category == "企業テックブログRSS")
                     {
                         if (item.PublishDate < DateTime.Now.AddDays(-3) || item.PublishDate > DateTime.Now)
                         {
@@ -95,7 +96,7 @@ namespace AimAssist.Units.Implementation.Web.Rss
             }
         }
 
-        private static bool TryGetFeed(CategoryUrl rssUrl, out SyndicationFeed feed)
+        private static bool TryGetFeed(CategoryUrl rssUrl, out SyndicationFeed? feed)
         {
             try
             {
@@ -132,10 +133,6 @@ namespace AimAssist.Units.Implementation.Web.Rss
 
             var args = new UnitsArgs(RssMode.Instance, unitLists, true);
             AimAssistCommands.SendUnitCommand.Execute(args, this);
-        }
-
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        {
         }
     }
 }

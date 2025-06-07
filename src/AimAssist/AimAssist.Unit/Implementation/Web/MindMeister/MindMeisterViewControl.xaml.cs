@@ -108,10 +108,10 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
                 return await apiService.GetMap(id);
             }));
 
-            var maps = unitLists.Where(x => x != null).ToArray();
-            SendUnits(maps!);
+            var maps = unitLists.Where(x => x != null).Cast<MindMeisterMap>().ToArray();
+            SendUnits(maps);
 
-            apiService.AddMaps(maps!);
+            apiService.AddMaps(maps);
 
             using (HttpClient client = new HttpClient())
             {

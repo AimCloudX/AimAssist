@@ -1,16 +1,7 @@
-﻿using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using Newtonsoft.Json.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using RestSharp;
 using System.Text.Json;
 using System.IO;
-using System.Collections;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
@@ -18,7 +9,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
     {
         public string ApiKey { get; }
 
-        public string MapCashPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mindmeisterap.cash");
+        public string MapCashPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mindmeisterap.cash");
         public List<MindMeisterMap> Cash = new();
 
         public void AddMaps(IEnumerable<MindMeisterMap> maps)
@@ -35,7 +26,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             }
 
             var options = new JsonSerializerOptions { WriteIndented = true };
-            string json = System.Text.Json.JsonSerializer.Serialize(Cash.OrderByDescending(x=>x.UpdatedTime), options);
+            string json = JsonSerializer.Serialize(Cash.OrderByDescending(x=>x.UpdatedTime), options);
             File.WriteAllText(MapCashPath, json);
         }
 
@@ -43,7 +34,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
         {
             string apiUrl = $"https://www.mindmeister.com/api/v2/maps/{id}";
 
-            var json = await GetJsonObject(ApiKey, apiUrl, id);
+            var json = await GetJsonObject(ApiKey, apiUrl);
             if (json.TryGetValue("title", out var value))
             {
 
@@ -58,7 +49,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             return null;
         }
 
-        private static async Task<JObject> GetJsonObject(string accessToken, string apiUrl, string id)
+        private static async Task<JObject> GetJsonObject(string accessToken, string apiUrl)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -77,7 +68,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
                     // JSONをパース
                     return JObject.Parse(responseBody);
                 }
-                catch (HttpRequestException e)
+                catch (HttpRequestException)
                 {
                     return new JObject();
                 }
@@ -103,7 +94,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
                     }));
 
                     var maps = validatedMaps.Where(x => x != null).ToArray();
-                    Cash.AddRange(maps);
+                    Cash.AddRange(maps!);
 
                     return maps;
                 }

@@ -1,11 +1,7 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.UI.PickerWindows;
-using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Service
@@ -17,34 +13,28 @@ namespace AimAssist.Service
     {
         private static IntPtr beforeWindow;
         private static bool isActive;
-        private readonly ICommandService _commandService;
-        private readonly IUnitsService _unitsService;
-        private readonly IEditorOptionService _editorOptionService;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IApplicationLogService _logService;
-        private TaskCompletionSource<string> _tcs;
+        private readonly ICommandService commandService;
+        private readonly IUnitsService unitsService;
+        private readonly IEditorOptionService editorOptionService;
+        private readonly IApplicationLogService logService;
+        private TaskCompletionSource<string> tcs = new();
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
-        
+
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="commandService">コマンドサービス</param>
-        /// <param name="unitsService">ユニットサービス</param>
-        /// <param name="editorOptionService">エディタオプションサービス</param>
-        public PickerService(ICommandService commandService, IUnitsService unitsService, IEditorOptionService editorOptionService, IApplicationLogService logService)
+        public PickerService(ICommandService commandService, IUnitsService unitsService,
+            IEditorOptionService editorOptionService, IApplicationLogService logService)
         {
-            _commandService = commandService;
-            _unitsService = unitsService;
-            _editorOptionService = editorOptionService;
-            _logService = logService;
+            this.commandService = commandService;
+            this.unitsService = unitsService;
+            this.editorOptionService = editorOptionService;
+            this.logService = logService;
         }
 
         /// <summary>
@@ -53,13 +43,13 @@ namespace AimAssist.Service
         /// <returns>選択された結果</returns>
         public async Task<string> ShowPicker()
         {
-            if (isActive) 
-            { 
-                return string.Empty; 
+            if (isActive)
+            {
+                return string.Empty;
             }
 
-            _tcs = new TaskCompletionSource<string>();
-            
+            tcs = new TaskCompletionSource<string>();
+
             try
             {
                 isActive = true;
@@ -68,33 +58,34 @@ namespace AimAssist.Service
                 beforeWindow = GetForegroundWindow();
 
                 GetWindowThreadProcessId(beforeWindow, out var processId);
-                Process process = Process.GetProcessById((int)processId);
+                Process process = Process.GetProcessById((int) processId);
 
-                var window = new PickerWindow(process.ProcessName, _commandService, _unitsService, _editorOptionService, _logService);
-                window.Closed += (sender, e) => 
+                var window = new PickerWindow(process.ProcessName, commandService, unitsService, editorOptionService,
+                    logService);
+                window.Closed += (sender, _) =>
                 {
                     if (sender is PickerWindow pickerWindow)
                     {
-                        _tcs.TrySetResult(pickerWindow.SnippetText ?? string.Empty);
+                        tcs.TrySetResult(pickerWindow.SnippetText);
                     }
                     else
                     {
-                        _tcs.TrySetResult(string.Empty);
+                        tcs.TrySetResult(string.Empty);
                     }
-                    
+
                     isActive = false;
-                    HandlePickerClosed(sender, e);
+                    HandlePickerClosed(sender);
                 };
-                
+
                 window.Show();
                 window.Activate();
 
-                return await _tcs.Task;
+                return await tcs.Task;
             }
             catch (Exception ex)
             {
                 isActive = false;
-                _tcs.TrySetException(ex);
+                tcs.TrySetException(ex);
                 throw;
             }
         }
@@ -109,7 +100,7 @@ namespace AimAssist.Service
             try
             {
                 string result = await ShowPicker();
-                callback?.Invoke(result);
+                callback.Invoke(result);
             }
             catch (Exception ex)
             {
@@ -123,13 +114,13 @@ namespace AimAssist.Service
         public void ClosePicker()
         {
             isActive = false;
-            _tcs?.TrySetResult(string.Empty);
+            tcs.TrySetResult(string.Empty);
         }
 
-        private static void HandlePickerClosed(object? sender, EventArgs e)
+        private static void HandlePickerClosed(object? sender)
         {
             string text = string.Empty;
-            KeySequence keySequence = null;
+            KeySequence? keySequence = null;
 
             try
             {
@@ -140,6 +131,7 @@ namespace AimAssist.Service
                     {
                         System.Windows.Clipboard.SetText(text);
                     }
+
                     keySequence = window.KeySequence;
                 }
             }

@@ -80,7 +80,7 @@ namespace AimAssist.Units.Implementation.Pdf
                 var droppedData = e.Data.GetData(typeof(string)) as string;
                 var listBox = sender as ListBox;
 
-                if (listBox?.ItemsSource is ObservableCollection<string> items)
+                if (listBox?.ItemsSource is ObservableCollection<string> items && droppedData != null)
                 {
                     int oldIndex = items.IndexOf(droppedData);
                     Point dropPosition = e.GetPosition(listBox);
@@ -109,7 +109,7 @@ namespace AimAssist.Units.Implementation.Pdf
                 var droppedData = e.Data.GetData(typeof(PdfFile)) as PdfFile;
                 var listBox = sender as ListBox;
 
-                if (listBox?.ItemsSource is ObservableCollection<PdfFile> items)
+                if (listBox?.ItemsSource is ObservableCollection<PdfFile> items && droppedData != null)
                 {
                     int oldIndex = items.IndexOf(droppedData);
                     Point dropPosition = e.GetPosition(listBox);
@@ -126,8 +126,11 @@ namespace AimAssist.Units.Implementation.Pdf
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                AddPdfFiles(files.Select(x=>new PdfFile(x)).ToArray());
+                string[]? files = (string[]?)e.Data.GetData(DataFormats.FileDrop);
+                if (files != null)
+                {
+                    AddPdfFiles(files.Select(x=>new PdfFile(x)).ToArray());
+                }
             }
         }
 

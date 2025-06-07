@@ -19,7 +19,7 @@ namespace AimAssist.Units.Implementation.Factories
                 Assembly.GetAssembly(typeof(IUnit)),
                 AppDomain.CurrentDomain.GetAssemblies()
                     .FirstOrDefault(a => a.GetName().Name == "AimAssist.Unit")
-            }.Where(a => a != null).ToArray();
+            }.Where(a => a != null).Cast<Assembly>().ToArray();
         }
 
         public override IEnumerable<IUnit> CreateUnits()
@@ -38,7 +38,7 @@ namespace AimAssist.Units.Implementation.Factories
                     foreach (var unitType in unitTypes)
                     {
                         var attr = unitType.GetCustomAttribute<AutoRegisterUnitAttribute>();
-                        if (attr.IsEnabled)
+                        if (attr != null && attr.IsEnabled)
                         {
                             discoveredUnits.Add((unitType, attr));
                         }
@@ -68,7 +68,7 @@ namespace AimAssist.Units.Implementation.Factories
             System.Diagnostics.Debug.WriteLine($"ReflectionBasedUnitsFactory completed. Discovered: {discoveredUnits.Count} units");
         }
 
-        private IUnit CreateUnitInstance(Type unitType)
+        private IUnit? CreateUnitInstance(Type unitType)
         {
             var constructors = unitType.GetConstructors()
                 .OrderBy(c => c.GetParameters().Length);
@@ -80,7 +80,7 @@ namespace AimAssist.Units.Implementation.Factories
                     var parameters = constructor.GetParameters();
                     if (parameters.Length == 0)
                     {
-                        return (IUnit)Activator.CreateInstance(unitType);
+                        return (IUnit?)Activator.CreateInstance(unitType);
                     }
 
                     var args = new object[parameters.Length];
@@ -94,7 +94,7 @@ namespace AimAssist.Units.Implementation.Factories
                         args[i] = service;
                     }
 
-                    return (IUnit)Activator.CreateInstance(unitType, args);
+                    return (IUnit?)Activator.CreateInstance(unitType, args);
                 }
                 catch
                 {

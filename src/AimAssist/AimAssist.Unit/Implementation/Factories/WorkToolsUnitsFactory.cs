@@ -13,11 +13,11 @@ namespace AimAssist.Units.Implementation.Factories
 
     public class WorkToolsUnitsFactory : IWorkToolsUnitsFactory
     {
-        private readonly IWorkItemOptionService _workItemOptionService;
+        private readonly IWorkItemOptionService workItemOptionService;
 
         public WorkToolsUnitsFactory(IWorkItemOptionService workItemOptionService)
         {
-            _workItemOptionService = workItemOptionService;
+            this.workItemOptionService = workItemOptionService;
         }
 
         public IEnumerable<IUnit> CreateUnits()
@@ -25,7 +25,7 @@ namespace AimAssist.Units.Implementation.Factories
             var markdownService = new MarkdownService();
             CategoryOrderManager.ClearCategoryOrder();
             
-            foreach (var workItemPath in _workItemOptionService.Option.ItemPaths)
+            foreach (var workItemPath in workItemOptionService.Option.ItemPaths)
             {
                 var actualPath = workItemPath.GetActualPath();
                 

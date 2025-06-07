@@ -8,19 +8,17 @@ using AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
 namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 {
-    public partial class ClipboardList : UserControl
+    public partial class ClipboardList
     {
-        public ObservableCollection<IClipboardData> Items { get; set; } = new ObservableCollection<IClipboardData>();
-        private readonly IEditorOptionService? editorOptionService;
+        public ObservableCollection<IClipboardData> Items { get; set; } = [];
 
         public ClipboardList(IEditorOptionService? editorOptionService)
         {
-            this.editorOptionService = editorOptionService;
             InitializeComponent();
             UpdateClipboard();
-            if (this.editorOptionService != null)
+            if (editorOptionService != null)
             {
-                this.editor.SetOption(this.editorOptionService.Option);
+                this.editor.SetOption(editorOptionService.Option);
             }
         }
 
@@ -57,7 +55,7 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
                 selectedFormat = "Text";
             }
 
-            Clipboard.SetData(selectedFormat, await this.editor.GetText());
+            Clipboard.SetData(selectedFormat, await this.editor.GetText() ?? string.Empty);
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -71,14 +69,14 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 
             if (string.IsNullOrEmpty(selectedFormat))
             {
-                this.editor.SetTextAsync(string.Empty);
+                _ = this.editor.SetTextAsync(string.Empty);
                 return;
             }
 
             var foramtData = Items.FirstOrDefault(x => x.Format == selectedFormat);
             if (foramtData?.Data != null)
             {
-                this.editor.SetTextAsync(foramtData.Data.ToString() ?? string.Empty);
+                _ = this.editor.SetTextAsync(foramtData.Data.ToString() ?? string.Empty);
             }
         }
 
@@ -90,7 +88,7 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
                 return;
             }
 
-            var separators = new string[] { "\r\n", "\n" };
+            var separators = new[] { "\r\n", "\n" };
             var lines = text.Split(separators, StringSplitOptions.None);
 
             var sb = new StringBuilder();
@@ -102,14 +100,14 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
                     continue;
                 }
 
-                var splitedText = line.Split(new char[] { ' ', '\t' });
+                var splitedText = line.Split(' ', '\t');
                 var key = splitedText[0];
                 var value = string.Join(" ", splitedText, 1, splitedText.Length - 1);
 
                 sb.AppendLine($"{{\"{key}\" : \"{value}\"}}");
             }
 
-            this.editor.SetTextAsync(sb.ToString().TrimEnd('\r', '\n'));
+            await this.editor.SetTextAsync(sb.ToString().TrimEnd('\r', '\n'));
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)

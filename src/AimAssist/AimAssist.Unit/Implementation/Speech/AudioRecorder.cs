@@ -1,6 +1,4 @@
 using NAudio.Wave;
-using System;
-using System.IO;
 
 namespace AimAssist.Units.Implementation.Speech
 {
@@ -8,7 +6,7 @@ namespace AimAssist.Units.Implementation.Speech
     {
         private WaveFileWriter? writer;
         private WaveInEvent? waveIn;
-        private bool disposed = false;
+        private bool disposed;
 
         public event EventHandler<RecordingStoppedEventArgs>? RecordingStopped;
 
@@ -35,7 +33,7 @@ namespace AimAssist.Units.Implementation.Speech
                 IsRecording = true;
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 CleanupRecording();
                 return false;
