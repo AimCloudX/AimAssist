@@ -2,14 +2,10 @@
 using System.IO;
 using System.Text;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using Microsoft.Web.WebView2.Core;
 
 namespace Common.UI.Markdown
 {
-    /// <summary>
-    /// MarkdownView.xaml の相互作用ロジック
-    /// </summary>
     public partial class MarkdownView : System.Windows.Controls.UserControl
     {
         private string markdownText;
@@ -22,11 +18,10 @@ namespace Common.UI.Markdown
                 markdownText = File.ReadAllText(filePath);
             }
 
-            // WebView2の初期化完了イベントを設定
             WebView.NavigationCompleted += OnNavigationCompleted;
-            // WebView2を初期化
             InitializeAsync();
         }
+        
         public MarkdownView(IEnumerable<string> filePaths)
         {
             InitializeComponent();
@@ -38,9 +33,7 @@ namespace Common.UI.Markdown
 
             markdownText = sb.ToString() ;
 
-            // WebView2の初期化完了イベントを設定
             WebView.NavigationCompleted += OnNavigationCompleted;
-            // WebView2を初期化
             InitializeAsync();
         }
 
@@ -52,13 +45,10 @@ namespace Common.UI.Markdown
         {
             await WebView.EnsureCoreWebView2Async(null);
 
-            // MarkdownをHTMLに変換し、目次を作成
             string htmlText = MarkdownToHtmlWithAnchors(markdownText);
 
-            // CSSを取得
             string css = GetNordThemeCss();
 
-            // HTMLにエンコーディングを指定するメタタグとNordテーマのCSSを追加
             string fullHtml = $@"
 <!DOCTYPE html>
 <html>
@@ -81,32 +71,20 @@ namespace Common.UI.Markdown
 </body>
 </html>";
 
-            // WebView2にHTMLを表示
             WebView.NavigateToString(fullHtml);
-            // Navigatingイベントを設定
         }
 
-
-   private void WebBrowser_Navigating(object sender, NavigatingCancelEventArgs e)
-        {
-            if (e.Uri != null && (e.Uri.Scheme == Uri.UriSchemeHttp || e.Uri.Scheme == Uri.UriSchemeHttps))
-            {
-                e.Cancel = true;
-                Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
-            }
-        }
         private void OnNavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            // 目次を作成してTreeViewに追加
             var outline = CreateOutline(markdownText);
             foreach (var item in outline)
             {
                 OutlineTreeView.Items.Add(item);
             }
 
-            // TreeViewItemのクリックイベントを設定
             SetTreeViewItemClickEvent(OutlineTreeView.Items);
         }
+        
         private string MarkdownToHtmlWithAnchors(string markdownText)
         {
             var lines = markdownText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
@@ -198,7 +176,6 @@ namespace Common.UI.Markdown
                     }
                 };
 
-                // 再帰的に子アイテムにも設定
                 if (item.Items.Count > 0)
                 {
                     SetTreeViewItemClickEvent(item.Items);
@@ -276,17 +253,15 @@ namespace Common.UI.Markdown
 
         private void WebView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
-            // 外部リンクをチェック（httpやhttpsで始まるリンク）
             if (e.Uri.StartsWith("http://") || e.Uri.StartsWith("https://"))
             {
-                e.Cancel = true; // WebView2でのナビゲーションをキャンセル
+                e.Cancel = true;
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = e.Uri,
                     UseShellExecute = true
-                }); // 既定のブラウザでURLを開く
+                });
             }
         }
     }
 }
-

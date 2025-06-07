@@ -21,9 +21,9 @@ namespace Common.UI.Commands.Shortcus
                 var parts = line.TrimStart('-', ' ').Split(new[] { ' ' }, 2);
                 if (parts.Length == 2)
                 {
-                        var Operation = parts[0];
+                        var operation = parts[0];
                         var keysequence = ParseKeySequence(parts[1].Trim());
-                        result.Add(new KeySequenceItem(keysequence, Operation,currentTitle, applicationName));
+                        result.Add(new KeySequenceItem(keysequence, operation, currentTitle, applicationName));
                 }
             }
         }

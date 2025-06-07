@@ -13,8 +13,8 @@ namespace Common.UI.WebUI.Amazon
         private string url;
         private string title;
 
-        private string producttitle;
-        private string ASIN;
+        private string productTitle;
+        private string asin;
         private BookInfo book;
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -107,17 +107,11 @@ namespace Common.UI.WebUI.Amazon
             ";
                 webView.CoreWebView2.ExecuteScriptAsync(productTitelScript).ContinueWith(task =>
                 {
-                    // JavaScriptの結果を取得
-                    producttitle = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    producttitle = producttitle.Trim('"');
-
+                    productTitle = task.Result;
+                    productTitle = productTitle.Trim('"');
                 });
 
-
-                // ASIN
-string asinScript = @"
+                string asinScript = @"
 var ASINElement = document.querySelector('#ASIN');
 var ASIN = ASINElement ? ASINElement.value : '';
 ASIN;
@@ -125,12 +119,8 @@ ASIN;
 
                 webView.CoreWebView2.ExecuteScriptAsync(asinScript).ContinueWith(task =>
                 {
-                    // JavaScriptの結果を取得
-                    ASIN = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    ASIN = ASIN.Trim('"');
-
+                    asin = task.Result;
+                    asin = asin.Trim('"');
                 });
 
                 book = await FetchBookInfoAsync();
@@ -196,7 +186,7 @@ ASIN;
                 string bookmarklet = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
                 webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
             }
-            else if(string.IsNullOrEmpty(producttitle)|| string.IsNullOrEmpty(ASIN))
+            else if(string.IsNullOrEmpty(productTitle)|| string.IsNullOrEmpty(asin))
             {
                 var htmlLink = $"<a href=\"{url}\">{title}</a>";
                 var titleUrl = $"[{title}]({url})";
@@ -211,10 +201,9 @@ ASIN;
             }
             else 
             {
-                // HTMLリンクとMarkdownリンクを生成
-                var shortURL = $"https://www.amazon.co.jp/dp/{ASIN}";
-                var htmlLink = $"<a href=\"{shortURL}\">{producttitle}</a>";
-                var titleUrl = $"[{producttitle}]({shortURL})";
+                var shortURL = $"https://www.amazon.co.jp/dp/{asin}";
+                var htmlLink = $"<a href=\"{shortURL}\">{productTitle}</a>";
+                var titleUrl = $"[{productTitle}]({shortURL})";
 
                 // クリップボードに書き込む
                 var dataObject = new DataObject();

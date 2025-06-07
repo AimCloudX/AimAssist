@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
@@ -63,21 +59,18 @@ private static async Task<string> GetFaviconUrlAsync(string domain)
 
     string cleanDomain = uri.Host;
 
-    // Google favicon serviceを試す
     string googleFaviconUrl = $"https://www.google.com/s2/favicons?domain={Uri.EscapeDataString(cleanDomain)}&sz=64";
     if (await IsValidImageUrl(googleFaviconUrl))
     {
         return googleFaviconUrl;
     }
 
-    // 直接のfavicon URLを試す
     string directFaviconUrl = $"{uri.Scheme}://{cleanDomain}/favicon.ico";
     if (await IsValidImageUrl(directFaviconUrl))
     {
         return directFaviconUrl;
     }
 
-    // DuckDuckGo faviconサービスをフォールバック
     return $"https://icons.duckduckgo.com/ip3/{cleanDomain}.ico";
 }
 

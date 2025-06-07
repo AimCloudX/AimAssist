@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.UI.Commands.Shortcus
+﻿namespace Common.UI.Commands.Shortcus
 {
     public class KeySequenceItem
     {

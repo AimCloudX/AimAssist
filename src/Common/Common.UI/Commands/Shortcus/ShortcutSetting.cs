@@ -2,9 +2,9 @@
 {
     public class ShortcutSetting
     {
-        public ShortcutSetting(string CommandName, KeySequence keySequence)
+        public ShortcutSetting(string commandName, KeySequence keySequence)
         {
-            this.CommandName = CommandName;
+            CommandName = commandName;
             KeySequence = keySequence;
         }
 
