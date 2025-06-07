@@ -8,20 +8,24 @@ using AimAssist.Services.ClipboardAnalyzer.DomainModels;
 
 namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 {
-    /// <summary>
-    /// ClipboardList.xaml の相互作用ロジック
-    /// </summary>
     public partial class ClipboardList : UserControl
     {
         public ObservableCollection<IClipboardData> Items { get; set; } = new ObservableCollection<IClipboardData>();
-        private readonly IEditorOptionService _editorOptionService;
+        private readonly IEditorOptionService editorOptionService;
 
         public ClipboardList(IEditorOptionService editorOptionService)
         {
-            _editorOptionService = editorOptionService;
+            this.editorOptionService = editorOptionService;
             InitializeComponent();
             UpdateClipboard();
-            this.editor.SetOption(_editorOptionService.Option);
+            if (this.editorOptionService != null)
+            {
+                this.editor.SetOption(this.editorOptionService.Option);
+            }
+        }
+
+        public ClipboardList() : this(null)
+        {
         }
 
         private void UpdateClipboard()
@@ -86,7 +90,9 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
                 return;
             }
 
-            var separators = new string[] { "\r\n", "\n" };
+            var separators = new string[] { @"
+", @"
+" };
             var lines = text.Split(separators, StringSplitOptions.None);
 
             var sb = new StringBuilder();

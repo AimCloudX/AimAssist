@@ -310,12 +310,19 @@ case MyNewUnit:
 ### 実装完了状況
 ✅ **Phase 1完了** - ViewProviderシステム導入
 - IViewProvider インターフェース
-- 3つのViewProvider実装（Url、FileBased、DynamicContent）
+- 4つのViewProvider実装（Url、FileBased、DynamicContent、MindMeister）
 - UnitViewFactoryの更新
 - DI統合
 - ビルド成功・動作確認完了
 
-次のPhase 2（DataTemplate移行）の準備が整いました。既存機能への影響を最小限に抑えつつ、段階的に新しいアーキテクチャに移行する基盤が完成しています。
+✅ **Phase 2完了** - DataTemplate移行
+- App.xamlにDataTemplate追加（TranscriptionUnit、ComputerUnit、PdfMergeUnit、RssSettingUnit）
+- UnitViewFactoryのswitch文大幅削除（100行→約30行、70%削減）
+- ViewProvider + DataTemplateハイブリッドシステム確立
+- DIが必要なコントロールはViewProvider、単純な1:1対応はDataTemplate
+- ビルド成功・動作確認完了
+
+次のPhase 3（Unit自動登録システム）の準備が整いました。既存機能への影響を最小限に抑えつつ、段階的に新しいアーキテクチャに移行する基盤が完成しています。
 Provider
 [ViewProvider(Priority = 80)]
 public class DynamicContentViewProvider : IViewProvider

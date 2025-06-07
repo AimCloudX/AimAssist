@@ -79,10 +79,16 @@ namespace AimAssist.UI.UnitContentsView
 
             switch (unit.Content)
             {
-                case TranscriptionUnit speechModel:
+                case TranscriptionUnit:
                     return new SpeechControl();
+                case ComputerUnit:
+                    return new ComputerView();
+                case PdfMergeUnit:
+                    return new PdfMergerControl();
                 case RssSettingUnit:
                     return new RssControl();
+                case ClipboardUnit:
+                    return new ClipboardList(editorOptionService);
                 case ShortcutOptionUnit:
                     return new CustomizeKeyboardShortcutsSettings(commandService);
                 case SnippetModelUnit model:
@@ -93,16 +99,6 @@ namespace AimAssist.UI.UnitContentsView
                         VerticalAlignment = VerticalAlignment.Stretch,
                         Margin = new Thickness(0)
                     };
-                case MindMeisterUnit model:
-                    return new MindMeisterViewControl(model);
-                case MindMeisterItemUnit model:
-                    return new WebViewControl(model.SearchUrl, model.Name);
-                case PdfMergeUnit:
-                    return new PdfMergerControl();
-                case ComputerUnit:
-                    return new ComputerView();
-                case ClipboardUnit:
-                    return new ClipboardList(editorOptionService);
                 default:
                     break;
             }
@@ -114,8 +110,7 @@ namespace AimAssist.UI.UnitContentsView
 
             var contentPresenter = new ContentPresenter
             {
-                Content = unit.Content,
-                DataContext = serviceProvider
+                Content = unit.Content
             };
 
             return contentPresenter;

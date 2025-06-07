@@ -8,32 +8,35 @@ using Common.UI.Commands.Shortcus;
 
 namespace AimAssist.Units.Implementation.Options
 {
-    /// <summary>
-    /// CustomizeKeyboardShortcutsSettings.xaml の相互作用ロジック
-    /// </summary>
     public partial class CustomizeKeyboardShortcutsSettings : System.Windows.Controls.UserControl
     {
-        private readonly ICommandService _commandService;
+        private readonly ICommandService commandService;
 
         public CustomizeKeyboardShortcutsSettings(ICommandService commandService)
         {
-            _commandService = commandService;
+            this.commandService = commandService;
             InitializeComponent();
-            foreach (var shortcut in _commandService.GetKeymap())
+            if (this.commandService != null)
             {
-                this.ShortcutSettings.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
+                foreach (var shortcut in this.commandService.GetKeymap())
+                {
+                    this.ShortcutSettings.Add(new ShortcutSource(shortcut.Key, shortcut.Value));
+                }
             }
 
             this.DataContext = this;
         }
 
-        private bool _isFirstKeyEntered = false;
+        public CustomizeKeyboardShortcutsSettings() : this(null)
+        {
+        }
+
+        private bool isFirstKeyEntered = false;
         private void ShortcutTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox textBox && textBox.DataContext is ShortcutSource setting)
             {
-                // リセット
-                _isFirstKeyEntered = false;
+                isFirstKeyEntered = false;
             }
         }
         private void ShortcutTextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -50,7 +53,6 @@ namespace AimAssist.Units.Implementation.Options
                 var key = e.Key == Key.System ? e.SystemKey : e.Key;
                 var modifiers = Keyboard.Modifiers;
 
-                // モディファイアキーのみの場合は無視
                 if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.LeftAlt ||
                     key == Key.RightAlt || key == Key.LeftShift || key == Key.RightShift|| key == Key.Escape)
                 {
@@ -62,19 +64,17 @@ namespace AimAssist.Units.Implementation.Options
                     return;
                 }
 
-                if (!_isFirstKeyEntered)
+                if (!isFirstKeyEntered)
                 {
-                    // 最初のキー入力
                     setting.Gesture = new KeySequence(key, modifiers);
                     textBox.Text = setting.Gesture.ToString();
-                    _isFirstKeyEntered = true;
+                    isFirstKeyEntered = true;
                 }
                 else
                 {
-                    // 2つ目のキー入力
                     setting.Gesture = new KeySequence(setting.Gesture.FirstKey, setting.Gesture.FirstModifiers, key, modifiers);
                     textBox.Text = setting.Gesture.ToString();
-                    _isFirstKeyEntered = false; // リセット
+                    isFirstKeyEntered = false;
                 }
             }
             else{
@@ -110,12 +110,14 @@ namespace AimAssist.Units.Implementation.Options
 
         private void ApplyKey()
         {
+            if (commandService == null) return;
+
             var modifiedShortcutes = ShortcutSettings.Where(x => x.IsModified);
             if (modifiedShortcutes.Any())
             {
                 foreach (var shortcut in modifiedShortcutes)
                 {
-                    _commandService.UpdateKeyGesture(shortcut.CommandName, shortcut.Gesture);
+                    commandService.UpdateKeyGesture(shortcut.CommandName, shortcut.Gesture);
                 }
             }
         }
