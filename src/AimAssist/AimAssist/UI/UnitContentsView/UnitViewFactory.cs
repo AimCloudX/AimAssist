@@ -47,6 +47,9 @@ namespace AimAssist.UI.UnitContentsView
             this.editorOptionService = editorOptionService;
             this.serviceProvider = serviceProvider;
             this.viewProviders = viewProviders.OrderByDescending(p => p.Priority);
+
+            // DataTemplateRegistryを初期化
+            DataTemplateRegistry.Initialize();
         }
 
         public UIElement Create(UnitViewModel unit, bool createNew = false)
@@ -71,22 +74,27 @@ namespace AimAssist.UI.UnitContentsView
 
         private UIElement CreateInner(UnitViewModel unit)
         {
+            // 1. ViewProviderを最優先でチェック
             var provider = viewProviders.FirstOrDefault(p => p.CanProvideView(unit.Content.GetType()));
             if (provider != null)
             {
                 return provider.CreateView(unit.Content, serviceProvider);
             }
 
+            // 2. 自動登録されたDataTemplateをチェック
+            var autoTemplate = DataTemplateRegistry.CreateView(unit.Content.GetType());
+            if (autoTemplate != null)
+            {
+                if (autoTemplate is FrameworkElement element)
+                {
+                    element.DataContext = unit.Content;
+                }
+                return autoTemplate;
+            }
+
+            // 3. 従来のswitch文による手動対応
             switch (unit.Content)
             {
-                case TranscriptionUnit:
-                    return new SpeechControl();
-                case ComputerUnit:
-                    return new ComputerView();
-                case PdfMergeUnit:
-                    return new PdfMergerControl();
-                case RssSettingUnit:
-                    return new RssControl();
                 case ClipboardUnit:
                     return new ClipboardList(editorOptionService);
                 case ShortcutOptionUnit:
@@ -103,11 +111,13 @@ namespace AimAssist.UI.UnitContentsView
                     break;
             }
 
+            // 4. レガシー辞書による対応
             if (UnitToUIElementDictionary.TryGetValue(unit.Content.GetType(), out var value))
             {
                 return value.Invoke(unit.Content);
             }
 
+            // 5. フォールバック: ContentPresenter
             var contentPresenter = new ContentPresenter
             {
                 Content = unit.Content

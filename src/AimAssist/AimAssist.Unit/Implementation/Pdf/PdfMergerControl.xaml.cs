@@ -17,17 +17,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using AimAssist.Core.Attributes;
 
 namespace AimAssist.Units.Implementation.Pdf
 {
-    /// <summary>
-    /// PdfMergerControl.xaml の相互作用ロジック
-    /// </summary>
+    [AutoDataTemplate(typeof(PdfMergeUnit))]
     public partial class PdfMergerControl : UserControl
     {
         public ObservableCollection<PdfFile> PdfFiles { get; set; }
-        private int _draggedItemIndex = -1;
-        private int _dropTargetIndex = -1;
+        private int draggedItemIndex = -1;
+        private int dropTargetIndex = -1;
 
         public PdfMergerControl()
         {
@@ -36,7 +35,6 @@ namespace AimAssist.Units.Implementation.Pdf
             FileListBox.ItemsSource = PdfFiles;
             DataContext = this;
 
-            // ドラッグ＆ドロップの設定
             AllowDrop = true;
             FileListBox.AllowDrop = true;
             FileListBox.DragEnter += FileListBox_DragEnter;
@@ -135,14 +133,14 @@ namespace AimAssist.Units.Implementation.Pdf
 
         private void FileListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _draggedItemIndex = FileListBox.SelectedIndex;
+            draggedItemIndex = FileListBox.SelectedIndex;
         }
 
         private void FileListBox_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed && _draggedItemIndex != -1)
+            if (e.LeftButton == MouseButtonState.Pressed && draggedItemIndex != -1)
             {
-                DragDrop.DoDragDrop(FileListBox, PdfFiles[_draggedItemIndex], DragDropEffects.Move);
+                DragDrop.DoDragDrop(FileListBox, PdfFiles[draggedItemIndex], DragDropEffects.Move);
             }
         }
 
@@ -198,7 +196,6 @@ namespace AimAssist.Units.Implementation.Pdf
             {
                 try
                 {
-                    // PDFの結合処理
                     using (PdfDocument outputDocument = new PdfDocument())
                     {
                         foreach (var pdfPath in PdfFiles)
@@ -215,8 +212,6 @@ namespace AimAssist.Units.Implementation.Pdf
                         outputDocument.Save(saveFileDialog.FileName);
                     }
 
-
-                    // 結合したPDFを開く
                     Process.Start(new ProcessStartInfo
                     {
                         FileName = saveFileDialog.FileName,

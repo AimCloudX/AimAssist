@@ -6,12 +6,11 @@ using System.ServiceModel.Syndication;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml;
+using AimAssist.Core.Attributes;
 
 namespace AimAssist.Units.Implementation.Web.Rss
 {
-    /// <summary>
-    /// RssControl.xaml の相互作用ロジック
-    /// </summary>
+    [AutoDataTemplate(typeof(RssSettingUnit))]
     public partial class RssControl : UserControl
     {
         public RssControl()

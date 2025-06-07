@@ -13,12 +13,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using AimAssist.Core.Attributes;
 
 namespace AimAssist.Units.Implementation.Computer
 {
-    /// <summary>
-    /// ComputerView.xaml の相互作用ロジック
-    /// </summary>
+    [AutoDataTemplate(typeof(ComputerUnit))]
     public partial class ComputerView : UserControl
     {
         private DispatcherTimer _timer;
@@ -1834,5 +1833,5 @@ internal class RelayCommand : ICommand
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
-}
+    }
 }
