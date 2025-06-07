@@ -6,228 +6,339 @@ WPFベースのコマンドランチャー・生産性向上ツール
 - DI、Factory、Command、MVVMパターンを採用
 - ユニットベースの機能拡張システム
 
-## コード全体像分析
-### 現在のアーキテクチャ
-1. **メインプロジェクト（AimAssist）**: WPFアプリケーション本体
-2. **Core**: インターフェースとコアロジック  
-3. **Units**: 機能単位の実装
-4. **Services**: 各種サービス実装
-5. **Infrastructure**: 外部依存との統合
-6. **Common**: 共通UI・コンポーネント
+## リファクタリング計画 - View Template + 規約ベース ハイブリッド設計
 
-## リファクタリング計画
+### 目標
+1. 人間が変更を加えやすい（Unitの追加など）構造に変更
+2. コード量の削減（特にUnitViewFactory.csの100行switch文削除）
+3. 既存のフォルダ構成は維持
 
-### Phase 1: アーキテクチャの明確化と依存関係の整理
+### 現状の問題分析
 
-#### 1.1 レイヤード構造の確立
-現在のプロジェクト構造は以下の6つの主要レイヤーで構成されている：
-- **AimAssist**: WPFアプリケーション本体
-- **AimAssist.Core**: インターフェースとコアロジック
-- **AimAssist.Units**: 機能単位の実装
-- **AimAssist.Services**: 各種サービス実装
-- **AimAssist.Plugins**: プラグインシステム
-- **Common**: 共通UI・コンポーネント
+#### Unit-View対応の複雑性
+**UnitsFactory.cs (80行):**
+- 全Unitの生成ロジックが手動記述
+- MarkdownファイルやSnippet等の動的生成が複雑
 
-#### 1.2 依存関係の整理
+**UnitViewFactory.cs (100行switch文):**
+```csharp
+switch (unit.Content)
+{
+    case MarkdownUnit markdownPath:
+        return new MarkdownView(markdownPath.FullPath);
+    case TranscriptionUnit speechModel:
+        return new SpeechControl();
+    case ComputerUnit:
+        return new ComputerView();
+    case UrlUnit urlPath:
+        // 複雑なURL条件分岐
+        if (url.StartsWith("https://chatgpt")) return new ChatGptControl(url);
+        if (url.StartsWith("https://claude.ai")) return new ClaudeControl(url);
+        // ...
+    // 16個のケース + デフォルト処理
+}
+```
 
-**問題点:**
-- Initializerクラスが多数の依存関係を持ちすぎている（11個のパラメータ）
-- ServiceRegistrationが複雑になっている
-- ファクトリーパターンの実装が分散している
+#### 既存のUnit-View対応関係
+1. **1:1対応（単純）**
+   - `TranscriptionUnit` → `SpeechControl`
+   - `ComputerUnit` → `ComputerView`
+   - `PdfMergeUnit` → `PdfMergerControl`
+   - `ClipboardUnit` → `ClipboardList`
 
-**改善案:**
-1. **Builder Pattern の導入**: Initializerの複雑な依存関係を整理
-2. **Module分離**: ServiceRegistrationを機能別にモジュール化
-3. **Factory統合**: CompositeUnitsFactoryを活用したファクトリー管理の統一
+2. **1:1対応（パラメータ付き）**
+   - `MarkdownUnit` → `MarkdownView(filePath)`
+   - `EditorUnit` → `AimEditor(filePath)`
+   - `OptionUnit` → `AimEditor(multiple files)`
 
-#### 1.3 命名規則の統一化
-既存の命名不一致を解決：
-- インターフェース：Iプレフィックス統一
-- サービス：ServiceサフィックスまたはManagerサフィックスの統一
-- メソッド：動詞開始の統一（Get, Create, Load, Save等）
+3. **条件分岐（複雑）**
+   - `UrlUnit` → 4種類のWebViewControl（URL条件による分岐）
 
-### Phase 2: サービス層の再設計
+4. **動的生成**
+   - `SnippetUnit` → `TextBox(code)`
 
-#### 2.1 ApplicationServiceの責務分離
-現在のApplicationServiceが初期化とシャットダウンの両方を担当している。以下に分離：
-- **ApplicationLifecycleService**: アプリケーションのライフサイクル管理専用
-- **ConfigurationService**: 設定管理専用
-- **ModuleInitializationService**: モジュール初期化専用
+### 新設計：View Template + 規約ベース + ViewProvider ハイブリッド
 
-#### 2.2 Factoryパターンの統合
-現在複数存在するFactoryを統合：
-- **AbstractUnitsFactory**: 基底ファクトリー
-- **CompositeUnitsFactory**: 複合ファクトリー（現在の実装を拡張）
-- **PluginUnitsFactory**: プラグイン用ファクトリー
+#### 1. Unit側の完全分離
+```csharp
+// Unit は UI を一切知らない純粋なビジネスモデル
+public class TranscriptionUnit : IUnit
+{
+    public IMode Mode => AllInclusiveMode.Instance;
+    public string Name => "音声認識";
+    public string Description => "音声をテキストに変換";
+    public string Category => "Audio";
+    // UI の知識ゼロ
+}
 
-#### 2.3 設定管理の統一
-複数のOptionServiceを統合：
-- **IConfigurationManager**: 全設定の統合管理
-- **ConfigurationSection**: 設定セクション別の管理
+public class ComputerUnit : IUnit
+{
+    public IMode Mode => WorkToolsMode.Instance;
+    public string Name => "PC情報";
+    public string Description => "コンピューター情報の表示";
+    public string Category => "System";
+}
 
-### Phase 3: エラーハンドリングとログの強化
+// パラメータ持ちUnitもUI無知
+public class MarkdownUnit : IUnit
+{
+    public string FullPath { get; }
+    public string Category { get; }
+    // View作成ロジックなし
+}
+```
 
-#### 3.1 統一エラーハンドリング
-- **ErrorHandlingMiddleware**: 全体的なエラー処理
-- **ErrorContext**: エラー情報の構造化
-- **ErrorRecoveryStrategy**: エラー回復戦略の実装
+#### 2. WPF DataTemplate による自動対応（シンプルケース）
+**App.xaml または専用ResourceDictionary:**
+```xml
+<Application.Resources>
+    <ResourceDictionary>
+        <!-- 1:1対応の簡単なケース -->
+        <DataTemplate DataType="{x:Type units:TranscriptionUnit}">
+            <speech:SpeechControl />
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type units:ComputerUnit}">
+            <computer:ComputerView />
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type units:PdfMergeUnit}">
+            <pdf:PdfMergerControl />
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type units:ClipboardUnit}">
+            <clipboard:ClipboardList EditorOptionService="{Binding EditorOptionService}" />
+        </DataTemplate>
+    </ResourceDictionary>
+</Application.Resources>
+```
 
-#### 3.2 ログシステムの改善
-- **StructuredLogging**: 構造化ログの導入
-- **LoggingScope**: ログのスコープ管理
-- **LoggingConfiguration**: ログ設定の統一
+#### 3. ViewProvider による複雑ケース対応
+```csharp
+public interface IViewProvider
+{
+    bool CanProvideView(Type unitType);
+    UIElement CreateView(IUnit unit, IServiceProvider serviceProvider);
+    int Priority { get; }
+}
 
-### Phase 4: UIとビジネスロジックの分離
+// URL条件分岐専用Provider
+[ViewProvider(Priority = 100)]
+public class UrlViewProvider : IViewProvider
+{
+    public bool CanProvideView(Type unitType) => unitType == typeof(UrlUnit);
+    
+    public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
+    {
+        var urlUnit = (UrlUnit)unit;
+        return urlUnit.Url switch
+        {
+            var url when url.StartsWith("https://chatgpt") => new ChatGptControl(url),
+            var url when url.StartsWith("https://claude.ai") => new ClaudeControl(url),
+            var url when url.StartsWith("https://www.amazon") => new AmazonWebViewControl(url),
+            _ => new WebViewControl(urlUnit.Url)
+        };
+    }
+}
 
-#### 4.1 MVVM強化
-- **ViewModelBase**: 共通ViewModelの基底クラス
-- **CommandFactory**: コマンドの統一生成
-- **EventAggregator**: イベント通信の統一
+// ファイルパス系Unit用Provider
+[ViewProvider(Priority = 90)]
+public class FileBasedViewProvider : IViewProvider
+{
+    private readonly IEditorOptionService editorOptionService;
+    
+    public bool CanProvideView(Type unitType) => 
+        unitType == typeof(MarkdownUnit) || 
+        unitType == typeof(EditorUnit) || 
+        unitType == typeof(OptionUnit);
+    
+    public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
+    {
+        return unit switch
+        {
+            MarkdownUnit md => new MarkdownView(md.FullPath),
+            EditorUnit editor => CreateEditor(editor.FullPath),
+            OptionUnit option => CreateMultiFileEditor(option.OptionFilePaths),
+            _ => null
+        };
+    }
+}
 
-#### 4.2 UI責務の明確化
-- **WindowManager**: ウィンドウ管理の統一
-- **DialogService**: ダイアログ表示の統一
-- **NavigationService**: 画面遷移の統一
+// 動的コンテンツ用Provider
+[ViewProvider(Priority = 80)]
+public class DynamicContentViewProvider : IViewProvider
+{
+    public bool CanProvideView(Type unitType) => 
+        unitType == typeof(SnippetUnit) || unitType == typeof(SnippetModelUnit);
+    
+    public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
+    {
+        var code = unit switch
+        {
+            SnippetUnit snippet => snippet.Code,
+            SnippetModelUnit model => model.Code,
+            _ => string.Empty
+        };
+        
+        return new TextBox
+        {
+            Text = code,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Margin = new Thickness(0)
+        };
+    }
+}
+```
 
-### Phase 5: プラグインシステムの改善
+#### 4. 新しいUnitViewFactory（超シンプル）
+```csharp
+public class UnitViewFactory
+{
+    private readonly IEnumerable<IViewProvider> viewProviders;
+    private readonly IServiceProvider serviceProvider;
+    private readonly Dictionary<string, UIElement> cache = new();
+    
+    public UnitViewFactory(IEnumerable<IViewProvider> viewProviders, IServiceProvider serviceProvider)
+    {
+        this.viewProviders = viewProviders.OrderByDescending(p => p.Priority);
+        this.serviceProvider = serviceProvider;
+    }
+    
+    public UIElement Create(UnitViewModel unit, bool createNew = false)
+    {
+        if (!createNew && cache.TryGetValue(unit.Name, out var cached))
+            return cached;
+            
+        var element = CreateViewForUnit(unit.Content);
+        
+        if (!createNew && element != null)
+            cache[unit.Name] = element;
+            
+        return element;
+    }
+    
+    private UIElement CreateViewForUnit(IUnit unit)
+    {
+        // 1. 専用ViewProviderをチェック
+        var provider = viewProviders.FirstOrDefault(p => p.CanProvideView(unit.GetType()));
+        if (provider != null)
+        {
+            return provider.CreateView(unit, serviceProvider);
+        }
+        
+        // 2. WPFのDataTemplateに委譲（標準機能）
+        var contentPresenter = new ContentPresenter 
+        { 
+            Content = unit,
+            DataContext = serviceProvider // DIコンテナを提供
+        };
+        
+        return contentPresenter;
+    }
+}
+```
 
-#### 5.1 プラグインアーキテクチャの強化
-- **PluginContract**: プラグイン契約の明確化
-- **PluginLifecycle**: プラグインライフサイクル管理
-- **PluginSecurity**: プラグインセキュリティ
+#### 5. Unit自動登録システム（既存のFactoryManager活用）
+```csharp
+// 既存のAbstractUnitsFactory + FactoryManagerを活用
+public class AutoDiscoveryUnitsFactory : AbstractUnitsFactory
+{
+    private readonly IServiceProvider serviceProvider;
+    
+    public AutoDiscoveryUnitsFactory(IServiceProvider serviceProvider) 
+        : base("AutoDiscovery", priority: 1000)
+    {
+        this.serviceProvider = serviceProvider;
+    }
+    
+    public override IEnumerable<IUnit> CreateUnits()
+    {
+        // 動的ファイル読み込み系
+        foreach (var markdownUnit in CreateMarkdownUnits()) yield return markdownUnit;
+        foreach (var snippetUnit in CreateSnippetUnits()) yield return snippetUnit;
+        foreach (var workItemUnit in CreateWorkItemUnits()) yield return workItemUnit;
+        
+        // 静的Unit系（既存コードから移行）
+        yield return new TranscriptionUnit();
+        yield return new PdfMergeUnit();
+        yield return new ComputerUnit();
+        yield return new ClipboardUnit();
+        yield return new MindMeisterUnit("最近開いたMap", "https://www.mindmeister.com/app/maps/recent");
+        
+        // CheatSheet系
+        foreach (var cheatSheetUnit in CreateCheatSheetUnits()) yield return cheatSheetUnit;
+        
+        // Option系
+        yield return CreateOptionUnit();
+        yield return new ShortcutOptionUnit();
+    }
+}
+```
 
-#### 5.2 プラグイン発見メカニズム
-- **PluginDiscovery**: プラグイン自動発見
-- **PluginMetadata**: プラグインメタデータ管理
+### 移行戦略
 
-### 実装スケジュール
+#### Phase 1: ViewProvider システム導入（1週間）
+1. IViewProvider インターフェース作成
+2. 既存のswitch文ロジックをViewProviderに移行
+3. DI登録とUnitViewFactoryの部分修正
+4. 既存機能との並行動作確認
 
-**Week 1-2: Phase 1（基盤整備）**
-- 命名規則の統一
-- ServiceRegistrationのモジュール化
-- Initializerの責務分離
+#### Phase 2: DataTemplate 移行（1週間）
+1. App.xaml にDataTemplate追加
+2. 簡単な1:1対応Unitから順次移行
+3. ViewProviderから対応するケースを削除
+4. 動作確認とテスト
 
-**Week 3-4: Phase 2（サービス層）**
-- ApplicationServiceの分離
-- Factoryパターンの統合
-- 設定管理の統一
+#### Phase 3: Unit自動登録システム（1週間）
+1. AutoDiscoveryUnitsFactory 実装
+2. 既存UnitsFactory.csから段階的に移行
+3. CompositeUnitsFactory との統合
+4. 既存FactoryManagerシステムとの統合
 
-**Week 5-6: Phase 3（エラー処理・ログ）**
-- エラーハンドリングの統一
-- ログシステムの改善
+#### Phase 4: 完全移行とクリーンアップ（1週間）
+1. 全Unit-View対応の新システム移行完了
+2. UnitViewFactory.csのswitch文完全削除
+3. UnitsFactory.csの削除
+4. テストと最適化
 
-**Week 7-8: Phase 4（UI改善）**
-- MVVM強化
-- UI責務の明確化
+### 期待効果
 
-**Week 9-10: Phase 5（プラグイン）**
-- プラグインシステムの改善
-- 統合テスト・品質保証
+#### 新Unit追加の簡素化
+**従来（2箇所修正必要）:**
+```csharp
+// 1. UnitsFactory.cs に追加
+yield return new MyNewUnit();
 
-### リスク管理
+// 2. UnitViewFactory.cs に追加
+case MyNewUnit:
+    return new MyNewView();
+```
 
-**高リスク要素:**
-1. 広範囲な変更による予期しない影響
-2. プラグインシステムの後方互換性
-3. UI・UXへの影響
+**新方式（1箇所のみ）:**
+```xml
+<!-- App.xaml に1行追加するだけ -->
+<DataTemplate DataType="{x:Type units:MyNewUnit}">
+    <views:MyNewView />
+</DataTemplate>
+```
 
-**軽減策:**
-1. 段階的リファクタリング（フェーズ分割）
-2. 十分なテスト実施
-3. ロールバック計画の準備
-4. プラグインAPIの段階的移行
+#### コード削減効果
+- **UnitViewFactory.cs**: 100行 → 30行（70%削減）
+- **UnitsFactory.cs**: 80行 → 削除（100%削減）
+- **新Unit追加工数**: 95%削減
+- **修正漏れリスク**: ほぼゼロ
 
-## Phase 2 進捗状況
+#### 保守性向上
+- Unit-View対応が宣言的で視覚的に分かりやすい
+- WPF標準のDataTemplate活用でデバッグ容易
+- 複雑なケースもViewProviderで分離
+- プラグイン対応が自然に可能
 
-### 完了項目
-1. **ApplicationServiceの責務分離**: ✅ 完了
-   - IApplicationLifecycleService: アプリケーションライフサイクル管理専用
-   - IConfigurationManagerService: 設定管理の統一システム
-   - IModuleInitializationService: モジュール初期化の統合管理
-   - ApplicationServiceの単一責任化
+#### テスタビリティ向上
+- UnitからUIの依存を完全排除
+- Unit単体テストが容易
+- ViewProvider単体テストも可能
 
-2. **Factoryパターンの統合**: ✅ 完了
-   - AbstractUnitsFactory: 基底ファクトリークラス
-   - IUnitsFactoryManager: ファクトリー管理システム
-   - CompositeUnitsFactory: 統合ファクトリーパターンに更新
-   - PluginUnitsFactory: プラグイン専用ファクトリー
-   - 優先度ベースのUnit生成順序制御
-
-3. **設定管理の統一**: ✅ 完了
-   - IConfigurationSection: セクション別設定管理
-   - EditorConfigurationSection: エディター設定専用
-   - SnippetConfigurationSection: スニペット設定専用
-   - WorkItemConfigurationSection: 作業項目設定専用
-   - KeymapConfigurationSection: キーマップ設定専用
-   - キャッシュ機能付き設定システム
-
-### バグ修正
-4. **コンパイルエラーの修正**: ✅ 完了
-   - 不足しているusing文の追加
-   - 型の不一致の修正
-   - KeySequence型の適切な処理
-   - Dictionary型の型パラメータ修正
-
-### 技術的改善点
-- **責務の明確化**: 各サービスが単一責任を持つよう分離
-- **モジュール性の向上**: 設定管理がセクション単位で独立
-- **Factory管理の統一**: 統合されたファクトリー管理システム
-- **プラグイン対応強化**: 専用ファクトリーによる管理
-- **優先度制御**: ファクトリーの実行順序を制御可能
-- **エラーハンドリング**: 各ファクトリーの独立したエラー処理
-- **並行性**: ファクトリー管理でのスレッドセーフ実装
-- **型安全性**: 強い型付けによる設定管理
-
-### 実装内容詳細
-- **ApplicationLifecycleService**: アプリケーション状態管理とイベント通知
-- **ConfigurationManagerService**: 統一設定APIと検証機能
-- **ModuleInitializationService**: モジュール単位の初期化・シャットダウン
-- **UnitsFactoryManager**: ファクトリーの登録・管理・実行制御
-- **AbstractUnitsFactory**: 共通ファクトリー基盤とライフサイクル管理
-- **PluginUnitsFactory**: プラグインの動的登録・管理
-
-### 次のステップ
-Phase 3のエラーハンドリングとログの強化に進む予定
-
-## Phase 1 進捗状況
-
-### 完了項目
-1. **ServiceRegistrationのモジュール化**: ✅ 完了
-   - IServiceModuleインターフェースの作成
-   - 機能別モジュール分離（Core, Application, UI, Option, Factory, Plugin, Initialization）
-   - モジュールベースの登録システム
-
-2. **Initializerの責務分離**: ✅ 完了
-   - IApplicationInitializationServiceの作成
-   - FileInitializationServiceによるファイル初期化の分離
-   - PluginInitializationServiceによるプラグイン初期化の分離
-   - ApplicationInitializationServiceによる統合初期化
-
-3. **依存関係の簡素化**: ✅ 完了
-   - Initializerが単一のIApplicationInitializationServiceに依存
-   - 11個のパラメータから1個に削減
-
-### バグ修正
-4. **計算機能の修正**: ✅ 完了
-   - CalcUnitの新規実装
-   - PickerWindowViewModelでのCalc機能の復旧
-   - Calc→Snippet→Calcモード切り替え時の表示問題を修正
-   - フィルタリング状態の適切な管理
-   - SelectedUnitの同期問題の解決
-
-### 技術的改善点
-- **責務の明確化**: 各サービスが単一責任を持つよう分離
-- **モジュール性の向上**: DIコンテナの登録がモジュール単位で管理
-- **テスタビリティの向上**: 各初期化サービスが独立してテスト可能
-- **保守性の向上**: 新機能追加時にモジュールとして追加可能
-- **UI状態管理の改善**: モード切り替え時の状態の一貫性を確保
-
-### 修正内容詳細
-- **CalcUnit**: 計算専用のUnitクラスを新規作成
-- **HandleCalculationMode**: モード切り替え時のフィルタクリアとSelectedUnit同期
-- **HandleSnippetMode**: フィルタ再適用とビューの強制更新
-- **SelectedIndex**: インデックス変更時のSelectedUnit自動同期
-- **NavigateUp/Down**: フィルタされたアイテムを考慮したナビゲーション
-
-### 次のステップ
-Phase 3のエラーハンドリングとログの強化に進む予定
+### 次の作業
+Phase 1のViewProviderシステム導入から着手予定。既存機能への影響を最小限に抑えつつ、段階的に新しいアーキテクチャに移行する。
