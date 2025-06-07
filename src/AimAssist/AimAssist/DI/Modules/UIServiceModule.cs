@@ -1,11 +1,15 @@
-﻿using AimAssist.Commands;
+﻿using System;
+using System.Reflection;
+using System.Linq;
+using AimAssist.Commands;
 using AimAssist.Core.Interfaces;
+using AimAssist.Core.Units;
 using AimAssist.Service;
 using AimAssist.UI.HotKeys;
 using AimAssist.UI.MainWindows;
 using AimAssist.UI.PickerWindows;
 using AimAssist.UI.UnitContentsView;
-using AimAssist.UI.UnitContentsView.ViewProviders;
+using AimAssist.Units.ViewProviders;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI.Modules
@@ -67,9 +71,32 @@ namespace AimAssist.DI.Modules
 
         private void RegisterViewProviders(IServiceCollection services)
         {
-            services.AddTransient<IViewProvider, UrlViewProvider>();
-            services.AddTransient<IViewProvider, FileBasedViewProvider>();
-            services.AddTransient<IViewProvider, DynamicContentViewProvider>();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => a.FullName?.Contains("AimAssist") == true)
+                .ToList();
+
+            var viewProviderTypes = assemblies
+                .SelectMany(assembly => 
+                {
+                    try
+                    {
+                        return assembly.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException)
+                    {
+                        return Enumerable.Empty<Type>();
+                    }
+                })
+                .Where(type => type.IsClass && 
+                              !type.IsAbstract && 
+                              typeof(IViewProvider).IsAssignableFrom(type) &&
+                              type.GetCustomAttribute<ViewProviderAttribute>() != null)
+                .ToList();
+
+            foreach (var type in viewProviderTypes)
+            {
+                services.AddTransient(typeof(IViewProvider), type);
+            }
         }
     }
 }

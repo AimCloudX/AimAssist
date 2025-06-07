@@ -1,4 +1,3 @@
-﻿using System;
 using System.Windows;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
@@ -6,7 +5,7 @@ using Common.UI.WebUI;
 using Common.UI.WebUI.Amazon;
 using Common.UI.WebUI.LLM;
 
-namespace AimAssist.UI.UnitContentsView.ViewProviders
+namespace AimAssist.Units.ViewProviders.Providers
 {
     [ViewProvider(Priority = 100)]
     public class UrlViewProvider : IViewProvider

@@ -3,9 +3,8 @@ using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.Snippets;
 using System.Windows;
-using AimAssist.Units.Implementation.ClipboardAnalyzer;
-using AimAssist.Units.Implementation.ClipboardAnalyzer.UI;
 using System.Windows.Controls;
+using AimAssist.Units.ViewProviders;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using TextBox = System.Windows.Controls.TextBox;
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AimAssist.UI.UnitContentsView
+﻿namespace AimAssist.Units.ViewProviders
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class ViewProviderAttribute : Attribute

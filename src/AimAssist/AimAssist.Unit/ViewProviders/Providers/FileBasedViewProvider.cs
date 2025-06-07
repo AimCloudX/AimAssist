@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
@@ -10,7 +7,7 @@ using AimAssist.Units.Implementation.Options;
 using Common.UI.Markdown;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AimAssist.UI.UnitContentsView.ViewProviders
+namespace AimAssist.Units.ViewProviders.Providers
 {
     [ViewProvider(Priority = 90)]
     public class FileBasedViewProvider : IViewProvider

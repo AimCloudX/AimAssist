@@ -1,12 +1,10 @@
-﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Snippets;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using TextBox = System.Windows.Controls.TextBox;
 
-namespace AimAssist.UI.UnitContentsView.ViewProviders
+namespace AimAssist.Units.ViewProviders.Providers
 {
     [ViewProvider(Priority = 80)]
     public class DynamicContentViewProvider : IViewProvider

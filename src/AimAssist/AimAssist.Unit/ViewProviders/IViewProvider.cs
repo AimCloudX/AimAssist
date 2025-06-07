@@ -1,8 +1,7 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using AimAssist.Core.Units;
 
-namespace AimAssist.UI.UnitContentsView
+namespace AimAssist.Units.ViewProviders
 {
     public interface IViewProvider
     {
