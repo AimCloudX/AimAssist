@@ -1,146 +1,72 @@
-﻿using NAudio.Wave;
-using System;
-using System.ComponentModel;
+﻿using Microsoft.Win32;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
-using Whisper.net;
-using Whisper.net.Ggml;
 
 namespace AimAssist.Units.Implementation.Speech
 {
-    /// <summary>
-    /// WhisperControl.xaml の相互作用ロジック
-    /// </summary>
-    public partial class WhisperControl : UserControl, INotifyPropertyChanged, IDisposable
+    public partial class WhisperControl : IDisposable
     {
-        private WhisperProcessor? processor;
-        private WaveFileWriter? writer;
-        private WaveInEvent? waveIn;
-        private bool disposed = false;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private string _modelPath = "ggml-base.bin";
-        public string ModelPath
-        {
-            get => _modelPath;
-            set
-            {
-                if (_modelPath != value)
-                {
-                    _modelPath = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _language = "ja";
-        public string Language
-        {
-            get => _language;
-            set
-            {
-                if (_language != value)
-                {
-                    _language = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _isRunning;
-        public bool IsRunning
-        {
-            get => _isRunning;
-            set
-            {
-                if (_isRunning != value)
-                {
-                    _isRunning = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _canRun;
-        public bool CanRun
-        {
-            get => _canRun;
-            set
-            {
-                if (_canRun != value)
-                {
-                    _canRun = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        private readonly WhisperAudioProcessor whisperProcessor;
+        private readonly AudioRecorder audioRecorder;
+        private readonly WhisperConfiguration configuration;
+        private bool disposed;
 
         public WhisperControl()
         {
             InitializeComponent();
-            this.DataContext = this;
-            CanRun = true;
-            UpdateProcessorAsync();
+            
+            whisperProcessor = new WhisperAudioProcessor();
+            audioRecorder = new AudioRecorder();
+            configuration = new WhisperConfiguration { CanRun = true };
+            
+            DataContext = configuration;
+            
+            audioRecorder.RecordingStopped += OnRecordingStopped;
+            
+            InitializeProcessorAsync();
         }
 
-        /// <summary>
-        /// モデルパス選択ダイアログを開きます
-        /// </summary>
         private void BrowseModelPath_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
                 Filter = "Binary Files (*.bin)|*.bin|All Files (*.*)|*.*",
                 Title = "Whisperモデルファイルを選択"
             };
+            
             if (openFileDialog.ShowDialog() == true)
             {
-                ModelPath = openFileDialog.FileName;
+                configuration.ModelPath = openFileDialog.FileName;
             }
         }
 
-        /// <summary>
-        /// 保存先パス選択ダイアログを開きます
-        /// </summary>
         private void BrowseSavePath_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 Filter = "Wave Files (*.wav)|*.wav|All Files (*.*)|*.*",
                 Title = "保存先ファイルを選択",
                 FileName = "temp.wav"
             };
+            
             if (saveFileDialog.ShowDialog() == true)
             {
                 PathTextBox.Text = saveFileDialog.FileName;
             }
         }
 
-        /// <summary>
-        /// モデルをダウンロードします
-        /// </summary>
         private async void BaseModelDownload_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                CanRun = false;
-                var tinyPath = ModelPath;
-                if (File.Exists(tinyPath))
-                {
-                    MessageBox.Show("モデルファイルは既に存在します。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
-                    CanRun = true;
-                    return;
-                }
-
-                using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.Base);
-                using var fileWriter = File.OpenWrite(tinyPath);
-                await modelStream.CopyToAsync(fileWriter);
+                configuration.CanRun = false;
+                await whisperProcessor.DownloadModelAsync(configuration.ModelPath);
                 MessageBox.Show("モデルのダウンロードが完了しました。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "情報", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -148,233 +74,133 @@ namespace AimAssist.Units.Implementation.Speech
             }
             finally
             {
-                CanRun = true;
+                configuration.CanRun = true;
             }
         }
 
-        /// <summary>
-        /// 設定を更新します
-        /// </summary>
         private async void UpdateClick(object sender, RoutedEventArgs e)
         {
             await UpdateProcessorAsync();
         }
 
-        /// <summary>
-        /// Whisperプロセッサを更新します
-        /// </summary>
         private async Task UpdateProcessorAsync()
         {
-            if (IsRunning)
+            if (configuration.IsRunning)
             {
-                StopRecording();
+                audioRecorder.StopRecording();
             }
 
-            CanRun = false;
-            OnPropertyChanged(nameof(CanRun));
+            configuration.CanRun = false;
 
-            var modelPath = ModelPath;
             var language = ((ComboBoxItem)LanguageComboBox.SelectedItem)?.Tag?.ToString() ?? "ja";
+            var success = await whisperProcessor.InitializeAsync(configuration.ModelPath, language);
 
-            if (!File.Exists(modelPath))
+            if (!success)
             {
                 TextBox.Text = "Whisper Modelが見つかりませんでした。モデルをダウンロードしてください。";
-                CanRun = true;
-                return;
             }
-
-            try
+            else
             {
-                var whisperFactory = WhisperFactory.FromPath(modelPath); // Whisperモデルのパスを指定
-                processor = whisperFactory.CreateBuilder().WithLanguage(language).Build(); // 言語を指定
-
                 TextBox.Text = string.Empty;
-                CanRun = true;
             }
-            catch (Exception ex)
-            {
-                TextBox.Text = $"モデルの読み込み中にエラーが発生しました: {ex.Message}";
-            }
+
+            configuration.CanRun = true;
         }
 
-        /// <summary>
-        /// 録音を開始します
-        /// </summary>
         private void StartRecording_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                waveIn = new WaveInEvent
+                var success = audioRecorder.StartRecording(PathTextBox.Text);
+                if (success)
                 {
-                    WaveFormat = new WaveFormat(16000, 16, 1)
-                };
-                waveIn.DataAvailable += OnDataAvailable;
-                waveIn.RecordingStopped += OnRecordingStopped;
-
-                writer = new WaveFileWriter(PathTextBox.Text, waveIn.WaveFormat);
-
-                waveIn.StartRecording();
-                IsRunning = true;
-                CanRun = false;
+                    configuration.IsRunning = true;
+                    configuration.CanRun = false;
+                }
+                else
+                {
+                    MessageBox.Show("録音の開始に失敗しました。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"録音の開始中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                CanRun = true;
+                configuration.CanRun = true;
             }
         }
 
-        /// <summary>
-        /// 録音を停止します
-        /// </summary>
         private void StopRecording_Click(object sender, RoutedEventArgs e)
         {
-            StopRecording();
+            audioRecorder.StopRecording();
         }
 
-        /// <summary>
-        /// 録音を停止する処理を共通化
-        /// </summary>
-        private void StopRecording()
+        private async void OnRecordingStopped(object? sender, RecordingStoppedEventArgs e)
         {
-            if (waveIn != null)
-            {
-                waveIn.StopRecording();
-            }
-        }
+            configuration.IsRunning = false;
+            configuration.CanRun = true;
 
-        /// <summary>
-        /// 録音データが利用可能になったときの処理
-        /// </summary>
-        private void OnDataAvailable(object sender, WaveInEventArgs e)
-        {
-            if (writer == null) return;
-            writer.Write(e.Buffer, 0, e.BytesRecorded);
-        }
-
-        /// <summary>
-        /// 録音が停止されたときの処理
-        /// </summary>
-        private void OnRecordingStopped(object sender, StoppedEventArgs e)
-        {
-            try
-            {
-                waveIn?.Dispose();
-                writer?.Dispose();
-            }
-            catch (Exception ex)
+            if (!e.Success && !string.IsNullOrEmpty(e.ErrorMessage))
             {
                 Dispatcher.Invoke(() =>
                 {
-                    MessageBox.Show($"録音の停止中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"録音中にエラーが発生しました: {e.ErrorMessage}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
                 });
+                return;
             }
-            finally
+
+            if (whisperProcessor.IsRunning && File.Exists(PathTextBox.Text))
             {
-                IsRunning = false;
-                CanRun = true;
-                if (e.Exception != null)
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        MessageBox.Show($"録音中にエラーが発生しました: {e.Exception.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                    });
-                }
-                else
-                {
-                    // 録音停止後に文字起こしを実行
-                    if (processor != null && File.Exists(PathTextBox.Text))
-                    {
-                        WhisperRunAsync(PathTextBox.Text);
-                    }
-                }
+                await ProcessTranscriptionAsync(PathTextBox.Text);
             }
         }
 
-        /// <summary>
-        /// Whisperを使って文字起こしを実行します
-        /// </summary>
-        private async Task WhisperRunAsync(string filePath)
+        private async Task ProcessTranscriptionAsync(string filePath)
         {
-            CanRun = false;
-            OnPropertyChanged(nameof(CanRun));
+            configuration.CanRun = false;
 
             try
             {
-                using var fileStream = File.OpenRead(filePath);
-
-                await foreach (var result in processor!.ProcessAsync(fileStream))
-                {
-                    Dispatcher.Invoke(() => TextBox.AppendText(result.Text + Environment.NewLine));
-                }
-
+                var result = await whisperProcessor.ProcessAudioAsync(filePath);
+                
                 Dispatcher.Invoke(() =>
                 {
+                    TextBox.AppendText(result);
                     TextBox.ScrollToEnd();
                 });
             }
-            catch (Exception ex)
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    TextBox.AppendText($"Error: {ex.Message}{Environment.NewLine}");
-                });
-            }
             finally
             {
-                CanRun = true;
-                OnPropertyChanged(nameof(CanRun));
+                configuration.CanRun = true;
             }
         }
 
-        /// <summary>
-        /// テキストボックスをクリアします
-        /// </summary>
         private void ClearText_Click(object sender, RoutedEventArgs e)
         {
             TextBox.Clear();
         }
 
-        /// <summary>
-        /// テキストプロパティの変更を通知します
-        /// </summary>
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private async void InitializeProcessorAsync()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            await UpdateProcessorAsync();
         }
 
-        /// <summary>
-        /// リソースの解放
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// Disposeパターンの実装
-        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
-                    waveIn?.Dispose();
-                    writer?.Dispose();
-                    processor?.Dispose();
+                    audioRecorder.Dispose();
+                    whisperProcessor.Dispose();
                 }
                 disposed = true;
             }
-        }
-
-        /// <summary>
-        /// ユーザーコントロールが破棄される際にリソースを解放します
-        /// </summary>
-        ~WhisperControl()
-        {
-            Dispose(false);
         }
     }
 }

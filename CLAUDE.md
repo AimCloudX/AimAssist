@@ -181,3 +181,17 @@ case MyNewUnit:
 - ✅ 非同期アイコン読み込みの最適化
 - ✅ エラーハンドリングの保持
 - ✅ Task.Runの除去によるパフォーマンス向上
+
+### WhisperControlのリファクタリング
+- ✅ WhisperControlファイルを4つの専門クラスに分割
+  - `WhisperProcessor.cs`: Whisper処理とモデル管理（WhisperAudioProcessorクラス）
+  - `AudioRecorder.cs`: 録音機能とイベント管理
+  - `WhisperConfiguration.cs`: 設定とプロパティ変更通知
+  - `WhisperControl.xaml.cs`: UI制御とイベントハンドリング
+- ✅ 変数命名規約の統一（アンダースコア除去）
+- ✅ null許容参照型の適切な処理
+- ✅ 不要なusingディレクティブの整理
+- ✅ Disposeパターンの適切な実装
+- ✅ 責任の分離による保守性向上
+- ✅ 型名競合の解決（WhisperAudioProcessorに変更）
+- ✅ 全警告の解消
