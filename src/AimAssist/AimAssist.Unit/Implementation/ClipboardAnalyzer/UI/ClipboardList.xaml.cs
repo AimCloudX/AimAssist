@@ -2,12 +2,15 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using AimAssist.Core.Attributes;
 using AimAssist.Core.Interfaces;
 using AimAssist.Services.ClipboardAnalyzer;
 using AimAssist.Services.ClipboardAnalyzer.DomainModels;
+using AimAssist.Units.Implementation.ClipboardAnalyzer;
 
 namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 {
+    [AutoDataTemplate(typeof(ClipboardUnit), useDependencyInjection: true)]
     public partial class ClipboardList
     {
         public ObservableCollection<IClipboardData> Items { get; set; } = [];

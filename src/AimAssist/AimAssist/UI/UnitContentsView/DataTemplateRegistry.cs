@@ -11,7 +11,7 @@ namespace AimAssist.UI.UnitContentsView
 {
     public static class DataTemplateRegistry
     {
-        private static readonly Dictionary<Type, Type> registeredTemplates = new();
+        private static readonly Dictionary<Type, TemplateInfo> registeredTemplates = new();
         private static bool isInitialized = false;
 
         public static void Initialize()
@@ -55,19 +55,30 @@ namespace AimAssist.UI.UnitContentsView
                 var attribute = viewType.GetCustomAttribute<AutoDataTemplateAttribute>();
                 if (attribute != null)
                 {
-                    registeredTemplates[attribute.UnitType] = viewType;
-                    System.Diagnostics.Debug.WriteLine($"Registered DataTemplate: {attribute.UnitType.Name} -> {viewType.Name}");
+                    registeredTemplates[attribute.UnitType] = new TemplateInfo(viewType, attribute.UseDependencyInjection);
+                    System.Diagnostics.Debug.WriteLine($"Registered DataTemplate: {attribute.UnitType.Name} -> {viewType.Name} (UseDI: {attribute.UseDependencyInjection})");
                 }
             }
         }
 
-        public static UIElement CreateView(Type unitType)
+        public static UIElement CreateView(Type unitType, IServiceProvider serviceProvider = null)
         {
-            if (registeredTemplates.TryGetValue(unitType, out var viewType))
+            if (registeredTemplates.TryGetValue(unitType, out var templateInfo))
             {
                 try
                 {
-                    return Activator.CreateInstance(viewType) as UIElement;
+                    UIElement view;
+                    
+                    if (templateInfo.UseDependencyInjection && serviceProvider != null)
+                    {
+                        view = CreateInstanceWithDI(templateInfo.ViewType, serviceProvider);
+                    }
+                    else
+                    {
+                        view = Activator.CreateInstance(templateInfo.ViewType) as UIElement;
+                    }
+
+                    return view;
                 }
                 catch (Exception ex)
                 {
@@ -78,6 +89,51 @@ namespace AimAssist.UI.UnitContentsView
             return null;
         }
 
+        private static UIElement CreateInstanceWithDI(Type viewType, IServiceProvider serviceProvider)
+        {
+            var constructors = viewType.GetConstructors()
+                .OrderByDescending(c => c.GetParameters().Length);
+
+            foreach (var constructor in constructors)
+            {
+                try
+                {
+                    var parameters = constructor.GetParameters();
+                    var args = new object[parameters.Length];
+
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        var parameterType = parameters[i].ParameterType;
+                        object service;
+
+                        if (parameterType == typeof(IServiceProvider))
+                        {
+                            service = serviceProvider;
+                        }
+                        else
+                        {
+                            service = serviceProvider.GetService(parameterType);
+                        }
+
+                        if (service == null && !parameters[i].HasDefaultValue)
+                        {
+                            break;
+                        }
+
+                        args[i] = service ?? parameters[i].DefaultValue;
+                    }
+
+                    return Activator.CreateInstance(viewType, args) as UIElement;
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+
+            return Activator.CreateInstance(viewType) as UIElement;
+        }
+
         public static bool HasTemplate(Type unitType)
         {
             return registeredTemplates.ContainsKey(unitType);
@@ -85,7 +141,19 @@ namespace AimAssist.UI.UnitContentsView
 
         public static IReadOnlyDictionary<Type, Type> GetRegisteredTemplates()
         {
-            return registeredTemplates.AsReadOnly();
+            return registeredTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ViewType).AsReadOnly();
+        }
+
+        private class TemplateInfo
+        {
+            public Type ViewType { get; }
+            public bool UseDependencyInjection { get; }
+
+            public TemplateInfo(Type viewType, bool useDependencyInjection)
+            {
+                ViewType = viewType;
+                UseDependencyInjection = useDependencyInjection;
+            }
         }
     }
 }

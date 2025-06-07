@@ -66,7 +66,7 @@ namespace AimAssist.UI.UnitContentsView
             }
 
             // 2. 自動登録されたDataTemplateをチェック
-            var autoTemplate = DataTemplateRegistry.CreateView(unit.Content.GetType());
+            var autoTemplate = DataTemplateRegistry.CreateView(unit.Content.GetType(), serviceProvider);
             if (autoTemplate != null)
             {
                 if (autoTemplate is FrameworkElement element)
@@ -79,8 +79,6 @@ namespace AimAssist.UI.UnitContentsView
             // 3. 従来のswitch文による手動対応
             switch (unit.Content)
             {
-                case ClipboardUnit:
-                    return new ClipboardList(editorOptionService);
                 case ShortcutOptionUnit:
                     return new CustomizeKeyboardShortcutsSettings(commandService);
                 case SnippetModelUnit model:
