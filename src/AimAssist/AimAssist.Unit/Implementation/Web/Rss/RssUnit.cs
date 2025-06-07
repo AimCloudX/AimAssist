@@ -1,9 +1,11 @@
-﻿using AimAssist.Core.Units;
+﻿using AimAssist.Core.Attributes;
+using AimAssist.Core.Units;
 using AimAssist.Units.Core;
 using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Web.Rss
 {
+    [AutoRegisterUnit("Web", Priority = 70)]
     public class RssSettingUnit : IUnit
     {
         public IMode Mode => RssMode.Instance;

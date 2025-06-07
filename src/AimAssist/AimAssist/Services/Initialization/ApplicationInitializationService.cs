@@ -68,26 +68,28 @@ namespace AimAssist.Services.Initialization
 
         private void InitializeFactoriesAndUnits()
         {
-            // Phase 3: 新しいFactoryManagerシステムのテスト
+            // Phase 3: 属性ベース自動登録システムのテスト
             factoryInitializationService.InitializeFactories();
             
-            // テスト用：新システムのみで動作確認
-            // 問題がなければ、従来のUnitsFactoryを完全に削除予定
-            
-            // var legacyFactory = new UnitsFactory(
-            //     editorOptionService,
-            //     workItemOptionService,
-            //     snippetOptionService);
-            // unitsService.RegisterUnits(legacyFactory);
+            // テスト用：属性ベース自動登録のみで動作確認
+            System.Diagnostics.Debug.WriteLine("=== 属性ベース自動登録システム テスト開始 ===");
             
             // デバッグ用：Unit数の確認
             var allUnits = unitsService.GetAllUnits().ToList();
-            System.Diagnostics.Debug.WriteLine($"新システム合計Unit数: {allUnits.Count}");
+            System.Diagnostics.Debug.WriteLine($"属性ベース自動登録Unit数: {allUnits.Count}");
+            
+            foreach (var unit in allUnits.Take(10)) // 最初の10個を表示
+            {
+                System.Diagnostics.Debug.WriteLine($"  - {unit.GetType().Name}: {unit.Name} (Category: {unit.Category})");
+            }
+            
             foreach (var mode in unitsService.GetAllModes())
             {
                 var modeUnits = unitsService.CreateUnits(mode).ToList();
                 System.Diagnostics.Debug.WriteLine($"Mode '{mode.GetType().Name}': {modeUnits.Count} units");
             }
+            
+            System.Diagnostics.Debug.WriteLine("=== 属性ベース自動登録システム テスト完了 ===");
         }
 
         private void RegisterHotKeys()

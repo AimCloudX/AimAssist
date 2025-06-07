@@ -20,6 +20,7 @@ namespace AimAssist.DI.Modules
             services.AddSingleton<IOptionUnitsFactory, OptionUnitsFactory>();
             services.AddSingleton<ICoreUnitsFactory, CoreUnitsFactory>();
             services.AddSingleton<AutoDiscoveryUnitsFactory>();
+            services.AddSingleton<ReflectionBasedUnitsFactory>();
             
             return services;
         }

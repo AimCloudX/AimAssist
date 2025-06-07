@@ -9,6 +9,7 @@ namespace AimAssist.Services.Initialization
     {
         void InitializeFactories();
         void RegisterAutoDiscoveryFactory();
+        void RegisterReflectionBasedFactory();
     }
 
     public class FactoryInitializationService : IFactoryInitializationService
@@ -17,6 +18,7 @@ namespace AimAssist.Services.Initialization
         private readonly IUnitsService unitsService;
         private readonly ICompositeUnitsFactory compositeFactory;
         private readonly AutoDiscoveryUnitsFactory autoDiscoveryFactory;
+        private readonly ReflectionBasedUnitsFactory reflectionBasedFactory;
         private readonly IApplicationLogService logService;
 
         public FactoryInitializationService(
@@ -24,12 +26,14 @@ namespace AimAssist.Services.Initialization
             IUnitsService unitsService,
             ICompositeUnitsFactory compositeFactory,
             AutoDiscoveryUnitsFactory autoDiscoveryFactory,
+            ReflectionBasedUnitsFactory reflectionBasedFactory,
             IApplicationLogService logService)
         {
             this.factoryManager = factoryManager;
             this.unitsService = unitsService;
             this.compositeFactory = compositeFactory;
             this.autoDiscoveryFactory = autoDiscoveryFactory;
+            this.reflectionBasedFactory = reflectionBasedFactory;
             this.logService = logService;
         }
 
@@ -39,7 +43,11 @@ namespace AimAssist.Services.Initialization
             {
                 logService.Info("Factoryシステムの初期化を開始します");
 
-                // AutoDiscoveryUnitsFactoryをFactoryManagerに登録
+                // ReflectionBasedUnitsFactory（属性ベース自動登録）を最優先で登録
+                factoryManager.RegisterFactory(reflectionBasedFactory);
+                logService.Info("ReflectionBasedUnitsFactoryを登録しました");
+
+                // AutoDiscoveryUnitsFactory（従来の個別Factory統合）をバックアップとして登録
                 factoryManager.RegisterFactory(autoDiscoveryFactory);
                 logService.Info("AutoDiscoveryUnitsFactoryを登録しました");
 
@@ -52,6 +60,21 @@ namespace AimAssist.Services.Initialization
             catch (Exception ex)
             {
                 logService.LogException(ex, "Factoryシステム初期化中にエラーが発生しました");
+                throw;
+            }
+        }
+
+        public void RegisterReflectionBasedFactory()
+        {
+            try
+            {
+                logService.Info("ReflectionBasedUnitsFactoryの登録を開始します");
+                factoryManager.RegisterFactory(reflectionBasedFactory);
+                logService.Info("ReflectionBasedUnitsFactoryの登録が完了しました");
+            }
+            catch (Exception ex)
+            {
+                logService.LogException(ex, "ReflectionBasedUnitsFactory登録中にエラーが発生しました");
                 throw;
             }
         }

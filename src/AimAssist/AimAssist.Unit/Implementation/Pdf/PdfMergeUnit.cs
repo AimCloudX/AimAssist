@@ -1,14 +1,11 @@
-﻿using AimAssist.Core.Units;
+﻿using AimAssist.Core.Attributes;
+using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.WorkTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AimAssist.Units.Implementation.Pdf
 {
+    [AutoRegisterUnit("Document", Priority = 80)]
     public class PdfMergeUnit : IUnit
     {
         public IMode Mode => WorkToolsMode.Instance;
