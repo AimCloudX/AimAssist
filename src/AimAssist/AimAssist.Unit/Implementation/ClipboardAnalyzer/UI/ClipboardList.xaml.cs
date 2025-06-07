@@ -11,9 +11,9 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
     public partial class ClipboardList : UserControl
     {
         public ObservableCollection<IClipboardData> Items { get; set; } = new ObservableCollection<IClipboardData>();
-        private readonly IEditorOptionService editorOptionService;
+        private readonly IEditorOptionService? editorOptionService;
 
-        public ClipboardList(IEditorOptionService editorOptionService)
+        public ClipboardList(IEditorOptionService? editorOptionService)
         {
             this.editorOptionService = editorOptionService;
             InitializeComponent();
@@ -54,7 +54,7 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
             var selectedFormat = this.ComboBox.SelectedItem as string;
             if(selectedFormat == null)
             {
-                selectedFormat = "Text"; ;
+                selectedFormat = "Text";
             }
 
             Clipboard.SetData(selectedFormat, await this.editor.GetText());
@@ -78,7 +78,7 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
             var foramtData = Items.FirstOrDefault(x => x.Format == selectedFormat);
             if (foramtData?.Data != null)
             {
-                this.editor.SetTextAsync(foramtData.Data.ToString());
+                this.editor.SetTextAsync(foramtData.Data.ToString() ?? string.Empty);
             }
         }
 
@@ -90,9 +90,7 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
                 return;
             }
 
-            var separators = new string[] { @"
-", @"
-" };
+            var separators = new string[] { "\r\n", "\n" };
             var lines = text.Split(separators, StringSplitOptions.None);
 
             var sb = new StringBuilder();

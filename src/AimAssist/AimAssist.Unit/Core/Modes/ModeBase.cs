@@ -20,7 +20,6 @@ namespace AimAssist.Units.Core.Modes
 
         public virtual string Description => string.Empty;
 
-
         public abstract Control Icon { get; }
 
         public virtual bool IsIncludeAllInclusive => true;
@@ -62,13 +61,11 @@ namespace AimAssist.Units.Core.Modes
                 Margin = new Thickness(10,0,0,0),
             };
 
-            //// ToolTipの表示を制御するカスタムロジック
             ToolTipService.SetShowDuration(packIcon, 3000);
             ToolTipService.SetInitialShowDelay(packIcon, 0);
             packIcon.ToolTip = toolTip;
 
             return packIcon;
-
         }
     }
 
@@ -87,7 +84,7 @@ namespace AimAssist.Units.Core.Modes
             }
         }
 
-        private void OnTargetLayoutUpdated(object sender, EventArgs e)
+        private void OnTargetLayoutUpdated(object? sender, EventArgs e)
         {
             if (IsOpen && PlacementTarget is FrameworkElement target)
             {
@@ -104,25 +101,21 @@ namespace AimAssist.Units.Core.Modes
                 var transformToPopup = target.TransformToVisual(popupRoot);
                 var targetPositionInPopup = transformToPopup.Transform(new Point(target.ActualWidth, 0));
 
-                // ツールチップを右側に配置
-                HorizontalOffset = 5; // 右側の余白
-                VerticalOffset = -this.ActualHeight / 2 + target.ActualHeight / 2; // 垂直中央に配置
+                HorizontalOffset = 5;
+                VerticalOffset = -this.ActualHeight / 2 + target.ActualHeight / 2;
 
-                // 画面端でのはみ出しを防ぐ
                 var screen = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(Window.GetWindow(this)).Handle);
                 if (targetPoint.X + this.ActualWidth > screen.WorkingArea.Right)
                 {
-                    // 右側がはみ出る場合は左側に配置
                     HorizontalOffset = -this.ActualWidth - 5;
                 }
             }
         }
-
     }
 
     public static class VisualTreeHelperExtensions
     {
-        public static T GetVisualAncestor<T>(this DependencyObject element) where T : DependencyObject
+        public static T? GetVisualAncestor<T>(this DependencyObject element) where T : DependencyObject
         {
             while (element != null && !(element is T))
             {
@@ -131,8 +124,7 @@ namespace AimAssist.Units.Core.Modes
             return element as T;
         }
 
-        // 他の便利な拡張メソッドもここに追加できます
-        public static T GetVisualDescendant<T>(this DependencyObject element) where T : DependencyObject
+        public static T? GetVisualDescendant<T>(this DependencyObject element) where T : DependencyObject
         {
             if (element == null)
                 return null;
@@ -140,7 +132,7 @@ namespace AimAssist.Units.Core.Modes
             if (element is T)
                 return (T)element;
 
-            T foundElement = null;
+            T? foundElement = null;
             int childrenCount = VisualTreeHelper.GetChildrenCount(element);
 
             for (int i = 0; i < childrenCount; i++)

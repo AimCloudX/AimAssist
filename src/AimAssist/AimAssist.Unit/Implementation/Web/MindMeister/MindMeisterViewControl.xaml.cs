@@ -12,23 +12,20 @@ using Microsoft.Web.WebView2.Core;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
-    /// <summary>
-    /// MindMeisterViewControl.xaml の相互作用ロジック
-    /// </summary>
-    public partial class MindMeisterViewControl : System.Windows.Controls.UserControl, IFocasable
+    public partial class MindMeisterViewControl : IFocasable
     {
-        private string ApiKey;
-        private string apiKeyFilePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mindmeisterap.dat");
+        private string? apiKey;
+        private readonly string apiKeyFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mindmeisterap.dat");
+        
+        private readonly string url;
+        private string? title;
+        private ApiService? apiService;
+
         public MindMeisterViewControl(MindMeisterUnit unit)
         {
             InitializeComponent();
             this.url = unit.Path;
         }
-
-        private string url;
-        private string readedURl;
-        private string title;
-        private ApiService apiService;
 
         public new async void Focus()
         {
@@ -48,7 +45,6 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             }
         }
 
-
         private async void InitializeWebView()
         {
             if (this.webView.CoreWebView2 != null)
@@ -59,30 +55,40 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             try
             {
                 await webView.EnsureCoreWebView2Async(null);
-                webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-                webView.CoreWebView2.Settings.IsBuiltInErrorPageEnabled = false;
-                webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
+                if (webView.CoreWebView2 != null)
+                {
+                    webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                    webView.CoreWebView2.Settings.IsBuiltInErrorPageEnabled = false;
+                    webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
 
-                webView.CoreWebView2.Navigate(url);
+                    webView.CoreWebView2.Navigate(url);
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // ignored
             }
         }
 
-        public string Url { get => this.url; set
+        public string Url 
+        { 
+            get => this.url; 
+            set
             {
-                this.url = value;
-                webView.CoreWebView2.Navigate(url);
-            } }
+                if (webView.CoreWebView2 != null)
+                {
+                    webView.CoreWebView2.Navigate(value);
+                }
+            } 
+        }
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             InitializeWebView();
             LoadApiKey();
-            if (ApiKey != null)
+            if (apiKey != null)
             {
-                apiService = new ApiService(ApiKey);
+                apiService = new ApiService(apiKey);
                 var maps = await apiService.LoadMap();
                 SendUnits(maps);
             }
@@ -97,24 +103,20 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
 
             var ids = await ExtractMapIdsFromWebViewAsync(this.webView.CoreWebView2);
 
-            // Use Parallel.ForEachAsync to process map requests concurrently
             var unitLists = await Task.WhenAll(ids.Select(async id =>
             {
-                return  await apiService.GetMap(id);
+                return await apiService.GetMap(id);
             }));
 
             var maps = unitLists.Where(x => x != null).ToArray();
-            SendUnits(maps);
+            SendUnits(maps!);
 
-            apiService.AddMaps(maps);
-
-            // test
+            apiService.AddMaps(maps!);
 
             using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
                 string apiUrl = "https://www.mindmeister.com/api/v2/mm.folders.getList";
-                //string apiUrl = "https://www.mindmeister.com/api/v2/maps/3236607029";
 
                 try
                 {
@@ -142,102 +144,99 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
 
         private void SendUnits(IEnumerable<MindMeisterMap> maps)
         {
-            if (!maps.Any())
+            var mindMeisterMaps = maps as MindMeisterMap[] ?? maps.ToArray();
+            if (mindMeisterMaps.Length == 0)
             {
                 return;
             }
 
-            var args = new UnitsArgs(MindMeisterMode.Instance, maps.Select(y => new UrlUnit(MindMeisterMode.Instance, y.Title, y.Url)).ToList(), true);
+            var args = new UnitsArgs(MindMeisterMode.Instance, mindMeisterMaps.Select(y => new UrlUnit(MindMeisterMode.Instance, y.Title, y.Url)).ToList(), true);
             AimAssistCommands.SendUnitCommand.Execute(args, this);
         }
 
         static async Task<List<string>> ExtractMapIdsFromWebViewAsync(CoreWebView2 webView)
         {
- try
-    {
-        string script = @"(function() {
-            let ids = [];
-            document.querySelectorAll('[data-item-id]').forEach(el => {
-                let data = el.getAttribute('data-item-id');
-                try {
-                    let parsed = JSON.parse(data);
-                    if (parsed && parsed.id) {
-                        ids.push(parsed.id.toString());
-                    }
-                } catch (e) {
-                    console.error('Error parsing data-item-id:', e);
-                }
-            });
-            return JSON.stringify(ids);
-        })();";
+            try
+            {
+                string script = @"(function() {
+                    let ids = [];
+                    document.querySelectorAll('[data-item-id]').forEach(el => {
+                        let data = el.getAttribute('data-item-id');
+                        try {
+                            let parsed = JSON.parse(data);
+                            if (parsed && parsed.id) {
+                                ids.push(parsed.id.toString());
+                            }
+                        } catch (e) {
+                            console.error('Error parsing data-item-id:', e);
+                        }
+                    });
+                    return JSON.stringify(ids);
+                })();";
 
-        string result = await webView.ExecuteScriptAsync(script);
-        result = result.Trim('"').Replace("\\n", "").Replace("\\\"", "\"");
-        return System.Text.Json.JsonSerializer.Deserialize<List<string>>(result);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error fetching map IDs: {ex.Message}");
-        return new List<string>();
-    }
+                string result = await webView.ExecuteScriptAsync(script);
+                result = result.Trim('"').Replace("\\n", "").Replace("\\\"", "\"");
+                return System.Text.Json.JsonSerializer.Deserialize<List<string>>(result) ?? new List<string>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching map IDs: {ex.Message}");
+                return new List<string>();
+            }
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(title))
             {
-
                 var bookmarklet1 = "javascript:(function(){alert('リンクコピーに失敗しました');})();";
-                webView.CoreWebView2.ExecuteScriptAsync(bookmarklet1);
+                if (webView.CoreWebView2 != null)
+                {
+                    await webView.CoreWebView2.ExecuteScriptAsync(bookmarklet1);
+                }
                 return;
             }
 
-            // HTMLリンクとMarkdownリンクを生成
             var htmlLink = $"<a href=\"{url}\">{title}</a>";
             var titleUrl = $"[{title}]({url})";
 
-            // クリップボードに書き込む
             var dataObject = new DataObject();
             dataObject.SetData(DataFormats.Html, htmlLink);
             dataObject.SetData(DataFormats.Text, titleUrl);
             Clipboard.SetDataObject(dataObject);
 
             string bookmarklet = "javascript:(function(){alert('リンクをコピーしました');})();";
-            webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+            if (webView.CoreWebView2 != null)
+            {
+                await webView.CoreWebView2.ExecuteScriptAsync(bookmarklet);
+            }
         }
 
-        private void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        private async void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            // ナビゲーションが成功したか確認
-            if (e.IsSuccess)
+            if (e.IsSuccess && webView.CoreWebView2 != null)
             {
-                // 現在のURLを取得
-                readedURl = webView.Source.ToString();
-
-                // 現在のページのタイトルを取得するためにJavaScriptを実行
-                webView.CoreWebView2.ExecuteScriptAsync("document.title").ContinueWith(task =>
+                try
                 {
-                    // JavaScriptの結果を取得
-                    title = task.Result;
-
-                    // JSON形式で返されるため、トリムしてダブルクォーテーションを削除
-                    title = title.Trim('"');
-
-                });
-            }
-            else
-            {
+                    var titleResult = await webView.CoreWebView2.ExecuteScriptAsync("document.title");
+                    title = titleResult?.Trim('"');
+                }
+                catch
+                {
+                    title = null;
+                }
             }
         }
 
         private void Button_Click2(object sender, RoutedEventArgs e)
         {
-            // デフォルトのブラウザでURLを開く
             Process.Start(new ProcessStartInfo
             {
                 FileName = url,
                 UseShellExecute = true
             });
         }
+
         private void LoadApiKey()
         {
             if (File.Exists(apiKeyFilePath))
@@ -246,23 +245,24 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
                 {
                     byte[] encryptedApiKey = File.ReadAllBytes(apiKeyFilePath);
                     byte[] apiKeyBytes = ProtectedData.Unprotect(encryptedApiKey, null, DataProtectionScope.CurrentUser);
-                    string apiKey = Encoding.UTF8.GetString(apiKeyBytes);
-                    this.ApiKey = apiKey;
+                    string loadedApiKey = Encoding.UTF8.GetString(apiKeyBytes);
+                    this.apiKey = loadedApiKey;
                 }
                 catch (Exception ex)
                 {
-                    this.ApiKey = null;
+                    this.apiKey = null;
                     StatusTextBlock.Text = $"APIキーの読み込みに失敗しました: {ex.Message}";
                 }
             }
             else
             {
-                this.ApiKey = null;
+                this.apiKey = null;
             }
         }
-        private void SaveApiKey(string apiKey)
+
+        private void SaveApiKey(string newApiKey)
         {
-            byte[] apiKeyBytes = Encoding.UTF8.GetBytes(apiKey);
+            byte[] apiKeyBytes = Encoding.UTF8.GetBytes(newApiKey);
             byte[] encryptedApiKey = ProtectedData.Protect(apiKeyBytes, null, DataProtectionScope.CurrentUser);
             File.WriteAllBytes(apiKeyFilePath, encryptedApiKey);
         }
@@ -272,14 +272,14 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             var apiKeyWindow = new ApiKeyInputWindow();
             if (apiKeyWindow.ShowDialog() == true)
             {
-                var apiKey = apiKeyWindow.ApiKey;
-                if (!string.IsNullOrWhiteSpace(apiKey))
+                var inputApiKey = apiKeyWindow.ApiKey;
+                if (!string.IsNullOrWhiteSpace(inputApiKey))
                 {
-                    SaveApiKey(apiKey);
+                    SaveApiKey(inputApiKey);
                     LoadApiKey();
-                    if(ApiKey != null)
+                    if(apiKey != null)
                     {
-                        apiService = new ApiService(ApiKey);
+                        apiService = new ApiService(apiKey);
                         StatusTextBlock.Text = "APIキーを保存しました。";
                     }
                     else
@@ -296,7 +296,10 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
 
         private void Button_Click3(object sender, RoutedEventArgs e)
         {
-            webView.CoreWebView2.Navigate(this.url);
+            if (webView.CoreWebView2 != null)
+            {
+                webView.CoreWebView2.Navigate(this.url);
+            }
         }
     }
 }
