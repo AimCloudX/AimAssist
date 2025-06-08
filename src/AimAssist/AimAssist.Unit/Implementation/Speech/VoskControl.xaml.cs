@@ -13,9 +13,11 @@ namespace AimAssist.Units.Implementation.Speech
         {
             this.model = model;
             InitializeComponent();
-            Task.Run(() => {
-                InitializeVosk();
-                InitializeMicrophone();
+            Task.Run(async () => {
+                await InitializeVoskAsync();
+                await Dispatcher.InvokeAsync(() => {
+                    InitializeMicrophone();
+                });
             });
         }
 
@@ -28,7 +30,11 @@ namespace AimAssist.Units.Implementation.Speech
             if (recognizer != null && recognizer.AcceptWaveform(e.Buffer, e.BytesRecorded))
             {
                 var result = recognizer.Result();
-                Dispatcher.Invoke(() => TextBox.Text += ExtractTextFromJson(result) + "\n");
+                var text = ExtractTextFromJson(result);
+                if (!string.IsNullOrEmpty(text))
+                {
+                    Dispatcher.BeginInvoke(() => TextBox.Text += text + "\n");
+                }
             }
         }
 
@@ -38,10 +44,10 @@ namespace AimAssist.Units.Implementation.Speech
             return jObject["text"]?.ToString()?? string.Empty;
         }
 
-        private void InitializeVosk()
+        private async Task InitializeVoskAsync()
         {
             Vosk.Vosk.SetLogLevel(0);
-            const string modelPath = "Resources/vosk-model-small-ja-0.22"; // モデルのパスを指定
+            const string modelPath = "Resources/vosk-model-small-ja-0.22";
             model = new Model(modelPath);
             recognizer = new VoskRecognizer(model, 16000.0f);
         }

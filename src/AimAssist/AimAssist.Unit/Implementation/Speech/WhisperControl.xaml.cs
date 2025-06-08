@@ -7,7 +7,7 @@ namespace AimAssist.Units.Implementation.Speech
 {
     public partial class WhisperControl : IDisposable
     {
-        private readonly WhisperAudioProcessor whisperProcessor;
+        private readonly WhisperProcessor whisperProcessor;
         private readonly AudioRecorder audioRecorder;
         private readonly WhisperConfiguration configuration;
         private bool disposed;
@@ -16,7 +16,7 @@ namespace AimAssist.Units.Implementation.Speech
         {
             InitializeComponent();
             
-            whisperProcessor = new WhisperAudioProcessor();
+            whisperProcessor = new WhisperProcessor();
             audioRecorder = new AudioRecorder();
             configuration = new WhisperConfiguration { CanRun = true };
             

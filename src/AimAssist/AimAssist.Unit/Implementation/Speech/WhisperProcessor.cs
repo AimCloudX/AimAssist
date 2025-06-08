@@ -4,9 +4,9 @@ using Whisper.net.Ggml;
 
 namespace AimAssist.Units.Implementation.Speech
 {
-    public class WhisperAudioProcessor : IDisposable
+    public class WhisperProcessor : IDisposable
     {
-        private WhisperProcessor? processor;
+        private Whisper.net.WhisperProcessor? processor;
         private bool disposed;
 
         public Task<bool> InitializeAsync(string modelPath, string language)

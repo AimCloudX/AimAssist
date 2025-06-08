@@ -55,29 +55,29 @@ namespace AimAssist.Units.Implementation.Computer
 
         private void TimerTick(object? sender, EventArgs e)
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                UpdatePerformanceInfo();
-                UpdateNetworkStatus();
+                await UpdatePerformanceInfoAsync();
+                await UpdateNetworkStatusAsync();
             });
         }
 
         private void LoadData()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                LoadBasicInfo();
-                LoadHardwareInfo();
-                LoadNetworkInfo();
-                LoadPerformanceInfo();
-                LoadSecurityInfo();
-                LoadDetailedHardwareInfo();
-                LoadResourceUsageInfo();
-                LoadDriverInfo();
+                await LoadBasicInfoAsync();
+                await LoadHardwareInfoAsync();
+                await LoadNetworkInfoAsync();
+                await LoadPerformanceInfoAsync();
+                await LoadSecurityInfoAsync();
+                await LoadDetailedHardwareInfoAsync();
+                await LoadResourceUsageInfoAsync();
+                await LoadDriverInfoAsync();
             });
         }
 
-        private void LoadBasicInfo()
+        private async Task LoadBasicInfoAsync()
         {
             try
             {
@@ -85,7 +85,7 @@ namespace AimAssist.Units.Implementation.Computer
                 string architecture = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
                 TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount);
 
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtComputerName.Text = Environment.MachineName;
                     txtOSVersion.Text = osVersion;
                     txtArchitecture.Text = architecture;
@@ -97,11 +97,13 @@ namespace AimAssist.Units.Implementation.Computer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"基本情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"基本情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private void LoadHardwareInfo()
+        private async Task LoadHardwareInfoAsync()
         {
             try
             {
@@ -111,7 +113,7 @@ namespace AimAssist.Units.Implementation.Computer
                 string gpuInfo = hardwareInfoService.GetGpuInfo();
                 string motherboardInfo = hardwareInfoService.GetMotherboardInfo();
 
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtCPUInfo.Text = cpuInfo;
                     txtMemoryInfo.Text = memoryInfo;
                     txtDiskInfo.Text = diskInfo;
@@ -121,45 +123,51 @@ namespace AimAssist.Units.Implementation.Computer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ハードウェア情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"ハードウェア情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private void LoadNetworkInfo()
+        private async Task LoadNetworkInfoAsync()
         {
             try
             {
                 Dictionary<string, string> ipAddresses = networkInfoService.GetIpAddresses();
                 string macAddress = networkInfoService.GetMacAddress();
 
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtIPv4Address.Text = ipAddresses.ContainsKey("IPv4") ? ipAddresses["IPv4"] : "取得できませんでした";
                     txtIPv6Address.Text = ipAddresses.ContainsKey("IPv6") ? ipAddresses["IPv6"] : "取得できませんでした";
                     txtMACAddress.Text = macAddress;
                 });
                 
-                UpdateNetworkStatus();
-                _ = LoadIpInfoAsync();
+                await UpdateNetworkStatusAsync();
+                await LoadIpInfoAsync();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ネットワーク情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"ネットワーク情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private void LoadPerformanceInfo()
+        private async Task LoadPerformanceInfoAsync()
         {
             try
             {
-                UpdatePerformanceInfo();
+                await UpdatePerformanceInfoAsync();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"パフォーマンス情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"パフォーマンス情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private void UpdatePerformanceInfo()
+        private async Task UpdatePerformanceInfoAsync()
         {
             try
             {
@@ -168,7 +176,7 @@ namespace AimAssist.Units.Implementation.Computer
                 string diskUsage = performanceInfoService.GetDiskUsage();
                 string serviceStatus = performanceInfoService.GetServiceStatus();
 
-                Dispatcher.Invoke(() =>
+                await Dispatcher.InvokeAsync(() =>
                 {
                     txtCPUUsage.Text = $"{cpuUsage:F1}%";
                     txtMemoryUsage.Text = $"{ramUsage:F1}%";
@@ -185,24 +193,34 @@ namespace AimAssist.Units.Implementation.Computer
             }
         }
 
-        private void UpdateNetworkStatus()
+        private void UpdatePerformanceInfo()
+        {
+            Task.Run(async () => await UpdatePerformanceInfoAsync());
+        }
+
+        private async Task UpdateNetworkStatusAsync()
         {
             try
             {
                 string networkStatus = networkInfoService.GetNetworkStatus();
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtNetworkStatus.Text = networkStatus;
                 });
             }
             catch (Exception ex)
             {
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtNetworkStatus.Text = $"接続情報を取得できませんでした: {ex.Message}";
                 });
             }
         }
 
-        private void LoadSecurityInfo()
+        private void UpdateNetworkStatus()
+        {
+            Task.Run(async () => await UpdateNetworkStatusAsync());
+        }
+
+        private async Task LoadSecurityInfoAsync()
         {
             try
             {
@@ -210,7 +228,7 @@ namespace AimAssist.Units.Implementation.Computer
                 string firewallStatus = securityInfoService.GetFirewallStatus();
                 string securityUpdates = securityInfoService.GetSecurityUpdateStatus();
 
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtDefenderStatus.Text = defenderStatus;
                     txtFirewallStatus.Text = firewallStatus;
                     txtSecurityUpdates.Text = securityUpdates;
@@ -218,11 +236,13 @@ namespace AimAssist.Units.Implementation.Computer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"セキュリティ情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"セキュリティ情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private void LoadDetailedHardwareInfo()
+        private async Task LoadDetailedHardwareInfoAsync()
         {
             try
             {
@@ -231,7 +251,7 @@ namespace AimAssist.Units.Implementation.Computer
                 string storageDetails = detailedHardwareInfoService.GetStorageDetails();
                 string batteryStatus = detailedHardwareInfoService.GetBatteryStatus();
 
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtCPUTemperature.Text = cpuTemperature;
                     txtGPUTemperature.Text = gpuTemperature;
                     txtStorageDetails.Text = storageDetails;
@@ -240,43 +260,49 @@ namespace AimAssist.Units.Implementation.Computer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"詳細なハードウェア情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"詳細なハードウェア情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private void LoadResourceUsageInfo()
+        private async Task LoadResourceUsageInfoAsync()
         {
             try
             {
                 string processInfo = resourceUsageService.GetProcessInfo();
                 string heapMemory = resourceUsageService.GetHeapMemoryInfo();
 
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtThreadsProcesses.Text = processInfo;
                     txtHeapMemory.Text = heapMemory;
                 });
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"リソース利用状況の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"リソース利用状況の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private void LoadDriverInfo()
+        private async Task LoadDriverInfoAsync()
         {
             try
             {
                 string driverVersions = driverInfoService.GetDriverVersions();
                 string problemDevices = driverInfoService.GetProblemDevices();
 
-                Dispatcher.Invoke(() => {
+                await Dispatcher.InvokeAsync(() => {
                     txtDriverVersions.Text = driverVersions;
                     txtProblemDevices.Text = problemDevices;
                 });
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ドライバー情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"ドライバー情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
@@ -296,7 +322,7 @@ namespace AimAssist.Units.Implementation.Computer
             {
                 var ipInfo = await ipInfoService.GetIpInfoAsync();
 
-                this.Dispatcher.Invoke(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     IPAddressTextBlock.Text = ipInfo.Ip;
                     CountryTextBlock.Text = ipInfo.Country;
@@ -311,7 +337,9 @@ namespace AimAssist.Units.Implementation.Computer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"情報の取得中にエラーが発生しました:\n{ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() => {
+                    MessageBox.Show($"情報の取得中にエラーが発生しました:\n{ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
     }
