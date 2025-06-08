@@ -52,6 +52,14 @@ WPFベースのコマンドランチャー・生産性向上ツール
 ## TODO
 - なし
 
+## 最新の変更
+### MainWindowCommands.NextUnit/PreviousUnit コマンド修正
+- ViewのSelectedIndexを直接操作するように変更
+- 範囲チェックを追加して配列外アクセスを防止
+- NextUnit: 最後の要素で最初に戻る（循環）
+- PreviousUnit: 最初の要素で最後に戻る（循環）
+- Items.Countが0の場合の安全チェックも追加
+
 ## アーキテクチャ
 - WPFアプリケーション（.NET 8）
 - マルチプロジェクト構成

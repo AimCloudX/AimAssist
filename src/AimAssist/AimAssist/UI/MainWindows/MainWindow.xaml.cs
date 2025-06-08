@@ -6,13 +6,12 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Common.UI.Commands.Shortcus;
-using Microsoft.Extensions.DependencyInjection;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using RelayCommand = Common.UI.Commands.RelayCommand;
 
 namespace AimAssist.UI.MainWindows
 {
-    public partial class MainWindow : Window, IMainWindow
+    public partial class MainWindow : IMainWindow
     {
         private readonly MainWindowViewModel viewModel;
         private readonly IApplicationLogService logService;
@@ -147,7 +146,7 @@ namespace AimAssist.UI.MainWindows
                 }
 
                 // メインウィンドウ用コマンドの登録
-                MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), (Window window) =>
+                MainWindowCommands.NextMode = new RelayCommand(nameof(MainWindowCommands.NextMode), window =>
                 {
                     if (window is MainWindow mainWindow)
                     {
@@ -181,36 +180,41 @@ namespace AimAssist.UI.MainWindows
                     }
                 });
 
-                MainWindowCommands.NextUnit = new RelayCommand(nameof(MainWindowCommands.NextUnit), (Window window) =>
-                {
-                    if (window is MainWindow mainWindow)
+                MainWindowCommands.NextUnit = new RelayCommand(nameof(MainWindowCommands.NextUnit),
+                    (Window window) =>
                     {
-                        var units = mainWindow.viewModel.Units;
-                        var currentIndex = units.IndexOf(mainWindow.viewModel.SelectedUnit);
-                        if (currentIndex == units.Count - 1)
+                        if (window is MainWindow mainWindow)
                         {
-                            mainWindow.viewModel.SelectedUnit = units[0];
+                            var listBox = mainWindow.UnitListBox;
+                            if (listBox != null && listBox.Items.Count > 0)
+                            {
+                                if (listBox.SelectedIndex < listBox.Items.Count - 1)
+                                {
+                                    listBox.SelectedIndex += 1;
+                                }
+                                else
+                                {
+                                    listBox.SelectedIndex = 0;
+                                }
+                            }
                         }
-                        else
-                        {
-                            mainWindow.viewModel.SelectedUnit = units[currentIndex + 1];
-                        }
-                    }
-                });
+                    });
 
                 MainWindowCommands.PreviousUnit = new RelayCommand(nameof(MainWindowCommands.PreviousUnit), (Window window) =>
                 {
                     if (window is MainWindow mainWindow)
                     {
-                        var units = mainWindow.viewModel.Units;
-                        var currentIndex = units.IndexOf(mainWindow.viewModel.SelectedUnit);
-                        if (currentIndex == 0)
+                        var listBox = mainWindow.UnitListBox;
+                        if (listBox != null && listBox.Items.Count > 0)
                         {
-                            mainWindow.viewModel.SelectedUnit = units[units.Count - 1];
-                        }
-                        else
-                        {
-                            mainWindow.viewModel.SelectedUnit = units[currentIndex - 1];
+                            if (listBox.SelectedIndex > 0)
+                            {
+                                listBox.SelectedIndex -= 1;
+                            }
+                            else
+                            {
+                                listBox.SelectedIndex = listBox.Items.Count - 1;
+                            }
                         }
                     }
                 });
