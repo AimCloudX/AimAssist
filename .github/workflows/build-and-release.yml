@@ -17,6 +17,8 @@ env:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: read
     
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -94,6 +96,9 @@ jobs:
   release:
     needs: build
     runs-on: windows-latest
+    permissions:
+      contents: write
+      packages: write
     if: needs.build.outputs.should-release == 'true'
     
     steps:
