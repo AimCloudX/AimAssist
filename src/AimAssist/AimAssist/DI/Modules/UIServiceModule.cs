@@ -52,7 +52,7 @@ namespace AimAssist.DI.Modules
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<PickerWindowViewModel>();
 
-            services.AddTransient<UI.MainWindows.MainWindow>(provider => new UI.MainWindows.MainWindow(
+            services.AddSingleton<IMainWindow>(provider => new MainWindow(
                 provider.GetRequiredService<MainWindowViewModel>(),
                 provider.GetRequiredService<IApplicationLogService>(),
                 (KeySequenceManager)provider.GetRequiredService<IKeySequenceManager>(),

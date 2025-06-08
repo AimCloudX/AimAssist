@@ -12,7 +12,7 @@ using RelayCommand = Common.UI.Commands.RelayCommand;
 
 namespace AimAssist.UI.MainWindows
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IMainWindow
     {
         private readonly MainWindowViewModel viewModel;
         private readonly IApplicationLogService logService;

@@ -11,10 +11,12 @@ namespace AimAssist.Units.Implementation.Apps;
 public partial class AimAssistCommandsControl : UserControl
 {
     private readonly ICommandService commandService;
+    private readonly IMainWindow mainWindow;
 
-    public AimAssistCommandsControl(ICommandService commandService)
+    public AimAssistCommandsControl(ICommandService commandService, IMainWindow mainWindow)
     {
         this.commandService = commandService;
+        this.mainWindow = mainWindow;
         InitializeComponent();
         CreateCommandButtons();
     }
@@ -59,7 +61,7 @@ public partial class AimAssistCommandsControl : UserControl
     {
         if (sender is Button button && button.Tag is RelayCommand command)
         {
-            command.Execute(this);
+            command.Execute(this.mainWindow);
         }
     }
 }

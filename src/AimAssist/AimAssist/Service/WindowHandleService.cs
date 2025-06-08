@@ -10,7 +10,7 @@ namespace AimAssist.Service
 {
     public class WindowHandleService : IWindowHandleService
     {
-        public MainWindow Window { get; private set; }
+        public IMainWindow Window { get; private set; }
         private bool isActivate;
         private readonly IServiceProvider _serviceProvider;
 
@@ -53,7 +53,7 @@ namespace AimAssist.Service
 
             if (Window == null)
             {
-                Window = _serviceProvider.GetRequiredService<MainWindow>();
+                Window = _serviceProvider.GetRequiredService<IMainWindow>();
             }
 
             Window.Visibility = System.Windows.Visibility.Visible;
