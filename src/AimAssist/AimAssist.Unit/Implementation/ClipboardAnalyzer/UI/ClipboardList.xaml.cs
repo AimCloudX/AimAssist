@@ -10,7 +10,7 @@ using AimAssist.Units.Implementation.ClipboardAnalyzer;
 
 namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 {
-    [AutoDataTemplate(typeof(ClipboardUnit), useDependencyInjection: true)]
+    [AutoDataTemplate(typeof(ClipboardUnit))]
     public partial class ClipboardList
     {
         public ObservableCollection<IClipboardData> Items { get; set; } = [];

@@ -13,7 +13,7 @@ using Microsoft.Web.WebView2.Core;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
-    [AutoDataTemplate(typeof(MindMeisterUnit), true)]
+    [AutoDataTemplate(typeof(MindMeisterUnit))]
     public partial class MindMeisterViewControl : IFocasable
     {
         private string? apiKey;

@@ -54,8 +54,8 @@ namespace AimAssist.UI.UnitContentsView
                 {
                     foreach (var unitType in attribute.UnitTypes)
                     {
-                        registeredTemplates[unitType] = new TemplateInfo(viewType, attribute.UseDependencyInjection);
-                        System.Diagnostics.Debug.WriteLine($"Registered DataTemplate: {unitType.Name} -> {viewType.Name} (UseDI: {attribute.UseDependencyInjection})");
+                        registeredTemplates[unitType] = new TemplateInfo(viewType);
+                        System.Diagnostics.Debug.WriteLine($"Registered DataTemplate: {unitType.Name} -> {viewType.Name}");
                     }
                 }
             }
@@ -69,8 +69,10 @@ namespace AimAssist.UI.UnitContentsView
                 try
                 {
                     UIElement view;
+                    var useDependencyInjection =
+                        templateInfo.ViewType.GetConstructors().Any(c => c.GetParameters().Length != 0);
                     
-                    if (templateInfo.UseDependencyInjection && serviceProvider != null)
+                    if (useDependencyInjection && serviceProvider != null)
                     {
                         view = CreateInstanceWithDI(unit,templateInfo.ViewType, serviceProvider);
                     }
@@ -153,12 +155,10 @@ namespace AimAssist.UI.UnitContentsView
         private class TemplateInfo
         {
             public Type ViewType { get; }
-            public bool UseDependencyInjection { get; }
 
-            public TemplateInfo(Type viewType, bool useDependencyInjection)
+            public TemplateInfo(Type viewType)
             {
                 ViewType = viewType;
-                UseDependencyInjection = useDependencyInjection;
             }
         }
     }

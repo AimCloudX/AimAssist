@@ -5,7 +5,7 @@ using AimAssist.Core.Interfaces;
 
 namespace AimAssist.Units.Implementation.Apps;
 
-[AutoDataTemplate(typeof(AppUnit),true)]
+[AutoDataTemplate(typeof(AppUnit))]
 public partial class AimAssistControl : UserControl
 {
     private readonly IAppCommands appCommands;
