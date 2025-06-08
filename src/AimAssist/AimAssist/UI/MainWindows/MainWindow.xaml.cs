@@ -97,9 +97,10 @@ namespace AimAssist.UI.MainWindows
         {
             try
             {
-                var app = (App)App.Current;
-                var appCommands = app._serviceProvider.GetRequiredService<IAppCommands>();
-                appCommands.ShutdownAimAssist.Execute(this);
+                if (commandService.TryGetCommand(nameof(IAppCommands.ShutdownAimAssist), out var command))
+                {
+                    command.Execute(this);
+                }
             }
             catch (Exception ex)
             {
