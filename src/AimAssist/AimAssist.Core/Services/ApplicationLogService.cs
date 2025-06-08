@@ -24,7 +24,7 @@ namespace AimAssist.Core.Services
             // ログディレクトリの設定
             string baseDir = logDirectory ?? Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "AimAssist", "Logs");
+                Constants.AppName, "Logs");
 
             // ディレクトリが存在しない場合は作成
             if (!Directory.Exists(baseDir))

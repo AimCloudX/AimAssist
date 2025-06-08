@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using AimAssist.Core;
 using AimAssist.Core.Interfaces;
 using Common.UI.Editor;
 using Newtonsoft.Json;
@@ -19,7 +20,7 @@ namespace AimAssist.Services.Options
         /// </summary>
         public string OptionPath => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
-            "AimAssist", 
+            Constants.AppName, 
             "editor.option.json");
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
+using AimAssist.Core;
 using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.UI.CheatSheet;
@@ -188,7 +189,7 @@ namespace AimAssist.Service
             {
                 if (_cheatsheets.TryGetValue(processName, out string cheatsheetContent))
                 {
-                    if(processName == "AimAssist")
+                    if(processName == Constants.AppName)
                     {
                         var unit = GetMainWindowCurrentUnit();
                         if(unit is UrlUnit urlUnit)

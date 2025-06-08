@@ -1,4 +1,5 @@
-﻿using AimAssist.Core.Interfaces;
+﻿using AimAssist.Core;
+using AimAssist.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.UI.SystemTray
@@ -33,7 +34,7 @@ namespace AimAssist.UI.SystemTray
             {
                 Visible = true,
                 Icon = new Icon(icon),
-                Text = "AimAssist",
+                Text = Constants.AppName,
                 ContextMenuStrip = menu,
             };
             _notifyIcon.MouseClick += new MouseEventHandler(NotifyIcon_Click);

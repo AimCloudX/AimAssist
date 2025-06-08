@@ -1,5 +1,5 @@
-﻿using AimAssist.Core.Units;
-using AimAssist.Units.Core.Units;
+﻿using AimAssist.Core;
+using AimAssist.Core.Units;
 
 namespace AimAssist.Units.Implementation.Options
 {
@@ -17,7 +17,7 @@ namespace AimAssist.Units.Implementation.Options
 
         public string Description => "";
 
-        public string Category => "";
+        public string Category => Constants.AppName;
 
         public IEnumerable<string> OptionFilePaths { get; }
     }

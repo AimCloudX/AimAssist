@@ -1,4 +1,5 @@
-﻿using AimAssist.Core.Attributes;
+﻿using AimAssist.Core;
+using AimAssist.Core.Attributes;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
 
@@ -13,6 +14,6 @@ namespace AimAssist.Units.Implementation.Options
 
         public string Description => string.Empty;
 
-        public string Category => string.Empty;
+        public string Category => Constants.AppName;
     }
 }

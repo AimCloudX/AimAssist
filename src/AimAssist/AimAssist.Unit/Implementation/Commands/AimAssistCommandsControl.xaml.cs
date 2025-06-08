@@ -5,12 +5,12 @@ using AimAssist.Core.Interfaces;
 
 namespace AimAssist.Units.Implementation.Apps;
 
-[AutoDataTemplate(typeof(AppUnit))]
-public partial class AimAssistControl : UserControl
+[AutoDataTemplate(typeof(AimAssistCommandsUnit))]
+public partial class AimAssistCommandsControl : UserControl
 {
     private readonly IAppCommands appCommands;
 
-    public AimAssistControl(IAppCommands appCommands)
+    public AimAssistCommandsControl(IAppCommands appCommands)
     {
         this.appCommands = appCommands;
         InitializeComponent();
