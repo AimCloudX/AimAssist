@@ -6,19 +6,29 @@ namespace AimAssist.Units.Implementation.Computer.Services
 {
     public class PerformanceInfoService
     {
-        private readonly PerformanceCounter? cpuCounter;
-        private readonly PerformanceCounter? ramCounter;
+        private PerformanceCounter? cpuCounter;
+        private PerformanceCounter? ramCounter;
+        private bool isInitialized = false;
 
         public PerformanceInfoService()
         {
+        }
+
+        private void InitializeCounters()
+        {
+            if (isInitialized) return;
+            
             try
             {
                 cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 ramCounter = new PerformanceCounter("Memory", "% Committed Bytes In Use");
+                cpuCounter.NextValue();
+                ramCounter.NextValue();
+                isInitialized = true;
             }
             catch
             {
-                // パフォーマンスカウンターの初期化に失敗した場合
+                isInitialized = true;
             }
         }
 
@@ -26,11 +36,12 @@ namespace AimAssist.Units.Implementation.Computer.Services
         {
             try
             {
-                return cpuCounter?.NextValue() ?? 0;
+                InitializeCounters();
+                return cpuCounter?.NextValue() ?? GetCpuUsageAlternative();
             }
             catch
             {
-                return 0;
+                return GetCpuUsageAlternative();
             }
         }
 
@@ -38,7 +49,46 @@ namespace AimAssist.Units.Implementation.Computer.Services
         {
             try
             {
-                return ramCounter?.NextValue() ?? 0;
+                InitializeCounters();
+                return ramCounter?.NextValue() ?? GetMemoryUsageAlternative();
+            }
+            catch
+            {
+                return GetMemoryUsageAlternative();
+            }
+        }
+
+        private float GetCpuUsageAlternative()
+        {
+            try
+            {
+                var startTime = DateTime.UtcNow;
+                var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+                
+                Thread.Sleep(100);
+                
+                var endTime = DateTime.UtcNow;
+                var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+                
+                var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+                var totalMsPassed = (endTime - startTime).TotalMilliseconds;
+                var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+                
+                return (float)(cpuUsageTotal * 100);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private float GetMemoryUsageAlternative()
+        {
+            try
+            {
+                var totalMemory = GC.GetTotalMemory(false);
+                var workingSet = Environment.WorkingSet;
+                return (float)((double)workingSet / (1024 * 1024 * 1024) * 100);
             }
             catch
             {
@@ -48,51 +98,52 @@ namespace AimAssist.Units.Implementation.Computer.Services
 
         public string GetDiskUsage()
         {
-            string diskUsage = string.Empty;
-            
             try
             {
-                DriveInfo[] allDrives = DriveInfo.GetDrives();
+                var drives = DriveInfo.GetDrives()
+                    .Where(d => d.IsReady && d.DriveType == DriveType.Fixed)
+                    .Take(3);
                 
-                foreach (DriveInfo drive in allDrives)
+                var results = new List<string>();
+                foreach (var drive in drives)
                 {
-                    if (drive.IsReady)
-                    {
-                        double usedPercentage = 100.0 - ((double)drive.AvailableFreeSpace / drive.TotalSize) * 100.0;
-                        diskUsage += $"ドライブ {drive.Name}: {usedPercentage:F1}%\n";
-                    }
+                    var usedPercentage = 100.0 - ((double)drive.AvailableFreeSpace / drive.TotalSize) * 100.0;
+                    results.Add($"{drive.Name} {usedPercentage:F1}%");
                 }
+                
+                return results.Any() ? string.Join(", ", results) : "取得できませんでした";
             }
             catch
             {
-                diskUsage = "情報を取得できませんでした";
+                return "取得できませんでした";
             }
-            
-            return diskUsage;
         }
 
         public string GetServiceStatus()
         {
             try
             {
-                string serviceStatus = string.Empty;
+                var importantServices = new[] { "Dhcp", "DNSCache" };
+                var results = new List<string>();
                 
-                string[] importantServices = { "Dhcp", "DNSCache", "BITS", "wuauserv" };
-                
-                foreach (string serviceName in importantServices)
+                foreach (var serviceName in importantServices)
                 {
-                    using var sc = new ServiceController(serviceName);
-                    string status = sc.Status.ToString();
-                    string displayName = sc.DisplayName;
-                    
-                    serviceStatus += $"{displayName}: {status}\n";
+                    try
+                    {
+                        using var sc = new ServiceController(serviceName);
+                        results.Add($"{sc.DisplayName}: {sc.Status}");
+                    }
+                    catch
+                    {
+                        results.Add($"{serviceName}: 不明");
+                    }
                 }
                 
-                return serviceStatus;
+                return results.Any() ? string.Join(", ", results) : "取得できませんでした";
             }
-            catch (Exception ex)
+            catch
             {
-                return $"サービス情報を取得できませんでした: {ex.Message}";
+                return "取得できませんでした";
             }
         }
 

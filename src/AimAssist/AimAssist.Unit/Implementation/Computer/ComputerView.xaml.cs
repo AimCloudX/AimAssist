@@ -12,94 +12,102 @@ namespace AimAssist.Units.Implementation.Computer
     [AutoDataTemplate(typeof(ComputerUnit))]
     public partial class ComputerView : UserControl
     {
-        private readonly DispatcherTimer timer;
-        private readonly HardwareInfoService hardwareInfoService;
-        private readonly NetworkInfoService networkInfoService;
-        private readonly PerformanceInfoService performanceInfoService;
-        private readonly SecurityInfoService securityInfoService;
-        private readonly DetailedHardwareInfoService detailedHardwareInfoService;
-        private readonly DriverInfoService driverInfoService;
-        private readonly IpInfoService ipInfoService;
-        private readonly ResourceUsageService resourceUsageService;
+        private HardwareInfoService? hardwareInfoService;
+        private NetworkInfoService? networkInfoService;
+        private PerformanceInfoService? performanceInfoService;
+        private SecurityInfoService? securityInfoService;
+        private DetailedHardwareInfoService? detailedHardwareInfoService;
+        private DriverInfoService? driverInfoService;
+        private IpInfoService? ipInfoService;
+        private ResourceUsageService? resourceUsageService;
 
         public ComputerView()
         {
             InitializeComponent();
             this.DataContext = this;
-
-            hardwareInfoService = new HardwareInfoService();
-            networkInfoService = new NetworkInfoService();
-            performanceInfoService = new PerformanceInfoService();
-            securityInfoService = new SecurityInfoService();
-            detailedHardwareInfoService = new DetailedHardwareInfoService();
-            driverInfoService = new DriverInfoService();
-            ipInfoService = new IpInfoService();
-            resourceUsageService = new ResourceUsageService();
-
-            LoadData();
-            
-            timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(1)
-            };
-            timer.Tick += TimerTick;
-            timer.Start();
         }
 
-        private async void InitializeWebView(string loc)
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            await LocationWebView.EnsureCoreWebView2Async(null);
-            var url = $"https://www.google.com/maps?q={loc}";
-            LocationWebView.Source = new Uri(url);
+            if (sender is TabControl tabControl && tabControl.SelectedItem is TabItem selectedTab)
+            {
+                var header = selectedTab.Header?.ToString();
+                if (!string.IsNullOrEmpty(header))
+                {
+                    Task.Run(() => LoadTabDataAsync(header));
+                }
+            }
         }
 
-        private void TimerTick(object? sender, EventArgs e)
+        private async Task LoadTabDataAsync(string tabHeader)
         {
-            Task.Run(async () =>
+            try
             {
-                await UpdatePerformanceInfoAsync();
-                await UpdateNetworkStatusAsync();
-            });
-        }
-
-        private void LoadData()
-        {
-            Task.Run(async () =>
+                switch (tabHeader)
+                {
+                    case "基本情報":
+                        await LoadBasicInfoAsync();
+                        break;
+                    case "ハードウェア情報":
+                        await LoadHardwareInfoAsync();
+                        break;
+                    case "ネットワーク情報":
+                        await LoadNetworkInfoAsync();
+                        break;
+                    case "パフォーマンス情報":
+                        await LoadPerformanceInfoAsync();
+                        break;
+                    case "セキュリティ":
+                        await LoadSecurityInfoAsync();
+                        break;
+                    case "詳細なハードウェア情報":
+                        await LoadDetailedHardwareInfoAsync();
+                        break;
+                    case "システムのリソース利用状況":
+                        await LoadResourceUsageInfoAsync();
+                        break;
+                    case "ドライバとデバイスの状態":
+                        await LoadDriverInfoAsync();
+                        break;
+                }
+            }
+            catch (Exception ex)
             {
-                await LoadBasicInfoAsync();
-                await LoadHardwareInfoAsync();
-                await LoadNetworkInfoAsync();
-                await LoadPerformanceInfoAsync();
-                await LoadSecurityInfoAsync();
-                await LoadDetailedHardwareInfoAsync();
-                await LoadResourceUsageInfoAsync();
-                await LoadDriverInfoAsync();
-            });
+                System.Diagnostics.Debug.WriteLine($"タブデータ読み込みエラー ({tabHeader}): {ex.Message}");
+            }
         }
 
         private async Task LoadBasicInfoAsync()
         {
             try
             {
-                string osVersion = hardwareInfoService.GetOsVersionInfo();
-                string architecture = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
-                TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount);
-
-                await Dispatcher.InvokeAsync(() => {
-                    txtComputerName.Text = Environment.MachineName;
-                    txtOSVersion.Text = osVersion;
-                    txtArchitecture.Text = architecture;
-                    txtUsername.Text = Environment.UserName;
-                    txtHostname.Text = System.Net.Dns.GetHostName();
-                    txtDomain.Text = Environment.UserDomainName;
-                    txtUptime.Text = $"{uptime.Days}日 {uptime.Hours}時間 {uptime.Minutes}分 {uptime.Seconds}秒";
+                hardwareInfoService ??= new HardwareInfoService();
+                
+                var basicData = await Task.Run(() => new
+                {
+                    ComputerName = Environment.MachineName,
+                    Username = Environment.UserName,
+                    Domain = Environment.UserDomainName,
+                    Architecture = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit",
+                    OsVersion = hardwareInfoService.GetOsVersionInfo(),
+                    Hostname = System.Net.Dns.GetHostName(),
+                    Uptime = TimeSpan.FromMilliseconds(Environment.TickCount)
                 });
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtComputerName.Text = basicData.ComputerName;
+                    txtUsername.Text = basicData.Username;
+                    txtDomain.Text = basicData.Domain;
+                    txtArchitecture.Text = basicData.Architecture;
+                    txtOSVersion.Text = basicData.OsVersion;
+                    txtHostname.Text = basicData.Hostname;
+                    txtUptime.Text = $"{basicData.Uptime.Days}日 {basicData.Uptime.Hours}時間 {basicData.Uptime.Minutes}分";
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"基本情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"基本情報取得エラー: {ex.Message}");
             }
         }
 
@@ -107,25 +115,29 @@ namespace AimAssist.Units.Implementation.Computer
         {
             try
             {
-                string cpuInfo = hardwareInfoService.GetCpuInfo();
-                string memoryInfo = hardwareInfoService.GetTotalPhysicalMemory();
-                string diskInfo = DiskInfoHelper.GetDiskInfo();
-                string gpuInfo = hardwareInfoService.GetGpuInfo();
-                string motherboardInfo = hardwareInfoService.GetMotherboardInfo();
-
-                await Dispatcher.InvokeAsync(() => {
-                    txtCPUInfo.Text = cpuInfo;
-                    txtMemoryInfo.Text = memoryInfo;
-                    txtDiskInfo.Text = diskInfo;
-                    txtGPUInfo.Text = gpuInfo;
-                    txtMotherboardInfo.Text = motherboardInfo;
+                hardwareInfoService ??= new HardwareInfoService();
+                
+                var hardwareData = await Task.Run(() => new
+                {
+                    CpuInfo = hardwareInfoService.GetCpuInfo(),
+                    MemoryInfo = hardwareInfoService.GetTotalPhysicalMemory(),
+                    DiskInfo = DiskInfoHelper.GetDiskInfo(),
+                    GpuInfo = hardwareInfoService.GetGpuInfo(),
+                    MotherboardInfo = hardwareInfoService.GetMotherboardInfo()
                 });
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtCPUInfo.Text = hardwareData.CpuInfo;
+                    txtMemoryInfo.Text = hardwareData.MemoryInfo;
+                    txtDiskInfo.Text = hardwareData.DiskInfo;
+                    txtGPUInfo.Text = hardwareData.GpuInfo;
+                    txtMotherboardInfo.Text = hardwareData.MotherboardInfo;
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"ハードウェア情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"ハードウェア情報取得エラー: {ex.Message}");
             }
         }
 
@@ -133,23 +145,28 @@ namespace AimAssist.Units.Implementation.Computer
         {
             try
             {
-                Dictionary<string, string> ipAddresses = networkInfoService.GetIpAddresses();
-                string macAddress = networkInfoService.GetMacAddress();
-
-                await Dispatcher.InvokeAsync(() => {
-                    txtIPv4Address.Text = ipAddresses.ContainsKey("IPv4") ? ipAddresses["IPv4"] : "取得できませんでした";
-                    txtIPv6Address.Text = ipAddresses.ContainsKey("IPv6") ? ipAddresses["IPv6"] : "取得できませんでした";
-                    txtMACAddress.Text = macAddress;
-                });
+                networkInfoService ??= new NetworkInfoService();
                 
-                await UpdateNetworkStatusAsync();
+                var networkData = await Task.Run(() => new
+                {
+                    IpAddresses = networkInfoService.GetIpAddresses(),
+                    MacAddress = networkInfoService.GetMacAddress(),
+                    NetworkStatus = networkInfoService.GetNetworkStatus()
+                });
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtIPv4Address.Text = networkData.IpAddresses.ContainsKey("IPv4") ? networkData.IpAddresses["IPv4"] : "取得できませんでした";
+                    txtIPv6Address.Text = networkData.IpAddresses.ContainsKey("IPv6") ? networkData.IpAddresses["IPv6"] : "取得できませんでした";
+                    txtMACAddress.Text = networkData.MacAddress;
+                    txtNetworkStatus.Text = networkData.NetworkStatus;
+                }, DispatcherPriority.Background);
+
                 await LoadIpInfoAsync();
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"ネットワーク情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"ネットワーク情報取得エラー: {ex.Message}");
             }
         }
 
@@ -157,88 +174,53 @@ namespace AimAssist.Units.Implementation.Computer
         {
             try
             {
-                await UpdatePerformanceInfoAsync();
-            }
-            catch (Exception ex)
-            {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"パフォーマンス情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                performanceInfoService ??= new PerformanceInfoService();
+                
+                var performanceData = await Task.Run(() => new
+                {
+                    CpuUsage = performanceInfoService.GetCpuUsage(),
+                    RamUsage = performanceInfoService.GetMemoryUsage(),
+                    DiskUsage = performanceInfoService.GetDiskUsage(),
+                    ServiceStatus = performanceInfoService.GetServiceStatus()
                 });
-            }
-        }
-
-        private async Task UpdatePerformanceInfoAsync()
-        {
-            try
-            {
-                float cpuUsage = performanceInfoService.GetCpuUsage();
-                float ramUsage = performanceInfoService.GetMemoryUsage();
-                string diskUsage = performanceInfoService.GetDiskUsage();
-                string serviceStatus = performanceInfoService.GetServiceStatus();
 
                 await Dispatcher.InvokeAsync(() =>
                 {
-                    txtCPUUsage.Text = $"{cpuUsage:F1}%";
-                    txtMemoryUsage.Text = $"{ramUsage:F1}%";
-                    txtDiskUsage.Text = diskUsage;
-                    txtServiceStatus.Text = serviceStatus;
-
-                    TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount);
-                    txtUptime.Text = $"{uptime.Days}日 {uptime.Hours}時間 {uptime.Minutes}分 {uptime.Seconds}秒";
-                });
+                    txtCPUUsage.Text = $"{performanceData.CpuUsage:F1}%";
+                    txtMemoryUsage.Text = $"{performanceData.RamUsage:F1}%";
+                    txtDiskUsage.Text = performanceData.DiskUsage;
+                    txtServiceStatus.Text = performanceData.ServiceStatus;
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"パフォーマンス情報の更新中にエラーが発生しました: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"パフォーマンス情報取得エラー: {ex.Message}");
             }
-        }
-
-        private void UpdatePerformanceInfo()
-        {
-            Task.Run(async () => await UpdatePerformanceInfoAsync());
-        }
-
-        private async Task UpdateNetworkStatusAsync()
-        {
-            try
-            {
-                string networkStatus = networkInfoService.GetNetworkStatus();
-                await Dispatcher.InvokeAsync(() => {
-                    txtNetworkStatus.Text = networkStatus;
-                });
-            }
-            catch (Exception ex)
-            {
-                await Dispatcher.InvokeAsync(() => {
-                    txtNetworkStatus.Text = $"接続情報を取得できませんでした: {ex.Message}";
-                });
-            }
-        }
-
-        private void UpdateNetworkStatus()
-        {
-            Task.Run(async () => await UpdateNetworkStatusAsync());
         }
 
         private async Task LoadSecurityInfoAsync()
         {
             try
             {
-                string defenderStatus = securityInfoService.GetWindowsDefenderStatus();
-                string firewallStatus = securityInfoService.GetFirewallStatus();
-                string securityUpdates = securityInfoService.GetSecurityUpdateStatus();
-
-                await Dispatcher.InvokeAsync(() => {
-                    txtDefenderStatus.Text = defenderStatus;
-                    txtFirewallStatus.Text = firewallStatus;
-                    txtSecurityUpdates.Text = securityUpdates;
+                securityInfoService ??= new SecurityInfoService();
+                
+                var securityData = await Task.Run(() => new
+                {
+                    DefenderStatus = securityInfoService.GetWindowsDefenderStatus(),
+                    FirewallStatus = securityInfoService.GetFirewallStatus(),
+                    SecurityUpdates = securityInfoService.GetSecurityUpdateStatus()
                 });
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtDefenderStatus.Text = securityData.DefenderStatus;
+                    txtFirewallStatus.Text = securityData.FirewallStatus;
+                    txtSecurityUpdates.Text = securityData.SecurityUpdates;
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"セキュリティ情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"セキュリティ情報取得エラー: {ex.Message}");
             }
         }
 
@@ -246,23 +228,27 @@ namespace AimAssist.Units.Implementation.Computer
         {
             try
             {
-                string cpuTemperature = detailedHardwareInfoService.GetCpuTemperature();
-                string gpuTemperature = detailedHardwareInfoService.GetGpuTemperature();
-                string storageDetails = detailedHardwareInfoService.GetStorageDetails();
-                string batteryStatus = detailedHardwareInfoService.GetBatteryStatus();
-
-                await Dispatcher.InvokeAsync(() => {
-                    txtCPUTemperature.Text = cpuTemperature;
-                    txtGPUTemperature.Text = gpuTemperature;
-                    txtStorageDetails.Text = storageDetails;
-                    txtBatteryStatus.Text = batteryStatus;
+                detailedHardwareInfoService ??= new DetailedHardwareInfoService();
+                
+                var detailedHardwareData = await Task.Run(() => new
+                {
+                    CpuTemperature = detailedHardwareInfoService.GetCpuTemperature(),
+                    GpuTemperature = detailedHardwareInfoService.GetGpuTemperature(),
+                    StorageDetails = detailedHardwareInfoService.GetStorageDetails(),
+                    BatteryStatus = detailedHardwareInfoService.GetBatteryStatus()
                 });
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtCPUTemperature.Text = detailedHardwareData.CpuTemperature;
+                    txtGPUTemperature.Text = detailedHardwareData.GpuTemperature;
+                    txtStorageDetails.Text = detailedHardwareData.StorageDetails;
+                    txtBatteryStatus.Text = detailedHardwareData.BatteryStatus;
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"詳細なハードウェア情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"詳細ハードウェア情報取得エラー: {ex.Message}");
             }
         }
 
@@ -270,19 +256,23 @@ namespace AimAssist.Units.Implementation.Computer
         {
             try
             {
-                string processInfo = resourceUsageService.GetProcessInfo();
-                string heapMemory = resourceUsageService.GetHeapMemoryInfo();
-
-                await Dispatcher.InvokeAsync(() => {
-                    txtThreadsProcesses.Text = processInfo;
-                    txtHeapMemory.Text = heapMemory;
+                resourceUsageService ??= new ResourceUsageService();
+                
+                var resourceData = await Task.Run(() => new
+                {
+                    ProcessInfo = resourceUsageService.GetProcessInfo(),
+                    HeapMemory = resourceUsageService.GetHeapMemoryInfo()
                 });
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtThreadsProcesses.Text = resourceData.ProcessInfo;
+                    txtHeapMemory.Text = resourceData.HeapMemory;
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"リソース利用状況の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"リソース情報取得エラー: {ex.Message}");
             }
         }
 
@@ -290,19 +280,23 @@ namespace AimAssist.Units.Implementation.Computer
         {
             try
             {
-                string driverVersions = driverInfoService.GetDriverVersions();
-                string problemDevices = driverInfoService.GetProblemDevices();
-
-                await Dispatcher.InvokeAsync(() => {
-                    txtDriverVersions.Text = driverVersions;
-                    txtProblemDevices.Text = problemDevices;
+                driverInfoService ??= new DriverInfoService();
+                
+                var driverData = await Task.Run(() => new
+                {
+                    DriverVersions = driverInfoService.GetDriverVersions(),
+                    ProblemDevices = driverInfoService.GetProblemDevices()
                 });
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtDriverVersions.Text = driverData.DriverVersions;
+                    txtProblemDevices.Text = driverData.ProblemDevices;
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"ドライバー情報の取得中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"ドライバー情報取得エラー: {ex.Message}");
             }
         }
 
@@ -310,9 +304,16 @@ namespace AimAssist.Units.Implementation.Computer
 
         private void CopyText(object? parameter)
         {
-            if (parameter is TextBlock textBlock)
+            try
             {
-                Clipboard.SetText(textBlock.Text);
+                if (parameter is TextBlock textBlock && !string.IsNullOrEmpty(textBlock.Text))
+                {
+                    Clipboard.SetText(textBlock.Text);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"コピーエラー: {ex.Message}");
             }
         }
 
@@ -320,26 +321,48 @@ namespace AimAssist.Units.Implementation.Computer
         {
             try
             {
+                ipInfoService ??= new IpInfoService();
+                
                 var ipInfo = await ipInfoService.GetIpInfoAsync();
 
-                await this.Dispatcher.InvokeAsync(() =>
+                await Dispatcher.InvokeAsync(() =>
                 {
-                    IPAddressTextBlock.Text = ipInfo.Ip;
-                    CountryTextBlock.Text = ipInfo.Country;
-                    RegionTextBlock.Text = ipInfo.Region;
-                    CityTextBlock.Text = ipInfo.City;
-                    PostalTextBlock.Text = ipInfo.Postal;
-                    TimezoneTextBlock.Text = ipInfo.Timezone;
-                    ISPTextBlock.Text = ipInfo.Org;
-                    LocationTextBlock.Text = $"{ipInfo.Loc} (緯度, 経度)";
-                    InitializeWebView(ipInfo.Loc);
-                });
+                    IPAddressTextBlock.Text = ipInfo.Ip ?? "取得できませんでした";
+                    CountryTextBlock.Text = ipInfo.Country ?? "取得できませんでした";
+                    RegionTextBlock.Text = ipInfo.Region ?? "取得できませんでした";
+                    CityTextBlock.Text = ipInfo.City ?? "取得できませんでした";
+                    PostalTextBlock.Text = ipInfo.Postal ?? "取得できませんでした";
+                    TimezoneTextBlock.Text = ipInfo.Timezone ?? "取得できませんでした";
+                    ISPTextBlock.Text = ipInfo.Org ?? "取得できませんでした";
+                    LocationTextBlock.Text = !string.IsNullOrEmpty(ipInfo.Loc) ? $"{ipInfo.Loc} (緯度, 経度)" : "取得できませんでした";
+                }, DispatcherPriority.Background);
+
+                if (!string.IsNullOrEmpty(ipInfo.Loc))
+                {
+                    await Task.Delay(1000);
+                    await InitializeWebViewAsync(ipInfo.Loc);
+                }
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"情報の取得中にエラーが発生しました:\n{ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                System.Diagnostics.Debug.WriteLine($"IP情報取得エラー: {ex.Message}");
+            }
+        }
+
+        private async Task InitializeWebViewAsync(string loc)
+        {
+            try
+            {
+                await Dispatcher.InvokeAsync(async () =>
+                {
+                    await LocationWebView.EnsureCoreWebView2Async(null);
+                    var url = $"https://www.google.com/maps?q={loc}";
+                    LocationWebView.Source = new Uri(url);
+                }, DispatcherPriority.Background);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"WebView初期化エラー: {ex.Message}");
             }
         }
     }

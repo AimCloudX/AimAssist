@@ -18,7 +18,7 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <TabControl>
+        <TabControl SelectionChanged="TabControl_SelectionChanged">
     <TabItem Header="基本情報">
         <Grid Margin="10">
             <Grid.ColumnDefinitions>
