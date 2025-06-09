@@ -36,5 +36,7 @@ namespace AimAssist.Core.Interfaces
         /// ユニットを再読み込みします
         /// </summary>
         void RefreshUnits();
+
+        int GetModeDisplayOrder(IMode mode);
     }
 }

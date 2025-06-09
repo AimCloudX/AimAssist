@@ -7,6 +7,7 @@ using AimAssist.Commands;
 using AimAssist.Core.Commands;
 using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
+using AimAssist.Core.Attributes;
 using AimAssist.Services;
 using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Modes;
@@ -188,7 +189,9 @@ namespace AimAssist.UI.MainWindows
                 Units.Clear();
                 var units = unitsService.CreateUnits(mode);
 
-                foreach (var unit in units)
+                foreach (var unit in units.OrderBy(u => unitsService.GetModeDisplayOrder(u.Mode))
+                                              .ThenBy(u => u.Category)
+                                              .ThenBy(u => u.Name))
                 {
                     if (unit is SnippetModelUnit && mode != SnippetMode.Instance)
                     {
@@ -200,7 +203,7 @@ namespace AimAssist.UI.MainWindows
 
                 if (Units.Any())
                 {
-                    SelectedUnit = Units.OrderBy(u => u.CategorySortKey).ThenBy(u => u.Name).First();
+                    SelectedUnit = Units.First();
                 }
             }
             catch (Exception ex)

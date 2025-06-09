@@ -1,9 +1,11 @@
 ﻿using System.Windows.Controls;
+using AimAssist.Core.Attributes;
 using AimAssist.Units.Core.Modes;
 using MaterialDesignThemes.Wpf;
 
 namespace AimAssist.Units.Implementation.Knowledges
 {
+    [ModeDisplayOrder(30)]
     public class KnowledgeMode : ModeBase
     {
         private KnowledgeMode() : base(ModeName) { }

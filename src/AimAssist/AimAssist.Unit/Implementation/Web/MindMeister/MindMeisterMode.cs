@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MaterialDesignThemes.Wpf;
 using System.Windows.Controls;
+using AimAssist.Core.Attributes;
 using AimAssist.Units.Core.Modes;
 
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
+    [ModeDisplayOrder(50)]
     public class MindMeisterMode : ModeBase
     {
         private MindMeisterMode() : base(ModeName) { }

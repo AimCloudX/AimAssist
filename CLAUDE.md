@@ -53,6 +53,12 @@ WPFベースのコマンドランチャー・生産性向上ツール
 - なし
 
 ## 最新の変更
+### Unit表示順序の修正
+- **Mode→Category→Name順序**: Unitの表示順序をMode表示順→Category→Name順に統一
+- **ReflectionBasedUnitsFactory修正**: Priority降順からMode表示順→Category→Name順に変更
+- **MainWindowViewModel修正**: CategorySortKey→Name順からMode表示順→Category→Name順に変更
+- **統一された並び順**: すべてのUnit表示において一貫したソート順序を実現
+
 ### ComputerView 超軽量化 - タイマー完全削除
 - **タイマー完全削除**: 定期的な自動更新機能を削除してCPU使用率を最小化
 - **オンデマンド読み込み**: ユーザーがタブを選択した時のみ最新データを取得

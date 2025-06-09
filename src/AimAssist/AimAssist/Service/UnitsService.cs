@@ -38,7 +38,7 @@ namespace AimAssist.Service
                 .ToList();
         }
 
-        private int GetModeDisplayOrder(IMode mode)
+        public int GetModeDisplayOrder(IMode mode)
         {
             var attribute = mode.GetType().GetCustomAttributes(typeof(ModeDisplayOrderAttribute), false)
                 .FirstOrDefault() as ModeDisplayOrderAttribute;
