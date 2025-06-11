@@ -2,11 +2,12 @@
 using AimAssist.Core.Units;
 using AimAssist.Services.Markdown;
 using AimAssist.Units.Core.Units;
+using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Factories
 {
-    public interface IWorkToolsUnitsFactory
+    public interface IWorkToolsUnitsFactory : IFeaturesFactory
     {
         IEnumerable<IUnit> CreateUnits();
     }
@@ -42,6 +43,15 @@ namespace AimAssist.Units.Implementation.Factories
                     yield return new UrlUnit(WorkToolsMode.Instance, link.Text, link.Url, link.ContainingHeader);
                 }
             }
+        }
+
+        public IEnumerable<IFeature> GetFeatures()
+        {
+            var lists = new List<string>();
+            lists.Add(workItemOptionService.OptionPath);
+            lists.AddRange(workItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
+            
+            yield return new OptionFeature(WorkToolsMode.Instance,"Option", lists);
         }
     }
 }

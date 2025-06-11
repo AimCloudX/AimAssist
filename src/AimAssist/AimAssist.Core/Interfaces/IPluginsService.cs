@@ -23,7 +23,7 @@ namespace AimAssist.Core.Interfaces
         /// UIエレメントコンバーターを取得します
         /// </summary>
         /// <returns>UIエレメントコンバーターのコレクション</returns>
-        Dictionary<Type, Func<IUnit, UIElement>> GetConverters();
+        Dictionary<Type, Func<IItem, UIElement>> GetConverters();
 
         /// <summary>
         /// プラグインが読み込まれているかどうかを取得します

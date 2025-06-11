@@ -124,14 +124,14 @@ namespace AimAssist.Plugins
         }
 
         /// <inheritdoc/>
-        public Dictionary<Type, Func<IUnit, UIElement>> GetConverters()
+        public Dictionary<Type, Func<IItem, UIElement>> GetConverters()
         {
             if (!IsPluginsLoaded)
             {
-                return new Dictionary<Type, Func<IUnit, UIElement>>();
+                return new Dictionary<Type, Func<IItem, UIElement>>();
             }
             
-            var converters = new Dictionary<Type, Func<IUnit, UIElement>>();
+            var converters = new Dictionary<Type, Func<IItem, UIElement>>();
             foreach (var plugin in plugins)
             {
                 try

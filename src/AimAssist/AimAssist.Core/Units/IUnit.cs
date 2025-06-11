@@ -1,11 +1,7 @@
 ﻿
 namespace AimAssist.Core.Units
 {
-    public interface IUnit
+    public interface IUnit :IItem
     {
-        IMode Mode { get; }
-        string Name { get; }
-        string Description { get; }
-        string Category { get; }
     }
 }

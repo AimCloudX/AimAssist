@@ -4,21 +4,16 @@ using AimAssist.Units.Implementation.Snippets;
 
 namespace AimAssist.Units.Implementation.Factories
 {
-    public interface ISnippetUnitsFactory
-    {
-        IEnumerable<IUnit> CreateUnits();
-    }
-
-    public class SnippetUnitsFactory : ISnippetUnitsFactory
+    public class SnippetFeaturesFactory : IFeaturesFactory
     {
         private readonly ISnippetOptionService snippetOptionService;
 
-        public SnippetUnitsFactory(ISnippetOptionService snippetOptionService)
+        public SnippetFeaturesFactory(ISnippetOptionService snippetOptionService)
         {
             this.snippetOptionService = snippetOptionService;
         }
 
-        public IEnumerable<IUnit> CreateUnits()
+        public IEnumerable<IFeature> GetFeatures()
         {
             var parser = new SnippetParser();
             foreach (var path in snippetOptionService.Option.ItemPaths)

@@ -73,23 +73,6 @@ namespace AimAssist.Services.Initialization
             
             // テスト用：属性ベース自動登録のみで動作確認
             System.Diagnostics.Debug.WriteLine("=== 属性ベース自動登録システム テスト開始 ===");
-            
-            // デバッグ用：Unit数の確認
-            var allUnits = unitsService.GetAllUnits().ToList();
-            System.Diagnostics.Debug.WriteLine($"属性ベース自動登録Unit数: {allUnits.Count}");
-            
-            foreach (var unit in allUnits.Take(10)) // 最初の10個を表示
-            {
-                System.Diagnostics.Debug.WriteLine($"  - {unit.GetType().Name}: {unit.Name} (Category: {unit.Category})");
-            }
-            
-            foreach (var mode in unitsService.GetAllModes())
-            {
-                var modeUnits = unitsService.CreateUnits(mode).ToList();
-                System.Diagnostics.Debug.WriteLine($"Mode '{mode.GetType().Name}': {modeUnits.Count} units");
-            }
-            
-            System.Diagnostics.Debug.WriteLine("=== 属性ベース自動登録システム テスト完了 ===");
         }
 
         private void RegisterHotKeys()

@@ -2,6 +2,7 @@
 using AimAssist.Units.Implementation;
 using AimAssist.Units.Implementation.Factories;
 using System;
+using AimAssist.Core.Units;
 
 namespace AimAssist.Services.Initialization
 {
@@ -19,6 +20,8 @@ namespace AimAssist.Services.Initialization
         private readonly ICompositeUnitsFactory compositeFactory;
         private readonly AutoDiscoveryUnitsFactory autoDiscoveryFactory;
         private readonly ReflectionBasedUnitsFactory reflectionBasedFactory;
+        private readonly IFeaturesFactory snippetFeaturesFactory;
+        private readonly IWorkToolsUnitsFactory workToolsUnitsFactory;
         private readonly IApplicationLogService logService;
 
         public FactoryInitializationService(
@@ -27,6 +30,8 @@ namespace AimAssist.Services.Initialization
             ICompositeUnitsFactory compositeFactory,
             AutoDiscoveryUnitsFactory autoDiscoveryFactory,
             ReflectionBasedUnitsFactory reflectionBasedFactory,
+            SnippetFeaturesFactory snippetFeaturesFactory,
+            IWorkToolsUnitsFactory workToolsUnitsFactory,
             IApplicationLogService logService)
         {
             this.factoryManager = factoryManager;
@@ -34,6 +39,8 @@ namespace AimAssist.Services.Initialization
             this.compositeFactory = compositeFactory;
             this.autoDiscoveryFactory = autoDiscoveryFactory;
             this.reflectionBasedFactory = reflectionBasedFactory;
+            this.snippetFeaturesFactory = snippetFeaturesFactory;
+            this.workToolsUnitsFactory = workToolsUnitsFactory;
             this.logService = logService;
         }
 
@@ -53,6 +60,9 @@ namespace AimAssist.Services.Initialization
 
                 // CompositeUnitsFactoryをUnitsServiceに登録
                 unitsService.RegisterUnits(compositeFactory);
+                
+                unitsService.RegisterFeatures(snippetFeaturesFactory);
+                unitsService.RegisterFeatures(workToolsUnitsFactory);
                 logService.Info("CompositeUnitsFactoryをUnitsServiceに登録しました");
 
                 logService.Info("Factoryシステムの初期化が完了しました");

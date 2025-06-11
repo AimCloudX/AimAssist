@@ -21,4 +21,24 @@ namespace AimAssist.Units.Implementation.Options
 
         public IEnumerable<string> OptionFilePaths { get; }
     }
+    
+    public class OptionFeature : IFeature
+    {
+        public OptionFeature(IMode mode, string name, IEnumerable<string> optionFilePaths)
+        {
+            this.Mode = mode;
+            Name = name;
+            OptionFilePaths = optionFilePaths;
+        }
+
+        public IMode Mode { get; }
+
+        public string Name { get; }
+
+        public string Description => "";
+
+        public string Category => "";
+
+        public IEnumerable<string> OptionFilePaths { get; }
+    }
 }

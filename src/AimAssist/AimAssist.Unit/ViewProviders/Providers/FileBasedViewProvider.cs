@@ -17,15 +17,17 @@ namespace AimAssist.Units.ViewProviders.Providers
         public bool CanProvideView(Type unitType) =>
             unitType == typeof(MarkdownUnit) ||
             unitType == typeof(EditorUnit) ||
-            unitType == typeof(OptionUnit);
+            unitType == typeof(OptionUnit)||
+            unitType == typeof(OptionFeature);
 
-        public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
+        public UIElement CreateView(IItem unit, IServiceProvider serviceProvider)
         {
             return unit switch
             {
                 MarkdownUnit md => new MarkdownView(md.FullPath),
                 EditorUnit editor => CreateEditor(editor.FullPath, serviceProvider),
                 OptionUnit option => CreateMultiFileEditor(option.OptionFilePaths, serviceProvider),
+                OptionFeature option => CreateMultiFileEditor(option.OptionFilePaths, serviceProvider),
                 _ => null
             };
         }

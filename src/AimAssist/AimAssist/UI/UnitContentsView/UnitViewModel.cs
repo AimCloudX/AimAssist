@@ -10,7 +10,7 @@ namespace AimAssist.UI.UnitContentsView
 {
     public class UnitViewModel : INotifyPropertyChanged
     {
-        public static UnitViewModel Instance(IUnit unit)
+        public static UnitViewModel Instance(IItem unit)
         {
             if (unit is UrlUnit urlUnit)
             {
@@ -39,7 +39,7 @@ namespace AimAssist.UI.UnitContentsView
             }
         }
 
-        private UnitViewModel(DependencyObject icon, IUnit content)
+        private UnitViewModel(DependencyObject icon, IItem content)
         {
             Icon = icon;
             Content = content;
@@ -82,7 +82,7 @@ namespace AimAssist.UI.UnitContentsView
         }
 
         private DependencyObject icon { get; set; }
-        public IUnit Content { get; }
+        public IItem Content { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

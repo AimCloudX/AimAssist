@@ -9,21 +9,18 @@ namespace AimAssist.Units.Implementation.Factories
     {
         private readonly IKnowledgeUnitsFactory knowledgeUnitsFactory;
         private readonly IWorkToolsUnitsFactory workToolsUnitsFactory;
-        private readonly ISnippetUnitsFactory snippetUnitsFactory;
         private readonly ICheatSheetUnitsFactory cheatSheetUnitsFactory;
         private readonly IOptionUnitsFactory optionUnitsFactory;
 
         public AutoDiscoveryUnitsFactory(
             IKnowledgeUnitsFactory knowledgeUnitsFactory,
             IWorkToolsUnitsFactory workToolsUnitsFactory,
-            ISnippetUnitsFactory snippetUnitsFactory,
             ICheatSheetUnitsFactory cheatSheetUnitsFactory,
             IOptionUnitsFactory optionUnitsFactory)
             : base("AutoDiscovery", priority: 1000)
         {
             this.knowledgeUnitsFactory = knowledgeUnitsFactory;
             this.workToolsUnitsFactory = workToolsUnitsFactory;
-            this.snippetUnitsFactory = snippetUnitsFactory;
             this.cheatSheetUnitsFactory = cheatSheetUnitsFactory;
             this.optionUnitsFactory = optionUnitsFactory;
         }
@@ -45,13 +42,6 @@ namespace AimAssist.Units.Implementation.Factories
             {
                 count++;
                 System.Diagnostics.Debug.WriteLine($"  WorkTools unit #{count}: {unit.GetType().Name} - {unit.Name}");
-                yield return unit;
-            }
-
-            foreach (var unit in snippetUnitsFactory.CreateUnits())
-            {
-                count++;
-                System.Diagnostics.Debug.WriteLine($"  Snippet unit #{count}: {unit.GetType().Name} - {unit.Name}");
                 yield return unit;
             }
 

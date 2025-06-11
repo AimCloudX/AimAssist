@@ -13,24 +13,10 @@ namespace AimAssist.Core.Interfaces
         /// <returns>利用可能なモードのコレクション</returns>
         IReadOnlyCollection<IMode> GetAllModes();
 
-        /// <summary>
-        /// ユニットファクトリからユニットを登録します
-        /// </summary>
-        /// <param name="factory">ユニットファクトリ</param>
         void RegisterUnits(IUnitsFactory factory);
-
-        /// <summary>
-        /// 指定したモードのユニットを作成します
-        /// </summary>
-        /// <param name="mode">モード</param>
-        /// <returns>作成されたユニットのコレクション</returns>
-        IEnumerable<IUnit> CreateUnits(IMode mode);
-
-        /// <summary>
-        /// すべてのユニットを取得します
-        /// </summary>
-        /// <returns>すべてのユニット</returns>
-        IEnumerable<IUnit> GetAllUnits();
+        void RegisterFeatures(IFeaturesFactory factory);
+        
+        IEnumerable<IItem> CreateUnits(IMode mode);
 
         /// <summary>
         /// ユニットを再読み込みします
