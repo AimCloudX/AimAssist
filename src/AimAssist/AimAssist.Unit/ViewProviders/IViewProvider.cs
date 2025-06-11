@@ -6,7 +6,7 @@ namespace AimAssist.Units.ViewProviders
     public interface IViewProvider
     {
         bool CanProvideView(Type unitType);
-        UIElement CreateView(IItem unit, IServiceProvider serviceProvider);
+        UIElement CreateView(IUnit unit, IServiceProvider serviceProvider);
         int Priority { get; }
     }
 }

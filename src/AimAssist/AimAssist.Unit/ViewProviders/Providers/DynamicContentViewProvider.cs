@@ -14,7 +14,7 @@ namespace AimAssist.Units.ViewProviders.Providers
         public bool CanProvideView(Type unitType) =>
             unitType == typeof(SnippetUnit);
 
-        public UIElement CreateView(IItem unit, IServiceProvider serviceProvider)
+        public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
         {
             var code = unit switch
             {

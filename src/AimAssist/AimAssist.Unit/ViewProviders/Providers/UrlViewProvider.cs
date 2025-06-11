@@ -14,7 +14,7 @@ namespace AimAssist.Units.ViewProviders.Providers
 
         public bool CanProvideView(Type unitType) => unitType == typeof(UrlUnit);
 
-        public UIElement CreateView(IItem unit, IServiceProvider serviceProvider)
+        public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
         {
             var urlUnit = (UrlUnit)unit;
             var url = urlUnit.Url;

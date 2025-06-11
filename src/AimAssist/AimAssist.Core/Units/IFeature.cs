@@ -1,6 +1,7 @@
 ﻿namespace AimAssist.Core.Units;
 
-public interface IFeature :IItem
+public interface IFeature :IUnit
 {
+    IMode ShowIn { get; }
     
 }

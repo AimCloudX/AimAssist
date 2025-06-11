@@ -21,6 +21,7 @@ namespace AimAssist.Units.Implementation.Snippets
         public IMode Mode => SnippetMode.Instance;
 
         public string Description => string.Empty;
+        public IMode ShowIn => this.Mode;
     }
     public class SnippetModelUnit :IFeature
     {
@@ -40,5 +41,6 @@ namespace AimAssist.Units.Implementation.Snippets
         public IMode Mode => SnippetMode.Instance;
 
         public string Description => string.Empty;
+        public IMode ShowIn => this.Mode;
     }
 }

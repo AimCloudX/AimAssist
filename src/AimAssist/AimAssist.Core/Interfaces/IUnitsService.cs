@@ -16,7 +16,7 @@ namespace AimAssist.Core.Interfaces
         void RegisterUnits(IUnitsFactory factory);
         void RegisterFeatures(IFeaturesFactory factory);
         
-        IEnumerable<IItem> CreateUnits(IMode mode);
+        IEnumerable<IUnit> CreateUnits(IMode mode);
 
         /// <summary>
         /// ユニットを再読み込みします

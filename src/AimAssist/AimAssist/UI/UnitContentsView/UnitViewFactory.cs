@@ -12,7 +12,7 @@ namespace AimAssist.UI.UnitContentsView
 {
     public class UnitViewFactory
     {
-        public static Dictionary<Type, Func<IItem, UIElement>> UnitToUIElementDictionary = new();
+        public static Dictionary<Type, Func<IUnit, UIElement>> UnitToUIElementDictionary = new();
 
         private static Dictionary<string, UIElement> cache = new();
         private readonly ICommandService commandService;

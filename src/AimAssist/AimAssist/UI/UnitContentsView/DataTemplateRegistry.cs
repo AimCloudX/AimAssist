@@ -61,7 +61,7 @@ namespace AimAssist.UI.UnitContentsView
             }
         }
 
-        public static UIElement CreateView(IItem unit, IServiceProvider serviceProvider = null)
+        public static UIElement CreateView(IUnit unit, IServiceProvider serviceProvider = null)
         {
             var unitType = unit.GetType();
             if (registeredTemplates.TryGetValue(unitType, out var templateInfo))
@@ -92,7 +92,7 @@ namespace AimAssist.UI.UnitContentsView
             return null;
         }
 
-        private static UIElement CreateInstanceWithDI(IItem unit, Type viewType, IServiceProvider serviceProvider)
+        private static UIElement CreateInstanceWithDI(IUnit unit, Type viewType, IServiceProvider serviceProvider)
         {
             var constructors = viewType.GetConstructors()
                 .OrderByDescending(c => c.GetParameters().Length);

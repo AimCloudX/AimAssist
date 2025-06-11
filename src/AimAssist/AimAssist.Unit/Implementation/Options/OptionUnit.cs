@@ -24,14 +24,14 @@ namespace AimAssist.Units.Implementation.Options
     
     public class OptionFeature : IFeature
     {
-        public OptionFeature(IMode mode, string name, IEnumerable<string> optionFilePaths)
+        public OptionFeature(IMode showIn, string name, IEnumerable<string> optionFilePaths)
         {
-            this.Mode = mode;
+            ShowIn = showIn;
             Name = name;
             OptionFilePaths = optionFilePaths;
         }
 
-        public IMode Mode { get; }
+        public IMode Mode  => OptionMode.Instance;
 
         public string Name { get; }
 
@@ -40,5 +40,6 @@ namespace AimAssist.Units.Implementation.Options
         public string Category => "";
 
         public IEnumerable<string> OptionFilePaths { get; }
+        public IMode ShowIn { get; }
     }
 }

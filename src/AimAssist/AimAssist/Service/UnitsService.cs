@@ -12,8 +12,8 @@ namespace AimAssist.Service
     /// </summary>
     public class UnitsService : IUnitsService
     {
-        private Dictionary<IMode, IList<IItem>> modeDic = new() {
-            { AllInclusiveMode.Instance, new List<IItem>() },
+        private Dictionary<IMode, IList<IUnit>> modeDic = new() {
+            { AllInclusiveMode.Instance, new List<IUnit>() },
         };
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace AimAssist.Service
                 }
                 else
                 {
-                    modeDic.Add(unit.Mode, new List<IItem>() { unit });
+                    modeDic.Add(unit.Mode, new List<IUnit>() { unit });
                 }
             }
         }
@@ -79,13 +79,13 @@ namespace AimAssist.Service
             var units = factory.GetFeatures();
             foreach (var unit in units)
             {
-                if (modeDic.TryGetValue(unit.Mode, out var unitLists))
+                if (modeDic.TryGetValue(unit.ShowIn, out var unitLists))
                 {
                     unitLists.Add(unit);
                 }
                 else
                 {
-                    modeDic.Add(unit.Mode, new List<IItem>() { unit });
+                    modeDic.Add(unit.ShowIn, new List<IUnit>() { unit });
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace AimAssist.Service
         /// </summary>
         /// <param name="mode">モード</param>
         /// <returns>作成されたユニットのコレクション</returns>
-        public IEnumerable<IItem> CreateUnits(IMode mode)
+        public IEnumerable<IUnit> CreateUnits(IMode mode)
         {
             if(modeDic.TryGetValue(mode, out var units))
             {
@@ -115,7 +115,7 @@ namespace AimAssist.Service
         public void RefreshUnits()
         {
             modeDic.Clear();
-            modeDic.Add(AllInclusiveMode.Instance, new List<IItem>());
+            modeDic.Add(AllInclusiveMode.Instance, new List<IUnit>());
         }
     }
 }

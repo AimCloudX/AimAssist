@@ -20,7 +20,7 @@ namespace AimAssist.Units.ViewProviders.Providers
             unitType == typeof(OptionUnit)||
             unitType == typeof(OptionFeature);
 
-        public UIElement CreateView(IItem unit, IServiceProvider serviceProvider)
+        public UIElement CreateView(IUnit unit, IServiceProvider serviceProvider)
         {
             return unit switch
             {

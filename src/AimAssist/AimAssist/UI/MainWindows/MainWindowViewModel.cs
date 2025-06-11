@@ -187,11 +187,12 @@ namespace AimAssist.UI.MainWindows
             try
             {
                 Units.Clear();
-                var units = unitsService.CreateUnits(mode);
-
-                foreach (var unit in units.OrderBy(u => unitsService.GetModeDisplayOrder(u.Mode))
+                var units = unitsService.CreateUnits(mode).OrderBy(u => u is IFeature ? 1 : 0)
+                             .ThenBy(u => unitsService.GetModeDisplayOrder(u.Mode))
                                               .ThenBy(u => u.Category)
-                                              .ThenBy(u => u.Name))
+                                              .ThenBy(u => u.Name);
+
+                foreach (var unit in units)
                 {
                     if (unit is SnippetModelUnit && mode != SnippetMode.Instance)
                     {

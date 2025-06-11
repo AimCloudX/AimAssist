@@ -18,6 +18,6 @@ namespace AimAssist.Plugins
         /// UIエレメントコンバーターを取得します
         /// </summary>
         /// <returns>UIエレメントコンバーターのディクショナリ</returns>
-        Dictionary<Type, Func<IItem, UIElement>> GetUIElementConverters();
+        Dictionary<Type, Func<IUnit, UIElement>> GetUIElementConverters();
     }
 }

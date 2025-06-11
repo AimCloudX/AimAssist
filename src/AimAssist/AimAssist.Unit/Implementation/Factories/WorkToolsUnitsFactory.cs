@@ -7,7 +7,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Factories
 {
-    public interface IWorkToolsUnitsFactory : IFeaturesFactory
+    public interface IWorkToolsUnitsFactory : IUnitsFactory, IFeaturesFactory
     {
         IEnumerable<IUnit> CreateUnits();
     }
@@ -21,7 +21,7 @@ namespace AimAssist.Units.Implementation.Factories
             this.workItemOptionService = workItemOptionService;
         }
 
-        public IEnumerable<IUnit> CreateUnits()
+        public IEnumerable<IUnit> GetUnits()
         {
             var markdownService = new MarkdownService();
             CategoryOrderManager.ClearCategoryOrder();
@@ -45,13 +45,18 @@ namespace AimAssist.Units.Implementation.Factories
             }
         }
 
+        public IEnumerable<IUnit> CreateUnits()
+        {
+            return GetUnits();
+        }
+
         public IEnumerable<IFeature> GetFeatures()
         {
             var lists = new List<string>();
             lists.Add(workItemOptionService.OptionPath);
             lists.AddRange(workItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
             
-            yield return new OptionFeature(WorkToolsMode.Instance,"Option", lists);
+            yield return new OptionFeature(WorkToolsMode.Instance,"WorkTools Option", lists);
         }
     }
 }

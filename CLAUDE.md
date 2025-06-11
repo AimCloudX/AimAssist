@@ -53,6 +53,20 @@ WPFベースのコマンドランチャー・生産性向上ツール
 - なし
 
 ## 最新の変更
+### MainWindowViewModel IUnit/IFeature表示順序修正
+- **LoadUnitsForMode**: IUnitとIFeatureが混在している場合にIUnitが先に表示されるように並び替え順序を修正
+- **並び替え優先度**: Mode表示順→IUnit/IFeature種別(IUnit=0, IFeature=1)→Category→Name順に変更
+- **混在表示**: 同一モード内でIUnitとIFeatureが混在する場合の表示順序を統一
+- **ユーザー体験**: より直感的な順序でユニットとフィーチャーが表示されるように改善
+
+### IUnit/IFeature順序統一修正
+- **IUnitsService**: RegisterUnitsとRegisterFeaturesメソッドの定義順序をIUnit→IFeature順に統一
+- **UnitsService**: メソッド実装順序をIUnit→IFeature順に統一
+- **FactoryInitializationService**: RegisterUnitsとRegisterFeaturesの呼び出し順序をIUnit→IFeature順に統一
+- **WorkToolsUnitsFactory**: インターフェース継承順序をIUnitsFactory→IFeaturesFactory順に統一
+- **メソッド定義**: IUnitsFactoryのGetUnitsメソッドを追加してCreateUnitsとの一貫性を確保
+- **コード一貫性**: すべてのファクトリーとサービスでIUnit関連処理がIFeature関連処理より先に実行される構造に統一
+
 ### Unit表示順序の修正
 - **Mode→Category→Name順序**: Unitの表示順序をMode表示順→Category→Name順に統一
 - **ReflectionBasedUnitsFactory修正**: Priority降順からMode表示順→Category→Name順に変更
