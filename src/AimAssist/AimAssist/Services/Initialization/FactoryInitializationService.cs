@@ -20,7 +20,7 @@ namespace AimAssist.Services.Initialization
         private readonly ICompositeUnitsFactory compositeFactory;
         private readonly AutoDiscoveryUnitsFactory autoDiscoveryFactory;
         private readonly ReflectionBasedUnitsFactory reflectionBasedFactory;
-        private readonly IFeaturesFactory snippetFeaturesFactory;
+        private readonly ISupportUnitsFactory snippetSupportUnitsFactory;
         private readonly IWorkToolsUnitsFactory workToolsUnitsFactory;
         private readonly IApplicationLogService logService;
 
@@ -30,7 +30,7 @@ namespace AimAssist.Services.Initialization
             ICompositeUnitsFactory compositeFactory,
             AutoDiscoveryUnitsFactory autoDiscoveryFactory,
             ReflectionBasedUnitsFactory reflectionBasedFactory,
-            SnippetFeaturesFactory snippetFeaturesFactory,
+            SnippetSupportUnitsFactory snippetSupportUnitsFactory,
             IWorkToolsUnitsFactory workToolsUnitsFactory,
             IApplicationLogService logService)
         {
@@ -39,7 +39,7 @@ namespace AimAssist.Services.Initialization
             this.compositeFactory = compositeFactory;
             this.autoDiscoveryFactory = autoDiscoveryFactory;
             this.reflectionBasedFactory = reflectionBasedFactory;
-            this.snippetFeaturesFactory = snippetFeaturesFactory;
+            this.snippetSupportUnitsFactory = snippetSupportUnitsFactory;
             this.workToolsUnitsFactory = workToolsUnitsFactory;
             this.logService = logService;
         }
@@ -61,7 +61,7 @@ namespace AimAssist.Services.Initialization
                 // CompositeUnitsFactoryをUnitsServiceに登録
                 unitsService.RegisterUnits(compositeFactory);
                 
-                unitsService.RegisterFeatures(snippetFeaturesFactory);
+                unitsService.RegisterFeatures(snippetSupportUnitsFactory);
                 unitsService.RegisterFeatures(workToolsUnitsFactory);
                 logService.Info("CompositeUnitsFactoryをUnitsServiceに登録しました");
 

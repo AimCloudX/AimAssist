@@ -3,7 +3,7 @@ using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Snippets
 {
-    public class SnippetUnit : IFeature
+    public class SnippetUnit : ISupportUnit
     {
         public SnippetUnit(string name, string text, string category = "")
         {
@@ -21,9 +21,9 @@ namespace AimAssist.Units.Implementation.Snippets
         public IMode Mode => SnippetMode.Instance;
 
         public string Description => string.Empty;
-        public IMode ShowIn => this.Mode;
+        public IMode SupportTarget => this.Mode;
     }
-    public class SnippetModelUnit :IFeature
+    public class SnippetModelUnit :ISupportUnit
     {
         public SnippetModelUnit(Snippet snippet)
         {
@@ -41,6 +41,6 @@ namespace AimAssist.Units.Implementation.Snippets
         public IMode Mode => SnippetMode.Instance;
 
         public string Description => string.Empty;
-        public IMode ShowIn => this.Mode;
+        public IMode SupportTarget => this.Mode;
     }
 }

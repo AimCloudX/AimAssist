@@ -22,11 +22,11 @@ namespace AimAssist.Units.Implementation.Options
         public IEnumerable<string> OptionFilePaths { get; }
     }
     
-    public class OptionFeature : IFeature
+    public class OptionSupportUnit : ISupportUnit
     {
-        public OptionFeature(IMode showIn, string name, IEnumerable<string> optionFilePaths)
+        public OptionSupportUnit(IMode showIn, string name, IEnumerable<string> optionFilePaths)
         {
-            ShowIn = showIn;
+            SupportTarget = showIn;
             Name = name;
             OptionFilePaths = optionFilePaths;
         }
@@ -40,6 +40,6 @@ namespace AimAssist.Units.Implementation.Options
         public string Category => "";
 
         public IEnumerable<string> OptionFilePaths { get; }
-        public IMode ShowIn { get; }
+        public IMode SupportTarget { get; }
     }
 }

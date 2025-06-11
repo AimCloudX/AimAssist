@@ -187,7 +187,7 @@ namespace AimAssist.UI.MainWindows
             try
             {
                 Units.Clear();
-                var units = unitsService.CreateUnits(mode).OrderBy(u => u is IFeature ? 1 : 0)
+                var units = unitsService.CreateUnits(mode).OrderBy(u => u is ISupportUnit ? 1 : 0)
                              .ThenBy(u => unitsService.GetModeDisplayOrder(u.Mode))
                                               .ThenBy(u => u.Category)
                                               .ThenBy(u => u.Name);

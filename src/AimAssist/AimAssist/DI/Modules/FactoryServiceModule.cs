@@ -14,7 +14,7 @@ namespace AimAssist.DI.Modules
             services.AddSingleton<ICompositeUnitsFactory, CompositeUnitsFactory>();
             
             services.AddSingleton<IWorkToolsUnitsFactory, WorkToolsUnitsFactory>();
-            services.AddSingleton<SnippetFeaturesFactory>();
+            services.AddSingleton<SnippetSupportUnitsFactory>();
             services.AddSingleton<IKnowledgeUnitsFactory, KnowledgeUnitsFactory>();
             services.AddSingleton<ICheatSheetUnitsFactory, CheatSheetUnitsFactory>();
             services.AddSingleton<IOptionUnitsFactory, OptionUnitsFactory>();

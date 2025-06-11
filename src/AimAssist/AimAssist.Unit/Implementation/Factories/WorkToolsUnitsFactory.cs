@@ -7,7 +7,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Factories
 {
-    public interface IWorkToolsUnitsFactory : IUnitsFactory, IFeaturesFactory
+    public interface IWorkToolsUnitsFactory : IUnitsFactory, ISupportUnitsFactory
     {
         IEnumerable<IUnit> CreateUnits();
     }
@@ -50,13 +50,13 @@ namespace AimAssist.Units.Implementation.Factories
             return GetUnits();
         }
 
-        public IEnumerable<IFeature> GetFeatures()
+        public IEnumerable<ISupportUnit> GetSupportUnits()
         {
             var lists = new List<string>();
             lists.Add(workItemOptionService.OptionPath);
             lists.AddRange(workItemOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
             
-            yield return new OptionFeature(WorkToolsMode.Instance,"WorkTools Option", lists);
+            yield return new OptionSupportUnit(WorkToolsMode.Instance,"WorkTools Option", lists);
         }
     }
 }

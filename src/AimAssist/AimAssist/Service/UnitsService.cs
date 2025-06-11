@@ -74,18 +74,18 @@ namespace AimAssist.Service
             }
         }
 
-        public void RegisterFeatures(IFeaturesFactory factory)
+        public void RegisterFeatures(ISupportUnitsFactory factory)
         {
-            var units = factory.GetFeatures();
+            var units = factory.GetSupportUnits();
             foreach (var unit in units)
             {
-                if (modeDic.TryGetValue(unit.ShowIn, out var unitLists))
+                if (modeDic.TryGetValue(unit.SupportTarget, out var unitLists))
                 {
                     unitLists.Add(unit);
                 }
                 else
                 {
-                    modeDic.Add(unit.ShowIn, new List<IUnit>() { unit });
+                    modeDic.Add(unit.SupportTarget, new List<IUnit>() { unit });
                 }
             }
         }
@@ -104,7 +104,7 @@ namespace AimAssist.Service
             return Enumerable.Empty<IUnit>();
         }
 
-        public IEnumerable<IFeature> CreateFeatures(IMode mode)
+        public IEnumerable<ISupportUnit> CreateFeatures(IMode mode)
         {
             throw new NotImplementedException();
         }
