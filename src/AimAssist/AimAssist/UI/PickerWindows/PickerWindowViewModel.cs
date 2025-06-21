@@ -85,7 +85,17 @@ namespace AimAssist.UI.PickerWindows
 
         public string SnippetText { get; set; } = string.Empty;
         public KeySequence KeySequence { get; set; }
-        public bool IsClosing { get; set; }
+        
+        private bool _isClosing;
+        public bool IsClosing 
+        { 
+            get => _isClosing;
+            set
+            {
+                _isClosing = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ICommand NavigateUpCommand { get; }
         public ICommand NavigateDownCommand { get; }

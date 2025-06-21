@@ -1,5 +1,6 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Service;
+using AimAssist.UI.PickerWindows;
 using Common.UI;
 using Common.UI.Editor;
 using System;
@@ -40,6 +41,7 @@ namespace AimAssist.UI.PickerWindows
             SourceInitialized += OnSourceInitialized;
             Closing += OnClosing;
             Deactivated += OnDeactivated;
+            _viewModel.PropertyChanged += OnViewModelPropertyChanged;
             
             InitializeEditor();
             FilterTextBox.Focus();
@@ -100,7 +102,7 @@ namespace AimAssist.UI.PickerWindows
         {
             try
             {
-                _viewModel.IsClosing = true;
+                _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
                 if (MainContent.Content is MonacoEditor editor)
                 {
                     EditorCache.Editor = editor;
@@ -115,6 +117,21 @@ namespace AimAssist.UI.PickerWindows
         private void OnDeactivated(object? sender, EventArgs e)
         {
             // フォーカス喪失時の処理（必要に応じて実装）
+        }
+
+        private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PickerWindowViewModel.IsClosing) && _viewModel.IsClosing)
+            {
+                try
+                {
+                    this.Close();
+                }
+                catch (Exception ex)
+                {
+                    _logService?.LogException(ex, "ウィンドウを閉じる際にエラーが発生しました");
+                }
+            }
         }
 
         public void FocusContent()

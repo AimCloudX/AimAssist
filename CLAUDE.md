@@ -1,10 +1,113 @@
-﻿# AimAssist
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## プロジェクト概要
 WPFベースのコマンドランチャー・生産性向上ツール
 - 複数のプロジェクトから構成される.NETアプリケーション
 - DI、Factory、Command、MVVMパターンを採用
 - ユニットベースの機能拡張システム
+
+## Common Development Commands
+
+### Build and Test
+```bash
+# Build entire solution
+dotnet build AimAssist.sln
+
+# Run tests
+dotnet test src/AimAssist/AimAssist.Tests/
+
+# Run application
+dotnet run --project src/AimAssist/AimAssist/
+
+# Publish release build
+dotnet publish src/AimAssist/AimAssist/ -c Release --self-contained true -r win-x64
+```
+
+### Project Structure
+```
+AimAssist/                    # Main WPF application
+├── AimAssist.Core/          # Core interfaces and base services
+├── AimAssist.Services/      # Business logic services
+├── AimAssist.Units/         # Unit-based feature implementations
+├── AimAssist.Plugins/       # MEF plugin system
+├── AimAssist.Tests/         # xUnit tests with Moq
+Common/                      # Shared functionality
+Common.UI/                   # Shared UI components and WebView controls
+Common.UI.Editor/            # Monaco Editor integration
+Common.Dependencies/         # Consolidated NuGet dependencies
+```
+
+## Architecture Overview
+
+### Dependency Injection System
+Uses Microsoft.Extensions.DependencyInjection with 7 specialized service modules:
+- **CoreServiceModule**: UnitsService, CommandService, ErrorHandling
+- **ApplicationServiceModule**: Application lifecycle services
+- **OptionServiceModule**: Configuration and settings (SettingManager)
+- **FactoryServiceModule**: Factory pattern implementations
+- **PluginServiceModule**: MEF plugin system
+- **UiServiceModule**: MainWindow, PickerService, UI components
+- **InitializationServiceModule**: Application startup services
+
+Service registration in `App.xaml.cs` via `ServiceRegistration.RegisterServices()` extension method.
+
+### Unit-Based Plugin Architecture
+Core extensibility through `IUnit` interface:
+```csharp
+public interface IUnit {
+    IMode Mode { get; }      // Operating context (WorkTools, Snippets, etc.)
+    string Name { get; }     
+    string Description { get; }
+    string Category { get; } // For grouping and sorting
+}
+```
+
+**Auto-Registration via Attributes**:
+```csharp
+[AutoRegisterUnit("CategoryName", Priority = 100, IsEnabled = true)]
+public class MyUnit : IUnit { }
+```
+
+**Factory Pattern**: Multiple specialized factories combined via `CompositeUnitsFactory`:
+- `ReflectionBasedUnitsFactory` - Attribute-based discovery
+- `WorkToolsUnitsFactory` - Work productivity tools
+- `CheatSheetUnitsFactory` - Help documentation
+- `PluginUnitsFactory` - MEF-based external plugins
+
+### MVVM Implementation
+- `MainWindowViewModel` with `INotifyPropertyChanged`
+- Command pattern via `IAppCommands` and `RelayCommand`
+- Clear View/ViewModel/Model separation
+- Two-way binding with ObservableCollections
+
+### Display Order Logic
+Units are sorted by: Mode display order → IUnit/IFeature type (IUnit=0, IFeature=1) → Category → Name
+
+## Key Integrations
+
+### Monaco Editor (VS Code Editor)
+- Full Monaco Editor embedded via WebView2
+- JavaScript/TypeScript with webpack build system
+- Located in `Common.UI.Editor/` project
+- Custom keybindings and Nord theme support
+
+### Speech Recognition
+- **Vosk**: Primary Japanese speech recognition with local models
+- **Whisper.net**: Alternative recognition engine
+- **NAudio**: Audio input processing
+
+### MEF Plugin System
+- Plugin directory: `./Plugins/`
+- `IUnitPlugin` interface for external plugins
+- Automatic composition with graceful error handling
+- System.ComponentModel.Composition framework
+
+### LLM Integration
+- Microsoft Semantic Kernel integration
+- Google Connectors for LLM services
+- ChatGPT and Claude UI controls
 
 ## 完了したタスク
 ### GitHub Actions自動リリース機能
@@ -83,10 +186,3 @@ WPFベースのコマンドランチャー・生産性向上ツール
 - **パフォーマンス重視**: バックグラウンド処理の完全分離でUI応答性最大化
 - **コード簡素化**: 200行以上のコード削減で保守性向上
 - **即応性**: View表示から操作可能まで最短時間を実現
-
-## アーキテクチャ
-- WPFアプリケーション（.NET 8）
-- マルチプロジェクト構成
-- プラグインシステム
-- 音声認識機能（Vosk/Whisper）
-- Web統合機能
