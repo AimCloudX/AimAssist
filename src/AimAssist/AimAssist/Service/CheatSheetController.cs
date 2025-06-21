@@ -26,6 +26,20 @@ namespace AimAssist.Service
         private LowLevelMouseProc _mouseProc;
         private DateTime _ctrlKeyPressStart;
         private bool _isCtrlPressed = false;
+        
+        // パフォーマンス最適化
+        private readonly bool _isDebugMode;
+        private DateTime _lastKeyboardEventTime = DateTime.MinValue;
+        private DateTime _lastMouseEventTime = DateTime.MinValue;
+        private readonly TimeSpan _debugEventThrottle = TimeSpan.FromMilliseconds(50); // デバッグ中は50msに制限
+        private readonly TimeSpan _releaseEventThrottle = TimeSpan.FromMilliseconds(10); // リリース中は10msに制限
+        
+        // キーコードキャッシュ
+        private const int VK_LCONTROL = 0xA2;
+        private const int VK_RCONTROL = 0xA3;
+        
+        // 最適化フラグ
+        private bool _ctrlKeyStateChanged = false;
 
         private Dictionary<string, string> _cheatsheets;
         private Dictionary<string, string> _webcCheatsheets;
@@ -38,10 +52,16 @@ namespace AimAssist.Service
 
         public CheatSheetController(Dispatcher dispatcher, IWindowHandleService windowHandleService)
         {
+            // デバッグモードの検出
+            _isDebugMode = Debugger.IsAttached;
+            
             _keyboardProc = KeyboardHookCallback;
             _mouseProc = MouseHookCallback;
+            
+            // デバッグ中でもフックを有効にするが、最適化を適用
             _keyboardHookID = SetKeyboardHook(_keyboardProc);
             _mouseHookID = SetMouseHook(_mouseProc);
+            
             InitializeCheatsheets();
 
             _timer = new DispatcherTimer();
@@ -104,24 +124,55 @@ namespace AimAssist.Service
 
         private IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0)
+            // 無効なコードは早期リターン
+            if (nCode < 0)
+                return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
+                
+            // イベント処理を制限
+            var now = DateTime.Now;
+            var throttleTime = _isDebugMode ? _debugEventThrottle : _releaseEventThrottle;
+            
+            if (now - _lastKeyboardEventTime < throttleTime)
             {
+                return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
+            }
+            _lastKeyboardEventTime = now;
+            
+            try
+            {
+                // Marshal.ReadInt32の回数を減らすため、一度だけ読み取り
                 int vkCode = Marshal.ReadInt32(lParam);
 
-                if ((Keys)vkCode == Keys.LControlKey || (Keys)vkCode == Keys.RControlKey)
+                // 定数を使用して比較を高速化
+                if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL)
                 {
-                    if (wParam == (IntPtr)WM_KEYDOWN && !_isCtrlPressed)
+                    bool isKeyDown = wParam == (IntPtr)WM_KEYDOWN;
+                    bool isKeyUp = wParam == (IntPtr)WM_KEYUP;
+                    
+                    if (isKeyDown && !_isCtrlPressed)
                     {
                         _isCtrlPressed = true;
-                        _ctrlKeyPressStart = DateTime.Now;
+                        _ctrlKeyStateChanged = true;
+                        _ctrlKeyPressStart = now; // 既にDateTime.Nowを取得済み
                         _timer.Start();
                     }
-                    else if (wParam == (IntPtr)WM_KEYUP)
+                    else if (isKeyUp && _isCtrlPressed)
                     {
                         _isCtrlPressed = false;
+                        _ctrlKeyStateChanged = true;
                         _timer.Stop();
-                        dispatcher.Invoke(() => CloseCheatSheet());
+                        
+                        // 非同期実行で応答性を向上
+                        dispatcher.BeginInvoke(() => CloseCheatSheet());
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーログは最小限に
+                if (!_isDebugMode)
+                {
+                    Debug.WriteLine($"KeyboardHook error: {ex.Message}");
                 }
             }
 
@@ -130,15 +181,39 @@ namespace AimAssist.Service
 
         private IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && _isCtrlPressed)
+            // 無効なコードまたはCtrlキーが押されていない場合は早期リターン
+            if (nCode < 0 || !_isCtrlPressed)
+                return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+                
+            // イベント処理を制限
+            var now = DateTime.Now;
+            var throttleTime = _isDebugMode ? _debugEventThrottle : _releaseEventThrottle;
+            
+            if (now - _lastMouseEventTime < throttleTime)
             {
-                if (wParam == (IntPtr)WM_MOUSEWHEEL ||
-                    wParam == (IntPtr)WM_LBUTTONDOWN ||
-                    wParam == (IntPtr)WM_RBUTTONDOWN ||
-                    wParam == (IntPtr)WM_MBUTTONDOWN)
+                return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+            }
+            _lastMouseEventTime = now;
+            
+            try
+            {
+                // IntPtr比較を一度にまとめて効率化
+                IntPtr msgType = wParam;
+                if (msgType == (IntPtr)WM_MOUSEWHEEL ||
+                    msgType == (IntPtr)WM_LBUTTONDOWN ||
+                    msgType == (IntPtr)WM_RBUTTONDOWN ||
+                    msgType == (IntPtr)WM_MBUTTONDOWN)
                 {
                     // Ctrl押下中にスクロールまたはクリックが検出された場合、タイマーをリセット
                     ResetTimer();
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーログは最小限に
+                if (!_isDebugMode)
+                {
+                    Debug.WriteLine($"MouseHook error: {ex.Message}");
                 }
             }
 
@@ -154,9 +229,22 @@ namespace AimAssist.Service
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (_isCtrlPressed && (DateTime.Now - _ctrlKeyPressStart).TotalSeconds >= 1)
+            // Ctrlキーが押されていない場合は早期リターン
+            if (!_isCtrlPressed)
             {
-                dispatcher.Invoke(() => ShowCheatSheet(_windowHandleService.GetActiveProcessName()));
+                _timer.Stop();
+                return;
+            }
+                
+            // 1秒以上経過したかチェック
+            if ((DateTime.Now - _ctrlKeyPressStart).TotalSeconds >= 1)
+            {
+                // 常にBeginInvokeで非同期実行（応答性向上）
+                dispatcher.BeginInvoke(() => 
+                {
+                    var processName = _windowHandleService.GetActiveProcessName();
+                    ShowCheatSheet(processName);
+                });
                 _timer.Stop();
             }
         }
@@ -180,71 +268,59 @@ namespace AimAssist.Service
         /// <param name="processName">対象プロセス名</param>
         public async Task ShowCheatSheet(string processName)
         {
+            // 既にポップアップが表示されている場合は早期リターン
             if (_cheatsheetPopup != null)
-            {
                 return;
-            }
 
             try
             {
-                if (_cheatsheets.TryGetValue(processName, out string cheatsheetContent))
+                // チートシートコンテンツを取得
+                if (!_cheatsheets.TryGetValue(processName, out string cheatsheetContent))
+                    return;
+
+                string title = processName;
+
+                // アプリケーション名の場合の特別処理
+                if (processName == Constants.AppName)
                 {
-                    if(processName == Constants.AppName)
+                    var unit = GetMainWindowCurrentUnit();
+                    if (unit is UrlUnit urlUnit)
                     {
-                        var unit = GetMainWindowCurrentUnit();
-                        if(unit is UrlUnit urlUnit)
+                        var domainName = GetDomainFromUrl(urlUnit.Description);
+                        if (_webcCheatsheets.TryGetValue(domainName, out var webCheatSheet))
                         {
-                            var domainName = GetDomainFromUrl(urlUnit.Description);
-                            if(_webcCheatsheets.TryGetValue(domainName, out var webCheatSheet))
-                            {
-                                cheatsheetContent += webCheatSheet;
-                                _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, processName + " / " + domainName);
-                            }
-                            else
-                            {
-                                return;
-                            }
+                            cheatsheetContent += webCheatSheet;
+                            title = $"{processName} / {domainName}";
                         }
                         else
                         {
-                            _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, processName);
+                            return;
                         }
                     }
-                    else
-                    {
-                        _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, processName);
-                    }
-                }
-                else
-                {
-                    return;
                 }
 
-                // アクティブウィンドウの位置を取得
+                // ポップアップを作成
+                _cheatsheetPopup = new CheatsheetPopup(cheatsheetContent, title);
+
+                // 画面位置の計算を最適化
                 IntPtr activeWindow = GetForegroundWindow();
-                RECT activeWindowRect;
-                GetWindowRect(activeWindow, out activeWindowRect);
+                var activeScreen = System.Windows.Forms.Screen.FromHandle(activeWindow);
 
-                // アクティブウィンドウが表示されているスクリーンを特定
-                System.Windows.Forms.Screen activeScreen = System.Windows.Forms.Screen.FromHandle(activeWindow);
-
-                if(_cheatsheetPopup == null)
-                {
-                    return;
-                }
+                const int popupHeight = 220;
                 
-                // チートシートポップアップの位置とサイズを設定
+                // ポップアップの位置とサイズを設定
                 _cheatsheetPopup.Width = activeScreen.WorkingArea.Width;
-                _cheatsheetPopup.Height = 220; // 必要に応じて調整
+                _cheatsheetPopup.Height = popupHeight;
                 _cheatsheetPopup.Left = activeScreen.WorkingArea.Left;
-                _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - _cheatsheetPopup.Height;
+                _cheatsheetPopup.Top = activeScreen.WorkingArea.Bottom - popupHeight;
 
                 _cheatsheetPopup.Show();
             }
             catch (Exception ex)
             {
+                // エラー時はポップアップをクリア
+                _cheatsheetPopup = null;
                 Debug.WriteLine($"チートシート表示エラー: {ex.Message}");
-                // エラーログの記録などの追加処理を行う
             }
         }
 
