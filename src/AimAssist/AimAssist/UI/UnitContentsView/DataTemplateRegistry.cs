@@ -61,14 +61,14 @@ namespace AimAssist.UI.UnitContentsView
             }
         }
 
-        public static UIElement CreateView(IUnit unit, IServiceProvider serviceProvider = null)
+        public static UIElement? CreateView(IUnit unit, IServiceProvider? serviceProvider = null)
         {
             var unitType = unit.GetType();
             if (registeredTemplates.TryGetValue(unitType, out var templateInfo))
             {
                 try
                 {
-                    UIElement view;
+                    UIElement? view;
                     var useDependencyInjection =
                         templateInfo.ViewType.GetConstructors().Any(c => c.GetParameters().Length != 0);
                     
@@ -81,7 +81,7 @@ namespace AimAssist.UI.UnitContentsView
                         view = Activator.CreateInstance(templateInfo.ViewType) as UIElement;
                     }
 
-                    return view;
+                    return view ?? throw new InvalidOperationException($"Failed to create view for {unitType.Name}");
                 }
                 catch (Exception ex)
                 {
@@ -92,7 +92,7 @@ namespace AimAssist.UI.UnitContentsView
             return null;
         }
 
-        private static UIElement CreateInstanceWithDI(IUnit unit, Type viewType, IServiceProvider serviceProvider)
+        private static UIElement? CreateInstanceWithDI(IUnit unit, Type viewType, IServiceProvider serviceProvider)
         {
             var constructors = viewType.GetConstructors()
                 .OrderByDescending(c => c.GetParameters().Length);
@@ -107,7 +107,7 @@ namespace AimAssist.UI.UnitContentsView
                     for (int i = 0; i < parameters.Length; i++)
                     {
                         var parameterType = parameters[i].ParameterType;
-                        object service;
+                        object? service;
 
                         if (parameterType == typeof(IServiceProvider))
                         {
@@ -128,10 +128,10 @@ namespace AimAssist.UI.UnitContentsView
                             break;
                         }
 
-                        args[i] = service ?? parameters[i].DefaultValue;
+                        args[i] = service ?? parameters[i].DefaultValue!;
                     }
 
-                    return Activator.CreateInstance(viewType, args) as UIElement;
+                    return (UIElement?)Activator.CreateInstance(viewType, args);
                 }
                 catch
                 {
@@ -139,7 +139,7 @@ namespace AimAssist.UI.UnitContentsView
                 }
             }
 
-            return Activator.CreateInstance(viewType) as UIElement;
+            return (UIElement?)Activator.CreateInstance(viewType);
         }
 
         public static bool HasTemplate(Type unitType)

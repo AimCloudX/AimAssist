@@ -12,7 +12,7 @@ public class HotKeyController : IDisposable
 {
     private readonly nint windowHandle;
     private readonly Dictionary<int, HotKeyItem> hotkeyList = new Dictionary<int, HotKeyItem>();
-    private ICheatSheetController cheatSheetController;
+    private ICheatSheetController? cheatSheetController;
 
     private const int WmHotkey = 0x0312;
 
@@ -40,7 +40,7 @@ public class HotKeyController : IDisposable
         var id = msg.wParam.ToInt32();
         if (hotkeyList.TryGetValue(id, out var hotkey))
         {
-            hotkey.Command.Execute(null);
+            hotkey.Command?.Execute(null!);
         }
     }
 
@@ -56,7 +56,7 @@ public class HotKeyController : IDisposable
     /// <param name="key"></param>
     /// <param name="command"></param>
     /// <returns></returns>
-    public bool Register(ModifierKeys modKey, Key key, RelayCommand? command)
+    public bool Register(ModifierKeys modKey, Key key, RelayCommand? command = null!)
     {
         var modKeyNum = (int)modKey;
         var vKey = KeyInterop.VirtualKeyFromKey(key);

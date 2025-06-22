@@ -34,7 +34,7 @@ namespace AimAssist.Service
                 var keySequence = new KeySequence(_lastKey, _lastModifiers, key, modifiers);
                 if (_commandService.TryGetFirstSecontKeyCommand(keySequence, out var doubleKeyCommand))
                 {
-                    doubleKeyCommand.Execute(window);
+                    doubleKeyCommand?.Execute(window);
                     ResetKeySequence();
                     return true;
                 }
@@ -49,7 +49,7 @@ namespace AimAssist.Service
             var singleKeySequence = new KeyGesture(key, modifiers);
             if (_commandService.TryGetFirstOnlyKeyCommand(singleKeySequence, out var command))
             {
-                command.Execute(window);
+                command?.Execute(window);
                 ResetKeySequence();
                 return true;
             }

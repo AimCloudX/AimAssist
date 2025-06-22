@@ -43,7 +43,7 @@ namespace AimAssist.Services.Initialization
             
             if (!File.Exists(editorOptionPath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(editorOptionPath));
+                Directory.CreateDirectory(Path.GetDirectoryName(editorOptionPath)!);
                 File.Copy(editorOptionSource, editorOptionPath);
             }
         }
@@ -53,7 +53,7 @@ namespace AimAssist.Services.Initialization
             string workItemOptionSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "WorkItems", "workitem.option.json");
             if (!File.Exists(_workItemOptionService.OptionPath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(_workItemOptionService.OptionPath));
+                Directory.CreateDirectory(Path.GetDirectoryName(_workItemOptionService.OptionPath)!);
                 File.Copy(workItemOptionSource, _workItemOptionService.OptionPath);
             }
 
@@ -62,7 +62,7 @@ namespace AimAssist.Services.Initialization
             string sourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "WorkItems", "WorkItem.md");
             if (!File.Exists(targetPath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+                Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
                 File.Copy(sourcePath, targetPath);
             }
         }
@@ -72,7 +72,7 @@ namespace AimAssist.Services.Initialization
             string snippetoption = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "snippet.option.json");
             if (!File.Exists(_snippetOptionService.OptionPath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(_snippetOptionService.OptionPath));
+                Directory.CreateDirectory(Path.GetDirectoryName(_snippetOptionService.OptionPath)!);
                 File.Copy(snippetoption, _snippetOptionService.OptionPath);
             }
 
@@ -81,7 +81,7 @@ namespace AimAssist.Services.Initialization
             string snippetSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Snippets", "SnippetsStandard.md");
             if (!File.Exists(snippetDefault))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(snippetDefault));
+                Directory.CreateDirectory(Path.GetDirectoryName(snippetDefault)!);
                 File.Copy(snippetSource, snippetDefault);
             }
         }

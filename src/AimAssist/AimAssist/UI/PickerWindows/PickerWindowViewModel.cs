@@ -304,12 +304,14 @@ namespace AimAssist.UI.PickerWindows
         {
             if (SelectedUnit?.Content is SnippetUnit)
             {
-                SnippetText = await EditorCache.Editor?.GetText() ?? string.Empty;
+                var text = EditorCache.Editor?.GetText();
+                SnippetText = (text != null ? await text : string.Empty) ?? string.Empty;
                 IsClosing = true;
             }
             else if (SelectedUnit?.Content is SnippetModelUnit)
             {
-                SnippetText = await EditorCache.Editor?.GetText() ?? string.Empty;
+                var text = EditorCache.Editor?.GetText();
+                SnippetText = (text != null ? await text : string.Empty) ?? string.Empty;
                 IsClosing = true;
             }
             else if (SelectedUnit?.Content is CalcUnit calcUnit)

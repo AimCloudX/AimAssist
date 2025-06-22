@@ -44,7 +44,7 @@ namespace AimAssist.Service
                 options.WriteIndented = true;
                 options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
                 string json = File.ReadAllText(_settingsFilePath);
-                return JsonSerializer.Deserialize<Dictionary<string, KeySequence>>(json, options);
+                return JsonSerializer.Deserialize<Dictionary<string, KeySequence>>(json, options) ?? new Dictionary<string, KeySequence>();
             }
 
             return new Dictionary<string, KeySequence>(); // デフォルト設定を返す

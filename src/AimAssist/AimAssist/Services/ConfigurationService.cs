@@ -6,7 +6,7 @@ namespace AimAssist.Services
 {
     public interface IConfigurationService
     {
-        T GetConfiguration<T>(string key, T defaultValue = default);
+        T GetConfiguration<T>(string key, T defaultValue = default!);
         void SetConfiguration<T>(string key, T value);
         void SaveAllConfigurations();
         void LoadAllConfigurations();
@@ -37,7 +37,7 @@ namespace AimAssist.Services
             _logService = logService;
         }
 
-        public T GetConfiguration<T>(string key, T defaultValue = default)
+        public T GetConfiguration<T>(string key, T defaultValue = default!)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace AimAssist.Services
                 }
 
                 var value = GetConfigurationFromSource<T>(key) ?? defaultValue;
-                _configurationCache[key] = value;
+                _configurationCache[key] = value!;
                 return value;
             }
             catch (Exception ex)
@@ -67,7 +67,7 @@ namespace AimAssist.Services
                     return;
                 }
 
-                _configurationCache[key] = value;
+                _configurationCache[key] = value!;
                 SetConfigurationToSource(key, value);
                 _logService.Info($"設定が更新されました。キー: {key}");
             }
@@ -120,13 +120,13 @@ namespace AimAssist.Services
             };
         }
 
-        private T GetConfigurationFromSource<T>(string key)
+        private T? GetConfigurationFromSource<T>(string key)
         {
             return key switch
             {
-                var k when k.StartsWith("Editor") => (T)GetEditorConfiguration(k),
-                var k when k.StartsWith("Snippet") => (T)GetSnippetConfiguration(k),
-                var k when k.StartsWith("WorkItem") => (T)GetWorkItemConfiguration(k),
+                var k when k.StartsWith("Editor") => (T?)GetEditorConfiguration(k),
+                var k when k.StartsWith("Snippet") => (T?)GetSnippetConfiguration(k),
+                var k when k.StartsWith("WorkItem") => (T?)GetWorkItemConfiguration(k),
                 _ => default
             };
         }
@@ -147,17 +147,17 @@ namespace AimAssist.Services
             }
         }
 
-        private object GetEditorConfiguration(string key)
+        private object? GetEditorConfiguration(string key)
         {
             return null;
         }
 
-        private object GetSnippetConfiguration(string key)
+        private object? GetSnippetConfiguration(string key)
         {
             return null;
         }
 
-        private object GetWorkItemConfiguration(string key)
+        private object? GetWorkItemConfiguration(string key)
         {
             return null;
         }

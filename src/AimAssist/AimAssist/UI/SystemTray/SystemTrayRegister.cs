@@ -27,8 +27,8 @@ namespace AimAssist.UI.SystemTray
         public void Register() 
         { 
             var menu = new ContextMenuStrip();
-            menu.Items.Add("Show PickerWindow", null, Show_Click);
-            menu.Items.Add("Quit AimAssist", null, Exit_Click);
+            menu.Items.Add("Show PickerWindow", image: null, Show_Click);
+            menu.Items.Add("Quit AimAssist", image: null, Exit_Click);
             var icon = App.GetResourceStream(new Uri("Resources/Icons/AimAssist.ico", UriKind.Relative)).Stream;
             _notifyIcon = new NotifyIcon
             {
@@ -42,14 +42,14 @@ namespace AimAssist.UI.SystemTray
 
         private void Show_Click(object? sender, EventArgs e)
         {
-            _appCommands.ToggleMainWindow.Execute(null);
+            _appCommands.ToggleMainWindow.Execute(null!);
         }
 
         private void NotifyIcon_Click(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                _appCommands.ToggleMainWindow.Execute(null);
+                _appCommands.ToggleMainWindow.Execute(null!);
             }
         }
 

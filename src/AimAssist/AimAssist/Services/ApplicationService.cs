@@ -46,7 +46,8 @@ namespace AimAssist.Services
                 var settings = _configurationManager.GetConfiguration<Dictionary<string, KeySequence>>("Keymap", "AllSettings", new Dictionary<string, KeySequence>());
                 if (settings != null && settings.Count > 0)
                 {
-                    _commandService.SetKeymap(settings);
+                    var nullableSettings = settings.ToDictionary(kvp => kvp.Key, kvp => (KeySequence?)kvp.Value);
+                    _commandService.SetKeymap(nullableSettings);
                 }
 
                 _logService.Info("アプリケーションサービスの初期化が正常に完了しました");

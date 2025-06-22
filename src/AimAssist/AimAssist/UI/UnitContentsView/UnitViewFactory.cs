@@ -52,7 +52,7 @@ namespace AimAssist.UI.UnitContentsView
             {
                 cache.Add(unit.Name, element);
             }
-            return element;
+            return element ?? new ContentPresenter();
         }
 
         private UIElement CreateInner(UnitViewModel unit)
