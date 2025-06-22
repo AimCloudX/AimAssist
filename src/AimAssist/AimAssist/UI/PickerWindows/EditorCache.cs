@@ -15,6 +15,6 @@ namespace AimAssist.UI.PickerWindows
         /// <summary>
         /// エディターインスタンスを取得または設定します
         /// </summary>
-        public static MonacoEditor Editor { get; set; }
+        public static MonacoEditor Editor { get; set; } = null!;
     }
 }

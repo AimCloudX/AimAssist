@@ -10,7 +10,7 @@ namespace AimAssist.Service
 {
     public class WindowHandleService : IWindowHandleService
     {
-        public IMainWindow Window { get; private set; }
+        public IMainWindow Window { get; private set; } = null!;
         private bool isActivate;
         private readonly IServiceProvider _serviceProvider;
 

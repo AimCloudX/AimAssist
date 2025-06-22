@@ -8,7 +8,7 @@ namespace AimAssist.Behaviors
 {
     public class DelayedFilterBehavior : Behavior<System.Windows.Controls.TextBox>
     {
-        private DispatcherTimer timer;
+        private DispatcherTimer timer = null!;
         private string previousText = string.Empty;
 
 
@@ -52,7 +52,7 @@ namespace AimAssist.Behaviors
             base.OnDetaching();
             AssociatedObject.TextChanged -= OnTextChanged;
             timer?.Stop();
-            timer = null;
+            timer = null!;
         }
 
         private void InitializeTimer()
@@ -64,13 +64,13 @@ namespace AimAssist.Behaviors
             timer.Tick += OnTimerTick;
         }
 
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        private void OnTextChanged(object? sender, TextChangedEventArgs e)
         {
             timer?.Stop();
             timer?.Start();
         }
 
-        private void OnTimerTick(object sender, EventArgs e)
+        private void OnTimerTick(object? sender, EventArgs e)
         {
             timer?.Stop();
 
@@ -80,12 +80,13 @@ namespace AimAssist.Behaviors
             ApplyFilter();
             previousText = AssociatedObject.Text;
 
-            FilterTarget.SelectedIndex = 0;
+            if (FilterTarget != null)
+                FilterTarget.SelectedIndex = 0;
         }
 
         private void ApplyFilter()
         {
-            if (FilterTarget.ItemsSource == null) return;
+            if (FilterTarget?.ItemsSource == null) return;
 
             var view = CollectionViewSource.GetDefaultView(FilterTarget.ItemsSource);
             if (view != null)

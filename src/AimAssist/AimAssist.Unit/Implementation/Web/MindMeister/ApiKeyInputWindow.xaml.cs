@@ -16,17 +16,17 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             InitializeComponent();
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private void OkButton_Click(object? sender, RoutedEventArgs e)
         {
             ApiKey = ApiKeyTextBox.Text.Trim();
             DialogResult = true;
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object? sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        private void Hyperlink_RequestNavigate(object? sender, RequestNavigateEventArgs e)
         {
             try
             {

@@ -60,7 +60,7 @@ namespace Common.UI.WebUI.Amazon
             }
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void UserControl_Loaded(object? sender, RoutedEventArgs e)
         {
             InitializeWebView();
         }
@@ -137,7 +137,7 @@ ASIN;
             }
         }
 
-        private void Button_Click1(object sender, RoutedEventArgs e)
+        private void Button_Click1(object? sender, RoutedEventArgs e)
         {
             if (book == null)
             {
@@ -187,7 +187,7 @@ ASIN;
             }
         }
 
-        private void Button_Click2(object sender, RoutedEventArgs e)
+        private void Button_Click2(object? sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(url))
             {
@@ -222,7 +222,7 @@ ASIN;
             }
         }
 
-        private void webView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        private void webView_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
         {
             this.CanExectuteCommand = false;
             OnPropertyChanged(nameof(CanExectuteCommand));
@@ -233,7 +233,7 @@ ASIN;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private void Button_Click3(object sender, RoutedEventArgs e)
+        private void Button_Click3(object? sender, RoutedEventArgs e)
         {
             // デフォルトのブラウザでURLを開く
             Process.Start(new ProcessStartInfo

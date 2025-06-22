@@ -33,7 +33,7 @@ namespace AimAssist.Services
             this.logService = logService;
         }
 
-        public async Task InitializeAllModulesAsync()
+        public Task InitializeAllModulesAsync()
         {
             try
             {
@@ -58,9 +58,11 @@ namespace AimAssist.Services
                 logService.LogException(ex, "モジュール初期化中にエラーが発生しました");
                 throw;
             }
+            
+            return Task.CompletedTask;
         }
 
-        public async Task InitializeModuleAsync(string moduleName)
+        public Task InitializeModuleAsync(string moduleName)
         {
             try
             {
@@ -82,7 +84,7 @@ namespace AimAssist.Services
                         break;
                     default:
                         logService.Warning($"不明なモジュール名: {moduleName}");
-                        return;
+                        return Task.CompletedTask;
                 }
 
                 logService.Info($"モジュール '{moduleName}' の初期化が完了しました");
@@ -92,9 +94,11 @@ namespace AimAssist.Services
                 logService.LogException(ex, $"モジュール '{moduleName}' の初期化中にエラーが発生しました");
                 throw;
             }
+            
+            return Task.CompletedTask;
         }
 
-        public async Task ShutdownAllModulesAsync()
+        public Task ShutdownAllModulesAsync()
         {
             try
             {
@@ -119,9 +123,11 @@ namespace AimAssist.Services
                 logService.LogException(ex, "モジュールシャットダウン中にエラーが発生しました");
                 throw;
             }
+            
+            return Task.CompletedTask;
         }
 
-        public async Task ShutdownModuleAsync(string moduleName)
+        public Task ShutdownModuleAsync(string moduleName)
         {
             try
             {
@@ -143,7 +149,7 @@ namespace AimAssist.Services
                         break;
                     default:
                         logService.Warning($"不明なモジュール名: {moduleName}");
-                        return;
+                        return Task.CompletedTask;
                 }
 
                 logService.Info($"モジュール '{moduleName}' のシャットダウンが完了しました");
@@ -153,6 +159,8 @@ namespace AimAssist.Services
                 logService.LogException(ex, $"モジュール '{moduleName}' のシャットダウン中にエラーが発生しました");
                 throw;
             }
+            
+            return Task.CompletedTask;
         }
 
         public bool IsModuleInitialized(string moduleName)

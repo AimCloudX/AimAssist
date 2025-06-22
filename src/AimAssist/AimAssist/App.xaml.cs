@@ -15,12 +15,12 @@ namespace AimAssist
 {
     public partial class App : System.Windows.Application
     {
-        private static Mutex mutex;
+        private static Mutex? mutex;
         private const string appName = "AimAssist";
         private const string PipeName = "AimAssist";
-        public ServiceProvider _serviceProvider { get; private set; }
+        public ServiceProvider _serviceProvider { get; private set; } = null!;
 
-        private void Application_Startup(object sender, System.Windows.StartupEventArgs e)
+        private void Application_Startup(object? sender, System.Windows.StartupEventArgs e)
         {
             ConfigureServices();
 
@@ -83,7 +83,7 @@ namespace AimAssist
             }
         }
 
-        private void WaitCallActivate(object state)
+        private void WaitCallActivate(object? state)
         {
             while (true)
             {
@@ -101,13 +101,14 @@ namespace AimAssist
             }
         }
 
-        private void Application_Exit(object sender, System.Windows.ExitEventArgs e)
+        private void Application_Exit(object? sender, System.Windows.ExitEventArgs e)
         {
             try
             {
                 var applicationService = _serviceProvider.GetRequiredService<IApplicationService>();
-                applicationService.ShutdownAsync().Wait();
-                mutex.ReleaseMutex();
+                // Use Task.Run to avoid potential deadlocks in exit handler
+                Task.Run(async () => await applicationService.ShutdownAsync()).Wait(TimeSpan.FromSeconds(5));
+                mutex?.ReleaseMutex();
             }
             catch (Exception ex)
             {

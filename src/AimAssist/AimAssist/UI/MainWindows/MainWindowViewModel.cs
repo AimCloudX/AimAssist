@@ -26,11 +26,11 @@ namespace AimAssist.UI.MainWindows
         private readonly UnitViewFactory unitViewFactory;
         
         private string filterText = string.Empty;
-        private UnitViewModel selectedUnit;
-        private IMode selectedMode;
+        private UnitViewModel selectedUnit = null!;
+        private IMode selectedMode = null!;
         private bool isLoading;
         private bool isItemListVisible = true;
-        private UIElement currentContent;
+        private UIElement currentContent = null!;
 
         public MainWindowViewModel(
             IUnitManagementService unitManagementService,
@@ -228,7 +228,7 @@ namespace AimAssist.UI.MainWindows
             }
         }
 
-        private async Task RefreshUnitsAsync()
+        private Task RefreshUnitsAsync()
         {
             try
             {
@@ -245,9 +245,11 @@ namespace AimAssist.UI.MainWindows
             {
                 IsLoading = false;
             }
+            
+            return Task.CompletedTask;
         }
         
-        private void ExecuteReceiveData(object sender, ExecutedRoutedEventArgs e)
+        private void ExecuteReceiveData(object? sender, ExecutedRoutedEventArgs e)
         {
             if (e.Parameter is UnitsArgs unitsArgs)
             {
@@ -304,7 +306,7 @@ namespace AimAssist.UI.MainWindows
             FilterText = string.Empty;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

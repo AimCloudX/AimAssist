@@ -30,12 +30,12 @@ namespace AimAssist.Commands
         /// <summary>
         /// メインウィンドウを切り替えるコマンド
         /// </summary>
-        public HotkeyCommand ToggleMainWindow { get; private set; }
+        public HotkeyCommand ToggleMainWindow { get; private set; } = null!;
         
         /// <summary>
         /// ピッカーウィンドウを表示するコマンド
         /// </summary>
-        public HotkeyCommand ShowPickerWindow { get; private set; }
+        public HotkeyCommand ShowPickerWindow { get; private set; } = null!;
         
         /// <summary>
         /// コマンドを初期化します

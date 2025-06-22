@@ -113,7 +113,7 @@ namespace Common.UI.Editor
             this.PreviewKeyDown += MainWindow_PreviewKeyDown;
         }
 
-        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void MainWindow_PreviewKeyDown(object? sender, KeyEventArgs e)
         {
             if (e.Key == Key.P && (Keyboard.Modifiers & ModifierKeys.Control) != 0 &&
                 (Keyboard.Modifiers & ModifierKeys.Shift) != 0)

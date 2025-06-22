@@ -45,7 +45,7 @@ namespace AimAssist.Behaviors
             timer = null;
         }
 
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        private void OnTextChanged(object? sender, TextChangedEventArgs e)
         {
             if (timer == null)
             {

@@ -37,15 +37,12 @@ namespace AimAssist.Service
         // キーコードキャッシュ
         private const int VK_LCONTROL = 0xA2;
         private const int VK_RCONTROL = 0xA3;
-        
-        // 最適化フラグ
-        private bool _ctrlKeyStateChanged = false;
 
-        private Dictionary<string, string> _cheatsheets;
-        private Dictionary<string, string> _webcCheatsheets;
+        private Dictionary<string, string> _cheatsheets = null!;
+        private Dictionary<string, string> _webcCheatsheets = null!;
 
-        private CheatsheetPopup _cheatsheetPopup;
-        private DispatcherTimer _timer;
+        private CheatsheetPopup? _cheatsheetPopup;
+        private DispatcherTimer _timer = null!;
 
         private readonly Dispatcher dispatcher;
         private readonly IWindowHandleService _windowHandleService;
@@ -152,14 +149,12 @@ namespace AimAssist.Service
                     if (isKeyDown && !_isCtrlPressed)
                     {
                         _isCtrlPressed = true;
-                        _ctrlKeyStateChanged = true;
                         _ctrlKeyPressStart = now; // 既にDateTime.Nowを取得済み
                         _timer.Start();
                     }
                     else if (isKeyUp && _isCtrlPressed)
                     {
                         _isCtrlPressed = false;
-                        _ctrlKeyStateChanged = true;
                         _timer.Stop();
                         
                         // 非同期実行で応答性を向上
@@ -227,7 +222,7 @@ namespace AimAssist.Service
             _timer.Start();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object? sender, EventArgs e)
         {
             // Ctrlキーが押されていない場合は早期リターン
             if (!_isCtrlPressed)
@@ -266,17 +261,17 @@ namespace AimAssist.Service
         /// チートシートを表示する
         /// </summary>
         /// <param name="processName">対象プロセス名</param>
-        public async Task ShowCheatSheet(string processName)
+        public Task ShowCheatSheet(string processName)
         {
             // 既にポップアップが表示されている場合は早期リターン
             if (_cheatsheetPopup != null)
-                return;
+                return Task.CompletedTask;
 
             try
             {
                 // チートシートコンテンツを取得
-                if (!_cheatsheets.TryGetValue(processName, out string cheatsheetContent))
-                    return;
+                if (!_cheatsheets.TryGetValue(processName, out string? cheatsheetContent))
+                    return Task.CompletedTask;
 
                 string title = processName;
 
@@ -294,7 +289,7 @@ namespace AimAssist.Service
                         }
                         else
                         {
-                            return;
+                            return Task.CompletedTask;
                         }
                     }
                 }
@@ -322,15 +317,17 @@ namespace AimAssist.Service
                 _cheatsheetPopup = null;
                 Debug.WriteLine($"チートシート表示エラー: {ex.Message}");
             }
+            
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// チートシートをアプリケーション名で表示する
         /// </summary>
         /// <param name="applicationName">アプリケーション名</param>
-        public async Task ShowCheatSheetByApplicationName(string applicationName)
+        public Task ShowCheatSheetByApplicationName(string applicationName)
         {
-            await ShowCheatSheet(applicationName);
+            return ShowCheatSheet(applicationName);
         }
 
         /// <summary>
@@ -345,7 +342,7 @@ namespace AimAssist.Service
             }
         }
 
-        private IUnit GetMainWindowCurrentUnit()
+        private IUnit? GetMainWindowCurrentUnit()
         {
             // メインウィンドウから現在のユニットを取得する処理を追加
             // この部分は実際の実装に合わせて修正する必要があります

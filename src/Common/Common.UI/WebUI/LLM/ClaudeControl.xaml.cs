@@ -75,12 +75,12 @@ namespace Common.UI.WebUI.LLM
             }
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void UserControl_Loaded(object? sender, RoutedEventArgs e)
         {
             InitializeWebView();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object? sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(title))
             {
@@ -129,7 +129,7 @@ namespace Common.UI.WebUI.LLM
             }
         }
 
-        private void Button_Click2(object sender, RoutedEventArgs e)
+        private void Button_Click2(object? sender, RoutedEventArgs e)
         {
             // デフォルトのブラウザでURLを開く
             Process.Start(new ProcessStartInfo

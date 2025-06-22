@@ -230,7 +230,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             }
         }
 
-        private void Button_Click2(object sender, RoutedEventArgs e)
+        private void Button_Click2(object? sender, RoutedEventArgs e)
         {
             Process.Start(new ProcessStartInfo
             {
@@ -269,7 +269,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             File.WriteAllBytes(apiKeyFilePath, encryptedApiKey);
         }
 
-        private void MenuItem_InputApiKey_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_InputApiKey_Click(object? sender, RoutedEventArgs e)
         {
             var apiKeyWindow = new ApiKeyInputWindow();
             if (apiKeyWindow.ShowDialog() == true)
@@ -296,7 +296,7 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
             }
         }
 
-        private void Button_Click3(object sender, RoutedEventArgs e)
+        private void Button_Click3(object? sender, RoutedEventArgs e)
         {
             if (webView.CoreWebView2 != null)
             {

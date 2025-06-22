@@ -44,7 +44,7 @@ namespace AimAssist.UI.MainWindows
             RegisterCommands();
         }
 
-        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        private void MainWindow_KeyDown(object? sender, KeyEventArgs e)
         {
             if (keySequenceManager.HandleKeyPress(e.Key, Keyboard.Modifiers, this))
             {
@@ -52,7 +52,7 @@ namespace AimAssist.UI.MainWindows
             }
         }
 
-        private void MainWindow_SourceInitialized(object sender, EventArgs e)
+        private void MainWindow_SourceInitialized(object? sender, EventArgs e)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace AimAssist.UI.MainWindows
             return IntPtr.Zero;
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object? sender, RoutedEventArgs e)
         {
             try
             {
@@ -92,7 +92,7 @@ namespace AimAssist.UI.MainWindows
             }
         }
 
-        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        private void MainWindow_Closing(object? sender, CancelEventArgs e)
         {
             try
             {
@@ -107,7 +107,7 @@ namespace AimAssist.UI.MainWindows
             }
         }
 
-        private void HamburgerButton_Click(object sender, RoutedEventArgs e)
+        private void HamburgerButton_Click(object? sender, RoutedEventArgs e)
         {
             try
             {

@@ -55,7 +55,7 @@ namespace AimAssist.Behaviors
             AssociatedObject.PreviewKeyDown -= OnPreviewKeyDown;
         }
 
-        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
         {
             switch (e.Key)
             {

@@ -237,7 +237,7 @@ namespace Common.UI.Markdown
     ";
         }
 
-        private void WebView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        private void WebView_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
         {
             if (e.Uri.StartsWith("http://") || e.Uri.StartsWith("https://"))
             {

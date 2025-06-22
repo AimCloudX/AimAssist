@@ -61,7 +61,7 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
             Clipboard.SetData(selectedFormat, await this.editor.GetText() ?? string.Empty);
         }
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             SetPreviewText();
         }
@@ -72,14 +72,16 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
 
             if (string.IsNullOrEmpty(selectedFormat))
             {
-                _ = this.editor.SetTextAsync(string.Empty);
+                // Fire-and-forget is intentional for UI responsiveness
+                _ = this.editor.SetTextAsync(string.Empty).ConfigureAwait(false);
                 return;
             }
 
             var foramtData = Items.FirstOrDefault(x => x.Format == selectedFormat);
             if (foramtData?.Data != null)
             {
-                _ = this.editor.SetTextAsync(foramtData.Data.ToString() ?? string.Empty);
+                // Fire-and-forget is intentional for UI responsiveness
+                _ = this.editor.SetTextAsync(foramtData.Data.ToString() ?? string.Empty).ConfigureAwait(false);
             }
         }
 
@@ -113,12 +115,12 @@ namespace AimAssist.Units.Implementation.ClipboardAnalyzer.UI
             await this.editor.SetTextAsync(sb.ToString().TrimEnd('\r', '\n'));
         }
 
-        private void Clear_Click(object sender, RoutedEventArgs e)
+        private void Clear_Click(object? sender, RoutedEventArgs e)
         {
             SetPreviewText();
         }
 
-        private void Update_Click(object sender, RoutedEventArgs e)
+        private void Update_Click(object? sender, RoutedEventArgs e)
         {
             UpdateClipboard();
             SetPreviewText();

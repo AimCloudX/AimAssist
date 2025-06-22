@@ -10,7 +10,7 @@ namespace AimAssist.UI.SystemTray
     public class SystemTrayRegister
     {
         private readonly IAppCommands _appCommands;
-        private NotifyIcon _notifyIcon;
+        private NotifyIcon _notifyIcon = null!;
 
         /// <summary>
         /// コンストラクタ

@@ -70,12 +70,12 @@ namespace Common.UI.WebUI
                 webView.CoreWebView2?.Navigate(url);
             } }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void UserControl_Loaded(object? sender, RoutedEventArgs e)
         {
             InitializeWebView();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object? sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(title))
             {
@@ -96,7 +96,7 @@ namespace Common.UI.WebUI
             webView.CoreWebView2?.ExecuteScriptAsync(bookmarklet);
         }
 
-        private void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        private void webView_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             if (e.IsSuccess)
             {
@@ -111,7 +111,7 @@ namespace Common.UI.WebUI
             }
         }
 
-        private void Button_Click2(object sender, RoutedEventArgs e)
+        private void Button_Click2(object? sender, RoutedEventArgs e)
         {
             Process.Start(new ProcessStartInfo
             {
@@ -120,7 +120,7 @@ namespace Common.UI.WebUI
             });
         }
 
-        private void Button_Click3(object sender, RoutedEventArgs e)
+        private void Button_Click3(object? sender, RoutedEventArgs e)
         {
             webView.CoreWebView2?.Navigate(this.url);
         }

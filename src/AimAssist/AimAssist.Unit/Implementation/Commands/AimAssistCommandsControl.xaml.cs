@@ -57,7 +57,7 @@ public partial class AimAssistCommandsControl : UserControl
         }
     }
 
-    private void CommandButton_Click(object sender, RoutedEventArgs e)
+    private void CommandButton_Click(object? sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is RelayCommand command)
         {

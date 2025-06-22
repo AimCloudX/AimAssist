@@ -23,7 +23,7 @@ namespace AimAssist.UI.PickerWindows
         private readonly string _processName;
         private DispatcherTimer? _filterTimer;
 
-        private IMode _mode;
+        private IMode _mode = null!;
         private int _selectedIndex;
         private string _filterText = string.Empty;
         private UnitViewModel? _selectedUnit;
@@ -84,7 +84,7 @@ namespace AimAssist.UI.PickerWindows
         }
 
         public string SnippetText { get; set; } = string.Empty;
-        public KeySequence KeySequence { get; set; }
+        public KeySequence KeySequence { get; set; } = null!;
         
         private bool _isClosing;
         public bool IsClosing 
@@ -226,15 +226,18 @@ namespace AimAssist.UI.PickerWindows
         {
             if (_selectedUnit?.Content is SnippetUnit snippetUnit)
             {
-                EditorCache.Editor?.SetTextAsync(snippetUnit.Code);
+                // Fire-and-forget is intentional for UI responsiveness
+                _ = EditorCache.Editor?.SetTextAsync(snippetUnit.Code);
             }
             else if (_selectedUnit?.Content is SnippetModelUnit snippetModelUnit)
             {
-                EditorCache.Editor?.SetTextAsync(snippetModelUnit.Code);
+                // Fire-and-forget is intentional for UI responsiveness
+                _ = EditorCache.Editor?.SetTextAsync(snippetModelUnit.Code);
             }
             else if (_selectedUnit?.Content is CalcUnit calcUnit)
             {
-                EditorCache.Editor?.SetTextAsync(calcUnit.Result);
+                // Fire-and-forget is intentional for UI responsiveness
+                _ = EditorCache.Editor?.SetTextAsync(calcUnit.Result);
             }
         }
 

@@ -38,7 +38,7 @@ namespace AimAssist.Services
         private readonly IApplicationLogService _logService;
         private ApplicationState _currentState = ApplicationState.NotStarted;
 
-        public event EventHandler<ApplicationStateChangedEventArgs> StateChanged;
+        public event EventHandler<ApplicationStateChangedEventArgs>? StateChanged;
 
         public ApplicationLifecycleService(IApplicationLogService logService)
         {
@@ -65,7 +65,7 @@ namespace AimAssist.Services
             }
         }
 
-        public async Task ShutdownAsync()
+        public Task ShutdownAsync()
         {
             try
             {
@@ -81,6 +81,8 @@ namespace AimAssist.Services
                 _logService.LogException(ex, "アプリケーション停止中にエラーが発生しました");
                 throw;
             }
+            
+            return Task.CompletedTask;
         }
 
         private void ChangeState(ApplicationState newState)

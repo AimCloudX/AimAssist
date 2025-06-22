@@ -113,7 +113,7 @@ namespace AimAssist.Middlewares
             }
         }
 
-        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void OnUnhandledException(object? sender, UnhandledExceptionEventArgs e)
         {
             if (e?.ExceptionObject is Exception exception)
             {
@@ -121,7 +121,7 @@ namespace AimAssist.Middlewares
             }
         }
 
-        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        private void OnDispatcherUnhandledException(object? sender, DispatcherUnhandledExceptionEventArgs e)
         {
             if (e?.Exception != null)
             {
@@ -130,7 +130,7 @@ namespace AimAssist.Middlewares
             }
         }
 
-        private void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
             if (e?.Exception != null)
             {

@@ -27,14 +27,15 @@ namespace AimAssist.Units.Implementation.Computer
             this.DataContext = this;
         }
 
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TabControl_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (sender is TabControl tabControl && tabControl.SelectedItem is TabItem selectedTab)
             {
                 var header = selectedTab.Header?.ToString();
                 if (!string.IsNullOrEmpty(header))
                 {
-                    Task.Run(() => LoadTabDataAsync(header));
+                    // Fire-and-forget is intentional for background data loading
+                    _ = Task.Run(() => LoadTabDataAsync(header));
                 }
             }
         }

@@ -76,7 +76,7 @@ namespace AimAssist.Units.Core.Modes
             Loaded += OnLoaded;
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
+        private void OnLoaded(object? sender, RoutedEventArgs e)
         {
             if (PlacementTarget is FrameworkElement target)
             {

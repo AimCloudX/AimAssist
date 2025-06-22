@@ -36,12 +36,12 @@ namespace AimAssist.Services.Editors
             }
         }
 
-        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void CommandBinding_Executed(object? sender, ExecutedRoutedEventArgs e)
         {
             this.Save();
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Button_Click(object? sender, System.Windows.RoutedEventArgs e)
         {
             var firstOrDefault = this.Models.FirstOrDefault(x => x.IsSelected);
             if(firstOrDefault != null)

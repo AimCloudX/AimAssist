@@ -29,14 +29,14 @@ namespace AimAssist.Units.Implementation.Options
         }
 
         private bool isFirstKeyEntered;
-        private void ShortcutTextBox_LostFocus(object sender, RoutedEventArgs e)
+        private void ShortcutTextBox_LostFocus(object? sender, RoutedEventArgs e)
         {
             if (sender is TextBox textBox && textBox.DataContext is ShortcutSource)
             {
                 isFirstKeyEntered = false;
             }
         }
-        private void ShortcutTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void ShortcutTextBox_PreviewKeyDown(object? sender, KeyEventArgs e)
         {
             e.Handled = true;
             if(e.Key == Key.Enter)
@@ -109,7 +109,7 @@ namespace AimAssist.Units.Implementation.Options
             return convertToString + "+" + key;
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void ButtonBase_OnClick(object? sender, RoutedEventArgs e)
         {
             ApplyKey();
         }
@@ -125,7 +125,7 @@ namespace AimAssist.Units.Implementation.Options
             }
         }
 
-        private void UIElement_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        private void UIElement_OnPreviewKeyDown(object? sender, KeyEventArgs e)
         {
             if (sender is TextBox textBox == false)
             {

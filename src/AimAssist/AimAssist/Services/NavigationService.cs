@@ -20,7 +20,7 @@ namespace AimAssist.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IApplicationLogService _logService;
-        private AimAssist.UI.MainWindows.MainWindow _mainWindow;
+        private AimAssist.UI.MainWindows.MainWindow? _mainWindow;
 
         public NavigationService(
             IServiceProvider serviceProvider,

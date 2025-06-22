@@ -44,7 +44,7 @@ namespace AimAssist.Units.Implementation.Pdf
             FileListBox.PreviewMouseMove += FileListBox_PreviewMouseMove;
         }
 
-        private void FileListBox_DragEnter(object sender, DragEventArgs e)
+        private void FileListBox_DragEnter(object? sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -59,7 +59,7 @@ namespace AimAssist.Units.Implementation.Pdf
                 e.Effects = DragDropEffects.None;
             }
         }
-        private void ListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ListBox_PreviewMouseLeftButtonDown(object? sender, MouseButtonEventArgs e)
         {
             if (sender is ListBox listBox && listBox.SelectedItem != null)
             {
@@ -67,13 +67,13 @@ namespace AimAssist.Units.Implementation.Pdf
             }
         }
 
-        private void ListBox_DragOver(object sender, DragEventArgs e)
+        private void ListBox_DragOver(object? sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.Move;
             e.Handled = true;
         }
 
-        private void ListBox_Drop(object sender, DragEventArgs e)
+        private void ListBox_Drop(object? sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(string)))
             {
@@ -96,13 +96,13 @@ namespace AimAssist.Units.Implementation.Pdf
                 }
             }
         }
-        private void FileListBox_DragOver(object sender, DragEventArgs e)
+        private void FileListBox_DragOver(object? sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.Move;
             e.Handled = true;
         }
 
-        private void FileListBox_Drop(object sender, DragEventArgs e)
+        private void FileListBox_Drop(object? sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(PdfFile)))
             {
@@ -134,12 +134,12 @@ namespace AimAssist.Units.Implementation.Pdf
             }
         }
 
-        private void FileListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void FileListBox_PreviewMouseLeftButtonDown(object? sender, MouseButtonEventArgs e)
         {
             draggedItemIndex = FileListBox.SelectedIndex;
         }
 
-        private void FileListBox_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void FileListBox_PreviewMouseMove(object? sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && draggedItemIndex != -1)
             {
@@ -159,7 +159,7 @@ namespace AimAssist.Units.Implementation.Pdf
             }
         }
 
-        private void AddPdfButton_Click(object sender, RoutedEventArgs e)
+        private void AddPdfButton_Click(object? sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -173,7 +173,7 @@ namespace AimAssist.Units.Implementation.Pdf
             }
         }
 
-        private void RemovePdfButton_Click(object sender, RoutedEventArgs e)
+        private void RemovePdfButton_Click(object? sender, RoutedEventArgs e)
         {
             if (FileListBox.SelectedItem is PdfFile pdfFile)
             {
@@ -181,7 +181,7 @@ namespace AimAssist.Units.Implementation.Pdf
             }
         }
 
-        private void MergePdfButton_Click(object sender, RoutedEventArgs e)
+        private void MergePdfButton_Click(object? sender, RoutedEventArgs e)
         {
             if (PdfFiles.Count < 2)
             {
@@ -228,12 +228,12 @@ namespace AimAssist.Units.Implementation.Pdf
             }
         }
 
-        private void ClearAllButton_Click(object sender, RoutedEventArgs e)
+        private void ClearAllButton_Click(object? sender, RoutedEventArgs e)
         {
             PdfFiles.Clear();
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Click(object? sender, RoutedEventArgs e)
         {
             if (FileListBox.SelectedItem is PdfFile pdfFile)
             {

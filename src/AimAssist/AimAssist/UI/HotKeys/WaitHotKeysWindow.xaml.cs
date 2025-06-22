@@ -30,7 +30,7 @@ namespace AimAssist.UI.HotKeys
                  += KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler; ;
         }
 
-        private void KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler(object sender, KeyGestureUpdatedEventArgs e)
+        private void KeyGesutureUpdatedEventPublisher_UpdateKeyGestureEventHandler(object? sender, KeyGestureUpdatedEventArgs e)
         {
             this.hotkeyController.Unregister(e.Before.FirstModifiers, e.Before.FirstKey);
             this.hotkeyController.Register(e.After.FirstModifiers, e.After.FirstKey, e.Command);

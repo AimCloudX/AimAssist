@@ -34,7 +34,7 @@ namespace AimAssist.UI.UnitContentsView
                 var image = new System.Windows.Controls.Image { Source = icon };
                 this.Icon = image;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
@@ -81,7 +81,7 @@ namespace AimAssist.UI.UnitContentsView
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private DependencyObject icon { get; set; }
+        private DependencyObject icon { get; set; } = null!;
         public IUnit Content { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
