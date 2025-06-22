@@ -85,6 +85,12 @@ namespace AimAssist.UI.MainWindows
             {
                 Activate();
                 Focus();
+                
+                // 先頭のユニットを選択
+                if (UnitListBox?.Items.Count > 0)
+                {
+                    UnitListBox.SelectedIndex = 0;
+                }
             }
             catch (Exception ex)
             {
