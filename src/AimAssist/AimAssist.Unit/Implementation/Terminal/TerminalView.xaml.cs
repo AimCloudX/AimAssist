@@ -257,10 +257,6 @@ namespace AimAssist.Units.Implementation.Terminal
                 {
                     UpdateStatus($"{conptySession.Title} がアクティブです");
                 }
-                else if (session is TerminalSession termSession)
-                {
-                    UpdateStatus($"{termSession.SessionName} がアクティブです");
-                }
                 else
                 {
                     UpdateStatus("ターミナルセッションがアクティブです");
