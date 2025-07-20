@@ -11,14 +11,14 @@ namespace AimAssist.Units.Implementation.Terminal
     public partial class TerminalView : UserControl
     {
         private int _tabCounter = 1;
-        private Dictionary<TabItem, TerminalSession> _terminals = new Dictionary<TabItem, TerminalSession>();
+        private Dictionary<TabItem, IDisposable> _terminals = new Dictionary<TabItem, IDisposable>();
 
         public TerminalView()
         {
             try
             {
                 InitializeComponent();
-                _terminals = new Dictionary<TabItem, TerminalSession>();
+                _terminals = new Dictionary<TabItem, IDisposable>();
                 this.Loaded += TerminalView_Loaded;
                 this.Unloaded += TerminalView_Unloaded;
             }
@@ -195,7 +195,7 @@ namespace AimAssist.Units.Implementation.Terminal
             }
 
             var sessionName = $"{shellDisplayName} {_tabCounter++}";
-            var terminalSession = new TerminalSession(sessionName, shellExecutable);
+            var terminalSession = new ConPtyTerminalSession(shellExecutable, sessionName);
             
             // Create tab header with close button
             var headerPanel = new StackPanel { Orientation = Orientation.Horizontal };
@@ -253,7 +253,18 @@ namespace AimAssist.Units.Implementation.Terminal
             if (tabControl.SelectedItem is TabItem selectedTab && _terminals.ContainsKey(selectedTab))
             {
                 var session = _terminals[selectedTab];
-                UpdateStatus($"{session.SessionName} がアクティブです");
+                if (session is ConPtyTerminalSession conptySession)
+                {
+                    UpdateStatus($"{conptySession.Title} がアクティブです");
+                }
+                else if (session is TerminalSession termSession)
+                {
+                    UpdateStatus($"{termSession.SessionName} がアクティブです");
+                }
+                else
+                {
+                    UpdateStatus("ターミナルセッションがアクティブです");
+                }
             }
         }
 
