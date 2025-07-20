@@ -66,15 +66,26 @@ namespace AimAssist.Units.Implementation.Terminal
                 {
                     await Task.Run(async () =>
                     {
-                        if (WslHelper.IsWslInstalled())
+                        // Try multiple methods to detect WSL
+                        bool wslInstalled = await WslHelper.IsWslInstalledAsync();
+                        if (!wslInstalled)
+                        {
+                            wslInstalled = WslHelper.IsWslInstalled();
+                        }
+
+                        if (wslInstalled)
                         {
                             var distributions = await WslHelper.GetInstalledDistributionsAsync();
                             
                             // UI操作はメインスレッドで実行
                             await Dispatcher.InvokeAsync(() =>
                             {
-                                foreach (var distro in distributions.Where(d => d.State.Equals("Running", StringComparison.OrdinalIgnoreCase) || 
-                                                                              d.State.Equals("Stopped", StringComparison.OrdinalIgnoreCase)))
+                                bool hasValidDistributions = false;
+                                
+                                foreach (var distro in distributions.Where(d => 
+                                    !string.IsNullOrWhiteSpace(d.Name) && 
+                                    (d.State.Equals("Running", StringComparison.OrdinalIgnoreCase) || 
+                                     d.State.Equals("Stopped", StringComparison.OrdinalIgnoreCase))))
                                 {
                                     var displayName = distro.IsDefault ? $"WSL ({distro.Name}) *" : $"WSL ({distro.Name})";
                                     var item = new ComboBoxItem 
@@ -83,14 +94,19 @@ namespace AimAssist.Units.Implementation.Terminal
                                         Tag = distro.Name
                                     };
                                     cmbShellType.Items.Add(item);
+                                    hasValidDistributions = true;
                                 }
 
                                 // ディストリビューションが見つからない場合は汎用WSLを追加
-                                if (!distributions.Any())
+                                if (!hasValidDistributions)
                                 {
-                                    cmbShellType.Items.Add(new ComboBoxItem { Content = "WSL" });
+                                    cmbShellType.Items.Add(new ComboBoxItem { Content = "WSL (デフォルト)" });
                                 }
                             });
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("WSL is not installed or not accessible");
                         }
                     });
                 }
@@ -98,6 +114,13 @@ namespace AimAssist.Units.Implementation.Terminal
                 {
                     // WSL検出でエラーが発生しても続行
                     System.Diagnostics.Debug.WriteLine($"WSL detection error: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"WSL detection stack trace: {ex.StackTrace}");
+                    
+                    // エラーが発生した場合でも汎用WSLオプションを追加
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        cmbShellType.Items.Add(new ComboBoxItem { Content = "WSL (汎用)" });
+                    });
                 }
 
                 // デフォルト選択を設定

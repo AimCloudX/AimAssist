@@ -28,24 +28,64 @@ namespace AimAssist.Units.Implementation.Terminal
                     Arguments = "--list --verbose",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     CreateNoWindow = true,
-                    StandardOutputEncoding = System.Text.Encoding.Unicode // Windows uses UTF-16 for wsl.exe output
+                    StandardOutputEncoding = System.Text.Encoding.UTF8 // Use UTF-8 encoding
                 };
 
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
-                    var output = await process.StandardOutput.ReadToEndAsync();
-                    await process.WaitForExitAsync();
-
-                    // Parse WSL output
-                    var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    var outputTask = process.StandardOutput.ReadToEndAsync();
+                    var errorTask = process.StandardError.ReadToEndAsync();
                     
-                    // Skip header line
-                    foreach (var line in lines.Skip(1))
+                    // Add timeout for the process
+                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(10));
+                    var completedTask = await Task.WhenAny(Task.WhenAll(outputTask, errorTask), timeoutTask);
+                    
+                    if (completedTask == timeoutTask)
                     {
-                        var parts = Regex.Split(line.Trim(), @"\s+");
-                        if (parts.Length >= 3)
+                        process.Kill();
+                        Console.WriteLine("WSL command timed out");
+                        return distributions;
+                    }
+
+                    await process.WaitForExitAsync();
+                    
+                    if (process.ExitCode != 0)
+                    {
+                        var error = await errorTask;
+                        Console.WriteLine($"WSL command failed with exit code {process.ExitCode}: {error}");
+                        return distributions;
+                    }
+
+                    var output = await outputTask;
+                    Console.WriteLine($"WSL output: {output}"); // Debug output
+
+                    // Parse WSL output - handle different encodings
+                    var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    // Skip header line and process each distribution line
+                    bool foundHeader = false;
+                    foreach (var line in lines)
+                    {
+                        var trimmedLine = line.Trim();
+                        
+                        // Skip header line (contains "NAME", "STATE", "VERSION")
+                        if (!foundHeader && (trimmedLine.Contains("NAME") || trimmedLine.Contains("名前")))
+                        {
+                            foundHeader = true;
+                            continue;
+                        }
+                        
+                        if (!foundHeader || string.IsNullOrWhiteSpace(trimmedLine))
+                            continue;
+
+                        // Clean up any non-printable characters
+                        var cleanLine = Regex.Replace(trimmedLine, @"[\u0000-\u001F\u007F-\u009F]", "");
+                        var parts = Regex.Split(cleanLine, @"\s+");
+                        
+                        if (parts.Length >= 2)
                         {
                             var name = parts[0];
                             var isDefault = false;
@@ -77,6 +117,7 @@ namespace AimAssist.Units.Implementation.Terminal
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to get WSL distributions: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
             }
 
             return distributions;
@@ -87,9 +128,9 @@ namespace AimAssist.Units.Implementation.Terminal
         {
             try
             {
-                // Use a timeout to prevent hanging
+                // Use a longer timeout to prevent hanging
                 var task = GetInstalledDistributionsAsync();
-                if (task.Wait(TimeSpan.FromSeconds(5)))
+                if (task.Wait(TimeSpan.FromSeconds(15)))
                 {
                     return task.Result;
                 }
@@ -99,8 +140,9 @@ namespace AimAssist.Units.Implementation.Terminal
                     return new List<WslDistribution>();
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Failed to get WSL distributions (sync): {ex.Message}");
                 return new List<WslDistribution>();
             }
         }
@@ -112,9 +154,10 @@ namespace AimAssist.Units.Implementation.Terminal
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = "wsl.exe",
-                    Arguments = "--help",
+                    Arguments = "--status",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     CreateNoWindow = true
                 };
 
@@ -122,18 +165,69 @@ namespace AimAssist.Units.Implementation.Terminal
                 if (process != null)
                 {
                     // Use timeout to prevent hanging
-                    if (process.WaitForExit(3000)) // 3 second timeout
+                    if (process.WaitForExit(5000)) // 5 second timeout
                     {
                         return process.ExitCode == 0;
                     }
                     else
                     {
-                        process.Kill(); // Kill if timeout
+                        try
+                        {
+                            process.Kill(); // Kill if timeout
+                        }
+                        catch { }
                         return false;
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WSL installation check failed: {ex.Message}");
+            }
+            
+            return false;
+        }
+
+        // Alternative method to check WSL using version command
+        public static async Task<bool> IsWslInstalledAsync()
+        {
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = "wsl.exe",
+                    Arguments = "--version",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using var process = Process.Start(startInfo);
+                if (process != null)
+                {
+                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(5));
+                    var processTask = process.WaitForExitAsync();
+                    
+                    var completedTask = await Task.WhenAny(processTask, timeoutTask);
+                    
+                    if (completedTask == timeoutTask)
+                    {
+                        try
+                        {
+                            process.Kill();
+                        }
+                        catch { }
+                        return false;
+                    }
+
+                    return process.ExitCode == 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WSL async installation check failed: {ex.Message}");
+            }
             
             return false;
         }
