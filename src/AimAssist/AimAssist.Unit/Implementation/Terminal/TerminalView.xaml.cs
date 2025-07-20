@@ -261,5 +261,86 @@ namespace AimAssist.Units.Implementation.Terminal
         {
             txtStatus.Text = message;
         }
+
+        private void BtnRunAsAdmin_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Windows Terminalがインストールされているかチェック
+                string terminalCommand = GetDefaultTerminalCommand();
+                
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = terminalCommand,
+                    UseShellExecute = true,
+                    Verb = "runas" // 管理者権限で実行
+                };
+
+                System.Diagnostics.Process.Start(startInfo);
+                UpdateStatus("管理者権限でターミナルを起動しました");
+            }
+            catch (Exception ex)
+            {
+                UpdateStatus($"管理者ターミナル起動エラー: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Admin terminal launch error: {ex.Message}");
+            }
+        }
+
+        private string GetDefaultTerminalCommand()
+        {
+            // Windows Terminalを優先、なければPowerShell、最後にコマンドプロンプト
+            
+            // Windows Terminal (wt.exe) - ファイル存在確認で検出
+            if (IsExecutableAvailable("wt.exe"))
+            {
+                return "wt.exe";
+            }
+
+            // PowerShell Core - ファイル存在確認で検出
+            if (IsExecutableAvailable("pwsh.exe"))
+            {
+                return "pwsh.exe";
+            }
+
+            // フォールバック：コマンドプロンプト（常に利用可能）
+            return "cmd.exe";
+        }
+
+        private bool IsExecutableAvailable(string executableName)
+        {
+            try
+            {
+                // where コマンドを使用してパスを確認（ウィンドウを表示せずに）
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "where.exe",
+                    Arguments = executableName,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                };
+
+                using (var process = System.Diagnostics.Process.Start(startInfo))
+                {
+                    if (process != null)
+                    {
+                        bool finished = process.WaitForExit(2000);
+                        if (finished && process.ExitCode == 0)
+                        {
+                            var output = process.StandardOutput.ReadToEnd();
+                            return !string.IsNullOrWhiteSpace(output);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error checking executable {executableName}: {ex.Message}");
+            }
+
+            return false;
+        }
     }
 }
