@@ -12,12 +12,12 @@
         </Grid.RowDefinitions>
         
         <!-- Terminal Display -->
-        <Border Grid.Row="0" Background="Black" BorderBrush="#333" BorderThickness="1">
+        <Border Grid.Row="0" Background="#2E3440" BorderBrush="#4C566A" BorderThickness="1">
             <ScrollViewer Name="scrollViewer" VerticalScrollBarVisibility="Auto" 
                           HorizontalScrollBarVisibility="Auto">
                 <TextBox Name="txtTerminal" 
-                         Background="Black" 
-                         Foreground="#00FF00"
+                         Background="#2E3440" 
+                         Foreground="#D8DEE9"
                          FontFamily="Consolas"
                          FontSize="12"
                          IsReadOnly="True"
@@ -31,18 +31,18 @@
         </Border>
         
         <!-- Input Area -->
-        <Grid Grid.Row="1" Background="#1E1E1E" Height="30">
+        <Grid Grid.Row="1" Background="#3B4252" Height="30">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <TextBlock Grid.Column="0" Text=">" Foreground="#00FF00" 
+            <TextBlock Grid.Column="0" Text=">" Foreground="#88C0D0" 
                        FontFamily="Consolas" FontSize="12" 
                        VerticalAlignment="Center" Margin="5,0"/>
             <TextBox Grid.Column="1" Name="txtInput" 
-                     Background="#1E1E1E" 
-                     Foreground="#00FF00"
+                     Background="#3B4252" 
+                     Foreground="#D8DEE9"
                      FontFamily="Consolas"
                      FontSize="12"
                      BorderThickness="0"
