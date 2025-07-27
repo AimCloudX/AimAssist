@@ -10,7 +10,7 @@ namespace AimAssist.Units.Implementation.Terminal
 
         public string Name => "ターミナル";
 
-        public string Description => "vs-pty.netを使用した高機能ターミナル（dirコマンド対応）";
+        public string Description => "PowerShell (pwsh) ベースの高機能ターミナル";
 
         public string Category => "System";
     }

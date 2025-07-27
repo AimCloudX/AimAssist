@@ -142,16 +142,16 @@ namespace AimAssist.Units.Implementation.Terminal
                 var workingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 
                 // Fallback to simple process execution if PTY fails
-                AppendOutput($"Starting terminal using enhanced process execution...\r\n");
+                AppendOutput($"Starting PowerShell terminal using enhanced process execution...\r\n");
                 AppendOutput($"Working directory: {workingDirectory}\r\n");
-                UpdateStatus("ターミナルを開始中...");
+                UpdateStatus("PowerShellターミナルを開始中...");
 
                 // Try PtyProvider first, fallback to process execution
                 try
                 {
                     var options = new PtyOptions
                     {
-                        App = "cmd.exe",
+                        App = "pwsh.exe",
                         Cwd = workingDirectory,
                         Cols = 100,
                         Rows = 30,
@@ -176,8 +176,8 @@ namespace AimAssist.Units.Implementation.Terminal
                     
                     _ = Task.Run(() => ReadOutputAsync(_cancellationTokenSource.Token));
                     
-                    AppendOutput("Terminal started successfully using vs-pty.net. Type 'exit' to close.\r\n");
-                    UpdateStatus($"vs-pty.net接続済み - PID: {_ptyConnection.Pid} - {workingDirectory}");
+                    AppendOutput("PowerShell terminal started successfully using vs-pty.net. Type 'exit' to close.\r\n");
+                    UpdateStatus($"PowerShell vs-pty.net接続済み - PID: {_ptyConnection.Pid} - {workingDirectory}");
                 }
                 else
                 {
@@ -201,7 +201,7 @@ namespace AimAssist.Units.Implementation.Terminal
                 
                 var processInfo = new ProcessStartInfo
                 {
-                    FileName = "cmd.exe",
+                    FileName = "pwsh.exe",
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
@@ -224,8 +224,8 @@ namespace AimAssist.Units.Implementation.Terminal
                     _fallbackProcess.BeginOutputReadLine();
                     _fallbackProcess.BeginErrorReadLine();
 
-                    AppendOutput("Fallback terminal started successfully.\r\n");
-                    UpdateStatus($"フォールバック接続済み - PID: {_fallbackProcess.Id} - {workingDirectory}");
+                    AppendOutput("PowerShell fallback terminal started successfully.\r\n");
+                    UpdateStatus($"PowerShell フォールバック接続済み - PID: {_fallbackProcess.Id} - {workingDirectory}");
                 }
                 else
                 {
