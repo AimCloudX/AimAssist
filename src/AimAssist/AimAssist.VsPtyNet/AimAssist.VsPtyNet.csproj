@@ -13,4 +13,15 @@
     <PackageReference Include="Terminal.Gui" Version="2.0.0-develop.4531" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="binary\Windows\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="binary\Windows\os64\conpty.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>os64\conpty.dll</Link>
+    </None>
+  </ItemGroup>
+
 </Project>

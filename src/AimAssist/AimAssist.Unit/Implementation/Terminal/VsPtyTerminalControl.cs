@@ -21,8 +21,11 @@ namespace AimAssist.Units.Implementation.Terminal
         private readonly Border _statusBar;
         private readonly TextBlock _statusText;
         private IPtyConnection? _ptyConnection;
+        private Process? _fallbackProcess;
+        private StreamWriter? _processInput;
         private CancellationTokenSource? _cancellationTokenSource;
         private bool _disposed = false;
+        private bool _usingFallback = false;
 
         public VsPtyTerminalControl()
         {
@@ -132,21 +135,34 @@ namespace AimAssist.Units.Implementation.Terminal
 
                 var workingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 
-                var options = new PtyOptions
-                {
-                    App = "cmd.exe",
-                    Cwd = workingDirectory,
-                    Cols = 100,
-                    Rows = 30,
-                    CommandLine = new string[] { }
-                };
-
-                AppendOutput($"Starting terminal using vs-pty.net...\r\n");
+                // Fallback to simple process execution if PTY fails
+                AppendOutput($"Starting terminal using enhanced process execution...\r\n");
                 AppendOutput($"Working directory: {workingDirectory}\r\n");
                 UpdateStatus("ターミナルを開始中...");
 
-                _cancellationTokenSource = new CancellationTokenSource();
-                _ptyConnection = await PtyProvider.SpawnAsync(options, _cancellationTokenSource.Token);
+                // Try PtyProvider first, fallback to process execution
+                try
+                {
+                    var options = new PtyOptions
+                    {
+                        App = "cmd.exe",
+                        Cwd = workingDirectory,
+                        Cols = 100,
+                        Rows = 30,
+                        CommandLine = new string[] { }
+                    };
+
+                    _cancellationTokenSource = new CancellationTokenSource();
+                    _ptyConnection = await PtyProvider.SpawnAsync(options, _cancellationTokenSource.Token);
+                }
+                catch (Exception ptyEx)
+                {
+                    AppendOutput($"PTY initialization failed: {ptyEx.Message}\r\n");
+                    AppendOutput("Falling back to standard process execution...\r\n");
+                    
+                    await StartFallbackProcessAsync(workingDirectory);
+                    return;
+                }
 
                 if (_ptyConnection != null)
                 {
@@ -171,13 +187,108 @@ namespace AimAssist.Units.Implementation.Terminal
             }
         }
 
+        private async Task StartFallbackProcessAsync(string workingDirectory)
+        {
+            try
+            {
+                _usingFallback = true;
+                
+                var processInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    UseShellExecute = false,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WorkingDirectory = workingDirectory,
+                    StandardInputEncoding = Encoding.UTF8,
+                    StandardOutputEncoding = Encoding.UTF8
+                };
+
+                _fallbackProcess = new Process { StartInfo = processInfo };
+                _fallbackProcess.OutputDataReceived += OnFallbackOutputDataReceived;
+                _fallbackProcess.ErrorDataReceived += OnFallbackErrorDataReceived;
+                _fallbackProcess.Exited += OnFallbackProcessExited;
+                _fallbackProcess.EnableRaisingEvents = true;
+
+                if (_fallbackProcess.Start())
+                {
+                    _processInput = _fallbackProcess.StandardInput;
+                    _fallbackProcess.BeginOutputReadLine();
+                    _fallbackProcess.BeginErrorReadLine();
+
+                    AppendOutput("Fallback terminal started successfully.\r\n");
+                    UpdateStatus($"フォールバック接続済み - PID: {_fallbackProcess.Id} - {workingDirectory}");
+                }
+                else
+                {
+                    AppendOutput("Failed to start fallback terminal.\r\n");
+                    UpdateStatus("接続失敗");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendOutput($"Failed to start fallback terminal: {ex.Message}\r\n");
+                UpdateStatus("エラー");
+            }
+        }
+
+        private void OnFallbackOutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+            {
+                Dispatcher.InvokeAsync(() => AppendOutput(e.Data + "\r\n"));
+            }
+        }
+
+        private void OnFallbackErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+            {
+                Dispatcher.InvokeAsync(() => AppendOutput($"ERROR: {e.Data}\r\n"));
+            }
+        }
+
+        private void OnFallbackProcessExited(object? sender, EventArgs e)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                var exitCode = _fallbackProcess?.ExitCode ?? -1;
+                AppendOutput($"\r\nProcess exited with code: {exitCode}\r\n");
+                _inputTextBox.IsEnabled = false;
+                UpdateStatus($"プロセス終了 (コード: {exitCode})");
+            });
+        }
+
         private void StopTerminal()
         {
             try
             {
                 _cancellationTokenSource?.Cancel();
-                _ptyConnection?.Kill();
-                _ptyConnection?.Dispose();
+                
+                if (_usingFallback)
+                {
+                    _processInput?.WriteLine("exit");
+                    _processInput?.Close();
+                    
+                    if (_fallbackProcess != null && !_fallbackProcess.HasExited)
+                    {
+                        _fallbackProcess.WaitForExit(3000);
+                        if (!_fallbackProcess.HasExited)
+                        {
+                            _fallbackProcess.Kill();
+                        }
+                    }
+                    
+                    _fallbackProcess?.Dispose();
+                }
+                else
+                {
+                    _ptyConnection?.Kill();
+                    _ptyConnection?.Dispose();
+                }
+                
                 UpdateStatus("切断済み");
             }
             catch (Exception ex)
@@ -245,7 +356,15 @@ namespace AimAssist.Units.Implementation.Terminal
                 
                 if (!string.IsNullOrEmpty(input))
                 {
-                    await SendInputAsync(input + "\r\n");
+                    if (_usingFallback)
+                    {
+                        AppendOutput($"> {input}\r\n");
+                        await SendInputAsync(input);
+                    }
+                    else
+                    {
+                        await SendInputAsync(input + "\r\n");
+                    }
                 }
             }
             else if (e.Key == Key.C && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
@@ -264,13 +383,23 @@ namespace AimAssist.Units.Implementation.Terminal
 
         private async Task SendInputAsync(string input)
         {
-            if (_ptyConnection?.WriterStream == null) return;
-
             try
             {
-                var bytes = Encoding.UTF8.GetBytes(input);
-                await _ptyConnection.WriterStream.WriteAsync(bytes, 0, bytes.Length);
-                await _ptyConnection.WriterStream.FlushAsync();
+                if (_usingFallback)
+                {
+                    if (_processInput == null || _fallbackProcess?.HasExited != false) return;
+                    
+                    await _processInput.WriteLineAsync(input);
+                    await _processInput.FlushAsync();
+                }
+                else
+                {
+                    if (_ptyConnection?.WriterStream == null) return;
+                    
+                    var bytes = Encoding.UTF8.GetBytes(input);
+                    await _ptyConnection.WriterStream.WriteAsync(bytes, 0, bytes.Length);
+                    await _ptyConnection.WriterStream.FlushAsync();
+                }
             }
             catch (Exception ex)
             {

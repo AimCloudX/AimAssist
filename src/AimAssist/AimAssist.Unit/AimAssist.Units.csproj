@@ -40,4 +40,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\AimAssist.VsPtyNet\binary\Windows\os64\conpty.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>os64\conpty.dll</Link>
+    </None>
+  </ItemGroup>
 </Project>
