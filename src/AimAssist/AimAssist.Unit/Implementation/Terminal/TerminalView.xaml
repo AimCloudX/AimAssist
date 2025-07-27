@@ -6,7 +6,176 @@
              xmlns:local="clr-namespace:AimAssist.Units.Implementation.Terminal"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
-    <Grid>
-        <local:TerminalControl />
+    <UserControl.Resources>
+        <!-- Windows Terminal inspired color scheme -->
+        <SolidColorBrush x:Key="TerminalBackground" Color="#0C0C0C"/>
+        <SolidColorBrush x:Key="TabBarBackground" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="TabActiveBackground" Color="#2D2D30"/>
+        <SolidColorBrush x:Key="TabInactiveBackground" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="TabBorder" Color="#3F3F46"/>
+        <SolidColorBrush x:Key="TerminalForeground" Color="#CCCCCC"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#0078D4"/>
+        
+        <!-- Tab Style -->
+        <Style x:Key="TerminalTabStyle" TargetType="TabItem">
+            <Setter Property="Background" Value="{StaticResource TabInactiveBackground}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TabBorder}"/>
+            <Setter Property="BorderThickness" Value="1,1,1,0"/>
+            <Setter Property="Margin" Value="0,0,-1,0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Foreground" Value="{StaticResource TerminalForeground}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6,6,0,0"
+                                Margin="{TemplateBinding Margin}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter x:Name="ContentSite"
+                                                Grid.Column="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Left"
+                                                ContentSource="Header"
+                                                Margin="{TemplateBinding Padding}"/>
+                                <Button x:Name="CloseButton"
+                                        Grid.Column="1"
+                                        Width="16"
+                                        Height="16"
+                                        Margin="8,0,8,0"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Content="×"
+                                        FontSize="12"
+                                        FontWeight="Bold"
+                                        Foreground="{StaticResource TerminalForeground}"
+                                        Visibility="Collapsed"
+                                        Click="CloseTab_Click"
+                                        Tag="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource TabActiveBackground}"/>
+                                <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0"/>
+                                <Setter TargetName="CloseButton" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CloseButton" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger SourceName="CloseButton" Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CloseButton" Property="Background" Value="#E81123"/>
+                                <Setter TargetName="CloseButton" Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- TabControl Style -->
+        <Style x:Key="TerminalTabControlStyle" TargetType="TabControl">
+            <Setter Property="Background" Value="{StaticResource TerminalBackground}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <!-- Tab Bar -->
+                            <Border Grid.Row="0" 
+                                    Background="{StaticResource TabBarBackground}"
+                                    BorderBrush="{StaticResource TabBorder}"
+                                    BorderThickness="0,0,0,1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ScrollViewer Grid.Column="0"
+                                                  HorizontalScrollBarVisibility="Auto"
+                                                  VerticalScrollBarVisibility="Hidden"
+                                                  CanContentScroll="True">
+                                        <TabPanel x:Name="HeaderPanel"
+                                                  IsItemsHost="True"
+                                                  Background="Transparent"/>
+                                    </ScrollViewer>
+                                    <!-- New Tab Button -->
+                                    <Button Grid.Column="1"
+                                            x:Name="NewTabButton"
+                                            Width="32"
+                                            Height="32"
+                                            Margin="4"
+                                            Background="Transparent"
+                                            BorderThickness="1"
+                                            BorderBrush="{StaticResource TabBorder}"
+                                            Content="+"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource TerminalForeground}"
+                                            Click="NewTab_Click"
+                                            ToolTip="新しいタブ (Ctrl+Shift+T)">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource TabActiveBackground}"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                            <!-- Content Area -->
+                            <Border Grid.Row="1" 
+                                    Background="{StaticResource TerminalBackground}">
+                                <ContentPresenter x:Name="PART_SelectedContentHost"
+                                                  ContentSource="SelectedContent"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource TerminalBackground}">
+        <TabControl x:Name="TerminalTabControl"
+                    Style="{StaticResource TerminalTabControlStyle}"
+                    ItemContainerStyle="{StaticResource TerminalTabStyle}">
+            <!-- Initial tab will be added in code-behind -->
+        </TabControl>
+        
+        <!-- Context Menu -->
+        <Grid.ContextMenu>
+            <ContextMenu Background="{StaticResource TabBarBackground}"
+                         Foreground="{StaticResource TerminalForeground}">
+                <MenuItem Header="新しいタブ (_N)"
+                          InputGestureText="Ctrl+Shift+T"
+                          Click="NewTab_Click"/>
+                <MenuItem Header="タブを閉じる (_C)"
+                          InputGestureText="Ctrl+Shift+W"
+                          Click="CloseCurrentTab_Click"/>
+                <Separator/>
+                <MenuItem Header="設定 (_S)"
+                          Click="OpenSettings_Click"/>
+                <MenuItem Header="コピー (_C)"
+                          InputGestureText="Ctrl+C"/>
+                <MenuItem Header="貼り付け (_P)"
+                          InputGestureText="Ctrl+V"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
     </Grid>
 </UserControl>
