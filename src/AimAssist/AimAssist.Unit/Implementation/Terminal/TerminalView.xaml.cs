@@ -12,6 +12,7 @@ namespace AimAssist.Units.Implementation.Terminal;
 public partial class TerminalView : UserControl
 {
     private int _tabCounter = 1;
+    private bool _isInitialized = false;
     
     public TerminalView()
     {
@@ -25,8 +26,12 @@ public partial class TerminalView : UserControl
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Create initial tab
-        CreateNewTab();
+        if (!_isInitialized)
+        {
+            // Create initial tab only on first load
+            CreateNewTab();
+            _isInitialized = true;
+        }
         Focus();
     }
 

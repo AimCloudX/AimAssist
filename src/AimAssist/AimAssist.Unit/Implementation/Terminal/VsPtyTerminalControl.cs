@@ -26,6 +26,7 @@ namespace AimAssist.Units.Implementation.Terminal
         private CancellationTokenSource? _cancellationTokenSource;
         private bool _disposed = false;
         private bool _usingFallback = false;
+        private bool _isInitialized = false;
 
         public VsPtyTerminalControl()
         {
@@ -118,13 +119,18 @@ namespace AimAssist.Units.Implementation.Terminal
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            await StartTerminalAsync();
+            if (!_isInitialized && !_disposed)
+            {
+                await StartTerminalAsync();
+                _isInitialized = true;
+            }
             _inputTextBox.Focus();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            StopTerminal();
+            // UIElementがキャッシュされる場合があるため、Unloaded時にはターミナルを停止しない
+            // Disposeメソッドで明示的に停止する
         }
 
         private async Task StartTerminalAsync()
@@ -439,6 +445,7 @@ namespace AimAssist.Units.Implementation.Terminal
             {
                 StopTerminal();
                 _disposed = true;
+                _isInitialized = false;
             }
         }
     }
