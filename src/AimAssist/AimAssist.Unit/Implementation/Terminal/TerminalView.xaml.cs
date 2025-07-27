@@ -84,7 +84,7 @@ public partial class TerminalView : UserControl
 
     private void CreateNewTab()
     {
-        var terminalControl = new ModernTerminalControl();
+        var terminalControl = new TerminalGuiControl();
         
         var tabItem = new TabItem
         {
@@ -107,7 +107,7 @@ public partial class TerminalView : UserControl
         if (TerminalTabControl.Items.Count <= 1)
         {
             // Don't close the last tab, just clear it
-            if (tabItem.Content is ModernTerminalControl terminal)
+            if (tabItem.Content is TerminalGuiControl terminal)
             {
                 terminal.Reset();
             }
@@ -115,7 +115,7 @@ public partial class TerminalView : UserControl
         }
 
         // Dispose terminal if needed
-        if (tabItem.Content is ModernTerminalControl terminalToClose)
+        if (tabItem.Content is TerminalGuiControl terminalToClose)
         {
             terminalToClose.Dispose();
         }

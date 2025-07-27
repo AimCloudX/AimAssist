@@ -3,7 +3,11 @@
     "allow": [
       "Bash(del:*)",
       "Bash(dotnet build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(dotnet add package:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.nuget.org)",
+      "Bash(dotnet remove:*)"
     ],
     "deny": []
   }

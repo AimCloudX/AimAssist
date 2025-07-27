@@ -10,7 +10,7 @@ namespace AimAssist.Units.Implementation.Terminal
 
         public string Name => "ターミナル";
 
-        public string Description => "ConPTYを使用した高機能ターミナル";
+        public string Description => "改良されたターミナル機能（dirコマンド対応）";
 
         public string Category => "System";
     }

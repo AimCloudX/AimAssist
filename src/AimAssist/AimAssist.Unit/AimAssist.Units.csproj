@@ -11,7 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.Dependencies\Common.Dependencies.csproj" />
     <ProjectReference Include="..\AimAssist.Services\AimAssist.Services.csproj" />
-    <ProjectReference Include="..\AimAssist.PtyNet\AimAssist.PtyNet.csproj" />
+    <ProjectReference Include="..\AimAssist.VsPtyNet\AimAssist.VsPtyNet.csproj" />
   </ItemGroup>
 
   <ItemGroup>

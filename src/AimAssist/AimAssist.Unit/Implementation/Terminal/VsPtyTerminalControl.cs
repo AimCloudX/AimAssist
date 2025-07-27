@@ -8,11 +8,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using AimAssist.PtyNet;
+using Pty.Net;
 
 namespace AimAssist.Units.Implementation.Terminal
 {
-    public class ModernTerminalControl : UserControl, IDisposable
+    public class VsPtyTerminalControl : UserControl, IDisposable
     {
         private readonly ScrollViewer _scrollViewer;
         private readonly TextBox _outputTextBox;
@@ -20,11 +20,11 @@ namespace AimAssist.Units.Implementation.Terminal
         private readonly StringBuilder _outputBuffer;
         private readonly Border _statusBar;
         private readonly TextBlock _statusText;
-        private ConPtyTerminal? _terminal;
+        private IPtyConnection? _ptyConnection;
         private CancellationTokenSource? _cancellationTokenSource;
         private bool _disposed = false;
 
-        public ModernTerminalControl()
+        public VsPtyTerminalControl()
         {
             InitializeComponent();
             _outputBuffer = new StringBuilder();
@@ -130,65 +130,43 @@ namespace AimAssist.Units.Implementation.Terminal
             {
                 UpdateStatus("ターミナルを初期化中...");
 
-                // Check administrator privileges first
-                if (!ConPtyChecker.IsRunningAsAdmin())
-                {
-                    AppendOutput("==========================================\r\n");
-                    AppendOutput("         管理者権限が必要です\r\n");
-                    AppendOutput("==========================================\r\n\r\n");
-                    AppendOutput("このターミナル機能を使用するには、管理者権限でアプリケーションを実行してください。\r\n\r\n");
-                    AppendOutput("手順:\r\n");
-                    AppendOutput("1. アプリケーションを終了する\r\n");
-                    AppendOutput("2. アプリケーションを右クリック\r\n");
-                    AppendOutput("3. \"管理者として実行\" を選択\r\n\r\n");
-                    AppendOutput("理由: ConPTY APIの制限により、標準ユーザー権限では\r\n");
-                    AppendOutput("ターミナル出力が正常に表示されません。\r\n\r\n");
-                    UpdateStatus("管理者権限が必要");
-                    return;
-                }
-
-                // Check system compatibility
-                var systemInfo = ConPtyChecker.GetDetailedDiagnostics();
-                AppendOutput($"System Diagnostics:\r\n{systemInfo}\r\n\r\n");
-
-                if (!ConPtyChecker.IsConPtyAvailable())
-                {
-                    AppendOutput("Error: ConPTY is not available on this system.\r\n");
-                    AppendOutput("ConPTY requires Windows 10 version 1809 or later.\r\n");
-                    AppendOutput("Please update your Windows version.\r\n");
-                    UpdateStatus("ConPTY利用不可");
-                    return;
-                }
-
-                _terminal = new ConPtyTerminal();
-                _terminal.ProcessExited += OnProcessExited;
-
                 var workingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var command = "cmd.exe";
                 
-                AppendOutput($"Starting {command}...\r\n");
-                UpdateStatus("ターミナルを開始中...");
-                
-                var success = await _terminal.StartAsync(command, workingDirectory, 100, 30);
-                
-                if (success && _terminal.OutputStream != null)
+                var options = new PtyOptions
                 {
-                    _cancellationTokenSource = new CancellationTokenSource();
+                    App = "cmd.exe",
+                    Cwd = workingDirectory,
+                    Cols = 100,
+                    Rows = 30,
+                    CommandLine = new string[] { }
+                };
+
+                AppendOutput($"Starting terminal using vs-pty.net...\r\n");
+                AppendOutput($"Working directory: {workingDirectory}\r\n");
+                UpdateStatus("ターミナルを開始中...");
+
+                _cancellationTokenSource = new CancellationTokenSource();
+                _ptyConnection = await PtyProvider.SpawnAsync(options, _cancellationTokenSource.Token);
+
+                if (_ptyConnection != null)
+                {
+                    _ptyConnection.ProcessExited += OnProcessExited;
                     
                     _ = Task.Run(() => ReadOutputAsync(_cancellationTokenSource.Token));
                     
-                    AppendOutput("Terminal started successfully. Type 'exit' to close.\r\n");
-                    UpdateStatus($"接続済み - {workingDirectory}");
+                    AppendOutput("Terminal started successfully using vs-pty.net. Type 'exit' to close.\r\n");
+                    UpdateStatus($"vs-pty.net接続済み - PID: {_ptyConnection.Pid} - {workingDirectory}");
                 }
                 else
                 {
-                    AppendOutput("Failed to start terminal.\r\n");
+                    AppendOutput("Failed to start terminal using vs-pty.net.\r\n");
                     UpdateStatus("接続失敗");
                 }
             }
             catch (Exception ex)
             {
                 AppendOutput($"Failed to start terminal: {ex.Message}\r\n");
+                AppendOutput($"Stack trace: {ex.StackTrace}\r\n");
                 UpdateStatus("エラー");
             }
         }
@@ -198,8 +176,8 @@ namespace AimAssist.Units.Implementation.Terminal
             try
             {
                 _cancellationTokenSource?.Cancel();
-                _terminal?.Kill();
-                _terminal?.Dispose();
+                _ptyConnection?.Kill();
+                _ptyConnection?.Dispose();
                 UpdateStatus("切断済み");
             }
             catch (Exception ex)
@@ -210,7 +188,7 @@ namespace AimAssist.Units.Implementation.Terminal
 
         private async Task ReadOutputAsync(CancellationToken cancellationToken)
         {
-            if (_terminal?.OutputStream == null) return;
+            if (_ptyConnection?.ReaderStream == null) return;
 
             var buffer = new byte[4096];
             
@@ -218,7 +196,7 @@ namespace AimAssist.Units.Implementation.Terminal
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var bytesRead = await _terminal.OutputStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                    var bytesRead = await _ptyConnection.ReaderStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
                     
                     if (bytesRead > 0)
                     {
@@ -286,13 +264,13 @@ namespace AimAssist.Units.Implementation.Terminal
 
         private async Task SendInputAsync(string input)
         {
-            if (_terminal?.InputStream == null) return;
+            if (_ptyConnection?.WriterStream == null) return;
 
             try
             {
                 var bytes = Encoding.UTF8.GetBytes(input);
-                await _terminal.InputStream.WriteAsync(bytes, 0, bytes.Length);
-                await _terminal.InputStream.FlushAsync();
+                await _ptyConnection.WriterStream.WriteAsync(bytes, 0, bytes.Length);
+                await _ptyConnection.WriterStream.FlushAsync();
             }
             catch (Exception ex)
             {
@@ -301,13 +279,13 @@ namespace AimAssist.Units.Implementation.Terminal
             }
         }
 
-        private void OnProcessExited(object? sender, int exitCode)
+        private void OnProcessExited(object? sender, PtyExitedEventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
-                AppendOutput($"\r\nProcess exited with code: {exitCode}\r\n");
+                AppendOutput($"\r\nProcess exited with code: {e.ExitCode}\r\n");
                 _inputTextBox.IsEnabled = false;
-                UpdateStatus($"プロセス終了 (コード: {exitCode})");
+                UpdateStatus($"プロセス終了 (コード: {e.ExitCode})");
             });
         }
 
