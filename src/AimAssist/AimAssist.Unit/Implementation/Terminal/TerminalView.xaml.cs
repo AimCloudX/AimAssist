@@ -65,7 +65,27 @@ public partial class TerminalView : UserControl
 
     private void NewTab_Click(object sender, RoutedEventArgs e)
     {
-        CreateNewTab();
+        // Get selected shell from ComboBox
+        var selectedShell = ShellType.PowerShell;
+        if (ShellSelectionComboBox?.SelectedItem is ComboBoxItem selectedItem && 
+            Enum.TryParse<ShellType>(selectedItem.Tag?.ToString(), out var shellType))
+        {
+            selectedShell = shellType;
+        }
+        
+        // Debug output
+        System.Diagnostics.Debug.WriteLine($"Selected shell: {selectedShell} ({selectedShell.GetDisplayName()})");
+        
+        CreateNewTab(selectedShell);
+    }
+
+    private void NewTabWithShell_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem && 
+            Enum.TryParse<ShellType>(menuItem.Tag?.ToString(), out var shellType))
+        {
+            CreateNewTab(shellType);
+        }
     }
 
     private void CloseTab_Click(object sender, RoutedEventArgs e)
@@ -87,13 +107,14 @@ public partial class TerminalView : UserControl
         MessageBox.Show("設定機能は今後実装予定です。", "ターミナル設定", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
-    private void CreateNewTab()
+    private void CreateNewTab(ShellType shellType = ShellType.PowerShell)
     {
-        var terminalControl = new VsPtyTerminalControl();
+        var terminalControl = new VsPtyTerminalControl(shellType);
         
+        var shellDisplayName = shellType.GetDisplayName();
         var tabItem = new TabItem
         {
-            Header = $"ターミナル {_tabCounter++}",
+            Header = $"{shellDisplayName} {_tabCounter++}",
             Content = terminalControl
         };
 

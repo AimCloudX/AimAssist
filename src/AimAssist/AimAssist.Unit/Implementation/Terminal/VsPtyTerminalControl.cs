@@ -27,9 +27,12 @@ namespace AimAssist.Units.Implementation.Terminal
         private bool _disposed = false;
         private bool _usingFallback = false;
         private bool _isInitialized = false;
+        
+        public ShellType ShellType { get; set; } = ShellType.PowerShell;
 
-        public VsPtyTerminalControl()
+        public VsPtyTerminalControl(ShellType shellType = ShellType.PowerShell)
         {
+            ShellType = shellType;
             InitializeComponent();
             _outputBuffer = new StringBuilder();
             
@@ -142,20 +145,21 @@ namespace AimAssist.Units.Implementation.Terminal
                 var workingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 
                 // Fallback to simple process execution if PTY fails
-                AppendOutput($"Starting PowerShell terminal using enhanced process execution...\r\n");
+                var shellDisplayName = ShellType.GetDisplayName();
+                AppendOutput($"Starting {shellDisplayName} terminal using enhanced process execution...\r\n");
                 AppendOutput($"Working directory: {workingDirectory}\r\n");
-                UpdateStatus("PowerShellターミナルを開始中...");
+                UpdateStatus($"{shellDisplayName}ターミナルを開始中...");
 
                 // Try PtyProvider first, fallback to process execution
                 try
                 {
                     var options = new PtyOptions
                     {
-                        App = "pwsh.exe",
+                        App = ShellType.GetExecutablePath(),
                         Cwd = workingDirectory,
                         Cols = 100,
                         Rows = 30,
-                        CommandLine = new string[] { }
+                        CommandLine = ShellType.GetArguments()
                     };
 
                     _cancellationTokenSource = new CancellationTokenSource();
@@ -176,8 +180,8 @@ namespace AimAssist.Units.Implementation.Terminal
                     
                     _ = Task.Run(() => ReadOutputAsync(_cancellationTokenSource.Token));
                     
-                    AppendOutput("PowerShell terminal started successfully using vs-pty.net. Type 'exit' to close.\r\n");
-                    UpdateStatus($"PowerShell vs-pty.net接続済み - PID: {_ptyConnection.Pid} - {workingDirectory}");
+                    AppendOutput($"{shellDisplayName} terminal started successfully using vs-pty.net. Type 'exit' to close.\r\n");
+                    UpdateStatus($"{shellDisplayName} vs-pty.net接続済み - PID: {_ptyConnection.Pid} - {workingDirectory}");
                 }
                 else
                 {
@@ -201,7 +205,8 @@ namespace AimAssist.Units.Implementation.Terminal
                 
                 var processInfo = new ProcessStartInfo
                 {
-                    FileName = "pwsh.exe",
+                    FileName = ShellType.GetExecutablePath(),
+                    Arguments = string.Join(" ", ShellType.GetArguments()),
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
@@ -224,8 +229,9 @@ namespace AimAssist.Units.Implementation.Terminal
                     _fallbackProcess.BeginOutputReadLine();
                     _fallbackProcess.BeginErrorReadLine();
 
-                    AppendOutput("PowerShell fallback terminal started successfully.\r\n");
-                    UpdateStatus($"PowerShell フォールバック接続済み - PID: {_fallbackProcess.Id} - {workingDirectory}");
+                    var shellDisplayName = ShellType.GetDisplayName();
+                    AppendOutput($"{shellDisplayName} fallback terminal started successfully.\r\n");
+                    UpdateStatus($"{shellDisplayName} フォールバック接続済み - PID: {_fallbackProcess.Id} - {workingDirectory}");
                 }
                 else
                 {

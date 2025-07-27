@@ -10,7 +10,7 @@ namespace AimAssist.Units.Implementation.Terminal
 
         public string Name => "ターミナル";
 
-        public string Description => "PowerShell (pwsh) ベースの高機能ターミナル";
+        public string Description => "マルチシェル対応ターミナル (PowerShell, CMD, Git Bash, WSL)";
 
         public string Category => "System";
     }
