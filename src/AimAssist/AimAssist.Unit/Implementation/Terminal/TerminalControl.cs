@@ -15,7 +15,7 @@ namespace AimAssist.Units.Implementation.Terminal
     public class TerminalControl : UserControl
     {
         private readonly ScrollViewer _scrollViewer;
-        private readonly TextBlock _outputTextBlock;
+        private readonly TextBox _outputTextBox;
         private readonly TextBox _inputTextBox;
         private readonly StringBuilder _outputBuffer;
         private ConPtyTerminal? _terminal;
@@ -30,19 +30,23 @@ namespace AimAssist.Units.Implementation.Terminal
             grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            _outputTextBlock = new TextBlock
+            _outputTextBox = new TextBox
             {
                 FontFamily = new FontFamily("Consolas"),
                 FontSize = 12,
                 Background = Brushes.Black,
                 Foreground = Brushes.White,
                 Padding = new Thickness(5),
-                TextWrapping = TextWrapping.Wrap
+                TextWrapping = TextWrapping.Wrap,
+                IsReadOnly = true,
+                BorderThickness = new Thickness(0),
+                VerticalScrollBarVisibility = ScrollBarVisibility.Hidden,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden
             };
 
             _scrollViewer = new ScrollViewer
             {
-                Content = _outputTextBlock,
+                Content = _outputTextBox,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
             };
@@ -92,9 +96,25 @@ namespace AimAssist.Units.Implementation.Terminal
         {
             try
             {
-                // Check system compatibility first
-                var systemInfo = ConPtyChecker.GetSystemInfo();
-                AppendOutput($"System Information:\r\n{systemInfo}\r\n\r\n");
+                // Check administrator privileges first
+                if (!ConPtyChecker.IsRunningAsAdmin())
+                {
+                    AppendOutput("==========================================\r\n");
+                    AppendOutput("         管理者権限が必要です\r\n");
+                    AppendOutput("==========================================\r\n\r\n");
+                    AppendOutput("このターミナル機能を使用するには、管理者権限でアプリケーションを実行してください。\r\n\r\n");
+                    AppendOutput("手順:\r\n");
+                    AppendOutput("1. アプリケーションを終了する\r\n");
+                    AppendOutput("2. アプリケーションを右クリック\r\n");
+                    AppendOutput("3. \"管理者として実行\" を選択\r\n\r\n");
+                    AppendOutput("理由: ConPTY APIの制限により、標準ユーザー権限では\r\n");
+                    AppendOutput("ターミナル出力が正常に表示されません。\r\n\r\n");
+                    return;
+                }
+
+                // Check system compatibility
+                var systemInfo = ConPtyChecker.GetDetailedDiagnostics();
+                AppendOutput($"System Diagnostics:\r\n{systemInfo}\r\n\r\n");
 
                 if (!ConPtyChecker.IsConPtyAvailable())
                 {
@@ -108,7 +128,10 @@ namespace AimAssist.Units.Implementation.Terminal
                 _terminal.ProcessExited += OnProcessExited;
 
                 var workingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var success = await _terminal.StartAsync("cmd.exe", workingDirectory, 80, 24);
+                var command = "cmd.exe";
+                
+                AppendOutput($"Starting {command}...\r\n");
+                var success = await _terminal.StartAsync(command, workingDirectory, 80, 24);
                 
                 if (success && _terminal.OutputStream != null)
                 {
@@ -120,13 +143,12 @@ namespace AimAssist.Units.Implementation.Terminal
                 }
                 else
                 {
-                    AppendOutput("Failed to start terminal. No administrator privileges required.\r\n");
+                    AppendOutput("Failed to start terminal.\r\n");
                 }
             }
             catch (Exception ex)
             {
                 AppendOutput($"Failed to start terminal: {ex.Message}\r\n");
-                AppendOutput("Note: This should work with normal user privileges.\r\n");
             }
         }
 
@@ -179,7 +201,7 @@ namespace AimAssist.Units.Implementation.Terminal
         private void AppendOutput(string text)
         {
             _outputBuffer.Append(text);
-            _outputTextBlock.Text = _outputBuffer.ToString();
+            _outputTextBox.Text = _outputBuffer.ToString();
             _scrollViewer.ScrollToEnd();
         }
 
