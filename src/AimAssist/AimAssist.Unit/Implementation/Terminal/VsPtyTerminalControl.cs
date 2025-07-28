@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,6 +28,7 @@ namespace AimAssist.Units.Implementation.Terminal
         private bool _disposed = false;
         private bool _usingFallback = false;
         private bool _isInitialized = false;
+        private static readonly Regex AnsiEscapeRegex = new Regex(@"\x1B\[[0-9;]*[mGKHfJhlABCDsuPXydHABCDLMNOPQRSTtgpqSLFEI]|\x1B\]0;.*?\x07|\x1B\[[?!]?[0-9;]*[lh]", RegexOptions.Compiled);
         
         public ShellType ShellType { get; set; } = ShellType.PowerShell;
 
@@ -347,9 +349,18 @@ namespace AimAssist.Units.Implementation.Terminal
 
         private void AppendOutput(string text)
         {
-            _outputBuffer.Append(text);
+            var cleanText = StripAnsiEscapeSequences(text);
+            _outputBuffer.Append(cleanText);
             _outputTextBox.Text = _outputBuffer.ToString();
             _scrollViewer.ScrollToEnd();
+        }
+
+        private static string StripAnsiEscapeSequences(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            
+            return AnsiEscapeRegex.Replace(text, string.Empty);
         }
 
         private void UpdateStatus(string status)
