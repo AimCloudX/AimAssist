@@ -64,6 +64,9 @@ namespace AimAssist
             services.AddSingleton<Initializer>();
             
             _serviceProvider = services.BuildServiceProvider();
+            
+            // Make service provider available to other components
+            this.Properties["ServiceProvider"] = _serviceProvider;
         }
 
         private static void ActivateAimAssistAnotherProcess()

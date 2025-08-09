@@ -1,0 +1,186 @@
+<UserControl x:Class="AimAssist.Units.Implementation.Git.GitView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AimAssist.Units.Implementation.Git"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0" Text="Git リポジトリ管理" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="フォルダを追加" Command="{Binding AddRepositoryCommand}" Margin="5,0,0,0"/>
+            <Button Grid.Column="2" Content="選択を削除" Command="{Binding RemoveRepositoryCommand}" Margin="5,0,0,0"/>
+            <Button Grid.Column="3" Content="リポジトリを再検索" Command="{Binding LoadRepositoriesCommand}" Margin="5,0,0,0"/>
+        </Grid>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="10,0,10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Repository List -->
+            <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="1" CornerRadius="3">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="リポジトリ一覧" FontWeight="Bold" Margin="10,10,10,5"/>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Repositories}" 
+                             SelectedItem="{Binding SelectedRepository}"
+                             DisplayMemberPath="Name" Margin="10,0,10,10"/>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="LightGray"/>
+
+            <!-- Repository Details -->
+            <Grid Grid.Column="2" DataContext="{Binding SelectedRepository}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Repository Info -->
+                <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Margin="0,0,0,10">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="リポジトリ: " FontWeight="Bold"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path}" Margin="5,0,0,0"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="現在のブランチ: " FontWeight="Bold" Margin="0,5,0,0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentBranch}" Margin="5,5,0,0" FontWeight="Bold" Foreground="Blue"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="ブランチ切り替え: " FontWeight="Bold" Margin="0,10,0,0"/>
+                        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Branches}" Margin="5,10,10,0">
+                            <ComboBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding CheckoutBranchCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}, Path=Text}"/>
+                            </ComboBox.InputBindings>
+                        </ComboBox>
+                        <Button Grid.Row="2" Grid.Column="2" Content="更新" Command="{Binding DataContext.RefreshCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="0,10,0,0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Tabs for different views -->
+                <TabControl Grid.Row="1">
+                    <!-- Commit History Tab -->
+                    <TabItem Header="コミット履歴">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Commits List -->
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding Commits}" 
+                                      AutoGenerateColumns="False" IsReadOnly="True" 
+                                      SelectionMode="Extended" Margin="0,0,0,10"
+                                      x:Name="CommitsDataGrid">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ハッシュ" Binding="{Binding ShortHash}" Width="80"/>
+                                    <DataGridTextColumn Header="メッセージ" Binding="{Binding Message}" Width="300"/>
+                                    <DataGridTextColumn Header="作成者" Binding="{Binding Author}" Width="100"/>
+                                    <DataGridTextColumn Header="日付" Binding="{Binding Date, StringFormat=yyyy/MM/dd HH:mm}" Width="120"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Selection Info -->
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5">
+                                <TextBlock Text="選択されたコミット: " FontWeight="Bold"/>
+                                <TextBlock Text="{Binding SelectedCommitsInfo}" Margin="5,0,20,0"/>
+                                <Button Content="選択クリア" Command="{Binding ClearSelectionCommand}" Margin="10,0,0,0"/>
+                            </StackPanel>
+
+                            <!-- Export Button -->
+                            <Button Grid.Row="2" Content="差分ファイルをエクスポート" 
+                                    Command="{Binding DataContext.ExportDiffCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    IsEnabled="{Binding CanExportDiff}" Margin="0,10,0,0" Padding="10,5"/>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Branch Management Tab -->
+                    <TabItem Header="ブランチ管理">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="利用可能なブランチ" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <ListBox Grid.Row="1" ItemsSource="{Binding Branches}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" Content="切り替え" 
+                                                    Command="{Binding DataContext.CheckoutBranchCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                    CommandParameter="{Binding}" Margin="10,0,0,0"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="LightGray" Padding="10,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"/>
+                <ProgressBar Grid.Column="1" IsIndeterminate="{Binding IsLoading}" 
+                             Width="100" Height="15">
+                    <ProgressBar.Style>
+                        <Style TargetType="ProgressBar">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ProgressBar.Style>
+                </ProgressBar>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

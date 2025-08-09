@@ -3,6 +3,7 @@ using AimAssist.Core.Interfaces;
 using AimAssist.Core.Services;
 using AimAssist.Middlewares;
 using AimAssist.Service;
+using AimAssist.Services.Git;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI.Modules
@@ -18,6 +19,7 @@ namespace AimAssist.DI.Modules
             services.AddSingleton<IApplicationLogService, ApplicationLogService>();
             services.AddSingleton<IWindowHandleService, WindowHandleService>();
             services.AddSingleton<IErrorHandlingMiddleware, ErrorHandlingMiddleware>();
+            services.AddSingleton<IGitService, GitService>();
             
             return services;
         }
