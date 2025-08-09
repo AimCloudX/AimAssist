@@ -26,7 +26,6 @@ namespace AimAssist.Units.Implementation.Git
         {
             _gitService = gitService;
             LoadRepositoriesCommand = new RelayCommand(async _ => await LoadRepositoriesAsync());
-            RefreshCommand = new RelayCommand(async _ => await RefreshSelectedRepositoryAsync(), _ => SelectedRepository != null);
             ExportDiffCommand = new RelayCommand(async _ => await ExportDiffAsync(), _ => SelectedRepository?.CanExportDiff == true);
             AddRepositoryCommand = new RelayCommand(async _ => await AddRepositoryAsync());
             RemoveRepositoryCommand = new RelayCommand(async _ => await RemoveRepositoryAsync(), _ => SelectedRepository != null);
@@ -47,7 +46,6 @@ namespace AimAssist.Units.Implementation.Git
             { 
                 _selectedRepository = value;
                 OnPropertyChanged();
-                ((RelayCommand)RefreshCommand).RaiseCanExecuteChanged();
                 ((RelayCommand)ExportDiffCommand).RaiseCanExecuteChanged();
                 ((RelayCommand)RemoveRepositoryCommand).RaiseCanExecuteChanged();
                 if (value != null)
@@ -70,7 +68,6 @@ namespace AimAssist.Units.Implementation.Git
         }
 
         public ICommand LoadRepositoriesCommand { get; }
-        public ICommand RefreshCommand { get; }
         public ICommand ExportDiffCommand { get; }
         public ICommand AddRepositoryCommand { get; }
         public ICommand RemoveRepositoryCommand { get; }
