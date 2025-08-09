@@ -81,11 +81,9 @@
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentBranch}" Margin="5,5,0,0" FontWeight="Bold" Foreground="Blue"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="ブランチ切り替え: " FontWeight="Bold" Margin="0,10,0,0"/>
-                        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Branches}" Margin="5,10,10,0">
-                            <ComboBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding CheckoutBranchCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}, Path=Text}"/>
-                            </ComboBox.InputBindings>
-                        </ComboBox>
+                        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Branches}" Margin="5,10,10,0"
+                                  SelectedItem="{Binding CurrentBranch, Mode=OneWay}"
+                                  x:Name="BranchComboBox"/>
                         <Button Grid.Row="2" Grid.Column="2" Content="更新" Command="{Binding DataContext.RefreshCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="0,10,0,0"/>
                     </Grid>
                 </Border>
@@ -147,7 +145,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"/>
                                             <Button Grid.Column="1" Content="切り替え" 
-                                                    Command="{Binding DataContext.CheckoutBranchCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                    Command="{Binding Path=DataContext.CheckoutBranchCommand, RelativeSource={RelativeSource AncestorType=TabItem}}"
                                                     CommandParameter="{Binding}" Margin="10,0,0,0"/>
                                         </Grid>
                                     </DataTemplate>

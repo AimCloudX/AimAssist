@@ -392,7 +392,7 @@ namespace AimAssist.Units.Implementation.Git
             }
         }
 
-        private async Task CheckoutBranchAsync(string branchName)
+        public async Task CheckoutBranchAsync(string branchName)
         {
             if (string.IsNullOrEmpty(branchName)) return;
 

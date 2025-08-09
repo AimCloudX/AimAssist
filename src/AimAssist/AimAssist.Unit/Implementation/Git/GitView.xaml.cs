@@ -33,8 +33,9 @@ namespace AimAssist.Units.Implementation.Git
                         _viewModel = new GitViewModel(gitService);
                         DataContext = _viewModel;
                         
-                        // Hook up DataGrid selection changed event
+                        // Hook up event handlers
                         CommitsDataGrid.SelectionChanged += CommitsDataGrid_SelectionChanged;
+                        BranchComboBox.SelectionChanged += BranchComboBox_SelectionChanged;
                     }
                 }
                 catch (Exception ex)
@@ -50,6 +51,18 @@ namespace AimAssist.Units.Implementation.Git
             {
                 var selectedCommits = dataGrid.SelectedItems.Cast<GitCommit>().ToList();
                 _viewModel.SelectedRepository.UpdateSelectedCommits(selectedCommits);
+            }
+        }
+
+        private async void BranchComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (_viewModel?.SelectedRepository != null && sender is System.Windows.Controls.ComboBox comboBox)
+            {
+                var selectedBranch = comboBox.SelectedItem as string;
+                if (!string.IsNullOrEmpty(selectedBranch) && selectedBranch != _viewModel.SelectedRepository.CurrentBranch)
+                {
+                    await _viewModel.SelectedRepository.CheckoutBranchAsync(selectedBranch);
+                }
             }
         }
     }
