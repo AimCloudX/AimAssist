@@ -1,9 +1,9 @@
-﻿using AimAssist.Core.Units;
-using AimAssist.Units.Implementation.Options;
-using System.IO;
+﻿using System.IO;
 using AimAssist.Core.Interfaces;
+using AimAssist.Core.Units;
+using AimAssist.Units.Implementation.Options;
 
-namespace AimAssist.Units.Implementation.Factories
+namespace AimAssist.Units.UnitFactories
 {
     public interface IOptionUnitsFactory
     {

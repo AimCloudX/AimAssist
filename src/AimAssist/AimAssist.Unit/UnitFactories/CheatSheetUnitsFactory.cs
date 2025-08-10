@@ -1,9 +1,9 @@
-﻿using AimAssist.Core.Units;
+﻿using System.IO;
+using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.KeyHelp;
 using Common.UI.Commands.Shortcus;
-using System.IO;
 
-namespace AimAssist.Units.Implementation.Factories
+namespace AimAssist.Units.UnitFactories
 {
     public interface ICheatSheetUnitsFactory
     {

@@ -1,5 +1,4 @@
 ﻿using AimAssist.Core.Units;
-using AimAssist.Units.Implementation.Factories;
 using System;
 
 namespace AimAssist.Units.Implementation

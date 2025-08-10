@@ -1,9 +1,7 @@
-﻿using AimAssist.Core.Interfaces;
-using AimAssist.Core.Units;
-using AimAssist.Units.Implementation.Factories;
-using AimAssist.Units.Implementation.ClipboardAnalyzer;
+﻿using AimAssist.Core.Units;
+using AimAssist.Units.Implementation;
 
-namespace AimAssist.Units.Implementation.Factories
+namespace AimAssist.Units.UnitFactories
 {
     public class AutoDiscoveryUnitsFactory : AbstractUnitsFactory
     {

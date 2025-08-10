@@ -1,8 +1,8 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Units.Implementation;
-using AimAssist.Units.Implementation.Factories;
 using System;
 using AimAssist.Core.Units;
+using AimAssist.Units.UnitFactories;
 
 namespace AimAssist.Services.Initialization
 {

@@ -2,6 +2,7 @@
 using AimAssist.Core.Attributes;
 using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
+using Constants = AimAssist.Core.Constants;
 
 namespace AimAssist.Units.Implementation.Options
 {

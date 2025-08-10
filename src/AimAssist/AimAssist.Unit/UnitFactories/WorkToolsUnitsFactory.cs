@@ -5,7 +5,7 @@ using AimAssist.Units.Core.Units;
 using AimAssist.Units.Implementation.Options;
 using AimAssist.Units.Implementation.WorkTools;
 
-namespace AimAssist.Units.Implementation.Factories
+namespace AimAssist.Units.UnitFactories
 {
     public interface IWorkToolsUnitsFactory : IUnitsFactory, ISupportUnitsFactory
     {

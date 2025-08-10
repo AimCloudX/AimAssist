@@ -2,7 +2,7 @@
 using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Snippets;
 
-namespace AimAssist.Units.Implementation.Factories
+namespace AimAssist.Units.UnitFactories
 {
     public class SnippetSupportUnitsFactory : ISupportUnitsFactory
     {

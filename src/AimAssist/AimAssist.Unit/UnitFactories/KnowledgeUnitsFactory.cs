@@ -1,9 +1,9 @@
-﻿using AimAssist.Core.Units;
+﻿using System.IO;
+using AimAssist.Core.Units;
 using AimAssist.Units.Core.Units;
-using System.IO;
 using AimAssist.Units.Implementation.Knowledges;
 
-namespace AimAssist.Units.Implementation.Factories
+namespace AimAssist.Units.UnitFactories
 {
     public interface IKnowledgeUnitsFactory
     {

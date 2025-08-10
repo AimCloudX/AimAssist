@@ -1,8 +1,9 @@
-﻿using AimAssist.Core.Attributes;
+﻿using System.Reflection;
+using AimAssist.Core.Attributes;
 using AimAssist.Core.Units;
-using System.Reflection;
+using AimAssist.Units.Implementation;
 
-namespace AimAssist.Units.Implementation.Factories
+namespace AimAssist.Units.UnitFactories
 {
     public class ReflectionBasedUnitsFactory : AbstractUnitsFactory
     {

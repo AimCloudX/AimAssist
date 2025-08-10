@@ -1,6 +1,6 @@
 ﻿using AimAssist.Plugins;
 using AimAssist.Units.Implementation;
-using AimAssist.Units.Implementation.Factories;
+using AimAssist.Units.UnitFactories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AimAssist.DI.Modules
