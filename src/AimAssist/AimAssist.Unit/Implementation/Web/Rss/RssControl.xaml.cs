@@ -90,7 +90,7 @@ namespace AimAssist.Units.Implementation.Web.Rss
 
                     if (!string.IsNullOrEmpty(url))
                     {
-                        yield return new UrlUnit(RssMode.Instance, title, url, rssUrl.Category);
+                        yield return new UrlUnit(RssMode.Instance, title, url, "RSS_" + rssUrl.Category);
                     }
                 }
             }

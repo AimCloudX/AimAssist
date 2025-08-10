@@ -25,6 +25,6 @@ namespace AimAssist.Units.Implementation.Web.MindMeister
 
         public string Description => string.Empty;
 
-        public string Category => string.Empty;
+        public string Category => "MindMeister";
     }
 }

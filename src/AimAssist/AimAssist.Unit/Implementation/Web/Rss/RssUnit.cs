@@ -14,6 +14,6 @@ namespace AimAssist.Units.Implementation.Web.Rss
 
         public string Description => string.Empty;
 
-        public string Category => string.Empty;
+        public string Category => "RSS";
     }
 }
