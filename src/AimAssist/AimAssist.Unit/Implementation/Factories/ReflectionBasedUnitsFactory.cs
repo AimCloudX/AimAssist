@@ -51,8 +51,7 @@ namespace AimAssist.Units.Implementation.Factories
             }
 
             var sortedUnits = discoveredUnits
-                .OrderByDescending(x => x.attr.Priority)
-                .ThenBy(x => x.attr.Category)
+                .OrderByDescending(x => x.attr.Category)
                 .ThenBy(x => x.type.Name);
 
             foreach (var (unitType, attr) in sortedUnits)
@@ -60,7 +59,7 @@ namespace AimAssist.Units.Implementation.Factories
                     var unit = CreateUnitInstance(unitType);
                     if (unit != null)
                     {
-                        System.Diagnostics.Debug.WriteLine($"  Auto-registered: {unitType.Name} (Category: {attr.Category}, Priority: {attr.Priority})");
+                        System.Diagnostics.Debug.WriteLine($"  Auto-registered: {unitType.Name} (Category: {attr.Category}");
                         yield return unit;
                     }
             }

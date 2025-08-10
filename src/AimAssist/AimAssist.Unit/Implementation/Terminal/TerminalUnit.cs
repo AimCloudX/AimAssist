@@ -3,7 +3,7 @@ using AimAssist.Core.Units;
 
 namespace AimAssist.Units.Implementation.Terminal
 {
-    [AutoRegisterUnit("Terminal", Priority = 95)]
+    [AutoRegisterUnit("Terminal")]
     public class TerminalUnit : IUnit
     {
         public IMode Mode => TerminalMode.Instance;

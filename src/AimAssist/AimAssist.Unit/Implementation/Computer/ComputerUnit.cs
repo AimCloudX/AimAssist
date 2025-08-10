@@ -4,7 +4,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Computer
 {
-    [AutoRegisterUnit("System", Priority = 90)]
+    [AutoRegisterUnit("System")]
     public class ComputerUnit : IUnit
     {
         public IMode Mode => WorkToolsMode.Instance;

@@ -5,7 +5,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Git
 {
-    [AutoRegisterUnit("Git", Priority = 90, IsEnabled = true)]
+    [AutoRegisterUnit("Git", IsEnabled = true)]
     public class GitUnit : IUnit
     {
         public IMode Mode => WorkToolsMode.Instance;

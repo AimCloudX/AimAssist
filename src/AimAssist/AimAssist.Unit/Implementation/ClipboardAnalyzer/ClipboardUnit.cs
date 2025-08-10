@@ -4,7 +4,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.ClipboardAnalyzer;
 
-[AutoRegisterUnit("System", Priority = 85)]
+[AutoRegisterUnit("System")]
 public class ClipboardUnit : IUnit
 {
     public IMode Mode => WorkToolsMode.Instance;

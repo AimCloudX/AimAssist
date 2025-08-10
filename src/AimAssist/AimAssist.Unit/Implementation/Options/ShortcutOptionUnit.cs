@@ -5,7 +5,7 @@ using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Options
 {
-    [AutoRegisterUnit("Settings", Priority = 60)]
+    [AutoRegisterUnit("Settings")]
     public class ShortcutOptionUnit : IUnit
     {
         public IMode Mode => OptionMode.Instance;

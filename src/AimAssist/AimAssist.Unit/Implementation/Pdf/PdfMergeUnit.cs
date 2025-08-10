@@ -5,7 +5,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Pdf
 {
-    [AutoRegisterUnit("Document", Priority = 80)]
+    [AutoRegisterUnit("Document")]
     public class PdfMergeUnit : IUnit
     {
         public IMode Mode => WorkToolsMode.Instance;

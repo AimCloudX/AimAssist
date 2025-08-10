@@ -4,7 +4,7 @@ using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Web.MindMeister
 {
-    [AutoRegisterUnit("Web", Priority = 75)]
+    [AutoRegisterUnit("Web")]
     public class MindMeisterUnit : IUnit
     {
         public MindMeisterUnit() : this("最近開いたMap", "https://www.mindmeister.com/app/maps/recent")

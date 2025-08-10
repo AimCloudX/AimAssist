@@ -5,7 +5,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.Implementation.Apps;
 
-[AutoRegisterUnit(Constants.AppName, Priority = 80)]
+[AutoRegisterUnit(Constants.AppName)]
 public class AimAssistCommandsUnit : IUnit
 {
     public IMode Mode { get; } = WorkToolsMode.Instance;
