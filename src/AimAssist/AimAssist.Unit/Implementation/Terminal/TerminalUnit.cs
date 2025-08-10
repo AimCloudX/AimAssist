@@ -1,5 +1,6 @@
 using AimAssist.Core.Attributes;
 using AimAssist.Core.Units;
+using AimAssist.Units.Core.Units;
 
 namespace AimAssist.Units.Implementation.Terminal
 {
@@ -12,6 +13,6 @@ namespace AimAssist.Units.Implementation.Terminal
 
         public string Description => "マルチシェル対応ターミナル (PowerShell, CMD, Git Bash, WSL)";
 
-        public string Category => "System";
+        public string Category => Constants.Category.System;
     }
 }
