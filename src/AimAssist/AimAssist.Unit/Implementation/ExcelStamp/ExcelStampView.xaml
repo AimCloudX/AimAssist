@@ -1,0 +1,141 @@
+<UserControl x:Class="AimAssist.Units.Implementation.ExcelStamp.ExcelStampView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AimAssist.Units.Implementation.ExcelStamp"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="700">
+    
+    <UserControl.Resources>
+        <local:DateStampVisibilityConverter x:Key="DateStampVisibilityConverter"/>
+    </UserControl.Resources>
+    
+    <UserControl.DataContext>
+        <local:ExcelStampViewModel/>
+    </UserControl.DataContext>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- タイトル -->
+        <TextBlock Grid.Row="0" Text="Excel電子印鑑作成ツール" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+        
+        <!-- 印鑑テキスト入力 -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <Label Content="名前：" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding PersonalName, UpdateSourceTrigger=PropertyChanged}" 
+                     Height="30" FontSize="12" Padding="5"/>
+        </StackPanel>
+        
+        <!-- 印鑑設定 -->
+        <Grid Grid.Row="2" Margin="0,0,0,15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 印鑑種類選択 -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                <Label Content="印鑑の種類：" FontWeight="Bold" Margin="0,0,0,5"/>
+                <ComboBox SelectedValue="{Binding StampType, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedValuePath="Tag"
+                          Height="30" FontSize="12">
+                    <ComboBoxItem Content="丸印" Tag="Circle"/>
+                    <ComboBoxItem Content="角印" Tag="Square"/>
+                    <ComboBoxItem Content="日付印" Tag="DateStamp"/>
+                    <ComboBoxItem Content="機密" Tag="Confidential"/>
+                    <ComboBoxItem Content="承認済" Tag="Approved"/>
+                    <ComboBoxItem Content="受領" Tag="Received"/>
+                    <ComboBoxItem Content="払済" Tag="Paid"/>
+                </ComboBox>
+            </StackPanel>
+            
+            <!-- サイズとフォント -->
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    <Label Content="フォントサイズ：" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="30" FontSize="12" Padding="5"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                    <Label Content="印鑑サイズ：" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <Slider Value="{Binding StampSize, UpdateSourceTrigger=PropertyChanged}"
+                            Minimum="50" Maximum="150" Height="30" 
+                            TickFrequency="10" IsSnapToTickEnabled="True"/>
+                </StackPanel>
+            </Grid>
+            
+            <!-- 日付設定（日付印のみ） -->
+            <StackPanel Grid.Row="2" Margin="0,0,0,0"
+                        Visibility="{Binding StampType, Converter={StaticResource DateStampVisibilityConverter}}">
+                <Label Content="日付：" FontWeight="Bold" Margin="0,0,0,5"/>
+                <DatePicker SelectedDate="{Binding StampDate, UpdateSourceTrigger=PropertyChanged}"
+                           Height="30" FontSize="12"/>
+            </StackPanel>
+        </Grid>
+        
+        <!-- 詳細設定 -->
+        <Grid Grid.Row="3" Margin="0,0,0,15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 色設定 -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                <Label Content="印鑑の色：" FontWeight="Bold" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="赤" IsChecked="True" Margin="0,0,20,0" 
+                                 Command="{Binding SetColorCommand}" CommandParameter="Red"/>
+                    <RadioButton Content="青" Margin="0,0,20,0"
+                                 Command="{Binding SetColorCommand}" CommandParameter="Blue"/>
+                    <RadioButton Content="緑" Margin="0,0,20,0"
+                                 Command="{Binding SetColorCommand}" CommandParameter="Green"/>
+                    <RadioButton Content="黒" Margin="0,0,20,0"
+                                 Command="{Binding SetColorCommand}" CommandParameter="Black"/>
+                </StackPanel>
+            </StackPanel>
+            
+            <!-- 効果設定 -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,0">
+                <CheckBox Content="縦書き" IsChecked="{Binding IsVerticalText}" Margin="0,0,30,0"/>
+            </StackPanel>
+        </Grid>
+        
+        
+        <!-- プレビュー -->
+        <StackPanel Grid.Row="4" Margin="0,0,0,15">
+            <Label Content="プレビュー：" FontWeight="Bold" Margin="0,0,0,5"/>
+            <Border BorderBrush="#CCCCCC" BorderThickness="2" Padding="20" Background="#FAFAFA" MinHeight="180">
+                <Image Source="{Binding PreviewImage}" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       Stretch="None"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Border>
+        </StackPanel>
+        
+        <!-- ボタン -->
+        <Button Grid.Row="5" Content="印鑑画像をクリップボードにコピー" 
+                Command="{Binding CopyToClipboardCommand}"
+                Height="40" FontSize="14" FontWeight="Bold"
+                Background="#DC143C" Foreground="White"
+                BorderBrush="#B22222" BorderThickness="1"
+                Margin="0,10,0,0"/>
+    </Grid>
+</UserControl>
