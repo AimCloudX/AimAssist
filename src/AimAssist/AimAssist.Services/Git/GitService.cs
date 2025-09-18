@@ -132,68 +132,68 @@ namespace AimAssist.Services.Git
             return null;
         }
 
-        public async Task<bool> ExportFilesDiffAsync(string repositoryPath, string fromCommit, string toCommit, string outputDirectory)
+        
+public async Task<bool> ExportFilesDiffAsync(string repositoryPath, string fromCommit, string toCommit, string outputDirectory)
+{
+    try
+    {
+        if (!Directory.Exists(outputDirectory))
         {
-            try
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        // Get list of changed files
+        var diffCommand = $"diff --name-only {fromCommit} {toCommit}";
+        var changedFiles = await ExecuteGitCommandAsync(repositoryPath, diffCommand);
+
+        if (string.IsNullOrEmpty(changedFiles)) return true;
+
+        var files = changedFiles.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+        // Create before and after directories
+        var beforeDir = Path.Combine(outputDirectory, "before");
+        var afterDir = Path.Combine(outputDirectory, "after");
+        Directory.CreateDirectory(beforeDir);
+        Directory.CreateDirectory(afterDir);
+
+        foreach (var file in files)
+        {
+            var fileName = file.Trim();
+            if (string.IsNullOrEmpty(fileName)) continue;
+
+            // --- before (fromCommit) ---
+            var beforeContent = await ExecuteGitCommandAsync(repositoryPath, $"show {fromCommit}:{fileName}");
+            if (!string.IsNullOrEmpty(beforeContent))
             {
-                if (!Directory.Exists(outputDirectory))
-                {
-                    Directory.CreateDirectory(outputDirectory);
-                }
+                var beforePath = Path.Combine(beforeDir, fileName.Replace('/', Path.DirectorySeparatorChar));
+                var beforeFileDir = Path.GetDirectoryName(beforePath);
+                if (!Directory.Exists(beforeFileDir))
+                    Directory.CreateDirectory(beforeFileDir);
 
-                // Get list of changed files
-                var diffCommand = $"diff --name-only {fromCommit} {toCommit}";
-                var changedFiles = await ExecuteGitCommandAsync(repositoryPath, diffCommand);
-                
-                if (string.IsNullOrEmpty(changedFiles)) return true;
-
-                var files = changedFiles.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-
-                // Create before and after directories
-                var beforeDir = Path.Combine(outputDirectory, "before");
-                var afterDir = Path.Combine(outputDirectory, "after");
-                Directory.CreateDirectory(beforeDir);
-                Directory.CreateDirectory(afterDir);
-
-                foreach (var file in files)
-                {
-                    var fileName = file.Trim();
-                    if (string.IsNullOrEmpty(fileName)) continue;
-
-                    // Export file from fromCommit (before)
-                    var beforeContent = await ExecuteGitCommandAsync(repositoryPath, $"show {fromCommit}:{fileName}");
-                    if (!string.IsNullOrEmpty(beforeContent))
-                    {
-                        var beforePath = Path.Combine(beforeDir, fileName.Replace('/', Path.DirectorySeparatorChar));
-                        var beforeFileDir = Path.GetDirectoryName(beforePath);
-                        if (!Directory.Exists(beforeFileDir))
-                        {
-                            Directory.CreateDirectory(beforeFileDir);
-                        }
-                        await File.WriteAllTextAsync(beforePath, beforeContent);
-                    }
-
-                    // Export file from toCommit (after)
-                    var afterContent = await ExecuteGitCommandAsync(repositoryPath, $"show {toCommit}:{fileName}");
-                    if (!string.IsNullOrEmpty(afterContent))
-                    {
-                        var afterPath = Path.Combine(afterDir, fileName.Replace('/', Path.DirectorySeparatorChar));
-                        var afterFileDir = Path.GetDirectoryName(afterPath);
-                        if (!Directory.Exists(afterFileDir))
-                        {
-                            Directory.CreateDirectory(afterFileDir);
-                        }
-                        await File.WriteAllTextAsync(afterPath, afterContent);
-                    }
-                }
-
-                return true;
+                await File.WriteAllTextAsync(beforePath, beforeContent);
             }
-            catch
+
+            // --- after (toCommit) ---
+            var afterContent = await ExecuteGitCommandAsync(repositoryPath, $"show {toCommit}:{fileName}");
+            if (!string.IsNullOrEmpty(afterContent))
             {
-                return false;
+                var afterPath = Path.Combine(afterDir, fileName.Replace('/', Path.DirectorySeparatorChar));
+                var afterFileDir = Path.GetDirectoryName(afterPath);
+                if (!Directory.Exists(afterFileDir))
+                    Directory.CreateDirectory(afterFileDir);
+
+                await File.WriteAllTextAsync(afterPath, afterContent);
             }
         }
+
+        return true;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
 
         private async Task<string> ExecuteGitCommandAsync(string workingDirectory, string arguments)
         {
