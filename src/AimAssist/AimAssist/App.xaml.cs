@@ -10,6 +10,7 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AimAssist.Services.Initialization;
 
 namespace AimAssist
 {
@@ -35,7 +36,7 @@ namespace AimAssist
                 
                 try
                 {
-                    var initializer = _serviceProvider.GetRequiredService<Initializer>();
+                    var initializer = _serviceProvider.GetRequiredService<IApplicationInitializationService>();
                     initializer.Initialize();
                 }
                 catch (Exception ex)

@@ -10,7 +10,6 @@
     <ApplicationIcon>Resources\Icons\AimAssist.ico</ApplicationIcon>
     <SatelliteResourceLanguages>_</SatelliteResourceLanguages>
     <AlwaysCreate>true</AlwaysCreate>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
