@@ -12,7 +12,6 @@ public class HotKeyController : IDisposable
 {
     private readonly nint windowHandle;
     private readonly Dictionary<int, HotKeyItem> hotkeyList = new Dictionary<int, HotKeyItem>();
-    private ICheatSheetController? cheatSheetController;
 
     private const int WmHotkey = 0x0312;
 
@@ -22,10 +21,9 @@ public class HotKeyController : IDisposable
     [DllImport("user32.dll")]
     private static extern int UnregisterHotKey(nint hWnd, int id);
 
-    public HotKeyController(Window window, ICheatSheetController cheatSheetController)
+    public HotKeyController(Window window)
     {
         this.window = window;
-        this.cheatSheetController = cheatSheetController;
         var host = new WindowInteropHelper(window);
         windowHandle = host.Handle;
         //cheatSheetController = new CheatSheetController(window.Dispatcher);
@@ -159,7 +157,6 @@ public class HotKeyController : IDisposable
 
     public void Dispose()
     {
-        cheatSheetController?.Dispose();
         Dispose(true);
         GC.SuppressFinalize(this);
     }

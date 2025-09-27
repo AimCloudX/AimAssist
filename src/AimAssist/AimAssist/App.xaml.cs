@@ -60,9 +60,7 @@ namespace AimAssist
         private void ConfigureServices()
         {
             var services = new ServiceCollection();
-            
             services.RegisterServices();
-            services.AddSingleton<Initializer>();
             
             _serviceProvider = services.BuildServiceProvider();
             

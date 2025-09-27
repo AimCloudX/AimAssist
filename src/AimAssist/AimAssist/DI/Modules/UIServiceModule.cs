@@ -62,8 +62,7 @@ namespace AimAssist.DI.Modules
 
             services.AddTransient<WaitHotKeysWindow>(provider => new WaitHotKeysWindow(
                 provider.GetRequiredService<ICommandService>(),
-                provider.GetRequiredService<IAppCommands>(),
-                provider.GetRequiredService<ICheatSheetController>()
+                provider.GetRequiredService<IAppCommands>()
             ));
 
             return services;

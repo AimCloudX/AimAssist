@@ -15,7 +15,6 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="PDFsharp" Version="6.2.0-preview-2" />
     <PackageReference Include="System.Management" Version="10.0.0-preview.1.25080.5" />
-    <PackageReference Include="Vosk" Version="0.3.38" />
     <PackageReference Include="Whisper.net" Version="1.5.0" />
     <PackageReference Include="Whisper.net.Runtime" Version="1.5.0" />
   </ItemGroup>
