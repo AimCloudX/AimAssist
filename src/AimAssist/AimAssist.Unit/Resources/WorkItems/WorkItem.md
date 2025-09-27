@@ -7,10 +7,10 @@
 [Gemini](https://gemini.google.com/app)
 [Phind](https://www.phind.com/search?home=true)
 
+[v0 by Vercel](https://v0.dev/chat)
 -->
 
 # AIツール
-[v0 by Vercel](https://v0.dev/chat)
 [Napkin AI](https://app.napkin.ai/)
 
 # memo
@@ -29,8 +29,8 @@
 # Playground
 <!-- 
 [Colab](https://colab.research.google.com/?hl=ja)
--->
 [PlayCode](https://playcode.io/new)
+-->
 
 # Utility
 [ISBN検索ツール](https://aimcloudx.github.io/ISBNLookup/)
