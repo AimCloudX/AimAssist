@@ -18,7 +18,6 @@ namespace AimAssist.Services
     public class ConfigurationManagerService : IConfigurationManagerService
     {
         private readonly IEditorOptionService editorOptionService;
-        private readonly ISnippetOptionService snippetOptionService;
         private readonly IWorkItemOptionService workItemOptionService;
         private readonly ISettingManager settingManager;
         private readonly IApplicationLogService logService;
@@ -28,13 +27,11 @@ namespace AimAssist.Services
 
         public ConfigurationManagerService(
             IEditorOptionService editorOptionService,
-            ISnippetOptionService snippetOptionService,
             IWorkItemOptionService workItemOptionService,
             ISettingManager settingManager,
             IApplicationLogService logService)
         {
             this.editorOptionService = editorOptionService;
-            this.snippetOptionService = snippetOptionService;
             this.workItemOptionService = workItemOptionService;
             this.settingManager = settingManager;
             this.logService = logService;
@@ -45,7 +42,6 @@ namespace AimAssist.Services
         private void InitializeSections()
         {
             sections["Editor"] = new EditorConfigurationSection(editorOptionService);
-            sections["Snippet"] = new SnippetConfigurationSection(snippetOptionService);
             sections["WorkItem"] = new WorkItemConfigurationSection(workItemOptionService);
             sections["Keymap"] = new KeymapConfigurationSection(settingManager);
         }
@@ -252,44 +248,6 @@ namespace AimAssist.Services
                 "Theme" => value is string theme && !string.IsNullOrWhiteSpace(theme),
                 "FontSize" => value is int fontSize && fontSize > 0 && fontSize <= 72,
                 "TabSize" => value is int tabSize && tabSize > 0 && tabSize <= 16,
-                _ => true
-            };
-        }
-    }
-
-    public class SnippetConfigurationSection : IConfigurationSection
-    {
-        private readonly ISnippetOptionService snippetService;
-
-        public SnippetConfigurationSection(ISnippetOptionService snippetService)
-        {
-            this.snippetService = snippetService;
-        }
-
-        public T? GetValue<T>(string key, T? defaultValue = default)
-        {
-            return defaultValue;
-        }
-
-        public void SetValue<T>(string key, T value)
-        {
-        }
-
-        public void Save()
-        {
-            snippetService.SaveOption();
-        }
-
-        public void Load()
-        {
-        }
-
-        public bool ValidateValue<T>(string key, T value)
-        {
-            return key switch
-            {
-                "Timeout" => value is int timeout && timeout > 0,
-                "MaxHistoryCount" => value is int count && count > 0 && count <= 1000,
                 _ => true
             };
         }

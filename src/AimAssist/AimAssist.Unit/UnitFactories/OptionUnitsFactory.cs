@@ -14,16 +14,14 @@ namespace AimAssist.Units.UnitFactories
     {
         private readonly IWorkItemOptionService workItemOptionService;
         private readonly IEditorOptionService editorOptionService;
-        private readonly ISnippetOptionService snippetOptionService;
 
         public OptionUnitsFactory(
             IWorkItemOptionService workItemOptionService,
-            IEditorOptionService editorOptionService,
-            ISnippetOptionService snippetOptionService)
+            IEditorOptionService editorOptionService
+            )
         {
             this.workItemOptionService = workItemOptionService;
             this.editorOptionService = editorOptionService;
-            this.snippetOptionService = snippetOptionService;
         }
 
         public IEnumerable<IUnit> CreateUnits()
@@ -41,9 +39,6 @@ namespace AimAssist.Units.UnitFactories
                 lists.AddRange([editorOptionService.OptionPath]);
             }
 
-            lists.AddRange([snippetOptionService.OptionPath]);
-            lists.AddRange(snippetOptionService.Option.ItemPaths.Select(x => x.GetActualPath()));
-            
             // 依存関係があるOptionUnitのみ生成（ShortcutOptionUnitは属性で自動登録）
             yield return new OptionUnit("Option", lists);
         }

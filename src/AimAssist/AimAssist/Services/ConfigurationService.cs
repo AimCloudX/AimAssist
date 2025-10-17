@@ -16,7 +16,6 @@ namespace AimAssist.Services
     public class ConfigurationService : IConfigurationService
     {
         private readonly IEditorOptionService _editorOptionService;
-        private readonly ISnippetOptionService _snippetOptionService;
         private readonly IWorkItemOptionService _workItemOptionService;
         private readonly ISettingManager _settingManager;
         private readonly IApplicationLogService _logService;
@@ -25,13 +24,11 @@ namespace AimAssist.Services
 
         public ConfigurationService(
             IEditorOptionService editorOptionService,
-            ISnippetOptionService snippetOptionService,
             IWorkItemOptionService workItemOptionService,
             ISettingManager settingManager,
             IApplicationLogService logService)
         {
             _editorOptionService = editorOptionService;
-            _snippetOptionService = snippetOptionService;
             _workItemOptionService = workItemOptionService;
             _settingManager = settingManager;
             _logService = logService;
@@ -83,7 +80,6 @@ namespace AimAssist.Services
             {
                 _logService.Info("全設定の保存を開始します");
                 _editorOptionService.SaveOption();
-                _snippetOptionService.SaveOption();
                 _workItemOptionService.SaveOption();
                 _logService.Info("全設定の保存が完了しました");
             }

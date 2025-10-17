@@ -1,7 +1,6 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Options;
-using AimAssist.Units.Implementation.Snippets;
 using System.Windows;
 using System.Windows.Controls;
 using AimAssist.Units.ViewProviders;
@@ -76,16 +75,6 @@ namespace AimAssist.UI.UnitContentsView
             {
                 case ShortcutOptionUnit:
                     return new CustomizeKeyboardShortcutsSettings(commandService);
-                case SnippetModelUnit model:
-                    return new TextBox()
-                    {
-                        Text = model.Code,
-                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                        VerticalAlignment = VerticalAlignment.Stretch,
-                        Margin = new Thickness(0)
-                    };
-                default:
-                    break;
             }
 
             // 4. レガシー辞書による対応

@@ -119,34 +119,6 @@ namespace AimAssist.Units.Implementation.Computer.Services
             }
         }
 
-        public string GetServiceStatus()
-        {
-            try
-            {
-                var importantServices = new[] { "Dhcp", "DNSCache" };
-                var results = new List<string>();
-                
-                foreach (var serviceName in importantServices)
-                {
-                    try
-                    {
-                        using var sc = new ServiceController(serviceName);
-                        results.Add($"{sc.DisplayName}: {sc.Status}");
-                    }
-                    catch
-                    {
-                        results.Add($"{serviceName}: 不明");
-                    }
-                }
-                
-                return results.Any() ? string.Join(", ", results) : "取得できませんでした";
-            }
-            catch
-            {
-                return "取得できませんでした";
-            }
-        }
-
         public void Dispose()
         {
             cpuCounter?.Dispose();

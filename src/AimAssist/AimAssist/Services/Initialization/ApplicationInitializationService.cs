@@ -1,7 +1,6 @@
 ﻿using AimAssist.Core.Interfaces;
 using AimAssist.UI.HotKeys;
 using AimAssist.UI.SystemTray;
-using AimAssist.Units.Implementation;
 using Common.UI.Commands.Shortcus;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +11,6 @@ namespace AimAssist.Services.Initialization
         private readonly IAppCommands appCommands;
         private readonly ICommandService commandService;
         private readonly IUnitsService unitsService;
-        private readonly ISnippetOptionService snippetOptionService;
         private readonly IWorkItemOptionService workItemOptionService;
         private readonly IEditorOptionService editorOptionService;
         private readonly IServiceProvider serviceProvider;
@@ -24,7 +22,6 @@ namespace AimAssist.Services.Initialization
             IAppCommands appCommands,
             ICommandService commandService,
             IUnitsService unitsService,
-            ISnippetOptionService snippetOptionService,
             IWorkItemOptionService workItemOptionService,
             IEditorOptionService editorOptionService,
             IServiceProvider serviceProvider,
@@ -35,7 +32,6 @@ namespace AimAssist.Services.Initialization
             this.appCommands = appCommands;
             this.commandService = commandService;
             this.unitsService = unitsService;
-            this.snippetOptionService = snippetOptionService;
             this.workItemOptionService = workItemOptionService;
             this.editorOptionService = editorOptionService;
             this.serviceProvider = serviceProvider;

@@ -9,7 +9,6 @@ using AimAssist.Core.Interfaces;
 using AimAssist.Core.Units;
 using AimAssist.Units.Implementation.Caluculation;
 using AimAssist.Units.Implementation.KeyHelp;
-using AimAssist.Units.Implementation.Snippets;
 using Common.UI.Commands.Shortcus;
 using Mathos.Parser;
 using UnitViewModel = AimAssist.UI.UnitContentsView.UnitViewModel;
@@ -109,7 +108,6 @@ namespace AimAssist.UI.PickerWindows
             _processName = processName;
             _unitsService = unitsService;
             _editorOptionService = editorOptionService;
-            _mode = SnippetMode.Instance;
 
             NavigateUpCommand = new RelayCommand(NavigateUp);
             NavigateDownCommand = new RelayCommand(NavigateDown);
@@ -134,10 +132,6 @@ namespace AimAssist.UI.PickerWindows
                 if (!string.IsNullOrEmpty(_filterText) && _filterText.StartsWith('='))
                 {
                     HandleCalculationMode();
-                }
-                else
-                {
-                    HandleSnippetMode();
                 }
             };
             _filterTimer.Start();
@@ -185,29 +179,6 @@ namespace AimAssist.UI.PickerWindows
             }
         }
 
-        private void HandleSnippetMode()
-        {
-            if (Mode != SnippetMode.Instance)
-            {
-                Mode = SnippetMode.Instance;
-                UpdateCandidate();
-            }
-
-            var view = CollectionViewSource.GetDefaultView(UnitLists);
-            view.Filter = FilterUnits;
-            view.Refresh(); // フィルタの再適用を強制
-            
-            // フィルタ適用後に最初の項目を選択
-            if (UnitLists.Count > 0)
-            {
-                SelectedIndex = 0;
-                var filteredItems = view.Cast<UnitViewModel>().ToList();
-                if (filteredItems.Count > 0)
-                {
-                    SelectedUnit = filteredItems[0];
-                }
-            }
-        }
 
         private bool FilterUnits(object obj)
         {
@@ -224,17 +195,7 @@ namespace AimAssist.UI.PickerWindows
 
         private void OnSelectedUnitChanged()
         {
-            if (_selectedUnit?.Content is SnippetUnit snippetUnit)
-            {
-                // Fire-and-forget is intentional for UI responsiveness
-                _ = EditorCache.Editor?.SetTextAsync(snippetUnit.Code);
-            }
-            else if (_selectedUnit?.Content is SnippetModelUnit snippetModelUnit)
-            {
-                // Fire-and-forget is intentional for UI responsiveness
-                _ = EditorCache.Editor?.SetTextAsync(snippetModelUnit.Code);
-            }
-            else if (_selectedUnit?.Content is CalcUnit calcUnit)
+            if (_selectedUnit?.Content is CalcUnit calcUnit)
             {
                 // Fire-and-forget is intentional for UI responsiveness
                 _ = EditorCache.Editor?.SetTextAsync(calcUnit.Result);
@@ -248,6 +209,7 @@ namespace AimAssist.UI.PickerWindows
             // フィルタをクリア
             var view = CollectionViewSource.GetDefaultView(UnitLists);
             view.Filter = null;
+            Mode = CalcMode.Instance; 
             
             var units = _unitsService.CreateUnits(Mode);
 
@@ -256,10 +218,10 @@ namespace AimAssist.UI.PickerWindows
                 UnitLists.Add(UnitViewModel.Instance(unit));
             }
 
-            if (System.Windows.Clipboard.ContainsText())
-            {
-                UnitLists.Add(UnitViewModel.Instance(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
-            }
+            // if (System.Windows.Clipboard.ContainsText())
+            // {
+            //     UnitLists.Add(UnitViewModel.Instance(new SnippetUnit("Clipboard", System.Windows.Clipboard.GetText())));
+            // }
 
             var keyUnits = _unitsService.CreateUnits(KeyHelpMode.Instance);
             foreach (var unit in keyUnits)
@@ -302,19 +264,7 @@ namespace AimAssist.UI.PickerWindows
 
         private async Task ExecuteSelectedUnit()
         {
-            if (SelectedUnit?.Content is SnippetUnit)
-            {
-                var text = EditorCache.Editor?.GetText();
-                SnippetText = (text != null ? await text : string.Empty) ?? string.Empty;
-                IsClosing = true;
-            }
-            else if (SelectedUnit?.Content is SnippetModelUnit)
-            {
-                var text = EditorCache.Editor?.GetText();
-                SnippetText = (text != null ? await text : string.Empty) ?? string.Empty;
-                IsClosing = true;
-            }
-            else if (SelectedUnit?.Content is CalcUnit calcUnit)
+            if (SelectedUnit?.Content is CalcUnit calcUnit)
             {
                 SnippetText = calcUnit.Result;
                 IsClosing = true;

@@ -7,7 +7,7 @@ using AimAssist.Units.Implementation.WorkTools;
 
 namespace AimAssist.Units.UnitFactories
 {
-    public interface IWorkToolsUnitsFactory : IUnitsFactory, ISupportUnitsFactory
+    public interface IWorkToolsUnitsFactory : IUnitsFactory
     {
         IEnumerable<IUnit> CreateUnits();
     }

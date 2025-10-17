@@ -14,7 +14,6 @@ namespace AimAssist.Core.Interfaces
         IReadOnlyCollection<IMode> GetAllModes();
 
         void RegisterUnits(IUnitsFactory factory);
-        void RegisterFeatures(ISupportUnitsFactory factory);
         
         IEnumerable<IUnit> CreateUnits(IMode mode);
 

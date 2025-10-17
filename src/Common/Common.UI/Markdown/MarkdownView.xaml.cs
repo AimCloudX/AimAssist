@@ -93,7 +93,8 @@ namespace Common.UI.Markdown
             }
 
             var modifiedMarkdown = string.Join(Environment.NewLine, modifiedLines);
-            return Markdig.Markdown.ToHtml(modifiedMarkdown);
+            return modifiedMarkdown;
+            // return Markdig.Markdown.ToHtml(modifiedMarkdown);
         }
 
         private List<TreeViewItem> CreateOutline(string markdown)

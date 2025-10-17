@@ -12,7 +12,6 @@ using AimAssist.Services;
 using AimAssist.UI.UnitContentsView;
 using AimAssist.Units.Core.Modes;
 using AimAssist.Units.Core.Units;
-using AimAssist.Units.Implementation.Snippets;
 using AimAssist.Units.Implementation.Web;
 using UnitViewModel = AimAssist.UI.UnitContentsView.UnitViewModel;
 
@@ -194,11 +193,6 @@ namespace AimAssist.UI.MainWindows
 
                 foreach (var unit in units)
                 {
-                    if (unit is SnippetModelUnit && mode != SnippetMode.Instance)
-                    {
-                        continue;
-                    }
-
                     Units.Add(UnitViewModel.Instance(unit));
                 }
 

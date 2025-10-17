@@ -74,21 +74,6 @@ namespace AimAssist.Service
             }
         }
 
-        public void RegisterFeatures(ISupportUnitsFactory factory)
-        {
-            var units = factory.GetSupportUnits();
-            foreach (var unit in units)
-            {
-                if (modeDic.TryGetValue(unit.SupportTarget, out var unitLists))
-                {
-                    unitLists.Add(unit);
-                }
-                else
-                {
-                    modeDic.Add(unit.SupportTarget, new List<IUnit>() { unit });
-                }
-            }
-        }
         /// <summary>
         /// 指定したモードのユニットを作成します
         /// </summary>

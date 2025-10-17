@@ -182,7 +182,6 @@ namespace AimAssist.Units.Implementation.Computer
                     CpuUsage = performanceInfoService.GetCpuUsage(),
                     RamUsage = performanceInfoService.GetMemoryUsage(),
                     DiskUsage = performanceInfoService.GetDiskUsage(),
-                    ServiceStatus = performanceInfoService.GetServiceStatus()
                 });
 
                 await Dispatcher.InvokeAsync(() =>
@@ -190,7 +189,6 @@ namespace AimAssist.Units.Implementation.Computer
                     txtCPUUsage.Text = $"{performanceData.CpuUsage:F1}%";
                     txtMemoryUsage.Text = $"{performanceData.RamUsage:F1}%";
                     txtDiskUsage.Text = performanceData.DiskUsage;
-                    txtServiceStatus.Text = performanceData.ServiceStatus;
                 }, DispatcherPriority.Background);
             }
             catch (Exception ex)
