@@ -33,15 +33,16 @@ namespace AimAssist.UI.MainWindows
             this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
             
             InitializeComponent();
-            
+
             DataContext = this.viewModel;
-            
+
             SourceInitialized += MainWindow_SourceInitialized;
             Loaded += MainWindow_Loaded;
             Closing += MainWindow_Closing;
             KeyDown += MainWindow_KeyDown;
-            
-            RegisterCommands();
+
+            // コマンド登録を遅延実行（Factory初期化後に実行）
+            Dispatcher.BeginInvoke(new Action(RegisterCommands), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
 
         private void MainWindow_KeyDown(object? sender, KeyEventArgs e)
@@ -138,17 +139,25 @@ namespace AimAssist.UI.MainWindows
         {
             try
             {
-                // モード変更コマンドの登録
-                foreach (var mode in unitsService.GetAllModes())
+                // モード変更コマンドの登録（Units初期化完了後に実行）
+                var modes = unitsService.GetAllModes();
+                if (modes?.Any() == true)
                 {
-                    var modeChangeCommand = new RelayCommand(mode.GetModeChnageCommandName(), (window) =>
+                    foreach (var mode in modes)
                     {
-                        if (window is MainWindow mainWindow)
+                        var modeChangeCommand = new RelayCommand(mode.GetModeChnageCommandName(), (window) =>
                         {
-                            mainWindow.viewModel.SelectedMode = mode;
-                        }
-                    });
-                    commandService.Register(modeChangeCommand, mode.DefaultKeySequence);
+                            if (window is MainWindow mainWindow)
+                            {
+                                mainWindow.viewModel.SelectedMode = mode;
+                            }
+                        });
+                        commandService.Register(modeChangeCommand, mode.DefaultKeySequence);
+                    }
+                }
+                else
+                {
+                    logService.Info("モード情報が取得できません。Units初期化が未完了の可能性があります。");
                 }
 
                 // メインウィンドウ用コマンドの登録

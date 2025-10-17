@@ -17,6 +17,7 @@ namespace AimAssist.Services.Initialization
         private readonly IFileInitializationService fileInitializationService;
         private readonly IPluginInitializationService pluginInitializationService;
         private readonly IFactoryInitializationService factoryInitializationService;
+        private readonly IApplicationLogService logService;
 
         public ApplicationInitializationService(
             IAppCommands appCommands,
@@ -27,7 +28,8 @@ namespace AimAssist.Services.Initialization
             IServiceProvider serviceProvider,
             IFileInitializationService fileInitializationService,
             IPluginInitializationService pluginInitializationService,
-            IFactoryInitializationService factoryInitializationService)
+            IFactoryInitializationService factoryInitializationService,
+            IApplicationLogService logService)
         {
             this.appCommands = appCommands;
             this.commandService = commandService;
@@ -38,17 +40,74 @@ namespace AimAssist.Services.Initialization
             this.fileInitializationService = fileInitializationService;
             this.pluginInitializationService = pluginInitializationService;
             this.factoryInitializationService = factoryInitializationService;
+            this.logService = logService;
         }
 
         public void Initialize()
         {
-            InitializeCommands();
-            fileInitializationService.InitializeFiles();
-            InitializeSystemTray();
-            InitializeFactoriesAndUnits();
-            pluginInitializationService.InitializePlugins();
-            RegisterHotKeys();
-            ShowMainWindow();
+            _ = InitializeAsync();
+        }
+
+        public async Task InitializeAsync()
+        {
+            try
+            {
+                logService.Info("アプリケーション初期化を開始します");
+
+                // Phase 1: 同期的な基本初期化
+                InitializeCommands();
+                fileInitializationService.InitializeFiles();
+                InitializeSystemTray();
+                RegisterHotKeys();
+
+                // Phase 2: 非同期でFactoryとUnitsを初期化
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        InitializeFactoriesAndUnits();
+                    }
+                    catch (Exception ex)
+                    {
+                        logService.LogException(ex, "Factory初期化中にエラーが発生しました");
+                        throw;
+                    }
+                });
+
+                // Phase 3: 非同期でPluginを初期化
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        pluginInitializationService.InitializePlugins();
+                    }
+                    catch (Exception ex)
+                    {
+                        logService.LogException(ex, "Plugin初期化中にエラーが発生しました");
+                        // Pluginエラーは致命的ではないため、継続
+                    }
+                });
+
+                // Phase 4: UIスレッドでMainWindow表示
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    try
+                    {
+                        ShowMainWindow();
+                        logService.Info("アプリケーション初期化が完了しました");
+                    }
+                    catch (Exception ex)
+                    {
+                        logService.LogException(ex, "MainWindow表示中にエラーが発生しました");
+                        throw;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                logService.LogException(ex, "アプリケーション初期化中に致命的なエラーが発生しました");
+                throw;
+            }
         }
 
         private void InitializeCommands()

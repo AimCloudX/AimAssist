@@ -186,19 +186,28 @@ namespace AimAssist.UI.MainWindows
             try
             {
                 Units.Clear();
-                var units = unitsService.CreateUnits(mode).OrderBy(u => u is ISupportUnit ? 1 : 0)
-                             .ThenBy(u => unitsService.GetModeDisplayOrder(u.Mode))
-                                              .ThenBy(u => u.Category)
-                                              .ThenBy(u => u.Name);
+                var units = unitsService.CreateUnits(mode);
 
-                foreach (var unit in units)
+                if (units?.Any() == true)
                 {
-                    Units.Add(UnitViewModel.Instance(unit));
+                    var sortedUnits = units.OrderBy(u => u is ISupportUnit ? 1 : 0)
+                                         .ThenBy(u => unitsService.GetModeDisplayOrder(u.Mode))
+                                         .ThenBy(u => u.Category)
+                                         .ThenBy(u => u.Name);
+
+                    foreach (var unit in sortedUnits)
+                    {
+                        Units.Add(UnitViewModel.Instance(unit));
+                    }
+
+                    if (Units.Any())
+                    {
+                        SelectedUnit = Units.First();
+                    }
                 }
-
-                if (Units.Any())
+                else
                 {
-                    SelectedUnit = Units.First();
+                    logService.Info($"モード '{mode.Name}' にユニットが見つかりません。Factory初期化が未完了の可能性があります。");
                 }
             }
             catch (Exception ex)

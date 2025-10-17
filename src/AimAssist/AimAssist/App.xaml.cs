@@ -21,7 +21,7 @@ namespace AimAssist
         private const string PipeName = "AimAssist";
         public ServiceProvider _serviceProvider { get; private set; } = null!;
 
-        private void Application_Startup(object? sender, System.Windows.StartupEventArgs e)
+        private async void Application_Startup(object? sender, System.Windows.StartupEventArgs e)
         {
             ConfigureServices();
 
@@ -33,27 +33,47 @@ namespace AimAssist
             {
                 var logService = _serviceProvider.GetRequiredService<IApplicationLogService>();
                 ErrorHandlingHelper.SetLogService(logService);
-                
+
                 try
                 {
+                    // 非同期初期化の開始
                     var initializer = _serviceProvider.GetRequiredService<IApplicationInitializationService>();
-                    initializer.Initialize();
+                    await InitializeApplicationAsync(initializer, errorHandler);
                 }
                 catch (Exception ex)
                 {
                     errorHandler.HandleException(ex, "アプリケーション初期化エラー");
+                    Shutdown();
                     return;
                 }
 
                 ThreadPool.QueueUserWorkItem(WaitCallActivate);
-
-                var appCommands = _serviceProvider.GetRequiredService<IAppCommands>();
-                appCommands.ToggleMainWindow.Execute(this);
             }
             else
             {
                 ActivateAimAssistAnotherProcess();
                 Shutdown();
+            }
+        }
+
+        private async Task InitializeApplicationAsync(IApplicationInitializationService initializer, IErrorHandlingMiddleware errorHandler)
+        {
+            try
+            {
+                // 初期化処理を非同期で実行
+                await initializer.InitializeAsync();
+
+                // 初期化完了後にMainWindowを表示
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    var appCommands = _serviceProvider.GetRequiredService<IAppCommands>();
+                    appCommands.ToggleMainWindow.Execute(this);
+                });
+            }
+            catch (Exception ex)
+            {
+                errorHandler.HandleException(ex, "非同期初期化中にエラーが発生しました");
+                throw;
             }
         }
         
